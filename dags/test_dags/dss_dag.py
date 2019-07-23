@@ -19,12 +19,11 @@ def conditionally_trigger(context, dag_run_obj):
 
 # Define the DAG
 dag = DAG(
-    dag_id='dss_controller_dag',
-    default_args={
+    dag_id='dss_controller_dag',   default_args={
         "owner": "dss admin",
-        "start_date": datetime.utcnow(),
+        "start_date": datetime.strptime('2019-07-23 09:30:00', '%Y-%m-%d %H:%M:%S'),
     },
-    schedule_interval='@once',
+    schedule_interval='*/5 * * * *',  # should have schedule interval for executing tasks.
 )
 
 # Define the single task in this controller example DAG
