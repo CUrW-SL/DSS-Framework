@@ -1,5 +1,5 @@
 FROM centos:latest
-MAINTAINER niranda perera <niranda.17@cse.mrt.ac.lk>
+MAINTAINER Hasitha Dhananjaya <hasitha.10@cse.mrt.ac.lk>
 #
 # This Dockerfile compiles WRF from source during "docker build" step
 ENV WRF_VERSION 3.9.1.1
@@ -58,11 +58,6 @@ RUN cd ./WPS \
 ENV LD_LIBRARY_PATH /usr/lib64/openmpi/lib
 ENV PATH  /usr/lib64/openmpi/bin:$PATH
 #
-# copy in a couple custom scripts
-#COPY run-wrf /wrf
-#COPY docker-clean /wrf
-#RUN chmod +x /wrf/run-wrf \
-# && chmod +x /wrf/docker-clean
 COPY docker-clean /wrf
 RUN chmod +x /wrf/docker-clean
 #
