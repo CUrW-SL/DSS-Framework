@@ -2,10 +2,12 @@ from datetime import datetime
 
 from airflow import DAG
 from airflow.operators.dagrun_operator import TriggerDagRunOperator
-from airflow.operators import ConditionTriggerDagRunOperator
+# from airflow.operators import ConditionTriggerDagRunOperator
+from condition_dag_run_opearator import ConditionTriggerDagRunOperator
+#from airflow.operators.condition_dag_run_opearator import ConditionTriggerDagRunOperator
 
 prod_dag_name = 'dss_controller_dag'
-schedule_interval = '*/5 * * * *'
+schedule_interval = '*/10 * * * *'
 
 
 def conditionally_trigger_dss_unit1(context, dag_run_obj):
@@ -15,7 +17,7 @@ def conditionally_trigger_dss_unit1(context, dag_run_obj):
     print("Controller DAG : conditionally_trigger = {}".format(c_p))
     if context['params']['condition_param']:
         dag_run_obj.payload = {'message': context['params']['message']}
-        return dag_run_obj
+        return {'trigger_dag_id': 'wrfv4-pre-dag', 'dro': dag_run_obj}
 
 
 def conditionally_trigger_dss_unit2(context, dag_run_obj):
@@ -25,7 +27,7 @@ def conditionally_trigger_dss_unit2(context, dag_run_obj):
     print("Controller DAG : conditionally_trigger = {}".format(c_p))
     if context['params']['condition_param']:
         dag_run_obj.payload = {'message': context['params']['message']}
-        return dag_run_obj
+        return {'trigger_dag_id': 'wrfv4-E-dag', 'dro': dag_run_obj}
 
 
 def conditionally_trigger_dss_unit3(context, dag_run_obj):
@@ -35,7 +37,7 @@ def conditionally_trigger_dss_unit3(context, dag_run_obj):
     print("Controller DAG : conditionally_trigger = {}".format(c_p))
     if context['params']['condition_param']:
         dag_run_obj.payload = {'message': context['params']['message']}
-        return dag_run_obj
+        return {'trigger_dag_id': 'hec-hms-single-dag', 'dro': dag_run_obj}
 
 
 def conditionally_trigger_dss_unit4(context, dag_run_obj):
@@ -45,12 +47,12 @@ def conditionally_trigger_dss_unit4(context, dag_run_obj):
     print("Controller DAG : conditionally_trigger = {}".format(c_p))
     if context['params']['condition_param']:
         dag_run_obj.payload = {'message': context['params']['message']}
-        return dag_run_obj
+        return {'trigger_dag_id': 'flo2d-250m-dag', 'dro': dag_run_obj}
 
 
 default_args = {
         'owner': 'dss admin',
-        'start_date': datetime.strptime('2019-07-24 10:00:00', '%Y-%m-%d %H:%M:%S'),
+        'start_date': datetime.strptime('2019-07-24 11:00:00', '%Y-%m-%d %H:%M:%S'),
         'email': ['hasithadkr7.com'],
         'email_on_failure': True,
     }
