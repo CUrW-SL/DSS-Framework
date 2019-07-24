@@ -1,6 +1,7 @@
 import datetime
 import six
 from airflow.models import BaseOperator
+from airflow.plugins_manager import AirflowPlugin
 from airflow.utils import timezone
 from airflow.utils.decorators import apply_defaults
 from airflow.api.common.experimental.trigger_dag import trigger_dag
@@ -78,3 +79,9 @@ class ConditionTriggerDagRunOperator(BaseOperator):
                             replace_microseconds=False)
             else:
                 self.log.info("Criteria not met, moving on")
+
+
+class MyFirstPlugin(AirflowPlugin):
+    name = "conditional_trigger_operator"
+    operators = [ConditionTriggerDagRunOperator]
+

@@ -9,6 +9,7 @@ schedule_interval = '*/5 * * * *'
 
 
 def conditionally_trigger_dss_unit1(context, dag_run_obj):
+    print('conditionally_trigger_dss_unit1')
     """This function decides whether or not to Trigger the remote DAG"""
     c_p = context['params']['condition_param']
     print("Controller DAG : conditionally_trigger = {}".format(c_p))
@@ -18,6 +19,7 @@ def conditionally_trigger_dss_unit1(context, dag_run_obj):
 
 
 def conditionally_trigger_dss_unit2(context, dag_run_obj):
+    print('conditionally_trigger_dss_unit2')
     """This function decides whether or not to Trigger the remote DAG"""
     c_p = context['params']['condition_param']
     print("Controller DAG : conditionally_trigger = {}".format(c_p))
@@ -27,6 +29,7 @@ def conditionally_trigger_dss_unit2(context, dag_run_obj):
 
 
 def conditionally_trigger_dss_unit3(context, dag_run_obj):
+    print('conditionally_trigger_dss_unit3')
     """This function decides whether or not to Trigger the remote DAG"""
     c_p = context['params']['condition_param']
     print("Controller DAG : conditionally_trigger = {}".format(c_p))
@@ -36,6 +39,7 @@ def conditionally_trigger_dss_unit3(context, dag_run_obj):
 
 
 def conditionally_trigger_dss_unit4(context, dag_run_obj):
+    print('conditionally_trigger_dss_unit4')
     """This function decides whether or not to Trigger the remote DAG"""
     c_p = context['params']['condition_param']
     print("Controller DAG : conditionally_trigger = {}".format(c_p))
