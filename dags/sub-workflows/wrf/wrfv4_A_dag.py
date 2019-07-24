@@ -12,6 +12,8 @@ default_args = {
     'owner': 'dss admin',
     'start_date': datetime.utcnow(),
     'queue': queue,
+    'email': ['hasithadkr7.com'],
+    'email_on_failure': True,
 }
 
 download_18hr_gfs_cmd = 'echo "download_18hr_gfs_cmd"'

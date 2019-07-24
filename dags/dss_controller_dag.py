@@ -17,13 +17,15 @@ def conditionally_trigger(context, dag_run_obj):
 
 
 default_args = {
-        "owner": "dss admin",
-        "start_date": datetime.strptime('2019-07-24 02:30:00', '%Y-%m-%d %H:%M:%S'),
+        'owner': 'dss admin',
+        'start_date': datetime.strptime('2019-07-24 02:30:00', '%Y-%m-%d %H:%M:%S'),
+        'email': ['hasithadkr7.com'],
+        'email_on_failure': True,
     }
 
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
          description='Run DSS Controller DAG') as dag:
-    # Define the single task in this controller example DAG
+
     dss_unit1 = TriggerDagRunOperator(
         task_id='dss_unit1',
         trigger_dag_id="wrfv4-pre-dag",

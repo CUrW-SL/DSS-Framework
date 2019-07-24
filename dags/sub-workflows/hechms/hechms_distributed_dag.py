@@ -1,7 +1,7 @@
 from datetime import datetime
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
-
+from airflow.operators.python_operator import PythonOperator
 
 prod_dag_name = 'hec-hms-distributed-dag'
 queue = 'default'
@@ -12,6 +12,8 @@ default_args = {
     'owner': 'curwsl admin',
     'start_date': datetime.utcnow(),
     'queue': queue,
+    'email': ['hasithadkr7.com'],
+    'email_on_failure': True,
 }
 
 create_rainfall_cmd = 'echo "create_rainfall_cmd"'
@@ -20,8 +22,20 @@ run_hechms_distributed_cmd = 'echo "run_hechms_distributed_cmd"'
 
 upload_discharge_cmd = 'echo "upload_discharge_cmd"'
 
+
+def run_this_func(ds, **kwargs):
+    print("Remotely received value of {} for key=message".
+          format(kwargs['dag_run'].conf['message']))
+
+
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
          description='Run HecHms DAG') as dag:
+
+    init_hec_distributed = PythonOperator(
+        task_id='init_hec_distributed',
+        provide_context=True,
+        python_callable=run_this_func,
+    )
 
     create_rainfall = BashOperator(
         task_id='create_rainfall',
@@ -41,5 +55,5 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool,
     )
 
-    create_rainfall >> run_hechms_distributed >> upload_discharge
+    init_hec_distributed >> create_rainfall >> run_hechms_distributed >> upload_discharge
 
