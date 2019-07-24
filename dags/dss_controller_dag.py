@@ -26,7 +26,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     # Define the single task in this controller example DAG
     dss_unit1 = TriggerDagRunOperator(
         task_id='dss_unit1',
-        trigger_dag_id="dss_trigger_target_dag",
+        trigger_dag_id="wrfv4-pre-dag",
         python_callable=conditionally_trigger,
         params={'condition_param': True, 'message': 'DSS UNIT 1'},
         dag=dag,

@@ -1,7 +1,7 @@
 from datetime import datetime
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
-
+from airflow.operators.python_operator import PythonOperator
 
 prod_dag_name = 'wrfv4-E-dag'
 queue = 'default'
@@ -23,19 +23,19 @@ extract_netcdf_weather_score_cmd = 'echo "extract_netcdf_weather_score_cmd"'
 push_wrfv4_data_cmd = 'echo "push_wrfv4_data_cmd"'
 
 
+def run_this_func(ds, **kwargs):
+    print("Remotely received value of {} for key=message".
+          format(kwargs['dag_run'].conf['message']))
+
+
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
          description='Run WRF v4 E DEG') as dag:
 
-    download_18hr_gfs = BashOperator(
-        task_id='download_18hr_gfs',
-        bash_command=download_18hr_gfs_cmd,
-        pool=dag_pool,
-    )
-
-    run_wps4 = BashOperator(
-        task_id='run_wps4',
-        bash_command=run_wps4_cmd,
-        pool=dag_pool,
+    init_wrfv4_E = PythonOperator(
+        task_id='init_wrfv4_E',
+        provide_context=True,
+        python_callable=run_this_func,
+        dag=dag,
     )
 
     run_wrf4_E = BashOperator(
@@ -68,5 +68,5 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool,
     )
 
-    download_18hr_gfs >> run_wps4 >> run_wrf4_E >> extract_stations >> create_gsmap >> extract_netcdf_weather_score >> push_wrfv4_data
+    init_wrfv4_E >> run_wrf4_E >> extract_stations >> create_gsmap >> extract_netcdf_weather_score >> push_wrfv4_data
 
