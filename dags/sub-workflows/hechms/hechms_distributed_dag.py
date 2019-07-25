@@ -4,14 +4,11 @@ from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 
 prod_dag_name = 'hec-hms-distributed-dag'
-queue = 'default'
-dag_pool = 'curw_prod_runs'
 
 
 default_args = {
     'owner': 'curwsl admin',
     'start_date': datetime.utcnow(),
-    'queue': queue,
     'email': ['hasithadkr7.com'],
     'email_on_failure': True,
 }
@@ -40,19 +37,16 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     create_rainfall = BashOperator(
         task_id='create_rainfall',
         bash_command=create_rainfall_cmd,
-        pool=dag_pool,
     )
 
     run_hechms_distributed = BashOperator(
         task_id='run_hechms_distributed',
         bash_command=run_hechms_distributed_cmd,
-        pool=dag_pool,
     )
 
     upload_discharge = BashOperator(
         task_id='upload_discharge',
         bash_command=upload_discharge_cmd,
-        pool=dag_pool,
     )
 
     init_hec_distributed >> create_rainfall >> run_hechms_distributed >> upload_discharge

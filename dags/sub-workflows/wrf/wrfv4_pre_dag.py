@@ -4,14 +4,11 @@ from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 
 prod_dag_name = 'wrfv4-pre-dag'
-queue = 'default'
-dag_pool = 'curw_prod_runs'
 
 
 default_args = {
     'owner': 'dss admin',
     'start_date': datetime.utcnow(),
-    'queue': queue,
     'email': ['hasithadkr7.com'],
     'email_on_failure': True,
 }
@@ -38,13 +35,11 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     download_18hr_gfs = BashOperator(
         task_id='download_18hr_gfs',
         bash_command=download_18hr_gfs_cmd,
-        pool=dag_pool,
     )
 
     run_wps4 = BashOperator(
         task_id='run_wps4',
         bash_command=run_wps4_cmd,
-        pool=dag_pool,
     )
 
     init_wrfv4_pre >> download_18hr_gfs >> run_wps4

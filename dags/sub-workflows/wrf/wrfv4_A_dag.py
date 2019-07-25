@@ -4,14 +4,11 @@ from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 
 prod_dag_name = 'wrfv4-A-dag'
-queue = 'default'
-dag_pool = 'curw_prod_runs'
 
 
 default_args = {
     'owner': 'dss admin',
     'start_date': datetime.utcnow(),
-    'queue': queue,
     'email': ['hasithadkr7.com'],
     'email_on_failure': True,
 }
@@ -43,31 +40,26 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     run_wrf4_A = BashOperator(
         task_id='run_wrf4_A',
         bash_command=run_wrf4_A_cmd,
-        pool=dag_pool,
     )
 
     extract_stations = BashOperator(
         task_id='extract_stations',
         bash_command=extract_stations_cmd,
-        pool=dag_pool,
     )
 
     create_gsmap = BashOperator(
         task_id='create_gsmap',
         bash_command=create_gsmap_cmd,
-        pool=dag_pool,
     )
 
     extract_netcdf_weather_score = BashOperator(
         task_id='extract_netcdf_weather_score',
         bash_command=extract_netcdf_weather_score_cmd,
-        pool=dag_pool,
     )
 
     push_wrfv4_data = BashOperator(
         task_id='create_rainfall',
         bash_command=push_wrfv4_data_cmd,
-        pool=dag_pool,
     )
 
     init_wrfv4_A >> run_wrf4_A >> extract_stations >> create_gsmap >> extract_netcdf_weather_score >> push_wrfv4_data

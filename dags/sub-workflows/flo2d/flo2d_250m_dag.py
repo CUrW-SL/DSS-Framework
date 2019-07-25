@@ -4,14 +4,11 @@ from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 
 prod_dag_name = 'flo2d-250m-dag'
-queue = 'default'
-dag_pool = 'curw_prod_runs'
 
 
 default_args = {
     'owner': 'dss admin',
     'start_date': datetime.utcnow(),
-    'queue': queue,
     'email': ['hasithadkr7.com'],
     'email_on_failure': True,
 }
@@ -44,31 +41,26 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     create_raincell = BashOperator(
         task_id='create_raincell',
         bash_command=create_raincell_cmd,
-        pool=dag_pool,
     )
 
     create_inflow = BashOperator(
         task_id='create_inflow',
         bash_command=create_inflow_cmd,
-        pool=dag_pool,
     )
 
     create_outflow = BashOperator(
         task_id='create_outflow',
         bash_command=create_outflow_cmd,
-        pool=dag_pool,
     )
 
     run_flo2d_250m = BashOperator(
         task_id='run_flo2d_250m',
         bash_command=run_flo2d_250m_cmd,
-        pool=dag_pool,
     )
 
     extract_water_level = BashOperator(
         task_id='extract_water_level',
         bash_command=extract_water_level_cmd,
-        pool=dag_pool,
     )
 
     init_flo2d_250m >> create_raincell >> create_inflow >> create_outflow >> run_flo2d_250m >> extract_water_level
