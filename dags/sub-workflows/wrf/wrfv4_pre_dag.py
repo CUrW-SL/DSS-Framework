@@ -13,8 +13,8 @@ default_args = {
     'email_on_failure': True,
 }
 
-download_18hr_gfs_cmd = 'echo "download_18hr_gfs_cmd"'
-run_wps4_cmd = 'echo "run_wps4_cmd"'
+download_18hr_gfs_cmd = 'echo "download_18hr_gfs_cmd" ; sleep $[ ( $RANDOM % 10 )  + 1 ]s'
+run_wps4_cmd = 'echo "run_wps4_cmd" ; sleep $[($RANDOM % 10) + 1]s'
 
 
 def run_this_func(ds, **kwargs):

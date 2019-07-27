@@ -13,11 +13,9 @@ default_args = {
     'email_on_failure': True,
 }
 
-create_rainfall_cmd = 'echo "create_rainfall_cmd"'
-
-run_hechms_single_cmd = 'echo "run_hechms_single_cmd"'
-
-upload_discharge_cmd = 'echo "upload_discharge_cmd"'
+create_rainfall_cmd = 'echo "create_rainfall_cmd" ;sleep $[($RANDOM % 10) + 1]s'
+run_hechms_single_cmd = 'echo "run_hechms_single_cmd" ;sleep $[($RANDOM % 10) + 1]s'
+upload_discharge_cmd = 'echo "upload_discharge_cmd" ;sleep $[($RANDOM % 10) + 1]s'
 
 
 def run_this_func(ds, **kwargs):

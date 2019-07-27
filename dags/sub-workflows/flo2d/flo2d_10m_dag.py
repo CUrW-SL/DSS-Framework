@@ -14,15 +14,15 @@ default_args = {
     'email_on_failure': True,
 }
 
-create_raincell_cmd = 'echo "create_raincell_cmd"'
+create_raincell_cmd = 'echo "create_raincell_cmd" ;sleep $[($RANDOM % 10) + 1]s'
 
-create_inflow_cmd = 'echo "create_inflow_cmd"'
+create_inflow_cmd = 'echo "create_inflow_cmd" ;sleep $[($RANDOM % 10) + 1]s'
 
-create_outflow_cmd = 'echo "create_outflow_cmd"'
+create_outflow_cmd = 'echo "create_outflow_cmd" ;sleep $[($RANDOM % 10) + 1]s'
 
-run_flo2d_10m_cmd = 'echo "run_flo2d_10m_cmd"'
+run_flo2d_10m_cmd = 'echo "run_flo2d_10m_cmd" ;sleep $[($RANDOM % 10) + 1]s'
 
-extract_water_level_cmd = 'echo "extract_water_level_cmd"'
+extract_water_level_cmd = 'echo "extract_water_level_cmd" ;sleep $[($RANDOM % 10) + 1]s'
 
 
 def run_this_func(ds, **kwargs):

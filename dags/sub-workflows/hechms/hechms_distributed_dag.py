@@ -7,17 +7,15 @@ prod_dag_name = 'hec-hms-distributed-dag'
 
 
 default_args = {
-    'owner': 'curwsl admin',
+    'owner': 'dss admin',
     'start_date': datetime.utcnow(),
     'email': ['hasithadkr7.com'],
     'email_on_failure': True,
 }
 
-create_rainfall_cmd = 'echo "create_rainfall_cmd"'
-
-run_hechms_distributed_cmd = 'echo "run_hechms_distributed_cmd"'
-
-upload_discharge_cmd = 'echo "upload_discharge_cmd"'
+create_rainfall_cmd = 'echo "create_rainfall_cmd" ;sleep $[($RANDOM % 10) + 1]s'
+run_hechms_distributed_cmd = 'echo "run_hechms_distributed_cmd" ;sleep $[($RANDOM % 10) + 1]s'
+upload_discharge_cmd = 'echo "upload_discharge_cmd" ;sleep $[($RANDOM % 10) + 1]s'
 
 
 def run_this_func(ds, **kwargs):

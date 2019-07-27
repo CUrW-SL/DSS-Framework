@@ -13,13 +13,13 @@ default_args = {
     'email_on_failure': True,
 }
 
-download_18hr_gfs_cmd = 'echo "download_18hr_gfs_cmd"'
-run_wps4_cmd = 'echo "run_wps4_cmd"'
-run_wrf4_A_cmd = 'echo "run_wrf4_A_cmd"'
-extract_stations_cmd = 'echo "extract_stations_cmd"'
-create_gsmap_cmd = 'echo "create_gsmap_cmd"'
-extract_netcdf_weather_score_cmd = 'echo "extract_netcdf_weather_score_cmd"'
-push_wrfv4_data_cmd = 'echo "push_wrfv4_data_cmd"'
+download_18hr_gfs_cmd = 'echo "download_18hr_gfs_cmd" ;sleep $[($RANDOM % 10) + 1]s'
+run_wps4_cmd = 'echo "run_wps4_cmd" ;sleep $[($RANDOM % 10) + 1]s'
+run_wrf4_A_cmd = 'echo "run_wrf4_A_cmd" ;sleep $[($RANDOM % 10) + 1]s'
+extract_stations_cmd = 'echo "extract_stations_cmd" ;sleep $[($RANDOM % 10) + 1]s'
+create_gsmap_cmd = 'echo "create_gsmap_cmd" ;sleep $[($RANDOM % 10) + 1]s'
+extract_netcdf_weather_score_cmd = 'echo "extract_netcdf_weather_score_cmd" ;sleep $[($RANDOM % 10) + 1]s'
+push_wrfv4_data_cmd = 'echo "push_wrfv4_data_cmd" ;sleep $[($RANDOM % 10) + 1]s'
 
 
 def run_this_func(ds, **kwargs):
