@@ -1,0 +1,17 @@
+{
+  "rule_id": "rule2",
+  "enable": "true",
+  "rule_type": "accuracy",
+  "variable": "discharge",
+  "station_list": [
+    "station1",
+    "station2",
+    "station3",
+    "station4",
+    "station5",
+    "station6"
+  ],
+  "percentage": "60",
+  "ts_start_date_time": "",
+  "ts_end_date_time": ""
+}

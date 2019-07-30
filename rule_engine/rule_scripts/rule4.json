@@ -1,0 +1,12 @@
+{
+  "rule_id": "rule4",
+  "enable": "true",
+  "rule_type": "exec",
+  "target_model": "FLO2D",
+  "trigger": {
+    "target_trigger": "flo2d_150m",
+    "data_from": "hechms1"
+  },
+  "exec_date": "",
+  "exec_time": ""
+}

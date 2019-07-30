@@ -1,0 +1,22 @@
+{
+  "rule_id": "rule5",
+  "enable": "true",
+  "rule_type": "accuracy",
+  "variable": "waterlevel",
+  "station_list": [
+    "station1",
+    "station2",
+    "station3",
+    "station4",
+    "station5",
+    "station6",
+    "station7",
+    "station8",
+    "station9",
+    "station10",
+    "station11"
+  ],
+  "percentage": "65",
+  "ts_start_date_time": "",
+  "ts_end_date_time": ""
+}

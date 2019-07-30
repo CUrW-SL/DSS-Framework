@@ -1,0 +1,13 @@
+{
+  "rule_id": "rule1",
+  "enable": "true",
+  "rule_type": "exec",
+  "target_model": "HECHMS",
+  "trigger" :
+      {
+        "target_trigger": "hechms1",
+        "data_from": "wrfA"
+      },
+  "exec_date": "",
+  "exec_time": ""
+}

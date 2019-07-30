@@ -1,0 +1,31 @@
+{
+  "rule_id": "rule6",
+  "enable": "true",
+  "rule_type": "alert",
+  "variable": "waterlevel",
+  "max_limits" : [
+    {
+      "station1": 1.3
+    },
+    {
+      "station2": 1.8
+    },
+    {
+      "station3": 1.6
+    },
+    {
+      "station4": 1.5
+    },
+    {
+      "station5": 1.4
+    },
+    {
+      "station6": 1.7
+    },
+    {
+      "station7": 1.6
+    }
+  ],
+  "ts_start_date_time": "",
+  "ts_end_date_time": ""
+}
