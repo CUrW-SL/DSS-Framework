@@ -1,0 +1,13 @@
+{
+  "priority" : 1,
+  "rule_id": "rule0",
+  "enable": "true",
+  "rule_type": "exec",
+  "target_model": "WRF",
+  "trigger": {
+    "target_trigger": "wrfv4-E-dag",
+    "data_from": ""
+  },
+  "exec_date": "",
+  "exec_time": ""
+}

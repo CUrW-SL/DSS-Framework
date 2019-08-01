@@ -1,4 +1,5 @@
 {
+  "priority": 4,
   "rule_id": "rule3",
   "enable": "true",
   "rule_type": "exec",

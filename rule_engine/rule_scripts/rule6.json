@@ -1,4 +1,5 @@
 {
+  "priority": 7,
   "rule_id": "rule6",
   "enable": "true",
   "rule_type": "alert",
