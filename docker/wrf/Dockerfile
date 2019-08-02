@@ -60,5 +60,46 @@ RUN cd ./WPS \
  && sed -i -e 's/-L$(NETCDF)\/lib/-L$(NETCDF)\/lib -lnetcdff /' ./configure.wps \
  && /bin/csh ./compile
 
+ENV LD_LIBRARY_PATH /usr/lib64/openmpi/lib
+ENV PATH  /usr/lib64/openmpi/bin:$PATH
 
+COPY docker-clean /wrf
+RUN chmod +x /wrf/docker-clean
 
+# set up ssh configuration
+COPY ssh_config /root/.ssh/config
+RUN mkdir -p /root/.openmpi
+COPY default-mca-params.conf /root/.openmpi/mca-params.conf
+RUN yum clean all \
+    && /wrf/docker-clean \
+    && mkdir -p /var/run/sshd \
+    && ssh-keygen -A \
+    && sed -i 's/#PermitRootLogin yes/PermitRootLogin yes/g' /etc/ssh/sshd_config \
+    && sed -i 's/#RSAAuthentication yes/RSAAuthentication yes/g' /etc/ssh/sshd_config \
+    && sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/g' /etc/ssh/sshd_config \
+    && ssh-keygen -f /root/.ssh/id_rsa -t rsa -N '' \
+    && chmod 600 /root/.ssh/config \
+    && chmod 700 /root/.ssh \
+    && cp /root/.ssh/id_rsa.pub /root/.ssh/authorized_keys
+#
+
+RUN yum -y install https://centos7.iuscommunity.org/ius-release.rpm
+RUN yum -y install git python36u python36u-pip python36u-devel
+RUN pip3.6 install joblib shapely
+
+# install gcsfuse
+RUN echo $'[gcsfuse] \nname=gcsfuse (packages.cloud.google.com) \nbaseurl=https://packages.cloud.google.com/yum/repos/gcsfuse-el7-x86_64 \nenabled=1 \ngpgcheck=1 \nrepo_gpgcheck=1 \ngpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg \n       https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg '\
+       > /etc/yum.repos.d/gcsfuse.repo
+RUN yum -y update
+RUN yum -y install gcsfuse
+
+# curwsl git repo
+RUN cd /wrf
+RUN mkdir gfs output geog archive config
+
+COPY run_wrf.sh /wrf
+RUN chmod +x /wrf/run_wrf.sh
+
+CMD ["/wrf/run_wrf.sh"]
+
+VOLUME /wrf
