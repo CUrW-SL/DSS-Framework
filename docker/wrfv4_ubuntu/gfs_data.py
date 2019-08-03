@@ -18,6 +18,13 @@ logging.basicConfig(filename='/home/uwcc-admin/hasitha/Build_WRF/logs/gfs_data.l
 log = logging.getLogger()
 
 
+class GfsDataUnavailable(Exception):
+    def __init__(self, msg, missing_data):
+        self.msg = msg
+        self.missing_data = missing_data
+        Exception.__init__(self, 'Unable to download %s' % msg)
+
+
 def create_dir_if_not_exists(path):
     if not os.path.exists(path):
         os.makedirs(path)
@@ -169,6 +176,35 @@ def download_gfs_data(start_date):
         
     except Exception as e:
         log.error('Downloading GFS data error: {}'.format(str(e)))
+
+
+def get_gfs_data_dest(inv, date_str, cycle, fcst_id, res, gfs_dir):
+    inv0 = inv.replace('CC', cycle).replace('FFF', fcst_id).replace('RRRR', res)
+    dest = os.path.join(gfs_dir, date_str + '.' + inv0)
+    return dest
+
+
+def get_gfs_inventory_dest_list(date, period, inv, step, cycle, res, gfs_dir):
+    date_str = date.strftime('%Y%m%d')
+    return [get_gfs_data_dest(inv, date_str, cycle, str(i).zfill(3), res, gfs_dir) for i in
+            range(0, period * 24 + 1, step)]
+
+
+def check_gfs_data_availability(date, wrf_config):
+    log.info('Checking gfs data availability...')
+    inventories = get_gfs_inventory_dest_list(date, wrf_config['period'], wrf_config['gfs_inv'],
+                                                    wrf_config['gfs_step'], wrf_config['gfs_cycle'],
+                                                    wrf_config['gfs_res'], wrf_config['gfs_dir'])
+    missing_inv = []
+    for inv in inventories:
+        if not os.path.exists(inv):
+            missing_inv.append(inv)
+
+    if len(missing_inv) > 0:
+        log.error('Some data unavailable')
+        raise GfsDataUnavailable('Some data unavailable', missing_inv)
+
+    log.info('GFS data available')
 
 
 if __name__ == '__main__':
