@@ -329,41 +329,6 @@ def run_em_real(wrf_config):
     utils.delete_files_with_prefix(em_real_dir, 'rsl*')
     os.remove(metgrid_zip)
 
-
-# def run_wrf(date, wrf_config):
-#     end = date + dt.timedelta(days=wrf_config.get('period'))
-#
-#     logging.info('Running WRF from %s to %s...' % (date.strftime('%Y%m%d'), end.strftime('%Y%m%d')))
-#
-#     wrf_home = wrf_config.get('wrf_home')
-#     check_gfs_data_availability(date, wrf_config)
-#
-#     replace_namelist_wps(wrf_config, date, end)
-#     run_wps(wrf_home, date)
-#
-#     replace_namelist_input(wrf_config, date, end)
-#     run_em_real(wrf_home, date, wrf_config.get('procs'))
-#
-#     logging.info('Moving the WRF files to output directory')
-#     utils.move_files_with_prefix(utils.get_em_real_dir(wrf_home), 'wrfout_d*', utils.get_output_dir(wrf_home))
-
-
-# def run_all(wrf_conf, start_date, end_date):
-#     logging.info('Running WRF model from %s to %s' % (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d')))
-#
-#     logging.info('WRF conf\n %s' % wrf_conf.to_string())
-#
-#     dates = np.arange(start_date, end_date, dt.timedelta(days=1)).astype(dt.datetime)
-#
-#     for date in dates:
-#         logging.info('Creating GFS context')
-#         logging.info('Downloading GFS Data for %s period %d' % (date.strftime('%Y-%m-%d'), wrf_conf.get('period')))
-#         download_gfs_data(date, wrf_conf)
-#
-#         logging.info('Running WRF %s period %d' % (date.strftime('%Y-%m-%d'), wrf_conf.get('period')))
-#         run_wrf(date, wrf_conf)
-
-
 class UnableToDownloadGfsData(Exception):
     def __init__(self, msg):
         self.msg = msg
