@@ -4,6 +4,7 @@
     "gfs_dir": "/mnt/disks/workspace1/wrf-data/gfs",
     "geog_dir": "/mnt/disks/workspace1/wrf-data/geog",
     "nfs_dir": "/mnt/disks/workspace1/wrf-data/nfs",
+    "archive_dir": "/mnt/disks/workspace1/wrf-data/archive",
     "period": 3,
     "namelist_input": "namelist.input",
     "namelist_wps": "namelist.wps",

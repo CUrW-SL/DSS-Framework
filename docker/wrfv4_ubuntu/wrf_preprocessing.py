@@ -7,6 +7,7 @@ import re
 import shlex
 import shutil
 import subprocess
+import traceback
 from datetime import datetime, timedelta
 import math
 import time
@@ -143,17 +144,15 @@ def datetime_floor(timestamp, floor_sec):
 
 
 def get_appropriate_gfs_inventory(wrf_config):
-    st = datetime_floor(datetime.strptime(wrf_config.get('start_date'), '%Y-%m-%d_%H:%M'), 3600 * wrf_config.get(
-        'gfs_step'))
+    st = datetime_floor(datetime.strptime(wrf_config['start_date'], '%Y-%m-%d_%H:%M'), 3600 * wrf_config['gfs_step'])
     # if the time difference between now and start time is lt gfs_lag, then the time will be adjusted
-    if (datetime.utcnow() - st).total_seconds() <= wrf_config.get('gfs_lag') * 3600:
-        floor_val = datetime_floor(st - timedelta(hours=wrf_config.get('gfs_lag')), 6 * 3600)
+    if (datetime.utcnow() - st).total_seconds() <= wrf_config['gfs_lag'] * 3600:
+        floor_val = datetime_floor(st - timedelta(hours=wrf_config['gfs_lag']), 6 * 3600)
     else:
         floor_val = datetime_floor(st, 6 * 3600)
     gfs_date = floor_val.strftime('%Y%m%d')
     gfs_cycle = str(floor_val.hour).zfill(2)
-    start_inv = math.floor((st - floor_val).total_seconds() / 3600 / wrf_config.get('gfs_step')) * wrf_config.get(
-        'gfs_step')
+    start_inv = math.floor((st - floor_val).total_seconds() / 3600 / wrf_config['gfs_step']) * wrf_config['gfs_step']
 
     return gfs_date, gfs_cycle, start_inv
 
@@ -164,7 +163,7 @@ def download_parallel(url_dest_list, procs=multiprocessing.cpu_count(), retries=
         delayed(download_file)(i[0], i[1], retries, delay, overwrite, secondary_dest_dir) for i in url_dest_list)
 
 
-def download_gfs_data(start_date, wrf_conf):
+def download_gfs_data(wrf_conf):
     """
     :param start_date: '2017-08-27_00:00'
     :return:
@@ -172,18 +171,18 @@ def download_gfs_data(start_date, wrf_conf):
     log.info('Downloading GFS data: START')
     try:
         gfs_date, gfs_cycle, start_inv = get_appropriate_gfs_inventory(wrf_conf)
-        inventories = get_gfs_inventory_url_dest_list(gfs_date, wrf_conf.get('period'),
-                                                          wrf_conf.get('gfs_url'),
-                                                          wrf_conf.get('gfs_inv'), wrf_conf.get('gfs_step'),
-                                                          gfs_cycle, wrf_conf.get('gfs_res'),
-                                                          wrf_conf.get('gfs_dir'), start=start_inv)
-        gfs_threads = wrf_conf.get('gfs_threads')
+        inventories = get_gfs_inventory_url_dest_list(gfs_date, wrf_conf['period'],
+                                                          wrf_conf['gfs_url'],
+                                                          wrf_conf['gfs_inv'], wrf_conf['gfs_step'],
+                                                          gfs_cycle, wrf_conf['gfs_res'],
+                                                          wrf_conf['gfs_dir'], start=start_inv)
+        gfs_threads = wrf_conf['gfs_threads']
         log.info('Following data will be downloaded in %d parallel threads\n%s' % (gfs_threads, '\n'.join(
                     ' '.join(map(str, i)) for i in inventories)))
 
         start_time = time.time()
-        download_parallel(inventories, procs=gfs_threads, retries=wrf_conf.get('gfs_retries'),
-                              delay=wrf_conf.get('gfs_delay'), secondary_dest_dir=None)
+        download_parallel(inventories, procs=gfs_threads, retries=wrf_conf['gfs_retries'],
+                              delay=wrf_conf['gfs_delay'], secondary_dest_dir=None)
 
         elapsed_time = time.time() - start_time
         log.info('Downloading GFS data: END Elapsed time: %f' % elapsed_time)
@@ -287,8 +286,23 @@ def replace_namelist_wps(wrf_config, start_date=None, end_date=None):
         f = get_resource_path(os.path.join('execution', constants.DEFAULT_NAMELIST_WPS_TEMPLATE))
 
     dest = os.path.join(get_wps_dir(wrf_config['wrf_home']), 'namelist.wps')
-    start_date = datetime.strptime(start_date, '%Y-%m-%d_%H:%M')
+    start_date = datetime.strptime(wrf_config['start_date'], '%Y-%m-%d_%H:%M')
     replace_file_with_values_with_dates(wrf_config, f, dest, 'namelist_wps_dict', start_date, end_date)
+
+
+def replace_namelist_input(wrf_config, start_date=None, end_date=None):
+    log.info('Replacing namelist.input ...')
+    if os.path.exists(wrf_config.get('namelist_input')):
+        f = wrf_config.get('namelist_input')
+    else:
+        f = get_resource_path(os.path.join('execution', constants.DEFAULT_NAMELIST_INPUT_TEMPLATE))
+
+    dest = os.path.join(get_em_real_dir(wrf_config.get('wrf_home')), 'namelist.input')
+    replace_file_with_values_with_dates(wrf_config, f, dest, 'namelist_input_dict', start_date, end_date)
+
+
+def get_em_real_dir(wrf_home=constants.DEFAULT_WRF_HOME):
+    return os.path.join(wrf_home, constants.DEFAULT_EM_REAL_PATH)
 
 
 def delete_files_with_prefix(src_dir, prefix):
@@ -413,19 +427,148 @@ def run_wps(wrf_config):
     move_files_with_prefix(wps_dir, metgrid_zip, dest_dir)
 
 
+def get_incremented_dir_path(path):
+    """
+    returns the incremented dir path
+    ex: /a/b/c/0 if not exists returns /a/b/c/0 else /a/b/c/1
+    :param path:
+    :return:
+    """
+    while os.path.exists(path):
+        try:
+            base = str(int(os.path.basename(path)) + 1)
+            path = os.path.join(os.path.dirname(path), base)
+        except ValueError:
+            path = os.path.join(path, '0')
+
+    return path
+
+
+def backup_dir(path):
+    bck_str = '__backup'
+    if os.path.exists(path):
+        bck_files = [l for l in os.listdir(path) if bck_str not in l]
+        if len(bck_files) > 0:
+            bck_dir = get_incremented_dir_path(os.path.join(path, bck_str))
+            os.makedirs(bck_dir)
+            for file in bck_files:
+                shutil.move(os.path.join(path, file), bck_dir)
+            return bck_dir
+
+    return None
+
+
+def copy_files_with_prefix(src_dir, prefix, dest_dir):
+    create_dir_if_not_exists(dest_dir)
+    for filename in glob.glob(os.path.join(src_dir, prefix)):
+        shutil.copy(filename, os.path.join(dest_dir, ntpath.basename(filename)))
+
+
+def run_subprocess(cmd, cwd=None, print_stdout=False):
+    log.info('Running subprocess %s cwd %s' % (cmd, cwd))
+    start_t = time.time()
+    output = ''
+    try:
+        output = subprocess.check_output(shlex.split(cmd), stderr=subprocess.STDOUT, cwd=cwd)
+    except subprocess.CalledProcessError as e:
+        log.error('Exception in subprocess %s! Error code %d' % (cmd, e.returncode))
+        log.error(e.output)
+        raise e
+    finally:
+        elapsed_t = time.time() - start_t
+        log.info('Subprocess %s finished in %f s' % (cmd, elapsed_t))
+        if print_stdout:
+            log.info('stdout and stderr of %s\n%s' % (cmd, output))
+    return output
+
+
+def run_em_real(wrf_config):
+    log.info('Running em_real...')
+
+    wrf_home = wrf_config['wrf_home']
+    em_real_dir = get_em_real_dir(wrf_home)
+    procs = wrf_config['procs']
+    run_id = wrf_config['run_id']
+    output_dir = create_dir_if_not_exists(os.path.join(wrf_config['nfs_dir'], 'results', run_id, 'wrf'))
+    archive_dir = create_dir_if_not_exists(os.path.join(wrf_config['archive_dir'], 'results', run_id, 'wrf'))
+
+    log.info('Backup the output dir')
+    backup_dir(output_dir)
+
+    logs_dir = create_dir_if_not_exists(os.path.join(output_dir, 'logs'))
+
+    log.info('Copying metgrid.zip')
+    metgrid_dir = os.path.join(wrf_config['nfs_dir'], 'metgrid')
+    # if wrf_config.is_set('wps_run_id'):
+    #     log.info('wps_run_id is set. Copying metgrid from ' + wrf_config['wps_run_id'])
+    #     copy_files_with_prefix(metgrid_dir, wrf_config['wps_run_id'] + '_metgrid.zip', em_real_dir)
+    #     metgrid_zip = os.path.join(em_real_dir, wrf_config['wps_run_id'] + '_metgrid.zip')
+    # else:
+    copy_files_with_prefix(metgrid_dir, wrf_config['run_id'] + '_metgrid.zip', em_real_dir)
+    metgrid_zip = os.path.join(em_real_dir, wrf_config['run_id'] + '_metgrid.zip')
+
+    log.info('Extracting metgrid.zip')
+    ZipFile(metgrid_zip, 'r', compression=ZIP_DEFLATED).extractall(path=em_real_dir)
+
+    # logs destination: nfs/logs/xxxx/rsl*
+    try:
+        try:
+            log.info('Starting real.exe')
+            print('em_real_dir : ', em_real_dir)
+            run_subprocess('mpirun -np %d ./real.exe' % procs, cwd=em_real_dir)
+        finally:
+            log.info('Moving Real log files...')
+            create_zip_with_prefix(em_real_dir, 'rsl*', os.path.join(em_real_dir, 'real_rsl.zip'), clean_up=True)
+            move_files_with_prefix(em_real_dir, 'real_rsl.zip', logs_dir)
+        try:
+            log.info('Starting wrf.exe')
+            run_subprocess('mpirun -np %d ./wrf.exe' % procs, cwd=em_real_dir)
+        finally:
+            log.info('Moving WRF log files...')
+            create_zip_with_prefix(em_real_dir, 'rsl*', os.path.join(em_real_dir, 'wrf_rsl.zip'), clean_up=True)
+            move_files_with_prefix(em_real_dir, 'wrf_rsl.zip', logs_dir)
+    finally:
+        log.info('Moving namelist input file')
+        move_files_with_prefix(em_real_dir, 'namelist.input', output_dir)
+
+    log.info('WRF em_real: DONE! Moving data to the output dir')
+
+    log.info('Extracting rf from domain3')
+    d03_nc = glob.glob(os.path.join(em_real_dir, 'wrfout_d03_*'))[0]
+    ncks_query = 'ncks -v %s %s %s' % ('RAINC,RAINNC,XLAT,XLONG,Times', d03_nc, d03_nc + '_rf')
+    run_subprocess(ncks_query)
+
+    log.info('Extracting rf from domain1')
+    d01_nc = glob.glob(os.path.join(em_real_dir, 'wrfout_d01_*'))[0]
+    ncks_query = 'ncks -v %s %s %s' % ('RAINC,RAINNC,XLAT,XLONG,Times', d01_nc, d01_nc + '_rf')
+    run_subprocess(ncks_query)
+
+    log.info('Moving data to the output dir')
+    move_files_with_prefix(em_real_dir, 'wrfout_d03*_rf', output_dir)
+    move_files_with_prefix(em_real_dir, 'wrfout_d01*_rf', output_dir)
+    log.info('Moving data to the archive dir')
+    move_files_with_prefix(em_real_dir, 'wrfout_*', archive_dir)
+
+    log.info('Cleaning up files')
+    delete_files_with_prefix(em_real_dir, 'met_em*')
+    delete_files_with_prefix(em_real_dir, 'rsl*')
+    os.remove(metgrid_zip)
+
+
 if __name__ == '__main__':
     with open('wrfv4_config.json') as json_file:
         config = json.load(json_file)
         wrf_conf = config['wrf_config']
-        #download_gfs_data('2019-08-02_00:00', wrf_conf)
-        #replace_namelist_wps(wrf_conf, '2019-08-02_00:00')
-        wrf_conf['run_id'] = 'test_run1_04_02_2019'
-        wrf_conf['start_date'] = '2019-08-02_00:00'
-        #run_wps(wrf_conf)
+        wrf_conf['run_id'] = 'test_run2_04_02_2019'
+        wrf_conf['start_date'] = '2019-08-03_00:00'
+        download_gfs_data(wrf_conf)
+        replace_namelist_wps(wrf_conf)
+        run_wps(wrf_conf)
         log.info('Cleaning up wps dir...')
         wps_dir = get_wps_dir(wrf_conf['wrf_home'])
         shutil.rmtree(wrf_conf['gfs_dir'])
         delete_files_with_prefix(wps_dir, 'FILE:*')
         delete_files_with_prefix(wps_dir, 'PFILE:*')
         delete_files_with_prefix(wps_dir, 'geo_em.*')
+        run_em_real(wrf_conf)
 
