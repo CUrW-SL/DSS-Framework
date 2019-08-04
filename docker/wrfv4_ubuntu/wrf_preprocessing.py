@@ -392,6 +392,7 @@ def run_wps(wrf_config):
     gfs_date, gfs_cycle, start = get_appropriate_gfs_inventory(wrf_config)
     dest = get_gfs_data_url_dest_tuple(wrf_config['gfs_url'], wrf_config['gfs_inv'], gfs_date, gfs_cycle,
                                              '', wrf_config['gfs_res'], '')[1].replace('.grb2', '')
+    print('wps_dir : ', wps_dir)
     run_subprocess(
         'csh link_grib.csh %s/%s' % (wrf_config['gfs_dir'], dest), cwd=wps_dir)
     try:
@@ -515,14 +516,15 @@ def run_em_real(wrf_config):
         try:
             log.info('Starting real.exe')
             print('em_real_dir : ', em_real_dir)
-            run_subprocess('mpirun -np %d ./real.exe' % procs, cwd=em_real_dir)
+            #run_subprocess('mpirun --allow-run-as-root -np %d ./real.exe' % procs, cwd=em_real_dir)
+            run_subprocess('./real.exe', cwd=em_real_dir)
         finally:
             log.info('Moving Real log files...')
             create_zip_with_prefix(em_real_dir, 'rsl*', os.path.join(em_real_dir, 'real_rsl.zip'), clean_up=True)
             move_files_with_prefix(em_real_dir, 'real_rsl.zip', logs_dir)
         try:
             log.info('Starting wrf.exe')
-            run_subprocess('mpirun -np %d ./wrf.exe' % procs, cwd=em_real_dir)
+            run_subprocess('./wrf.exe', cwd=em_real_dir)
         finally:
             log.info('Moving WRF log files...')
             create_zip_with_prefix(em_real_dir, 'rsl*', os.path.join(em_real_dir, 'wrf_rsl.zip'), clean_up=True)
