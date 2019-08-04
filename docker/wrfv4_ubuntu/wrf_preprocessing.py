@@ -292,12 +292,14 @@ def replace_namelist_wps(wrf_config, start_date=None, end_date=None):
 
 def replace_namelist_input(wrf_config, start_date=None, end_date=None):
     log.info('Replacing namelist.input ...')
-    if os.path.exists(wrf_config.get('namelist_input')):
-        f = wrf_config.get('namelist_input')
+    if os.path.exists(wrf_config['namelist_input']):
+        f = wrf_config['namelist_input']
     else:
         f = get_resource_path(os.path.join('execution', constants.DEFAULT_NAMELIST_INPUT_TEMPLATE))
-
-    dest = os.path.join(get_em_real_dir(wrf_config.get('wrf_home')), 'namelist.input')
+    print('replace_namelist_input|source : ', f)
+    dest = os.path.join(get_em_real_dir(wrf_config['wrf_home']), 'namelist.input')
+    print('replace_namelist_input|dest : ', dest)
+    start_date = datetime.strptime(wrf_config['start_date'], '%Y-%m-%d_%H:%M')
     replace_file_with_values_with_dates(wrf_config, f, dest, 'namelist_input_dict', start_date, end_date)
 
 
@@ -392,7 +394,7 @@ def run_wps(wrf_config):
     gfs_date, gfs_cycle, start = get_appropriate_gfs_inventory(wrf_config)
     dest = get_gfs_data_url_dest_tuple(wrf_config['gfs_url'], wrf_config['gfs_inv'], gfs_date, gfs_cycle,
                                              '', wrf_config['gfs_res'], '')[1].replace('.grb2', '')
-    print('wps_dir : ', wps_dir)
+    print('----------------------wps_dir : ', wps_dir)
     run_subprocess(
         'csh link_grib.csh %s/%s' % (wrf_config['gfs_dir'], dest), cwd=wps_dir)
     try:
@@ -500,6 +502,7 @@ def run_em_real(wrf_config):
 
     log.info('Copying metgrid.zip')
     metgrid_dir = os.path.join(wrf_config['nfs_dir'], 'metgrid')
+    print()
     # if wrf_config.is_set('wps_run_id'):
     #     log.info('wps_run_id is set. Copying metgrid from ' + wrf_config['wps_run_id'])
     #     copy_files_with_prefix(metgrid_dir, wrf_config['wps_run_id'] + '_metgrid.zip', em_real_dir)
@@ -561,16 +564,19 @@ if __name__ == '__main__':
     with open('wrfv4_config.json') as json_file:
         config = json.load(json_file)
         wrf_conf = config['wrf_config']
-        wrf_conf['run_id'] = 'test_run2_04_02_2019'
+        wrf_conf['run_id'] = 'test_run3_04_02_2019'
         wrf_conf['start_date'] = '2019-08-03_00:00'
         download_gfs_data(wrf_conf)
         replace_namelist_wps(wrf_conf)
         run_wps(wrf_conf)
         log.info('Cleaning up wps dir...')
+        print('wrf_conf : ', wrf_conf)
         wps_dir = get_wps_dir(wrf_conf['wrf_home'])
+        print('wps_dir : ', wps_dir)
         shutil.rmtree(wrf_conf['gfs_dir'])
         delete_files_with_prefix(wps_dir, 'FILE:*')
         delete_files_with_prefix(wps_dir, 'PFILE:*')
         delete_files_with_prefix(wps_dir, 'geo_em.*')
+        replace_namelist_input(wrf_conf)
         run_em_real(wrf_conf)
 
