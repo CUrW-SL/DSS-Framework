@@ -17,7 +17,8 @@ from zipfile import ZipFile, ZIP_DEFLATED
 
 import pkg_resources
 from joblib import Parallel, delayed
-from docker.wrfv4_ubuntu import constants
+#from docker.wrfv4_ubuntu import constants
+import constants
 
 
 LOG_FORMAT = '[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s'
@@ -242,7 +243,7 @@ def replace_file_with_values(source, destination, val_dict):
     log.debug('replace file final content \n' + out)
 
 
-def replace_file_with_values(wrf_config, src, dest, aux_dict, start_date=None, end_date=None):
+def replace_file_with_values_with_dates(wrf_config, src, dest, aux_dict, start_date=None, end_date=None):
     if start_date is None:
         start_date = datetime_floor(datetime.strptime(wrf_config['start_date'], '%Y-%m-%d_%H:%M'),
                                           wrf_config['gfs_step'] * 3600)
@@ -263,7 +264,7 @@ def replace_file_with_values(wrf_config, src, dest, aux_dict, start_date=None, e
         'DD2': end_date.strftime('%d'),
         'hh2': end_date.strftime('%H'),
         'mm2': end_date.strftime('%M'),
-        'GEOG': wrf_config.get('geog_dir'),
+        'GEOG': wrf_config['geog_dir'],
         'RD0': str(int(period)),
         'RH0': str(int(period * 24 % 24)),
         'RM0': str(int(period * 60 * 24 % 60)),
@@ -272,8 +273,8 @@ def replace_file_with_values(wrf_config, src, dest, aux_dict, start_date=None, e
         'hi3': '60',
     }
 
-    if aux_dict and wrf_config.is_set(aux_dict):
-        d.update(wrf_config.get(aux_dict))
+    if aux_dict and aux_dict in wrf_config:
+        d.update(wrf_config[aux_dict])
 
     replace_file_with_values(src, dest, d)
 
@@ -286,7 +287,8 @@ def replace_namelist_wps(wrf_config, start_date=None, end_date=None):
         f = get_resource_path(os.path.join('execution', constants.DEFAULT_NAMELIST_WPS_TEMPLATE))
 
     dest = os.path.join(get_wps_dir(wrf_config['wrf_home']), 'namelist.wps')
-    replace_file_with_values(wrf_config, f, dest, 'namelist_wps_dict', start_date, end_date)
+    start_date = datetime.strptime(start_date, '%Y-%m-%d_%H:%M')
+    replace_file_with_values_with_dates(wrf_config, f, dest, 'namelist_wps_dict', start_date, end_date)
 
 
 def delete_files_with_prefix(src_dir, prefix):
@@ -358,9 +360,11 @@ def run_wps(wrf_config):
     wrf_home = wrf_config['wrf_home']
     wps_dir = get_wps_dir(wrf_home)
     output_dir = create_dir_if_not_exists(
-        os.path.join(wrf_config.get('nfs_dir'), 'results', wrf_config.get('run_id'), 'wps'))
+        os.path.join(wrf_config['nfs_dir'], 'results', wrf_config['run_id'], 'wps'))
 
     log.info('Cleaning up files')
+    logs_dir = create_dir_if_not_exists(os.path.join(output_dir, 'logs'))
+
     delete_files_with_prefix(wps_dir, 'FILE:*')
     delete_files_with_prefix(wps_dir, 'PFILE:*')
     delete_files_with_prefix(wps_dir, 'met_em*')
@@ -368,14 +372,14 @@ def run_wps(wrf_config):
     # Linking VTable
     if not os.path.exists(os.path.join(wps_dir, 'Vtable')):
         log.info('Creating Vtable symlink')
-    os.symlink(os.path.join(wps_dir, 'ungrib/Variable_Tables/Vtable.NAM'), os.path.join(wps_dir, 'Vtable'))
+        os.symlink(os.path.join(wps_dir, 'ungrib/Variable_Tables/Vtable.NAM'), os.path.join(wps_dir, 'Vtable'))
 
     # Running link_grib.csh
     gfs_date, gfs_cycle, start = get_appropriate_gfs_inventory(wrf_config)
-    dest = get_gfs_data_url_dest_tuple(wrf_config.get('gfs_url'), wrf_config.get('gfs_inv'), gfs_date, gfs_cycle,
-                                             '', wrf_config.get('gfs_res'), '')[1].replace('.grb2', '')
+    dest = get_gfs_data_url_dest_tuple(wrf_config['gfs_url'], wrf_config['gfs_inv'], gfs_date, gfs_cycle,
+                                             '', wrf_config['gfs_res'], '')[1].replace('.grb2', '')
     run_subprocess(
-        'csh link_grib.csh %s/%s' % (wrf_config.get('gfs_dir'), dest), cwd=wps_dir)
+        'csh link_grib.csh %s/%s' % (wrf_config['gfs_dir'], dest), cwd=wps_dir)
     try:
         # Starting ungrib.exe
         try:
@@ -401,11 +405,11 @@ def run_wps(wrf_config):
     log.info('Running WPS: DONE')
 
     log.info('Zipping metgrid data')
-    metgrid_zip = os.path.join(wps_dir, wrf_config.get('run_id') + '_metgrid.zip')
+    metgrid_zip = os.path.join(wps_dir, wrf_config['run_id'] + '_metgrid.zip')
     create_zip_with_prefix(wps_dir, 'met_em.d*', metgrid_zip)
 
     log.info('Moving metgrid data')
-    dest_dir = os.path.join(wrf_config.get('nfs_dir'), 'metgrid')
+    dest_dir = os.path.join(wrf_config['nfs_dir'], 'metgrid')
     move_files_with_prefix(wps_dir, metgrid_zip, dest_dir)
 
 
@@ -414,6 +418,14 @@ if __name__ == '__main__':
         config = json.load(json_file)
         wrf_conf = config['wrf_config']
         #download_gfs_data('2019-08-02_00:00', wrf_conf)
-        replace_namelist_wps(wrf_conf)
+        #replace_namelist_wps(wrf_conf, '2019-08-02_00:00')
+        wrf_conf['run_id'] = 'test_run1_04_02_2019'
+        wrf_conf['start_date'] = '2019-08-02_00:00'
         #run_wps(wrf_conf)
+        log.info('Cleaning up wps dir...')
+        wps_dir = get_wps_dir(wrf_conf['wrf_home'])
+        shutil.rmtree(wrf_conf['gfs_dir'])
+        delete_files_with_prefix(wps_dir, 'FILE:*')
+        delete_files_with_prefix(wps_dir, 'PFILE:*')
+        delete_files_with_prefix(wps_dir, 'geo_em.*')
 
