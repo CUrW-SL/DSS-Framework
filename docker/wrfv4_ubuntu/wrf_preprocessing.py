@@ -520,15 +520,16 @@ def run_em_real(wrf_config):
         try:
             log.info('Starting real.exe')
             print('em_real_dir : ', em_real_dir)
-            #run_subprocess('mpirun --allow-run-as-root -np %d ./real.exe' % procs, cwd=em_real_dir)
-            run_subprocess('./real.exe', cwd=em_real_dir)
+            run_subprocess('mpirun -np %d ./real.exe' % procs, cwd=em_real_dir)
+            #run_subprocess('./real.exe', cwd=em_real_dir)
         finally:
             log.info('Moving Real log files...')
             create_zip_with_prefix(em_real_dir, 'rsl*', os.path.join(em_real_dir, 'real_rsl.zip'), clean_up=True)
             move_files_with_prefix(em_real_dir, 'real_rsl.zip', logs_dir)
         try:
             log.info('Starting wrf.exe')
-            run_subprocess('./wrf.exe', cwd=em_real_dir)
+            run_subprocess('mpirun -np %d ./wrf.exe' % procs, cwd=em_real_dir)
+            #run_subprocess('./wrf.exe', cwd=em_real_dir)
         finally:
             log.info('Moving WRF log files...')
             create_zip_with_prefix(em_real_dir, 'rsl*', os.path.join(em_real_dir, 'wrf_rsl.zip'), clean_up=True)
@@ -565,7 +566,7 @@ if __name__ == '__main__':
     with open('wrfv4_config.json') as json_file:
         config = json.load(json_file)
         wrf_conf = config['wrf_config']
-        wrf_conf['run_id'] = 'test_run5_05_02_2019'
+        wrf_conf['run_id'] = 'test_run8_05_02_2019'
         wrf_conf['start_date'] = '2019-08-03_00:00'
         download_gfs_data(wrf_conf)
         replace_namelist_wps(wrf_conf)

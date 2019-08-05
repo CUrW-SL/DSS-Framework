@@ -7,6 +7,7 @@ ENV WPS_VERSION 4.0
 RUN apt-get update -y
 RUN cd ~
 RUN mkdir Build_WRF/LIBRARIES/
+WORKDIR Build_WRF
 RUN cd Build_WRF/LIBRARIES/
 
 RUN wget http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/netcdf-4.1.3.tar.gz \
@@ -68,4 +69,41 @@ RUN tar xzvf jasper-1.900.1.tar.gz \
     && cd ..
 
 # Permanent Export
+ENV DIR "~/Build_WRF/LIBRARIES"
+ENV CC "gcc"
+ENV CXX "g++"
+ENV FC "gfortran"
+ENV FCFLAGS "-m64"
+ENV F77 "gfortran"
+ENV FFLAGS "-m64"
+ENV PATH "$DIR/netcdf/bin:$PATH"
+ENV NETCDF "$DIR/netcdf"
+ENV PATH "$DIR/mpich/bin:$PATH"
+ENV LDFLAGS "-L$DIR/grib2/lib"
+ENV CPPFLAGS "-I$DIR/grib2/include"
+ENV JASPERLIB "$DIR/grib2/lib"
+ENV JASPERINC "$DIR/grib2/include"
+
+WORKDIR Build_WRF
+
+# Installing & building WRS
+RUN apt-get install m4 -y \
+    && gunzip WRSV4.0.TAR.gz \
+    && tar -xf WRSV4.0.TAR \
+    && RUN cd ./WPS \
+    && ./configure <<< $'1\r' \
+    && ./compile em_real >& log.compile \
+    && cd ..
+
+# Installing & building WPF
+RUN apt-get install m4 -y \
+    && gunzip WPFV4.0.TAR.gz \
+    && tar -xf WPFV4.0.TAR \
+    && RUN cd ./WPF \
+    && export JASPERLIB=$DIR/grib2/lib \
+    && export JASPERINC=$DIR/grib2/include \
+    && ./configure <<< $'1\r' \
+    && ./compile >& log.compile \
+    && cd ..
+
 
