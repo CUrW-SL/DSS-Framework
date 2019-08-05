@@ -29,13 +29,13 @@
  /
 
  &domains
- time_step                           = 180,
+ time_step                           = 150,
  time_step_fract_num                 = 0,
  time_step_fract_den                 = 1,
  max_dom                             = 3,
  e_we                                = 80,    103,   100,
  e_sn                                = 90,    121,   163,
- e_vert                              = 100,   100,   100,
+ e_vert                              = 35,   35,   35,
  p_top_requested                     = 5000,
  num_metgrid_levels                  = 34,
  num_metgrid_soil_levels             = 4,
