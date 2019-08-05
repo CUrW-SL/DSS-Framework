@@ -1,6 +1,6 @@
 DEFAULT_WRF_HOME = '/home/uwcc-admin/hasitha/Build_WRF/'
 DEFAULT_NFS_DIR = '/mnt/disks/workspace1/wrf-data/nfs'
-DEFAULT_GEOG_DIR = '/mnt/disks/workspace1/wrf-data/WPS_GEOG'
+DEFAULT_GEOG_DIR = '/mnt/disks/workspace1/wrf-data/geog'
 
 # GFS configs
 DEFAULT_GFS_DATA_URL = 'http://www.ftp.ncep.noaa.gov/data/nccf/com/gfs/prod/gfs.YYYYMMDD/CC/'

@@ -286,6 +286,7 @@ def replace_namelist_wps(wrf_config, start_date=None, end_date=None):
         f = get_resource_path(os.path.join('execution', constants.DEFAULT_NAMELIST_WPS_TEMPLATE))
 
     dest = os.path.join(get_wps_dir(wrf_config['wrf_home']), 'namelist.wps')
+    print('replace_namelist_wps|dest: ', dest)
     start_date = datetime.strptime(wrf_config['start_date'], '%Y-%m-%d_%H:%M')
     replace_file_with_values_with_dates(wrf_config, f, dest, 'namelist_wps_dict', start_date, end_date)
 
@@ -564,7 +565,7 @@ if __name__ == '__main__':
     with open('wrfv4_config.json') as json_file:
         config = json.load(json_file)
         wrf_conf = config['wrf_config']
-        wrf_conf['run_id'] = 'test_run3_04_02_2019'
+        wrf_conf['run_id'] = 'test_run5_05_02_2019'
         wrf_conf['start_date'] = '2019-08-03_00:00'
         download_gfs_data(wrf_conf)
         replace_namelist_wps(wrf_conf)

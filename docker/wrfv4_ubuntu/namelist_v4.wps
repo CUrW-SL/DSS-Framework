@@ -23,7 +23,7 @@
  truelat1  =  7.697,
  truelat2  =  0,
  stand_lon =  80.774,
- geog_data_path = 'GEOG'
+ geog_data_path = '/mnt/disks/wrf-mod/DATA/geog'
 /
 
 &ungrib

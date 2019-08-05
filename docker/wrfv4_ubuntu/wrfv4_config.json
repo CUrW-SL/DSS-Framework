@@ -2,7 +2,7 @@
   "wrf_config": {
     "wrf_home": "/home/uwcc-admin/hasitha/Build_WRF/",
     "gfs_dir": "/mnt/disks/workspace1/wrf-data/gfs",
-    "geog_dir": "/mnt/disks/workspace1/wrf-data/WPS_GEOG",
+    "geog_dir": "/mnt/disks/workspace1/wrf-data/geog",
     "nfs_dir": "/mnt/disks/workspace1/wrf-data/nfs",
     "archive_dir": "/mnt/disks/workspace1/wrf-data/archive",
     "period": 3,
