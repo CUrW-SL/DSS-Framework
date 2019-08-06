@@ -5,6 +5,7 @@
     "gfs_dir": "/mnt/disks/wrf-mod/DATA/GFS",
     "geog_dir": "/mnt/disks/wrf-mod/DATA/geog",
     "nfs_dir": "/mnt/disks/wrf-mod/DATA/nfs",
+    "archive_dir": "",
     "period": 3,
     "namelist_input": "namelist.input",
     "namelist_wps": "namelist.wps",

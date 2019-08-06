@@ -468,24 +468,6 @@ def copy_files_with_prefix(src_dir, prefix, dest_dir):
         shutil.copy(filename, os.path.join(dest_dir, ntpath.basename(filename)))
 
 
-def run_subprocess(cmd, cwd=None, print_stdout=False):
-    log.info('Running subprocess %s cwd %s' % (cmd, cwd))
-    start_t = time.time()
-    output = ''
-    try:
-        output = subprocess.check_output(shlex.split(cmd), stderr=subprocess.STDOUT, cwd=cwd)
-    except subprocess.CalledProcessError as e:
-        log.error('Exception in subprocess %s! Error code %d' % (cmd, e.returncode))
-        log.error(e.output)
-        raise e
-    finally:
-        elapsed_t = time.time() - start_t
-        log.info('Subprocess %s finished in %f s' % (cmd, elapsed_t))
-        if print_stdout:
-            log.info('stdout and stderr of %s\n%s' % (cmd, output))
-    return output
-
-
 def run_em_real(wrf_config):
     log.info('Running em_real...')
 
@@ -521,7 +503,6 @@ def run_em_real(wrf_config):
             log.info('Starting real.exe')
             print('em_real_dir : ', em_real_dir)
             run_subprocess('mpirun -np %d ./real.exe' % procs, cwd=em_real_dir)
-            #run_subprocess('./real.exe', cwd=em_real_dir)
         finally:
             log.info('Moving Real log files...')
             create_zip_with_prefix(em_real_dir, 'rsl*', os.path.join(em_real_dir, 'real_rsl.zip'), clean_up=True)
@@ -529,7 +510,6 @@ def run_em_real(wrf_config):
         try:
             log.info('Starting wrf.exe')
             run_subprocess('mpirun -np %d ./wrf.exe' % procs, cwd=em_real_dir)
-            #run_subprocess('./wrf.exe', cwd=em_real_dir)
         finally:
             log.info('Moving WRF log files...')
             create_zip_with_prefix(em_real_dir, 'rsl*', os.path.join(em_real_dir, 'wrf_rsl.zip'), clean_up=True)
@@ -542,17 +522,17 @@ def run_em_real(wrf_config):
 
     log.info('Extracting rf from domain3')
     d03_nc = glob.glob(os.path.join(em_real_dir, 'wrfout_d03_*'))[0]
-    ncks_query = 'ncks -v %s %s %s' % ('RAINC,RAINNC,XLAT,XLONG,Times', d03_nc, d03_nc + '_rf')
+    ncks_query = 'ncks -v %s %s %s' % ('RAINC,RAINNC,XLAT,XLONG,Times', d03_nc, d03_nc + '_rf.nc')
     run_subprocess(ncks_query)
 
     log.info('Extracting rf from domain1')
     d01_nc = glob.glob(os.path.join(em_real_dir, 'wrfout_d01_*'))[0]
-    ncks_query = 'ncks -v %s %s %s' % ('RAINC,RAINNC,XLAT,XLONG,Times', d01_nc, d01_nc + '_rf')
+    ncks_query = 'ncks -v %s %s %s' % ('RAINC,RAINNC,XLAT,XLONG,Times', d01_nc, d01_nc + '_rf.nc')
     run_subprocess(ncks_query)
 
     log.info('Moving data to the output dir')
-    move_files_with_prefix(em_real_dir, 'wrfout_d03*_rf', output_dir)
-    move_files_with_prefix(em_real_dir, 'wrfout_d01*_rf', output_dir)
+    move_files_with_prefix(em_real_dir, 'wrfout_d03*_rf.nc', output_dir)
+    move_files_with_prefix(em_real_dir, 'wrfout_d01*_rf.nc', output_dir)
     log.info('Moving data to the archive dir')
     move_files_with_prefix(em_real_dir, 'wrfout_*', archive_dir)
 

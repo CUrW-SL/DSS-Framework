@@ -4,11 +4,17 @@ MAINTAINER Hasitha Dhananjaya <hasitha.10@cse.mrt.ac.lk>
 ENV WRF_VERSION 4.0
 ENV WPS_VERSION 4.0
 
-RUN apt-get update -y
-RUN cd ~
-RUN mkdir Build_WRF/LIBRARIES/
-WORKDIR Build_WRF
-RUN cd Build_WRF/LIBRARIES/
+RUN apt-get update -y \
+    && apt-get install wget -y \
+    && apt-get install gcc -y \
+    && apt-get install gfortran -y \
+    && apt-get install build-essential -y \
+    && apt-get install apt-utils -y \
+    && apt-get install file -y
+#RUN cd ~
+#RUN mkdir ~/Build_WRF/LIBRARIES/
+WORKDIR Build_WRF/LIBRARIES
+#RUN cd Build_WRF/LIBRARIES/
 
 RUN wget http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/netcdf-4.1.3.tar.gz \
     && wget http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/mpich-3.0.4.tar.gz \
@@ -34,7 +40,7 @@ RUN  export DIR=$PWD \
     && cd ..
 
 # Installing MPICH
-RUN tar xzvf mpi-3.0.4.tar.gz \
+RUN tar xzvf mpich-3.0.4.tar.gz \
     && cd mpich-3.0.4 \
     && ./configure --prefix=$DIR/mpich \
     && make \
@@ -53,7 +59,9 @@ RUN  export LDFLAGS=-L$DIR/grib2/lib \
     && cd ..
 
 # Installing libpng
-RUN tar xzvf libpng-1.2.50.tar.gz \
+RUN export LDFLAGS=-L$DIR/grib2/lib \
+    && export CPPFLAGS=-I$DIR/grib2/include \
+    && tar xzvf libpng-1.2.50.tar.gz \
     && cd libpng-1.2.50 \
     && ./configure --prefix=$DIR/grib2 \
     && make \
@@ -96,8 +104,7 @@ RUN apt-get install m4 -y \
     && cd ..
 
 # Installing & building WPF
-RUN apt-get install m4 -y \
-    && gunzip WPFV4.0.TAR.gz \
+RUN gunzip WPFV4.0.TAR.gz \
     && tar -xf WPFV4.0.TAR \
     && RUN cd ./WPF \
     && export JASPERLIB=$DIR/grib2/lib \
