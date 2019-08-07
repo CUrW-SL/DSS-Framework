@@ -103,14 +103,14 @@ RUN wget http://www2.mmm.ucar.edu/wrf/src/WRFV$WRF_VERSION.TAR.gz \
     && wget http://www2.mmm.ucar.edu/wrf/src/WPSV$WPS_VERSION.TAR.gz
 
 # Installing & building WRF
-RUN tar -xvzf  WRFV4.0.TAR.gz \
+RUN tar -xvzf  WRFV$WRF_VERSION.TAR.gz \
     && cd ./WRF \
     && echo $WRF_CONFIGURE_OPTION | ./configure  \
     && ./compile em_real >> log.compile 2>&1 \
     && cd ..
 
 # Installing & building WPS
-RUN tar -xvzf  WPSV4.0.TAR.gz \
+RUN tar -xvzf  WPSV$WPS_VERSION.TAR.gz \
     && cd ./WPS \
     && export JASPERLIB=$DIR/grib2/lib \
     && export JASPERINC=$DIR/grib2/include \
