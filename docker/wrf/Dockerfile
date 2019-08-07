@@ -1,9 +1,11 @@
 FROM centos:latest
-MAINTAINER Hasitha Dhananjaya <hasitha.10@cse.mrt.ac.lk>
+MAINTAINER niranda perera <niranda.17@cse.mrt.ac.lk>
 #
 # This Dockerfile compiles WRF from source during "docker build" step
-ENV WRF_VERSION 4.0
-ENV WPS_VERSION 4.0
+ENV WRF_VERSION 3.9.1.1
+ENV WPS_VERSION 3.9.1
+
+ENV CURW_VERSION="v2.0.0-snapshot"
 
 #RUN curl -SL https://ral.ucar.edu/sites/default/files/public/projects/ncar-docker-wrf/ucar-bsd-3-clause-license.pdf > /UCAR-BSD-3-Clause-License.pdf
 #
@@ -44,7 +46,7 @@ RUN mkdir netcdf_links \
  && export NETCDF=/wrf/netcdf_links \
  && export JASPERINC=/usr/include/jasper/ \
  && export JASPERLIB=/usr/lib64/ \
- && cd ./WRF \
+ && cd ./WRFV3 \
  && ./configure <<< $'34\r1\r' \
  && sed -i -e '/^DM_CC/ s/$/ -DMPI2_SUPPORT/' ./configure.wrf \
  && /bin/csh ./compile em_real
@@ -59,13 +61,18 @@ RUN cd ./WPS \
  && ./configure <<< $'1\r' \
  && sed -i -e 's/-L$(NETCDF)\/lib/-L$(NETCDF)\/lib -lnetcdff /' ./configure.wps \
  && /bin/csh ./compile
-
+#
 ENV LD_LIBRARY_PATH /usr/lib64/openmpi/lib
 ENV PATH  /usr/lib64/openmpi/bin:$PATH
-
+#
+# copy in a couple custom scripts
+#COPY run-wrf /wrf
+#COPY docker-clean /wrf
+#RUN chmod +x /wrf/run-wrf \
+# && chmod +x /wrf/docker-clean
 COPY docker-clean /wrf
 RUN chmod +x /wrf/docker-clean
-
+#
 # set up ssh configuration
 COPY ssh_config /root/.ssh/config
 RUN mkdir -p /root/.openmpi
@@ -97,9 +104,15 @@ RUN yum -y install gcsfuse
 RUN cd /wrf
 RUN mkdir gfs output geog archive config
 
+#RUN git clone https://github.com/nirandaperera/models.git && cd models && git checkout airflow-integ
+RUN git clone -b $CURW_VERSION https://github.com/nirandaperera/models.git curwsl
+RUN pip3.6 install -e curwsl/
+
 COPY run_wrf.sh /wrf
 RUN chmod +x /wrf/run_wrf.sh
 
+# update the git repo everytime a container is initialized
 CMD ["/wrf/run_wrf.sh"]
 
 VOLUME /wrf
+

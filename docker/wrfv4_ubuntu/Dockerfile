@@ -21,8 +21,11 @@ RUN apt-get update \
         file \
         m4
 
-RUN mkdir Build_WRF && \
-    mkdir Build_WRF/LIBRARIES
+RUN mkdir Build_WRF
+
+WORKDIR Build_WRF
+
+RUN mkdir LIBRARIES code logs gfs output geog archive config
 
 WORKDIR /home/Build_WRF/LIBRARIES
 
@@ -118,4 +121,17 @@ RUN tar -xvzf  WPSV$WPS_VERSION.TAR.gz \
     && ./compile >> log.compile 2>&1 \
     && cd ..
 
+# install gcsfuse
+RUN apt-get install -y curl \
+    && export GCSFUSE_REPO=gcsfuse-'lsb_release -c -s' \
+    && echo "deb http://packages.cloud.google.com/apt $GCSFUSE_REPO main" | sudo tee /etc/apt/sources.list.d/gcsfuse.list \
+    && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - \
+    && apt-get update \
+    && apt-get install -y gcsfuse daemon \
+    && apt-get install -y install gcsfuse \
+    && apt-get -y install python3 \
+    && apt-get -y install python3-pip
 
+ADD code /home/Build_WRF/code
+
+VOLUME /home/Build_WRF
