@@ -10,11 +10,10 @@ RUN apt-get update -y \
     && apt-get install gfortran -y \
     && apt-get install build-essential -y \
     && apt-get install apt-utils -y \
-    && apt-get install file -y
-#RUN cd ~
-#RUN mkdir ~/Build_WRF/LIBRARIES/
+    && apt-get install file -y \
+    && apt-get install m4 -y
+
 WORKDIR Build_WRF/LIBRARIES
-#RUN cd Build_WRF/LIBRARIES/
 
 RUN wget http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/netcdf-4.1.3.tar.gz \
     && wget http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/mpich-3.0.4.tar.gz \
@@ -94,22 +93,22 @@ ENV JASPERINC "$DIR/grib2/include"
 
 WORKDIR Build_WRF
 
-# Installing & building WRS
-RUN apt-get install m4 -y \
-    && gunzip WRSV4.0.TAR.gz \
-    && tar -xf WRSV4.0.TAR \
-    && RUN cd ./WPS \
-    && ./configure <<< $'1\r' \
+RUN wget http://www2.mmm.ucar.edu/wrf/src/WRFV4.0.TAR.gz \
+    && wget http://www2.mmm.ucar.edu/wrf/src/WPSV4.0.TAR.gz
+
+# Installing & building WRF
+RUN tar -xvzf  WRFV4.0.TAR.gz \
+    && cd ./WRF \
+    && echo 34 | ./configure  \
     && ./compile em_real >& log.compile \
     && cd ..
 
-# Installing & building WPF
-RUN gunzip WPFV4.0.TAR.gz \
-    && tar -xf WPFV4.0.TAR \
-    && RUN cd ./WPF \
+# Installing & building WPS
+RUN tar -xvzf  WPSV4.0.TAR.gz \
+    && cd ./WPS \
     && export JASPERLIB=$DIR/grib2/lib \
     && export JASPERINC=$DIR/grib2/include \
-    && ./configure <<< $'1\r' \
+    && echo 1 | ./configure \
     && ./compile >& log.compile \
     && cd ..
 
