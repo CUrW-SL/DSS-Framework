@@ -1,19 +1,30 @@
-FROM ubuntu:16.04
+FROM ubuntu:latest
 MAINTAINER Hasitha Dhananjaya <hasitha.10@cse.mrt.ac.lk>
 
 ENV WRF_VERSION 4.0
 ENV WPS_VERSION 4.0
+ENV WRF_CONFIGURE_OPTION 34
+ENV WPS_CONFIGURE_OPTION 1
 
-RUN apt-get update -y \
-    && apt-get install wget -y \
-    && apt-get install gcc -y \
-    && apt-get install gfortran -y \
-    && apt-get install build-essential -y \
-    && apt-get install apt-utils -y \
-    && apt-get install file -y \
-    && apt-get install m4 -y
+RUN apt-get update \
+    && apt-get install -y software-properties-common \
+    && add-apt-repository ppa:ubuntugis/ppa \
+    && apt-get update \
+    && apt-get install -y --allow-unauthenticated \
+        wget \
+        gcc \
+        csh \
+        gfortran \
+        gfortran-5-multilib \
+        build-essential \
+        apt-utils \
+        file \
+        m4
 
-WORKDIR Build_WRF/LIBRARIES
+RUN mkdir Build_WRF && \
+    mkdir Build_WRF/LIBRARIES
+
+WORKDIR /home/Build_WRF/LIBRARIES
 
 RUN wget http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/netcdf-4.1.3.tar.gz \
     && wget http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/mpich-3.0.4.tar.gz \
@@ -21,15 +32,17 @@ RUN wget http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/
     && wget http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/libpng-1.2.50.tar.gz \
     && wget http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/jasper-1.900.1.tar.gz
 
+ENV DIR /home/Build_WRF/LIBRARIES
+ENV CC gcc
+ENV CPP /lib/cpp -P
+ENV CXX g++
+ENV FC gfortran
+ENV FCFLAGS -m64
+ENV F77 gfortran
+ENV FFLAGS -m64
+
 # Installing NetCDF
-RUN  export DIR=$PWD \
-    && export CC=gcc \
-    && export CXX=g++ \
-    && export FC=gfortran \
-    && export FCFLAGS=-m64 \
-    && export F77=gfortran \
-    && export FFLAGS=-m64 \
-    && tar xzvf netcdf-4.1.3.tar.gz \
+RUN tar xzvf netcdf-4.1.3.tar.gz \
     && cd netcdf-4.1.3 \
     && ./configure --prefix=$DIR/netcdf --disable-dap --disable-netcdf-4 --disable-shared \
     && make \
@@ -76,13 +89,6 @@ RUN tar xzvf jasper-1.900.1.tar.gz \
     && cd ..
 
 # Permanent Export
-ENV DIR "~/Build_WRF/LIBRARIES"
-ENV CC "gcc"
-ENV CXX "g++"
-ENV FC "gfortran"
-ENV FCFLAGS "-m64"
-ENV F77 "gfortran"
-ENV FFLAGS "-m64"
 ENV PATH "$DIR/netcdf/bin:$PATH"
 ENV NETCDF "$DIR/netcdf"
 ENV PATH "$DIR/mpich/bin:$PATH"
@@ -91,16 +97,16 @@ ENV CPPFLAGS "-I$DIR/grib2/include"
 ENV JASPERLIB "$DIR/grib2/lib"
 ENV JASPERINC "$DIR/grib2/include"
 
-WORKDIR Build_WRF
+WORKDIR /home/Build_WRF
 
-RUN wget http://www2.mmm.ucar.edu/wrf/src/WRFV4.0.TAR.gz \
-    && wget http://www2.mmm.ucar.edu/wrf/src/WPSV4.0.TAR.gz
+RUN wget http://www2.mmm.ucar.edu/wrf/src/WRFV$WRF_VERSION.TAR.gz \
+    && wget http://www2.mmm.ucar.edu/wrf/src/WPSV$WPS_VERSION.TAR.gz
 
 # Installing & building WRF
 RUN tar -xvzf  WRFV4.0.TAR.gz \
     && cd ./WRF \
-    && echo 34 | ./configure  \
-    && ./compile em_real >& log.compile \
+    && echo $WRF_CONFIGURE_OPTION | ./configure  \
+    && ./compile em_real >> log.compile 2>&1 \
     && cd ..
 
 # Installing & building WPS
@@ -108,8 +114,8 @@ RUN tar -xvzf  WPSV4.0.TAR.gz \
     && cd ./WPS \
     && export JASPERLIB=$DIR/grib2/lib \
     && export JASPERINC=$DIR/grib2/include \
-    && echo 1 | ./configure \
-    && ./compile >& log.compile \
+    && echo $WPS_CONFIGURE_OPTION | ./configure \
+    && ./compile >> log.compile 2>&1 \
     && cd ..
 
 
