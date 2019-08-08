@@ -123,12 +123,11 @@ RUN tar -xvzf  WPSV$WPS_VERSION.TAR.gz \
 
 # install gcsfuse
 RUN apt-get install -y curl \
-    && export GCSFUSE_REPO=gcsfuse-'lsb_release -c -s' \
-    && echo "deb http://packages.cloud.google.com/apt $GCSFUSE_REPO main" | sudo tee /etc/apt/sources.list.d/gcsfuse.list \
+    && export GCSFUSE_REPO=gcsfuse-`lsb_release -c -s` \
+    && echo "deb http://packages.cloud.google.com/apt $GCSFUSE_REPO main" | tee /etc/apt/sources.list.d/gcsfuse.list \
     && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - \
     && apt-get update \
-    && apt-get install -y gcsfuse daemon \
-    && apt-get install -y install gcsfuse \
+    && apt-get install -y gcsfuse \
     && apt-get -y install python3 \
     && apt-get -y install python3-pip
 
