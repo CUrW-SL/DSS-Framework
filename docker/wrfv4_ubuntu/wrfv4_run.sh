@@ -41,3 +41,5 @@ source venv/bin/activate
 python3 wrfv4_run.py \
                     $( check_empty "$START_DATE" start_date ) \
                     $( check_empty "$RUN_ID" run_id )
+echo "Deactivating virtual environment"
+deactivate
