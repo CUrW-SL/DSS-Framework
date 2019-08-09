@@ -1,3 +1,4 @@
+import argparse
 import glob
 import json
 import logging
@@ -542,23 +543,55 @@ def run_em_real(wrf_config):
     os.remove(metgrid_zip)
 
 
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-run_id')
+    parser.add_argument('-start_date')
+    parser.add_argument('-wrf_config', default={})
+    return parser.parse_args()
+
+
+def run_wrf_model(wrf_conf):
+    try:
+        download_gfs_data(wrf_conf)
+        try:
+            replace_namelist_wps(wrf_conf)
+            run_wps(wrf_conf)
+            try:
+                log.info('Cleaning up wps dir...')
+                print('wrf_conf : ', wrf_conf)
+                wps_dir = get_wps_dir(wrf_conf['wrf_home'])
+                print('wps_dir : ', wps_dir)
+                shutil.rmtree(wrf_conf['gfs_dir'])
+                delete_files_with_prefix(wps_dir, 'FILE:*')
+                delete_files_with_prefix(wps_dir, 'PFILE:*')
+                delete_files_with_prefix(wps_dir, 'geo_em.*')
+                replace_namelist_input(wrf_conf)
+                run_em_real(wrf_conf)
+            except Exception as exx:
+                traceback.print_exc()
+                log.error('run wrf exception')
+        except Exception as ex:
+            traceback.print_exc()
+            log.error('run wps exception')
+    except Exception as e:
+        traceback.print_exc()
+        log.error('download_gfs_data exception')
+
+
 if __name__ == '__main__':
+    args = vars(parse_args())
+    logging.info('Running arguments:\n%s' % json.dumps(args, sort_keys=True, indent=0))
+    start_date = args['start_date']
+    logging.info('**** WRF RUN **** start_date: ' + start_date)
+    run_id = args['run_id']
+    logging.info('**** WRF RUN **** run_id: ' + run_id)
+    wrf_config = args['wrf_config']
+    logging.info('**** WRF RUN **** wrf_config: ' + wrf_config)
     with open('wrfv4_config.json') as json_file:
-        config = json.load(json_file)
-        wrf_conf = config['wrf_config']
+        wrf_config = json.load(json_file)
+        wrf_conf = wrf_config['wrf_config']
         wrf_conf['run_id'] = 'test_run8_05_02_2019'
         wrf_conf['start_date'] = '2019-08-03_00:00'
-        download_gfs_data(wrf_conf)
-        replace_namelist_wps(wrf_conf)
-        run_wps(wrf_conf)
-        log.info('Cleaning up wps dir...')
-        print('wrf_conf : ', wrf_conf)
-        wps_dir = get_wps_dir(wrf_conf['wrf_home'])
-        print('wps_dir : ', wps_dir)
-        shutil.rmtree(wrf_conf['gfs_dir'])
-        delete_files_with_prefix(wps_dir, 'FILE:*')
-        delete_files_with_prefix(wps_dir, 'PFILE:*')
-        delete_files_with_prefix(wps_dir, 'geo_em.*')
-        replace_namelist_input(wrf_conf)
-        run_em_real(wrf_conf)
+        run_wrf_model(wrf_conf)
 
