@@ -486,12 +486,7 @@ def run_em_real(wrf_config):
 
     log.info('Copying metgrid.zip')
     metgrid_dir = os.path.join(wrf_config['nfs_dir'], 'metgrid')
-    print()
-    # if wrf_config.is_set('wps_run_id'):
-    #     log.info('wps_run_id is set. Copying metgrid from ' + wrf_config['wps_run_id'])
-    #     copy_files_with_prefix(metgrid_dir, wrf_config['wps_run_id'] + '_metgrid.zip', em_real_dir)
-    #     metgrid_zip = os.path.join(em_real_dir, wrf_config['wps_run_id'] + '_metgrid.zip')
-    # else:
+
     copy_files_with_prefix(metgrid_dir, wrf_config['run_id'] + '_metgrid.zip', em_real_dir)
     metgrid_zip = os.path.join(em_real_dir, wrf_config['run_id'] + '_metgrid.zip')
 
