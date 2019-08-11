@@ -5,7 +5,7 @@
   "rule_type": "exec",
   "target_model": "WRF",
   "trigger": {
-    "target_trigger": "wrfv4-E-dag",
+    "target_trigger": "wrfv4_E",
     "data_from": ""
   },
   "exec_date": "",
