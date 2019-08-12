@@ -13,7 +13,6 @@ class RuleStore:
         def _load_rule(rule_file_path):
             with open(rule_file_path) as f:
                 data = json.load(f)
-                print('load_rule_json|data : ', data)
                 return data
         rule_file_list = glob.glob("{}/*.{}".format(self.rule_dir_path, 'json'))
         if rule_file_list:
@@ -33,6 +32,23 @@ def view_all_rules(rule_store):
 def execute_exec_rule(rule_store, rule_id):
     rule_data = rule_store.all_rule_data[rule_id]
     print('rule_data : ', rule_data)
+    if rule_data['rule_type'] == 'exec' and rule_data['enable'] == 'true':
+
+        print('')
+    else:
+        print('Rule {} is disabled.'.format(rule_id))
+
+
+def execute_wrf_model_rules():
+    print('')
+
+
+def execute_hechms_model_rules():
+    print('')
+
+
+def execute_flo2d_model_rules():
+    print('')
 
 
 def execute_accuracy_rule():

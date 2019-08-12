@@ -14,7 +14,7 @@ def conditionally_trigger_dss_unit1(context, dag_run_obj):
     """This function decides whether or not to Trigger the remote DAG"""
     c_p = context['params']['condition_param']
     print("Controller DAG : conditionally_trigger = {}".format(c_p))
-    if context['params']['condition_param']:
+    if context['params']['check_rules']:
         dag_run_obj.payload = {'message': context['params']['message']}
         return {'trigger_dag_id': 'wrfv4-pre-dag', 'dro': dag_run_obj}
 
@@ -24,7 +24,7 @@ def conditionally_trigger_dss_unit2(context, dag_run_obj):
     """This function decides whether or not to Trigger the remote DAG"""
     c_p = context['params']['condition_param']
     print("Controller DAG : conditionally_trigger = {}".format(c_p))
-    if context['params']['condition_param']:
+    if context['params']['check_rules']:
         dag_run_obj.payload = {'message': context['params']['message']}
         return {'trigger_dag_id': 'wrfv4-E-dag', 'dro': dag_run_obj}
 
@@ -34,7 +34,7 @@ def conditionally_trigger_dss_unit3(context, dag_run_obj):
     """This function decides whether or not to Trigger the remote DAG"""
     c_p = context['params']['condition_param']
     print("Controller DAG : conditionally_trigger = {}".format(c_p))
-    if context['params']['condition_param']:
+    if context['params']['check_rules']:
         dag_run_obj.payload = {'message': context['params']['message']}
         return {'trigger_dag_id': 'hec-hms-single-dag', 'dro': dag_run_obj}
 
@@ -44,7 +44,7 @@ def conditionally_trigger_dss_unit4(context, dag_run_obj):
     """This function decides whether or not to Trigger the remote DAG"""
     c_p = context['params']['condition_param']
     print("Controller DAG : conditionally_trigger = {}".format(c_p))
-    if context['params']['condition_param']:
+    if context['params']['check_rules']:
         dag_run_obj.payload = {'message': context['params']['message']}
         return {'trigger_dag_id': 'flo2d-250m-dag', 'dro': dag_run_obj}
 
@@ -63,7 +63,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         task_id='dss_unit1',
         default_trigger="dss_trigger_target_dag",
         python_callable=conditionally_trigger_dss_unit1,
-        params={'condition_param': True, 'message': 'DSS UNIT 1'},
+        params={'check_rules': True, 'rules': ['rule0']},
         dag=dag,
     )
 
@@ -71,7 +71,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         task_id='dss_unit2',
         default_trigger="dss_trigger_target_dag",
         python_callable=conditionally_trigger_dss_unit2,
-        params={'condition_param': True, 'message': 'DSS UNIT 2'},
+        params={'check_rules': True, 'rules': ['rule1']},
         dag=dag,
     )
 
@@ -79,7 +79,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         task_id='dss_unit3',
         default_trigger="dss_trigger_target_dag",
         python_callable=conditionally_trigger_dss_unit3,
-        params={'condition_param': True, 'message': 'DSS UNIT 3'},
+        params={'check_rules': True, 'rules': ['rule3', 'rule4']},
         dag=dag,
     )
 
@@ -87,7 +87,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         task_id='dss_unit4',
         default_trigger="dss_trigger_target_dag",
         python_callable=conditionally_trigger_dss_unit4,
-        params={'condition_param': True, 'message': 'DSS UNIT 4'},
+        params={'check_rules': True, 'rules': ['rule0']},
         dag=dag,
     )
 
