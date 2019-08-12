@@ -148,7 +148,7 @@ def download_gfs_data(start_date):
     """
     log.info('Downloading GFS data: START')
     try:
-        with open('wrfv4_config.json') as json_file:
+        with open('wrfv4_config_cmd.json') as json_file:
             config = json.load(json_file)
             wrf_conf = get_wrf_config(config['wrf_config'], start_date=start_date)
             

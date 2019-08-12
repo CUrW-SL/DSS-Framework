@@ -581,11 +581,12 @@ if __name__ == '__main__':
     logging.info('**** WRF RUN **** start_date: ' + start_date)
     run_id = args['run_id']
     logging.info('**** WRF RUN **** run_id: ' + run_id)
-    wrf_config = args['wrf_config']
-    logging.info('**** WRF RUN **** wrf_config: ' + wrf_config)
-    with open('wrfv4_config.json') as json_file:
+    # wrf_config = args['wrf_config']
+    # logging.info('**** WRF RUN **** wrf_config: ' + wrf_config)
+    with open('wrfv4_config_cmd.json') as json_file:
         wrf_config = json.load(json_file)
         wrf_conf = wrf_config['wrf_config']
+        logging.info('**** WRF RUN **** wrf_conf: ' + wrf_conf)
         wrf_conf['run_id'] = 'test_run8_05_02_2019'
         wrf_conf['start_date'] = '2019-08-03_00:00'
         run_wrf_model(wrf_conf)
