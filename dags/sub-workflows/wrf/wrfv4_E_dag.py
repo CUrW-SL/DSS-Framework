@@ -3,8 +3,7 @@ from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 
-prod_dag_name = 'wrfv4-E'
-
+prod_dag_name = 'wrfv4_E'
 
 default_args = {
     'owner': 'dss admin',

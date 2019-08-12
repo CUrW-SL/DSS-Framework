@@ -6,7 +6,7 @@
   "target_model": "WRF",
   "trigger":
       {
-        "target_trigger": "wrfv4_E",
+        "target_trigger": "wrfv4-E",
         "data_from": ""
       },
   "exec_date": "",

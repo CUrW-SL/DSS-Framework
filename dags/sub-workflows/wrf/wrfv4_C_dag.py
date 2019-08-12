@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 
-prod_dag_name = 'wrfv4-C'
+prod_dag_name = 'wrfv4_C'
 
 
 default_args = {

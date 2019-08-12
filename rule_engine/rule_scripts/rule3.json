@@ -6,7 +6,7 @@
   "target_model": "FLO2D",
   "trigger": {
     "target_trigger": "flo2d_250m",
-    "data_from": "hechms_single"
+    "data_from": "wrfv4_E:hechms_single"
   },
   "exec_date": "",
   "exec_time": ""
