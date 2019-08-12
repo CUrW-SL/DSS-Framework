@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 
-prod_dag_name = 'hec-hms-distributed-dag'
+prod_dag_name = 'hec-hms-distributed'
 
 
 default_args = {
