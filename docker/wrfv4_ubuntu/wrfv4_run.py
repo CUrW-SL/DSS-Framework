@@ -583,7 +583,7 @@ if __name__ == '__main__':
     logging.info('**** WRF RUN **** run_id: ' + run_id)
     # wrf_config = args['wrf_config']
     # logging.info('**** WRF RUN **** wrf_config: ' + wrf_config)
-    with open('wrfv4_config_cmd.json') as json_file:
+    with open('wrfv4_config_bucket.json') as json_file:
         wrf_config = json.load(json_file)
         wrf_conf = wrf_config['wrf_config']
         logging.info('**** WRF RUN **** wrf_conf: ' + wrf_conf)
