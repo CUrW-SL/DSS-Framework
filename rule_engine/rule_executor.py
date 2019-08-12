@@ -23,10 +23,9 @@ class RuleStore:
             print('No defined rules.')
         return all_rule_data
 
-
-def view_all_rules(rule_store):
-    for rule_id in rule_store:
-        print(rule_store[rule_id])
+    def view_all_rules(self):
+        for rule_id in self.all_rule_data:
+            print(self.all_rule_data[rule_id])
 
 
 def execute_exec_rule(rule_store, rule_id):

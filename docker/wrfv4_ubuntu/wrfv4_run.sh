@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-export GOOGLE_APPLICATION_CREDENTIALS=/wrf/gcs.json
+export GOOGLE_APPLICATION_CREDENTIALS=/home/Build_WRF/code/gcs.json
 
 echo "#### Reading running args..."
 while getopts ":d:i:g:k:v:" option; do
@@ -8,17 +8,6 @@ while getopts ":d:i:g:k:v:" option; do
 
   d) START_DATE=$OPTARG ;;
   i) RUN_ID=$OPTARG ;;
-  g) WRF_CONFIG=$OPTARG ;;
-  k)
-    GCS_KEY=$OPTARG
-    if [ -f "$GCS_KEY" ]; then
-      echo "#### using GCS KEY file location"
-      cat "$GCS_KEY" >${GOOGLE_APPLICATION_CREDENTIALS}
-    else
-      echo "#### using GCS KEY file content"
-      echo "$GCS_KEY" >${GOOGLE_APPLICATION_CREDENTIALS}
-    fi
-    ;;
   v)
     bucket=$(echo "$OPTARG" | cut -d':' -f1)
     path=$(echo "$OPTARG" | cut -d':' -f2)
