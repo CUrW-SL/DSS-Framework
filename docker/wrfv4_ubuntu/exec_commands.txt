@@ -1,0 +1,15 @@
+
+docker build -t wrfv4:latest .
+
+docker run -it curw-wrfv4 /bin/bash
+
+docker run -i --rm --privileged
+-v /mnt/disks/workspace1/wrf-data/geog:/home/Build_WRF/geog
+-v /home/uwcc-admin/uwcc-admin.json:/wrf/gcs.json
+curw-wrfv4
+/home/Build_WRF/code/wrfv4_run.sh
+    -d "2019-08-11_18:00"
+    -k "wrfv4_2019-08-11_18_00"
+-v curwsl_nfs_1:/home/Build_WRF/nfs
+-v curwsl_archive_1:/home/Build_WRF/archive
+

@@ -7,7 +7,7 @@ while getopts ":d:i:g:k:v:" option; do
   case "${option}" in
 
   d) START_DATE=$OPTARG ;;
-  i) RUN_ID=$OPTARG ;;
+  k) RUN_ID=$OPTARG ;;
   v)
     bucket=$(echo "$OPTARG" | cut -d':' -f1)
     path=$(echo "$OPTARG" | cut -d':' -f2)
