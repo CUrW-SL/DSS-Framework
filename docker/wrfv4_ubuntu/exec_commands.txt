@@ -1,8 +1,8 @@
 # building docker image
-docker build -t wrfv4:latest .
+docker build -t curw-wrfv4:v1 .
 
 # Run already built docker image and connect to its shell
-docker run -it wrfv4 /bin/bash
+docker run -it curw-wrfv4:v1 /bin/bash
 
 # view <none><none> docker images
 docker images -f dangling=true -q
