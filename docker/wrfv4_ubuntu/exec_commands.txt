@@ -2,10 +2,16 @@
 docker build -t wrfv4:latest .
 
 # Run already built docker image and connect to its shell
-docker run -it curw-wrfv4 /bin/bash
+docker run -it wrfv4 /bin/bash
+
+# view <none><none> docker images
+docker images -f dangling=true -q
+
+# remove <none><none> docker images
+docker rmi -f $(docker images -f dangling=true -q --no-trunc)
 
 # wrfv4 run inside docker image
-docker run -i --rm --privileged
+docker run -i --rm --privileged9+
 -v /mnt/disks/workspace1/wrf-data/geog:/home/Build_WRF/geog
 -v /home/uwcc-admin/uwcc-admin.json:/wrf/gcs.json
 curw-wrfv4

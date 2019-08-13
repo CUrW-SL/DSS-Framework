@@ -135,8 +135,8 @@ ADD code /home/Build_WRF/code
 
 WORKDIR /home/Build_WRF/code
 
-COPY /home/uwcc-admin/wrf_docker/code/wrfv4_run.sh /home/Build_WRF/code
-COPY /home/uwcc-admin/uwcc-admin.json /home/Build_WRF/code/gcs.json
+COPY wrfv4_run.sh /home/Build_WRF/code
+COPY uwcc-admin.json /home/Build_WRF/code/gcs.json
 RUN chmod +x wrfv4_run.sh
 
 CMD ["wrfv4_run.sh"]
