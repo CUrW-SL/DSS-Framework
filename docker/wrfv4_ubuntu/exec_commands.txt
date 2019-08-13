@@ -11,7 +11,7 @@ docker images -f dangling=true -q
 docker rmi -f $(docker images -f dangling=true -q --no-trunc)
 
 # wrfv4 run inside docker image
-docker run -i --rm --privileged9+
+docker run -i --rm --privileged
 -v /mnt/disks/workspace1/wrf-data/geog:/home/Build_WRF/geog
 -v /home/uwcc-admin/uwcc-admin.json:/wrf/gcs.json
 curw-wrfv4
