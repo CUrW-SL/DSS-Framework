@@ -25,7 +25,7 @@ RUN mkdir Build_WRF
 
 WORKDIR Build_WRF
 
-RUN mkdir LIBRARIES code logs gfs output geog archive config
+RUN mkdir LIBRARIES code logs gfs nfs geog archive
 
 WORKDIR /home/Build_WRF/LIBRARIES
 
