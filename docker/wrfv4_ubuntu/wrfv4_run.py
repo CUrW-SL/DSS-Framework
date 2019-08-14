@@ -546,23 +546,29 @@ def parse_args():
     return parser.parse_args()
 
 
-def run_wrf_model(wrf_conf):
+def run_wrf_model(run_mode, wrf_conf):
     try:
         download_gfs_data(wrf_conf)
         try:
-            replace_namelist_wps(wrf_conf)
-            run_wps(wrf_conf)
+            if run_mode != 'wrf':
+                replace_namelist_wps(wrf_conf)
+                run_wps(wrf_conf)
+            else:
+                log.info('-------------WRF only-------------')
             try:
                 log.info('Cleaning up wps dir...')
-                print('wrf_conf : ', wrf_conf)
-                wps_dir = get_wps_dir(wrf_conf['wrf_home'])
-                print('wps_dir : ', wps_dir)
-                shutil.rmtree(wrf_conf['gfs_dir'])
-                delete_files_with_prefix(wps_dir, 'FILE:*')
-                delete_files_with_prefix(wps_dir, 'PFILE:*')
-                delete_files_with_prefix(wps_dir, 'geo_em.*')
-                replace_namelist_input(wrf_conf)
-                run_em_real(wrf_conf)
+                if run_mode != 'wps':
+                    print('wrf_conf : ', wrf_conf)
+                    wps_dir = get_wps_dir(wrf_conf['wrf_home'])
+                    print('wps_dir : ', wps_dir)
+                    shutil.rmtree(wrf_conf['gfs_dir'])
+                    delete_files_with_prefix(wps_dir, 'FILE:*')
+                    delete_files_with_prefix(wps_dir, 'PFILE:*')
+                    delete_files_with_prefix(wps_dir, 'geo_em.*')
+                    replace_namelist_input(wrf_conf)
+                    run_em_real(wrf_conf)
+                else:
+                    log.info('-------------WPS only-------------')
             except Exception as exx:
                 traceback.print_exc()
                 log.error('run wrf exception')
@@ -581,8 +587,8 @@ if __name__ == '__main__':
     logging.info('**** WRF RUN **** start_date: ' + start_date)
     run_id = args['run_id']
     logging.info('**** WRF RUN **** run_id: ' + run_id)
-    # wrf_config = args['wrf_config']
-    # logging.info('**** WRF RUN **** wrf_config: ' + wrf_config)
+    run_mode = args['mode']
+    logging.info('**** WRF RUN Mode**** run_mode: ' + run_mode)
     with open('wrfv4_config_bucket.json') as json_file:
         wrf_config = json.load(json_file)
         wrf_conf = wrf_config['wrf_config']
@@ -591,5 +597,5 @@ if __name__ == '__main__':
         # wrf_conf['start_date'] = '2019-08-03_00:00'
         wrf_conf['run_id'] = run_id
         wrf_conf['start_date'] = start_date
-        run_wrf_model(wrf_conf)
+        run_wrf_model(run_mode, wrf_conf)
 
