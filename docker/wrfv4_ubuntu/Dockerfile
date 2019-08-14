@@ -131,9 +131,18 @@ RUN apt-get install -y curl \
     && apt-get -y install python3 \
     && apt-get -y install python3-pip
 
-ADD code /home/Build_WRF/code
+COPY code /home/Build_WRF/code
 
 WORKDIR /home/Build_WRF/code
+
+RUN pip3 install virtualenv \
+    && virtualenv -p python3 venv \
+    && source venv/bin/activate \
+    && pip3 install cftime==1.0.3.4 \
+                    joblib==0.13.2 \
+                    netCDF4==1.5.1.2 \
+                    numpy==1.17.0 \
+    && deactivate
 
 COPY wrfv4_run.sh /home/Build_WRF/code
 COPY uwcc-admin.json /home/Build_WRF/code/gcs.json
