@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:18.04
 MAINTAINER Hasitha Dhananjaya <hasitha.10@cse.mrt.ac.lk>
 
 ENV WRF_VERSION 4.0

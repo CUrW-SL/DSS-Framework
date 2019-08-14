@@ -1,5 +1,5 @@
 # building docker image
-docker build -t curw-wrfv4:v1 .
+docker build -t curw-wrfv4:ubuntu18 .
 
 # Run already built docker image and connect to its shell
 docker run -it curw-wrfv4:v1 /bin/bash
