@@ -24,7 +24,7 @@ import constants
 
 
 LOG_FORMAT = '[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s'
-logging.basicConfig(filename='/home/uwcc-admin/hasitha/Build_WRF/logs/wrf_preprocessing.log',
+logging.basicConfig(filename='/home/Build_WRF/logs/wrf_preprocessing.log',
                     level=logging.DEBUG,
                     format=LOG_FORMAT)
 log = logging.getLogger()
