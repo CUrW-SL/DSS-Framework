@@ -23,11 +23,8 @@ check_empty() {
 }
 
 echo "#### Running WRF procedures..."
+cd /home/Build_WRF/code
 echo "Inside $(pwd)"
-
-# Activate venv.
-echo "Activating venv python3 virtual environment."
-source venv/bin/activate
 python3 wrfv4_run.py \
                     $( check_empty "$START_DATE" start_date ) \
                     $( check_empty "$MODE" mode ) \

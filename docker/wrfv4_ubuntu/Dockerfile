@@ -19,7 +19,9 @@ RUN apt-get update \
         build-essential \
         apt-utils \
         file \
-        m4
+        m4 \
+        python3.6 \
+        python3-pip
 
 RUN mkdir Build_WRF
 
@@ -127,22 +129,13 @@ RUN apt-get install -y curl \
     && echo "deb http://packages.cloud.google.com/apt $GCSFUSE_REPO main" | tee /etc/apt/sources.list.d/gcsfuse.list \
     && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - \
     && apt-get update \
-    && apt-get install -y gcsfuse \
-    && apt-get -y install python3 \
-    && apt-get -y install python3-pip
+    && apt-get install -y gcsfuse
 
 COPY code /home/Build_WRF/code
 
 WORKDIR /home/Build_WRF/code
 
-RUN pip3 install virtualenv \
-    && virtualenv -p python3 venv \
-    && source venv/bin/activate \
-    && pip3 install cftime==1.0.3.4 \
-                    joblib==0.13.2 \
-                    netCDF4==1.5.1.2 \
-                    numpy==1.17.0 \
-    && deactivate
+RUN pip3 install -r requirements.yml
 
 COPY wrfv4_run.sh /home/Build_WRF/code
 COPY uwcc-admin.json /home/Build_WRF/code/gcs.json
