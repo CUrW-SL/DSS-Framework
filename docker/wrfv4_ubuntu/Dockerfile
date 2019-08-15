@@ -28,12 +28,12 @@ RUN mkdir Build_WRF
 WORKDIR Build_WRF
 
 RUN mkdir LIBRARIES \
-    && mkdir code \
-    && mkdir logs \
-    && mkdir gfs \
-    && mkdir nfs \
-    && mkdir geog \
-    && mkdir archive
+    && mkdir -p /home/Build_WRF/code \
+    && mkdir -p /home/Build_WRF/logs \
+    && mkdir -p /home/Build_WRF/gfs \
+    && mkdir -p /home/Build_WRF/nfs \
+    && mkdir -p /home/Build_WRF/geog \
+    && mkdir -p /home/Build_WRF/archive
 
 WORKDIR /home/Build_WRF/LIBRARIES
 
