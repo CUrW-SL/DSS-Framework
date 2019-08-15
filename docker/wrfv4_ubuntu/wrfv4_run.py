@@ -584,11 +584,11 @@ if __name__ == '__main__':
     args = vars(parse_args())
     logging.info('Running arguments:\n%s' % json.dumps(args, sort_keys=True, indent=0))
     start_date = args['start_date']
-    logging.info('**** WRF RUN **** start_date: ' + start_date)
+    logging.info('**** WRF RUN **** start_date: {}'.format(start_date))
     run_id = args['run_id']
-    logging.info('**** WRF RUN **** run_id: ' + run_id)
+    logging.info('**** WRF RUN **** run_id: {}'.format(run_id))
     run_mode = args['mode']
-    logging.info('**** WRF RUN Mode**** run_mode: ' + run_mode)
+    logging.info('**** WRF RUN Mode**** run_mode: {}'.format(run_mode))
     with open('wrfv4_config_bucket.json') as json_file:
         wrf_config = json.load(json_file)
         wrf_conf = wrf_config['wrf_config']

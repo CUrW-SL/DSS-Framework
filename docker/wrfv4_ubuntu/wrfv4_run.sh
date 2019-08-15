@@ -21,7 +21,9 @@ done
 check_empty() {
   [ -z "$1" ] && echo "" || echo "-$2=$1"
 }
-
+echo "START_DATE : $START_DATE"
+echo "RUN_ID : $RUN_ID"
+echo "MODE : $MODE"
 echo "#### Running WRF procedures..."
 cd /home/Build_WRF/code
 echo "Inside $(pwd)"

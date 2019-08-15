@@ -137,14 +137,14 @@ RUN apt-get install -y curl \
     && apt-get update \
     && apt-get install -y gcsfuse
 
-COPY code /home/Build_WRF/code
-
 WORKDIR /home/Build_WRF/code
 
+COPY code /home/Build_WRF/code
 RUN pip3 install -r requirements.yml
 
 COPY wrfv4_run.sh /home/Build_WRF/code
 COPY uwcc-admin.json /home/Build_WRF/code/gcs.json
+
 RUN chmod +x wrfv4_run.sh
 
 CMD ["wrfv4_run.sh"]

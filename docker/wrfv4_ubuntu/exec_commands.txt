@@ -2,7 +2,7 @@
 docker build -t curw-wrfv4:ubuntu18 .
 
 # build docker image without using cache
-docker build --no-cache -t curw-wrfv4:ubuntu18 .
+g
 
 # Run already built docker image and connect to its shell
 docker run -it curw-wrfv4:ubuntu18 /bin/bash
