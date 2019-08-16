@@ -141,8 +141,6 @@ WORKDIR /home/Build_WRF/code
 
 COPY code /home/Build_WRF/code
 RUN pip3 install -r requirements.yml
-
-COPY wrfv4_run.sh /home/Build_WRF/code
 COPY uwcc-admin.json /home/Build_WRF/code/gcs.json
 
 RUN chmod +x wrfv4_run.sh
