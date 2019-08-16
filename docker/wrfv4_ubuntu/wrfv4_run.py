@@ -542,6 +542,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-run_id')
     parser.add_argument('-start_date')
+    parser.add_argument('-mode')
     parser.add_argument('-wrf_config', default={})
     return parser.parse_args()
 
@@ -589,10 +590,10 @@ if __name__ == '__main__':
     logging.info('**** WRF RUN **** run_id: {}'.format(run_id))
     run_mode = args['mode']
     logging.info('**** WRF RUN Mode**** run_mode: {}'.format(run_mode))
-    with open('wrfv4_config_bucket.json') as json_file:
+    with open('wrfv4_config.json') as json_file:
         wrf_config = json.load(json_file)
         wrf_conf = wrf_config['wrf_config']
-        logging.info('**** WRF RUN **** wrf_conf: ' + wrf_conf)
+        logging.info('**** WRF RUN **** wrf_conf: {}'.format(wrf_conf))
         # wrf_conf['run_id'] = 'test_run8_05_02_2019'
         # wrf_conf['start_date'] = '2019-08-03_00:00'
         wrf_conf['run_id'] = run_id

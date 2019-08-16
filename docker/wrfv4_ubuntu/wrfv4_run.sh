@@ -5,7 +5,6 @@ export GOOGLE_APPLICATION_CREDENTIALS=/home/Build_WRF/code/gcs.json
 echo "#### Reading running args..."
 while getopts ":d:i:m:g:k:v:" option; do
   case "${option}" in
-
   d) START_DATE=$OPTARG ;;
   k) RUN_ID=$OPTARG ;;
   m) MODE=$OPTARG ;;
