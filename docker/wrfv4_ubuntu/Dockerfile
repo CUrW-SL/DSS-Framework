@@ -22,6 +22,7 @@ RUN apt-get update \
         apt-utils \
         file \
         m4 \
+        nco \
         python3.6 \
         python3-pip
 
