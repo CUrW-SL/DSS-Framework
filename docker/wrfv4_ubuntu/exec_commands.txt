@@ -1,5 +1,5 @@
 # building docker image
-docker build -t curw-wrfv4:ubuntu18 .
+docker build -t curw-wrfv4:ubuntu1804 .
 
 # build docker image without using cache
 docker build --no-cache -t curw-wrfv4:ubuntu1804 .

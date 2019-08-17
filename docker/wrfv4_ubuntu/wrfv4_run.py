@@ -169,6 +169,7 @@ def download_gfs_data(wrf_conf):
     :param start_date: '2017-08-27_00:00'
     :return:
     """
+    print('Downloading GFS data: START')
     log.info('Downloading GFS data: START')
     try:
         gfs_date, gfs_cycle, start_inv = get_appropriate_gfs_inventory(wrf_conf)
@@ -178,8 +179,10 @@ def download_gfs_data(wrf_conf):
                                                           gfs_cycle, wrf_conf['gfs_res'],
                                                           wrf_conf['gfs_dir'], start=start_inv)
         gfs_threads = wrf_conf['gfs_threads']
-        log.info('Following data will be downloaded in %d parallel threads\n%s' % (gfs_threads, '\n'.join(
+        print('Following data will be downloaded in %d parallel threads\n%s' % (gfs_threads, '\n'.join(
                     ' '.join(map(str, i)) for i in inventories)))
+        log.info('Following data will be downloaded in %d parallel threads\n%s' % (gfs_threads, '\n'.join(
+            ' '.join(map(str, i)) for i in inventories)))
 
         start_time = time.time()
         download_parallel(inventories, procs=gfs_threads, retries=wrf_conf['gfs_retries'],
@@ -188,8 +191,10 @@ def download_gfs_data(wrf_conf):
         elapsed_time = time.time() - start_time
         log.info('Downloading GFS data: END Elapsed time: %f' % elapsed_time)
         log.info('Downloading GFS data: END')
+        print('Downloading GFS data: END')
         return gfs_date, start_inv
     except Exception as e:
+        print('Downloading GFS data error: {}'.format(str(e)))
         log.error('Downloading GFS data error: {}'.format(str(e)))
 
 
@@ -396,7 +401,9 @@ def run_wps(wrf_config):
     gfs_date, gfs_cycle, start = get_appropriate_gfs_inventory(wrf_config)
     dest = get_gfs_data_url_dest_tuple(wrf_config['gfs_url'], wrf_config['gfs_inv'], gfs_date, gfs_cycle,
                                              '', wrf_config['gfs_res'], '')[1].replace('.grb2', '')
+    print('----------------------gfs_dir : ', wrf_config['gfs_dir'])
     print('----------------------wps_dir : ', wps_dir)
+    print('----------------------dest : ', dest)
     run_subprocess(
         'csh link_grib.csh %s/%s' % (wrf_config['gfs_dir'], dest), cwd=wps_dir)
     try:
@@ -548,7 +555,9 @@ def parse_args():
 
 
 def run_wrf_model(run_mode, wrf_conf):
+    print('wrf_conf : ', wrf_conf)
     try:
+        print('download_gfs_data.')
         download_gfs_data(wrf_conf)
         try:
             if run_mode != 'wrf':
@@ -559,7 +568,6 @@ def run_wrf_model(run_mode, wrf_conf):
             try:
                 log.info('Cleaning up wps dir...')
                 if run_mode != 'wps':
-                    print('wrf_conf : ', wrf_conf)
                     wps_dir = get_wps_dir(wrf_conf['wrf_home'])
                     print('wps_dir : ', wps_dir)
                     shutil.rmtree(wrf_conf['gfs_dir'])
