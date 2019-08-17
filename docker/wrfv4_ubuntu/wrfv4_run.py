@@ -81,12 +81,15 @@ def download_file(url, dest, retries=0, delay=60, overwrite=False, secondary_des
         _f = urlopen(_url)
         with open(_dest, "wb") as _local_file:
             _local_file.write(_f.read())
+            print('Downloaded {}'.format(_url))
 
     while try_count <= retries + 1:
         try:
+            print("Downloading %s to %s" % (url, dest))
             log.info("Downloading %s to %s" % (url, dest))
             if secondary_dest_dir is None:
                 if not overwrite and file_exists_nonempty(dest):
+                    print('File already exists. Skipping download!')
                     log.info('File already exists. Skipping download!')
                 else:
                     _download_file(url, dest)
@@ -94,22 +97,28 @@ def download_file(url, dest, retries=0, delay=60, overwrite=False, secondary_des
             else:
                 secondary_file = os.path.join(secondary_dest_dir, os.path.basename(dest))
                 if file_exists_nonempty(secondary_file):
+                    print("File available in secondary dir. Copying to the destination dir from secondary dir")
                     log.info("File available in secondary dir. Copying to the destination dir from secondary dir")
                     shutil.copyfile(secondary_file, dest)
                 else:
+                    print("File not available in secondary dir. Downloading...")
                     log.info("File not available in secondary dir. Downloading...")
                     _download_file(url, dest)
+                    print("Copying to the secondary dir")
                     log.info("Copying to the secondary dir")
                     shutil.copyfile(dest, secondary_file)
                 return
 
         except (HTTPError, URLError) as e:
+            print(
+                'Error in downloading %s Attempt %d : %s . Retrying in %d seconds' % (url, try_count, e.message, delay))
             log.error(
                 'Error in downloading %s Attempt %d : %s . Retrying in %d seconds' % (url, try_count, e.message, delay))
             try_count += 1
             last_e = e
             time.sleep(delay)
         except FileExistsError:
+            print('File was already downloaded by another process! Returning')
             log.info('File was already downloaded by another process! Returning')
             return
     raise last_e
@@ -333,19 +342,24 @@ def get_appropriate_gfs_inventory(wrf_config):
 
 
 def run_subprocess(cmd, cwd=None, print_stdout=False):
+    print('Running subprocess %s cwd %s' % (cmd, cwd))
     log.info('Running subprocess %s cwd %s' % (cmd, cwd))
     start_t = time.time()
     output = ''
     try:
         output = subprocess.check_output(shlex.split(cmd), stderr=subprocess.STDOUT, cwd=cwd)
     except subprocess.CalledProcessError as e:
+        print('Exception in subprocess %s! Error code %d' % (cmd, e.returncode))
         log.error('Exception in subprocess %s! Error code %d' % (cmd, e.returncode))
+        print(e.output)
         log.error(e.output)
         raise e
     finally:
         elapsed_t = time.time() - start_t
+        print('Subprocess %s finished in %f s' % (cmd, elapsed_t))
         log.info('Subprocess %s finished in %f s' % (cmd, elapsed_t))
         if print_stdout:
+            print('stdout and stderr of %s\n%s' % (cmd, output))
             log.info('stdout and stderr of %s\n%s' % (cmd, output))
     return output
 
@@ -384,6 +398,7 @@ def run_wps(wrf_config):
     wps_dir = get_wps_dir(wrf_home)
     output_dir = create_dir_if_not_exists(
         os.path.join(wrf_config['nfs_dir'], 'results', wrf_config['run_id'], 'wps'))
+    print('run_wps|output_dir : ', output_dir)
 
     log.info('Cleaning up files')
     logs_dir = create_dir_if_not_exists(os.path.join(output_dir, 'logs'))
@@ -394,8 +409,10 @@ def run_wps(wrf_config):
 
     # Linking VTable
     if not os.path.exists(os.path.join(wps_dir, 'Vtable')):
+        print('Creating Vtable symlink')
         log.info('Creating Vtable symlink')
         os.symlink(os.path.join(wps_dir, 'ungrib/Variable_Tables/Vtable.NAM'), os.path.join(wps_dir, 'Vtable'))
+        print('symlinks has created.')
 
     # Running link_grib.csh
     gfs_date, gfs_cycle, start = get_appropriate_gfs_inventory(wrf_config)
@@ -558,7 +575,7 @@ def run_wrf_model(run_mode, wrf_conf):
     print('wrf_conf : ', wrf_conf)
     try:
         print('download_gfs_data.')
-        download_gfs_data(wrf_conf)
+        #download_gfs_data(wrf_conf)
         try:
             if run_mode != 'wrf':
                 replace_namelist_wps(wrf_conf)
