@@ -1,8 +1,8 @@
 # building docker image
-docker build -t curw-wrfv4:ubuntu1804 .
+docker build -t curw-wrfv4:ubuntu1604 .
 
 # build docker image without using cache
-docker build --no-cache -t curw-wrfv4:ubuntu1804 .
+docker build --no-cache -t curw-wrfv4:ubuntu1604 .
 
 # Run already built docker image and connect to its shell
 docker run -it curw-wrfv4:ubuntu1804 /bin/bash
