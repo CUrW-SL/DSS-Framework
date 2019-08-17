@@ -503,6 +503,9 @@ def run_em_real(wrf_config):
     output_dir = create_dir_if_not_exists(os.path.join(wrf_config['nfs_dir'], 'results', run_id, 'wrf'))
     archive_dir = create_dir_if_not_exists(os.path.join(wrf_config['archive_dir'], 'results', run_id, 'wrf'))
 
+    print('run_em_real|output_dir: ', output_dir)
+    print('run_em_real|archive_dir: ', archive_dir)
+
     log.info('Backup the output dir')
     backup_dir(output_dir)
 
@@ -575,7 +578,7 @@ def run_wrf_model(run_mode, wrf_conf):
     print('wrf_conf : ', wrf_conf)
     try:
         print('download_gfs_data.')
-        #download_gfs_data(wrf_conf)
+        download_gfs_data(wrf_conf)
         try:
             if run_mode != 'wrf':
                 replace_namelist_wps(wrf_conf)
