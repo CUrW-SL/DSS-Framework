@@ -1,5 +1,6 @@
 import os
 import traceback
+import numpy as np
 from netCDF4._netCDF4 import Dataset
 
 if __name__ == "__main__":
@@ -12,7 +13,7 @@ if __name__ == "__main__":
             print('unit_info: ', rainc_unit_info)
             lat_unit_info = nc_fid.variables['XLAT'].units
             print('lat_unit_info: ', lat_unit_info)
-            times = nc_fid.variables['Times']
+            times = np.array([''.join([y.decode() for y in x]) for x in nc_fid.variables['Times'][:]])
             print('times : ', times)
             # time_unit_info = nc_fid.variables['Times'].units
             # print('time_unit_info: ', time_unit_info)
