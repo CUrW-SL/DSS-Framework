@@ -145,6 +145,8 @@ WORKDIR /home/Build_WRF/code
 COPY code /home/Build_WRF/code
 COPY code/namelist.wps /home/Build_WRF
 COPY code/namelist.input /home/Build_WRF
+
+#install required libs for python script
 RUN pip3 install -r requirements.yml
 COPY uwcc-admin.json /home/Build_WRF/code/gcs.json
 
