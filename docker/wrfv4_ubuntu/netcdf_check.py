@@ -12,9 +12,11 @@ if __name__ == "__main__":
             print('unit_info: ', rainc_unit_info)
             lat_unit_info = nc_fid.variables['XLAT'].units
             print('lat_unit_info: ', lat_unit_info)
-            time_unit_info = nc_fid.variables['Times'].units
-            print('time_unit_info: ', time_unit_info)
-            time_unit_info_list = time_unit_info.split(' ')
+            times = nc_fid.variables['Times']
+            print('times : ', times)
+            # time_unit_info = nc_fid.variables['Times'].units
+            # print('time_unit_info: ', time_unit_info)
     except Exception as e:
         print('Read netcdf info exception|e: ', str(e))
         traceback.print_exc()
+
