@@ -24,3 +24,11 @@ curw-wrfv4
 -v curwsl_nfs_1:/home/Build_WRF/nfs
 -v curwsl_archive_1:/home/Build_WRF/archive
 
+# processor core count
+cat /proc/cpuinfo | awk '/^processor/{print $3}' | wc -l
+or
+grep -c ^processor /proc/cpuinfo
+which will count the number of lines starting with "processor" in /proc/cpuinfo
+For systems with hyper-threading, you can use
+grep ^cpu\\scores /proc/cpuinfo | uniq |  awk '{print $4}'
+
