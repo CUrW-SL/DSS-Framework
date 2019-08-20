@@ -5,7 +5,7 @@ docker build -t curw-wrfv4:ubuntu1604 .
 docker build --no-cache -t curw-wrfv4:ubuntu1604 .
 
 # Run already built docker image and connect to its shell
-docker run -it curw-wrfv4:ubuntu1804 /bin/bash
+docker run -it curw-wrfv4:ubuntu1604 /bin/bash
 
 # view <none><none> docker images
 docker images -f dangling=true -q
