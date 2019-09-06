@@ -1,0 +1,8 @@
+{
+  "target_model" : "E,SE,A,C",
+  "version" : "4.0",
+  "run" : "0",
+  "data_hour" : "06",
+  "ignore_previous_run" : "true",
+  "check_gfs_data_availability" : "true"
+}
