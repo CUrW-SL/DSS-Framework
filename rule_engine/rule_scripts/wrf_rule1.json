@@ -3,6 +3,6 @@
   "ignore_previous_run": "true",
   "version" : "4.0",
   "run" : "0",
-  "data_hour" : "06",
+  "data_hour" : "00",
   "check_gfs_data_availability" : "true"
 }
