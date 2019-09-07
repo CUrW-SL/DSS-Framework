@@ -17,5 +17,7 @@
     "model": "E"
   },
   "no_forecast_continue": "true",
-  "no_observed_continue": "true"
+  "no_observed_continue": "true",
+  "forecast_days": 2,
+  "observed_days": 3
 }
