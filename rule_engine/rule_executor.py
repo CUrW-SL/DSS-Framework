@@ -46,7 +46,6 @@ def execute_exec_rule(rule_store, rule_id):
     rule_data = rule_store.all_rule_data[rule_id]
     print('rule_data : ', rule_data)
     if rule_data['rule_type'] == 'exec' and rule_data['enable'] == 'true':
-
         print('')
     else:
         print('Rule {} is disabled.'.format(rule_id))

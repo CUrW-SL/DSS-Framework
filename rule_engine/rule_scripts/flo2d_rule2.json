@@ -2,7 +2,7 @@
   "rule_type": "exec",
   "priority": 2,
   "rule_id": "flo2d_rule2",
-  "enable": "true",
+  "status": "enable/disable/completed/running",
   "target_model": "150m",
   "ignore_previous_run": "true",
   "rain_cell_data_from": {

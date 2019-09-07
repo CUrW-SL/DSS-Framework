@@ -2,7 +2,7 @@
   "rule_type": "exec",
   "priority": 2,
   "rule_id": "hechms_rule2",
-  "enable" : "true",
+  "status": "enable/disable/completed/running",
   "target_model": "distributed",
   "ignore_previous_run": "true",
   "init_run": "false",

@@ -2,6 +2,7 @@
   "rule_type": "exec",
   "priority": 2,
   "rule_id": "wrf_rule2",
+  "status": "enable/disable/completed/running",
   "enable": "true",
   "target_model": "E,SE",
   "ignore_previous_run": "true",
