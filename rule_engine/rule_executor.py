@@ -7,17 +7,31 @@ class RuleStore:
         self.rule_dir_path = rule_dir_path
         self.all_rule_data = self.load_all_rules()
 
+    def load_rule(self, rule_file_path):
+        with open(rule_file_path) as f:
+            data = json.load(f)
+            return data
+
+    def load_rule_set(self, rule_type='all'):
+        rule_data = {}
+        if rule_type == 'all':
+            rule_file_list = glob.glob("{}/*.{}".format(self.rule_dir_path, 'json'))
+        else:
+            rule_file_list = glob.glob("{}/{}*.{}".format(self.rule_dir_path, rule_type, 'json'))
+        if rule_file_list:
+            for rule_file in rule_file_list:
+                rule_data = self.load_rule(rule_file)
+                rule_data[rule_data['rule_id']] = rule_data
+        else:
+            print('No defined rules.')
+        return rule_data
+
     def load_all_rules(self):
         all_rule_data = {}
-
-        def _load_rule(rule_file_path):
-            with open(rule_file_path) as f:
-                data = json.load(f)
-                return data
         rule_file_list = glob.glob("{}/*.{}".format(self.rule_dir_path, 'json'))
         if rule_file_list:
             for rule_file in rule_file_list:
-                rule_data = _load_rule(rule_file)
+                rule_data = self.load_rule(rule_file)
                 all_rule_data[rule_data['rule_id']] = rule_data
         else:
             print('No defined rules.')
@@ -63,5 +77,6 @@ def execute_alert_rule():
 
 
 rule_store = RuleStore('/home/hasitha/PycharmProjects/DSS-Framework/rule_engine/rule_scripts')
-execute_exec_rule(rule_store, 'rule0')
+print('rule_store : ', rule_store)
+execute_exec_rule(rule_store, 'wrf_rule1')
 
