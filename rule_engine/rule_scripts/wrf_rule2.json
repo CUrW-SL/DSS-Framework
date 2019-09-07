@@ -1,4 +1,8 @@
 {
+  "rule_type": "exec",
+  "priority": 2,
+  "rule_id": "wrf_rule2",
+  "enable": "true",
   "target_model": "E,SE",
   "ignore_previous_run": "true",
   "version": "4.0",

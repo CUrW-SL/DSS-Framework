@@ -1,4 +1,8 @@
 {
+  "rule_type": "exec",
+  "priority": 1,
+  "rule_id" : "flo2d_rule1",
+  "enable": "true",
   "target_model": "250m",
   "ignore_previous_run": "true",
   "rain_cell_data_from": {
