@@ -106,13 +106,7 @@ class RuleEngineAdapter:
                                     'ignore_previous_run': row[10]})
         return flo2d_rules
 
-    def update_rule_status(self, model, rule_name, status):
-        if model == 'wrf':
-            query = 'update dss.wrf_rules set status={} where name=\'{}\''.format(status, rule_name)
-        elif model == 'hechms':
-            query = 'update dss.hechms_rules set status={} where name=\'{}\''.format(status, rule_name)
-        elif model == 'flo2d':
-            query = 'update dss.flo2d_rules set status={} where name=\'{}\''.format(status, rule_name)
+    def update_query(self, query):
         cursor = self.cursor
         try:
             print(query)
@@ -121,6 +115,15 @@ class RuleEngineAdapter:
         except Exception as ex:
             print('update_rule_status|Exception: ', str(ex))
             self.log.error('update_rule_status|query:{}'.format(query))
+
+    def update_rule_status(self, model, rule_name, status):
+        if model == 'wrf':
+            query = 'update dss.wrf_rules set status={} where name=\'{}\''.format(status, rule_name)
+        elif model == 'hechms':
+            query = 'update dss.hechms_rules set status={} where name=\'{}\''.format(status, rule_name)
+        elif model == 'flo2d':
+            query = 'update dss.flo2d_rules set status={} where name=\'{}\''.format(status, rule_name)
+        self.update_query(query)
 
 
 if __name__ == "__main__":
