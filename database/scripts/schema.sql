@@ -9,7 +9,8 @@ CREATE TABLE IF NOT EXISTS `wrf_rules` (
   `data_hour` varchar(45) DEFAULT NULL,
   `ignore_previous_run` TINYINT(1) DEFAULT NULL,
   `check_gfs_data_availability` TINYINT(1) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE IF NOT EXISTS `hechms_rules`
@@ -26,7 +27,8 @@ CREATE TABLE IF NOT EXISTS `hechms_rules`
     `no_observed_continue`        TINYINT(1) DEFAULT NULL,
     `rainfall_data_from`          varchar(100) DEFAULT NULL,
     `ignore_previous_run`         TINYINT(1)  DEFAULT NULL,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    PRIMARY KEY (`name`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
 
@@ -46,6 +48,7 @@ CREATE TABLE IF NOT EXISTS `flo2d_rules`
     `inflow_data_from`          varchar(100) DEFAULT NULL,
     `outflow_data_from`          varchar(100) DEFAULT NULL,
     `ignore_previous_run`         TINYINT(1)   DEFAULT NULL,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    PRIMARY KEY (`name`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
