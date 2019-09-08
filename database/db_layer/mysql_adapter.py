@@ -42,7 +42,6 @@ class RuleEngineAdapter:
             return value
 
     def get_multiple_result(self, sql_query):
-        result = None
         cursor = self.cursor
         try:
             cursor.execute(sql_query)
@@ -107,6 +106,22 @@ class RuleEngineAdapter:
                                     'ignore_previous_run': row[10]})
         return flo2d_rules
 
+    def update_rule_status(self, model, rule_name, status):
+        if model == 'wrf':
+            query = 'update dss.wrf_rules set status={} where name=\'{}\''.format(status, rule_name)
+        elif model == 'hechms':
+            query = 'update dss.hechms_rules set status={} where name=\'{}\''.format(status, rule_name)
+        elif model == 'flo2d':
+            query = 'update dss.flo2d_rules set status={} where name=\'{}\''.format(status, rule_name)
+        cursor = self.cursor
+        try:
+            print(query)
+            cursor.execute(query)
+            self.connection.commit()
+        except Exception as ex:
+            print('update_rule_status|Exception: ', str(ex))
+            self.log.error('update_rule_status|query:{}'.format(query))
+
 
 if __name__ == "__main__":
     adapter = RuleEngineAdapter('admin',
@@ -119,5 +134,6 @@ if __name__ == "__main__":
     print(adapter.get_wrf_rule_info(1))
     print(adapter.get_hechms_rule_info(1))
     print(adapter.get_flo2d_rule_info(1))
+    adapter.update_rule_status('wrf', 'rule1', 0)
     adapter.close_connection()
 
