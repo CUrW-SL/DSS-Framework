@@ -39,16 +39,6 @@ def conditionally_trigger_dss_unit3(context, dag_run_obj):
         return {'trigger_dag_id': 'hec-hms-single-dag', 'dro': dag_run_obj}
 
 
-def conditionally_trigger_dss_unit4(context, dag_run_obj):
-    print('conditionally_trigger_dss_unit4')
-    """This function decides whether or not to Trigger the remote DAG"""
-    c_p = context['params']['condition_param']
-    print("Controller DAG : conditionally_trigger = {}".format(c_p))
-    if context['params']['check_rules']:
-        dag_run_obj.payload = {'message': context['params']['message']}
-        return {'trigger_dag_id': 'flo2d-250m-dag', 'dro': dag_run_obj}
-
-
 default_args = {
         'owner': 'dss admin',
         'start_date': datetime.strptime('2019-07-24 11:00:00', '%Y-%m-%d %H:%M:%S'),
@@ -63,7 +53,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         task_id='dss_unit1',
         default_trigger="dss_trigger_target_dag",
         python_callable=conditionally_trigger_dss_unit1,
-        params={'check_rules': True, 'rules': ['rule0']},
+        params={'check_rules': True, 'rule_type': 'wrf'},
         dag=dag,
     )
 
@@ -71,7 +61,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         task_id='dss_unit2',
         default_trigger="dss_trigger_target_dag",
         python_callable=conditionally_trigger_dss_unit2,
-        params={'check_rules': True, 'rules': ['rule1']},
+        params={'check_rules': True, 'rule_type': 'hechms'},
         dag=dag,
     )
 
@@ -79,17 +69,9 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         task_id='dss_unit3',
         default_trigger="dss_trigger_target_dag",
         python_callable=conditionally_trigger_dss_unit3,
-        params={'check_rules': True, 'rules': ['rule3', 'rule4']},
+        params={'check_rules': True, 'rule_type': 'flo2d'},
         dag=dag,
     )
 
-    dss_unit4 = ConditionTriggerDagRunOperator(
-        task_id='dss_unit4',
-        default_trigger="dss_trigger_target_dag",
-        python_callable=conditionally_trigger_dss_unit4,
-        params={'check_rules': True, 'rules': ['rule0']},
-        dag=dag,
-    )
-
-    dss_unit1 >> dss_unit2 >> dss_unit3 >> dss_unit4
+    dss_unit1 >> dss_unit2 >> dss_unit3
 
