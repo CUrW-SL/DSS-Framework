@@ -53,7 +53,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         task_id='dss_unit1',
         default_trigger="dss_trigger_target_dag",
         python_callable=conditionally_trigger_dss_unit1,
-        params={'check_rules': True, 'rule_type': 'wrf'},
+        params={'check_rules': True, 'rule_types': ['wrf']},
         dag=dag,
     )
 
@@ -61,7 +61,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         task_id='dss_unit2',
         default_trigger="dss_trigger_target_dag",
         python_callable=conditionally_trigger_dss_unit2,
-        params={'check_rules': True, 'rule_type': 'hechms'},
+        params={'check_rules': True, 'rule_types': ['hechms']},
         dag=dag,
     )
 
@@ -69,7 +69,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         task_id='dss_unit3',
         default_trigger="dss_trigger_target_dag",
         python_callable=conditionally_trigger_dss_unit3,
-        params={'check_rules': True, 'rule_type': 'flo2d'},
+        params={'check_rules': True, 'rule_types': ['flo2d']},
         dag=dag,
     )
 
