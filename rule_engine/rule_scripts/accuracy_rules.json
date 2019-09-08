@@ -1,0 +1,38 @@
+{
+  "water_level" :
+  {
+    "rule1" :
+    {
+      "priority": 6,
+      "enable": "true",
+      "station_list": [
+        "station1",
+        "station2",
+        "station3",
+        "station4",
+        "station5",
+        "station6",
+        "station7",
+        "station8",
+        "station9",
+        "station10",
+        "station11"
+      ],
+      "accuracy_percentage": "65"
+    }
+  },
+  "discharge" :
+  {
+    "rule1" :
+    {
+      "priority": 3,
+      "enable": "true",
+      "variable": "discharge",
+      "station_list": [
+        "station1",
+        "station2"
+      ],
+      "percentage": "60"
+    }
+  }
+}

@@ -1,124 +1,115 @@
 {
-    "wrf" :
-        {
-            "rule1" :
-                {
-                  "priority": 1,
-                  "status": "enable/disable/completed/running",
-                  "target_model": "E,SE,A,C",
-                  "ignore_previous_run": "true",
-                  "version": "4.0",
-                  "run": "0",
-                  "data_hour": "00",
-                  "check_gfs_data_availability": "true"
-                },
-            "rule2" :
-                {
-                  "priority": 2,
-                  "status": "enable/disable/completed/running",
-                  "enable": "true",
-                  "target_model": "E,SE",
-                  "ignore_previous_run": "true",
-                  "version": "4.0",
-                  "run": "0",
-                  "data_hour": "06",
-                  "check_gfs_data_availability": "true"
-                }
-        },
-    "hechms" :
-        {
-            "rule1" :
-                {
-                  "priority": 1,
-                  "status": "enable/disable/completed/running",
-                  "target_model": "distributed,single",
-                  "ignore_previous_run": "true",
-                  "init_run": "false",
-                  "rainfall_data_from": {
-                    "model_type": "wrf",
-                    "model": "A",
-                    "version": "4.0",
-                    "run": "0",
-                    "data_hour": "06"
-                  },
-                  "no_forecast_continue": "true",
-                  "no_observed_continue": "true",
-                  "forecast_days": 2,
-                  "observed_days": 3
-                },
-            "rule2" :
-                {
-                  "priority": 2,
-                  "status": "enable/disable/completed/running",
-                  "target_model": "distributed",
-                  "ignore_previous_run": "true",
-                  "init_run": "false",
-                  "rainfall_data_from": {
-                    "model_type": "wrf",
-                    "model": "E",
-                    "version": "4.0",
-                    "run": "0",
-                    "data_hour": "00"
-                  },
-                  "no_forecast_continue": "true",
-                  "no_observed_continue": "true",
-                  "forecast_days": 2,
-                  "observed_days": 3
-                }
-        },
-    "flo2d" :
-        {
-            "rule1" :
-                {
-                  "priority": 1,
-                  "status": "enable/disable/completed/running",
-                  "target_model": "250m",
-                  "ignore_previous_run": "true",
-                  "rain_cell_data_from": {
-                    "model_type": "wrf",
-                    "model": "A",
-                    "version": "4.0",
-                    "run": "0",
-                    "data_hour": "06"
-                  },
-                  "inflow_data_from": {
-                    "model_type": "hechms",
-                    "model": "distributed"
-                  },
-                  "outflow_data_from": {
-                    "model_type": "wrf",
-                    "model": "A"
-                  },
-                  "no_forecast_continue": "true",
-                  "no_observed_continue": "true",
-                  "forecast_days": 2,
-                  "observed_days": 3
-                },
-            "rule2" :
-                {
-                  "priority": 2,
-                  "status": "enable/disable/completed/running",
-                  "target_model": "150m",
-                  "ignore_previous_run": "true",
-                  "rain_cell_data_from": {
-                    "model_type": "wrf",
-                    "model": "E",
-                    "version": "4.0",
-                    "run": "0",
-                    "data_hour": "06"
-                  },
-                  "inflow_data_from": {
-                    "model_type": "hechms",
-                    "model": "distributed"
-                  },
-                  "outflow_data_from": {
-                    "model_type": "wrf",
-                    "model": "E"
-                  },
-                  "no_forecast_continue": "true",
-                  "no_observed_continue": "true",
-                  "forecast_days": 2,
-                  "observed_days": 3
-                }
-        }
+  "wrf": {
+    "rule1": {
+      "priority": 1,
+      "status": "enable/disable/completed/running",
+      "target_model": "E,SE,A,C",
+      "ignore_previous_run": "true",
+      "version": "4.0",
+      "run": "0",
+      "data_hour": "00",
+      "check_gfs_data_availability": "true"
+    },
+    "rule2": {
+      "priority": 2,
+      "status": "enable/disable/completed/running",
+      "enable": "true",
+      "target_model": "E,SE",
+      "ignore_previous_run": "true",
+      "version": "4.0",
+      "run": "0",
+      "data_hour": "06",
+      "check_gfs_data_availability": "true"
+    }
+  },
+  "hechms": {
+    "rule1": {
+      "priority": 1,
+      "status": "enable/disable/completed/running",
+      "target_model": "distributed,single",
+      "ignore_previous_run": "true",
+      "init_run": "false",
+      "rainfall_data_from": {
+        "model_type": "wrf",
+        "model": "A",
+        "version": "4.0",
+        "run": "0",
+        "data_hour": "06"
+      },
+      "no_forecast_continue": "true",
+      "no_observed_continue": "true",
+      "forecast_days": 2,
+      "observed_days": 3
+    },
+    "rule2": {
+      "priority": 2,
+      "status": "enable/disable/completed/running",
+      "target_model": "distributed",
+      "ignore_previous_run": "true",
+      "init_run": "false",
+      "rainfall_data_from": {
+        "model_type": "wrf",
+        "model": "E",
+        "version": "4.0",
+        "run": "0",
+        "data_hour": "00"
+      },
+      "no_forecast_continue": "true",
+      "no_observed_continue": "true",
+      "forecast_days": 2,
+      "observed_days": 3
+    }
+  },
+  "flo2d": {
+    "rule1": {
+      "priority": 1,
+      "status": "enable/disable/completed/running",
+      "target_model": "250m",
+      "ignore_previous_run": "true",
+      "rain_cell_data_from": {
+        "model_type": "wrf",
+        "model": "A",
+        "version": "4.0",
+        "run": "0",
+        "data_hour": "06"
+      },
+      "inflow_data_from": {
+        "model_type": "hechms",
+        "model": "distributed"
+      },
+      "outflow_data_from": {
+        "model_type": "wrf",
+        "model": "A"
+      },
+      "no_forecast_continue": "true",
+      "no_observed_continue": "true",
+      "forecast_days": 2,
+      "observed_days": 3
+    },
+    "rule2": {
+      "priority": 2,
+      "status": "enable/disable/completed/running",
+      "target_model": "150m",
+      "ignore_previous_run": "true",
+      "rain_cell_data_from": {
+        "model_type": "wrf",
+        "model": "E",
+        "version": "4.0",
+        "run": "0",
+        "data_hour": "06"
+      },
+      "inflow_data_from": {
+        "model_type": "hechms",
+        "model": "distributed"
+      },
+      "outflow_data_from": {
+        "model_type": "wrf",
+        "model": "E"
+      },
+      "no_forecast_continue": "true",
+      "no_observed_continue": "true",
+      "forecast_days": 2,
+      "observed_days": 3
+    }
+  }
 }
