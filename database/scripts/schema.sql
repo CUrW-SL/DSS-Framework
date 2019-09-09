@@ -1,4 +1,5 @@
-CREATE TABLE IF NOT EXISTS `wrf_rules` (
+CREATE TABLE IF NOT EXISTS `wrf_rules`
+(
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(45) DEFAULT NULL,
   `priority` int(11) DEFAULT NULL,
@@ -11,7 +12,8 @@ CREATE TABLE IF NOT EXISTS `wrf_rules` (
   `check_gfs_data_availability` TINYINT(1) DEFAULT NULL,
   PRIMARY KEY (`id`),
   PRIMARY KEY (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB
+  DEFAULT CHARSET=latin1;
 
 CREATE TABLE IF NOT EXISTS `hechms_rules`
 (
