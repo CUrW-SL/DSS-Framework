@@ -52,3 +52,27 @@ CREATE TABLE IF NOT EXISTS `flo2d_rules`
     PRIMARY KEY (`name`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
+
+CREATE TABLE IF NOT EXISTS `accuracy_rules`
+(
+    `id`                  INT          NOT NULL AUTO_INCREMENT,
+    `name`                VARCHAR(45)  NOT NULL,
+    `priority`            INT          NULL,
+    `status`              INT          NULL COMMENT '0-disable,1-enable,2-running,3-completed',
+    `variable`            INT          NULL COMMENT '1-precipitation, 2- discharge, 3- water_level, 4- tide',
+    `relevant_station`    VARCHAR(200) NULL,
+    `accuracy_level`      INT          NULL,
+    `accuracy_percentage` INT          NULL,
+    PRIMARY KEY (`id`, `name`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = latin1;
+
+CREATE TABLE IF NOT EXISTS `water_level_rules`
+(
+    `id`            INT         NOT NULL AUTO_INCREMENT,
+    `station_name`  VARCHAR(45) NOT NULL,
+    `alert_level`   DECIMAL     NULL,
+    `warning_level` DECIMAL     NULL,
+    PRIMARY KEY (`id`, `station_name`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = latin1;
