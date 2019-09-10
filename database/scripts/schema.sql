@@ -78,3 +78,13 @@ CREATE TABLE IF NOT EXISTS `water_level_rules`
     PRIMARY KEY (`id`, `station_name`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
+
+CREATE TABLE IF NOT EXISTS `dss`.`variable_rules`
+(
+    `id`                   INT         NOT NULL,
+    `variable_name`        VARCHAR(45) NOT NULL,
+    `check_alert_level`    TINYINT(1)  NULL,
+    `check_warnning_level` TINYINT(1)  NULL,
+    PRIMARY KEY (`id`, `variable_name`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = latin1;
