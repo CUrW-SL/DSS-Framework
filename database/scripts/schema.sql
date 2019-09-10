@@ -69,17 +69,18 @@ CREATE TABLE IF NOT EXISTS `accuracy_rules`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
 
-CREATE TABLE IF NOT EXISTS `water_level_rules`
+CREATE TABLE IF NOT EXISTS `variable_limits`
 (
     `id`            INT         NOT NULL AUTO_INCREMENT,
     `station_name`  VARCHAR(45) NOT NULL,
+    `variable_type` DECIMAL     NULL COMMENT '1-precipitation, 2- discharge, 3- water_level',
     `alert_level`   DECIMAL     NULL,
     `warning_level` DECIMAL     NULL,
     PRIMARY KEY (`id`, `station_name`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
 
-CREATE TABLE IF NOT EXISTS `dss`.`variable_rules`
+CREATE TABLE IF NOT EXISTS `variable_rules`
 (
     `id`                   INT         NOT NULL,
     `variable_name`        VARCHAR(45) NOT NULL,
