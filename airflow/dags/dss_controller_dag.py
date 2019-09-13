@@ -15,6 +15,7 @@ def conditionally_trigger_dss_unit1(context, dag_run_obj):
     c_p = context['params']['condition_param']
     print("Controller DAG : conditionally_trigger = {}".format(c_p))
     if context['params']['check_rules']:
+        allowed_rule_types = context['params']['rule_types']
         dag_run_obj.payload = {'message': context['params']['message']}
         return {'trigger_dag_id': 'wrfv4-pre-dag', 'dro': dag_run_obj}
 
