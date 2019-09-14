@@ -1,6 +1,6 @@
 from datetime import datetime
 from airflow import DAG
-from workflow.plugins.operators import ConditionTriggerDagRunOperator
+from airflow.operators import ConditionTriggerDagRunOperator
 
 prod_dag_name = 'dss_controller_dag'
 schedule_interval = '*/10 * * * *'
