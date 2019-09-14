@@ -1,10 +1,10 @@
 import datetime
 import six
-from workflow.models import BaseOperator
-from workflow.plugins_manager import AirflowPlugin
-from workflow.utils import timezone
-from workflow.utils.decorators import apply_defaults
-from workflow.api.common.experimental.trigger_dag import trigger_dag
+from airflow.models import BaseOperator
+from airflow.plugins_manager import AirflowPlugin
+from airflow.utils import timezone
+from airflow.utils.decorators import apply_defaults
+from airflow.api.common.experimental.trigger_dag import trigger_dag
 
 import json
 

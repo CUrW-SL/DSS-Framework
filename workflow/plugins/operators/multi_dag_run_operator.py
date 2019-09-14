@@ -3,10 +3,10 @@ This operator can create multiple dag runs.
 """
 import datetime
 import six
-from workflow.bin.cli import trigger_dag
-from workflow.models import BaseOperator
-from workflow.utils import timezone, json
-from workflow.utils.decorators import apply_defaults
+from airflow.bin.cli import trigger_dag
+from airflow.models import BaseOperator
+from airflow.utils import timezone, json
+from airflow.utils.decorators import apply_defaults
 
 
 class DagRunOrder(object):
