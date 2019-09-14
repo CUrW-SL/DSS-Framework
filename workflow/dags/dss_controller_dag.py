@@ -1,8 +1,7 @@
 from datetime import datetime
 
 from airflow import DAG
-from airflow.operators.dagrun_operator import TriggerDagRunOperator
-# from airflow.operators import ConditionTriggerDagRunOperator
+# from workflow.operators import ConditionTriggerDagRunOperator
 from condition_dag_run_opearator import ConditionTriggerDagRunOperator
 
 prod_dag_name = 'dss_controller_dag'

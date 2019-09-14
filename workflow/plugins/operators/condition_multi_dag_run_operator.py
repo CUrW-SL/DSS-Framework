@@ -1,10 +1,10 @@
 import datetime
 import six
-from airflow.models import BaseOperator
-from airflow.plugins_manager import AirflowPlugin
-from airflow.utils import timezone
-from airflow.utils.decorators import apply_defaults
-from airflow.api.common.experimental.trigger_dag import trigger_dag
+from workflow.models import BaseOperator
+from workflow.plugins_manager import AirflowPlugin
+from workflow.utils import timezone
+from workflow.utils.decorators import apply_defaults
+from workflow.api.common.experimental.trigger_dag import trigger_dag
 
 import json
 
@@ -15,7 +15,7 @@ class DagRunOrder(object):
         self.payload = payload
 
 
-class ConditionTriggerDagRunOperator(BaseOperator):
+class ConditionMultiTriggerDagRunOperator(BaseOperator):
     """
     Triggers a DAG run for a specified ``dag_id`` return by python_callable
     :param python_callable: a reference to a python function that will be
@@ -35,13 +35,11 @@ class ConditionTriggerDagRunOperator(BaseOperator):
     @apply_defaults
     def __init__(
             self,
-            default_trigger,
             python_callable=None,
             execution_date=None,
             *args, **kwargs):
-        super(ConditionTriggerDagRunOperator, self).__init__(*args, **kwargs)
+        super(ConditionMultiTriggerDagRunOperator, self).__init__(*args, **kwargs)
         self.python_callable = python_callable
-        self.default_trigger = default_trigger
 
         if isinstance(execution_date, datetime.datetime):
             self.execution_date = execution_date.isoformat()
@@ -56,32 +54,29 @@ class ConditionTriggerDagRunOperator(BaseOperator):
                     type(execution_date)))
 
     def execute(self, context):
-        if self.execution_date is not None:
-            run_id = 'trig__{}'.format(self.execution_date)
-            self.execution_date = timezone.parse(self.execution_date)
-        else:
-            run_id = 'trig__' + timezone.utcnow().isoformat()
-        dro = DagRunOrder(run_id=run_id)
         if self.python_callable is not None:
-            condition_result = self.python_callable(context, dro)
-            dro = condition_result['dro']
-            trigger_dag_id = condition_result['trigger_dag_id']
-            trigger_dag(dag_id=trigger_dag_id,
-                        run_id=dro.run_id,
-                        conf=json.dumps(dro.payload),
-                        execution_date=self.execution_date,
-                        replace_microseconds=False)
-        else:
-            if self.default_trigger is not None:
-                trigger_dag(dag_id=self.default_trigger,
+            condition_results = self.python_callable(context)
+            count = 1
+            for condition_result in condition_results:
+                if self.execution_date is not None:
+                    run_id = 'trig_{}_{}'.format(count, self.execution_date)
+                    self.execution_date = timezone.parse(self.execution_date)
+                else:
+                    run_id = 'trig_{}_{}'.format(count, timezone.utcnow().isoformat())
+                dro = DagRunOrder(run_id=run_id)
+                trigger_dag_id = condition_result['trigger_dag_id']
+                payload = condition_result['payload']
+                trigger_dag(dag_id=trigger_dag_id,
                             run_id=dro.run_id,
+                            conf=json.dumps(payload),
                             execution_date=self.execution_date,
                             replace_microseconds=False)
-            else:
-                self.log.info("Criteria not met, moving on")
+                count += 1
+        else:
+            self.log.info("Criteria not met, moving on")
 
 
 class MyFirstPlugin(AirflowPlugin):
-    name = "conditional_trigger_operator"
-    operators = [ConditionTriggerDagRunOperator]
+    name = "conditional_multi_trigger_operator"
+    operators = [ConditionMultiTriggerDagRunOperator]
 

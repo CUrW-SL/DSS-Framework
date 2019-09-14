@@ -15,8 +15,8 @@ cd /home
 export AIRFLOW_HOME=/home/airflow
 #mkdir ./OUTPUT
 
-#airflow initdb
+#workflow initdb
 #sleep 5
 #echo "Starting Airflow Webserver"
-#airflow webserver -p 8080 &
+#workflow webserver -p 8080 &
 /bin/bash

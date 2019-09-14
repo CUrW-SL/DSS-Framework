@@ -104,7 +104,7 @@ RUN yum -y install gcsfuse
 RUN cd /wrf
 RUN mkdir gfs output geog archive config
 
-#RUN git clone https://github.com/nirandaperera/models.git && cd models && git checkout airflow-integ
+#RUN git clone https://github.com/nirandaperera/models.git && cd models && git checkout workflow-integ
 RUN git clone -b $CURW_VERSION https://github.com/nirandaperera/models.git curwsl
 RUN pip3.6 install -e curwsl/
 

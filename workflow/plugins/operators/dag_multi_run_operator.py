@@ -3,12 +3,12 @@ This operator can create multiple runs of same dag.
 """
 from datetime import datetime
 
-from airflow.models import DagBag
-from airflow.utils.state import State
+from workflow.models import DagBag
+from workflow.utils.state import State
 
-from airflow import settings
-from airflow.operators.dagrun_operator import TriggerDagRunOperator, DagRunOrder
-from airflow.utils import apply_defaults
+from workflow import settings
+from workflow.plugins.operators import TriggerDagRunOperator, DagRunOrder
+from workflow.utils import apply_defaults
 
 
 class TriggerMultiDagRunOperator(TriggerDagRunOperator):
