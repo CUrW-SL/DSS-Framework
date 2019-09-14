@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `hechms_rules`
     `init_run`                    TINYINT(1) DEFAULT NULL,
     `no_forecast_continue`        TINYINT(1) DEFAULT NULL,
     `no_observed_continue`        TINYINT(1) DEFAULT NULL,
-    `rainfall_data_from`          varchar(100) DEFAULT NULL,
+    `rainfall_data_from`          int(11) DEFAULT NULL,
     `ignore_previous_run`         TINYINT(1)  DEFAULT NULL,
     PRIMARY KEY (`id`),
     PRIMARY KEY (`name`)
@@ -46,9 +46,9 @@ CREATE TABLE IF NOT EXISTS `flo2d_rules`
     `init_run`                    TINYINT(1)   DEFAULT NULL,
     `no_forecast_continue`        TINYINT(1)   DEFAULT NULL,
     `no_observed_continue`        TINYINT(1)   DEFAULT NULL,
-    `rain_cell_data_from`          varchar(100) DEFAULT NULL,
-    `inflow_data_from`          varchar(100) DEFAULT NULL,
-    `outflow_data_from`          varchar(100) DEFAULT NULL,
+    `rain_cell_data_from`         int(11) DEFAULT NULL,
+    `inflow_data_from`            int(11) DEFAULT NULL,
+    `outflow_data_from`           int(11) DEFAULT NULL,
     `ignore_previous_run`         TINYINT(1)   DEFAULT NULL,
     PRIMARY KEY (`id`),
     PRIMARY KEY (`name`)
