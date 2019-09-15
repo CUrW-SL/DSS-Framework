@@ -111,6 +111,16 @@ class RuleEngineAdapter:
                                     'ignore_previous_run': row[10]})
         return flo2d_rules
 
+    def get_workflow_routines(self, schedule_date):
+        workflow_routines = []
+        query = 'select id,dss1,dss2,dss3 from dss.workflow_routines ' \
+                'where scheduled_date>=\'{}\''.format(schedule_date)
+        results = self.get_multiple_result(query)
+        if results is not None:
+            for row in results:
+                workflow_routines.append({'id': row[0], 'dss1': row[1], 'dss2': row[2], 'dss3': row[3]})
+        return workflow_routines
+
     def update_query(self, query):
         cursor = self.cursor
         try:
@@ -128,6 +138,10 @@ class RuleEngineAdapter:
             query = 'update dss.hechms_rules set status={} where name=\'{}\''.format(status, rule_name)
         elif model == 'flo2d':
             query = 'update dss.flo2d_rules set status={} where name=\'{}\''.format(status, rule_name)
+        self.update_query(query)
+
+    def update_workflow_routing_status(self, status, routine_id):
+        query = 'update dss.workflow_routines set status={} where name=\'{}\''.format(status, routine_id)
         self.update_query(query)
 
 
