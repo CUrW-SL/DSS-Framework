@@ -5,6 +5,11 @@ import os
 
 class RuleEngineAdapter:
     def __init__(self, mysql_user, mysql_password, mysql_host, mysql_db, log_path):
+        # mysql_user = 'admin'
+        # mysql_password = 'floody'
+        # mysql_host = 'localhost'
+        # mysql_db =  'dss'
+        # log_path = '/home/hasitha/PycharmProjects/DSS-Framework/log'
         print('[mysql_user, mysql_password, mysql_host, mysql_db, log_path] : ',
               [mysql_user, mysql_password, mysql_host, mysql_db, log_path])
         try:
