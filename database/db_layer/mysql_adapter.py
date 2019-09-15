@@ -97,7 +97,7 @@ class RuleEngineAdapter:
     def get_flo2d_rule_info(self, status=1):
         flo2d_rules = []
         query = 'select name, target_model, forecast_days, observed_days, ' \
-                'init_run, no_forecast_continue, no_observed_continue, rain_cell_data_from, ' \
+                'init_run, no_forecast_continue, no_observed_continue, raincell_data_from, ' \
                 'inflow_data_from, outflow_data_from, ignore_previous_run ' \
                 'from dss.flo2d_rules where status=1'.format(status)
         results = self.get_multiple_result(query)
@@ -106,7 +106,7 @@ class RuleEngineAdapter:
                 flo2d_rules.append({'name': row[0], 'target_model': row[1],
                                     'forecast_days': row[2], 'observed_days': row[3],
                                     'init_run': row[4], 'no_forecast_continue': row[5],
-                                    'no_observed_continue': row[6], 'rain_cell_data_from': row[7],
+                                    'no_observed_continue': row[6], 'raincell_data_from': row[7],
                                     'inflow_data_from': row[8], 'outflow_data_from': row[9],
                                     'ignore_previous_run': row[10]})
         return flo2d_rules
@@ -157,5 +157,6 @@ if __name__ == "__main__":
     print(adapter.get_hechms_rule_info(1))
     print(adapter.get_flo2d_rule_info(1))
     adapter.update_rule_status('wrf', 'rule1', 0)
+    print(adapter.get_workflow_routines('2019-09-14'))
     adapter.close_connection()
 
