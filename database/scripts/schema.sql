@@ -1,3 +1,17 @@
+CREATE TABLE IF NOT EXISTS `workflow_routines`
+(
+    `id`                int(11) NOT NULL AUTO_INCREMENT,
+    `dss1`              int(11)  DEFAULT NULL COMMENT 'rule id related to wrf',
+    `dss2`              int(11)  DEFAULT NULL COMMENT 'rule id related to hechms',
+    `dss3`              int(11)  DEFAULT NULL COMMENT 'rule id related to flo2d',
+    `status`            int(11)  DEFAULT NULL COMMENT '0-not triggered, 1- running, 2- completed, 3- error',
+    `last_trigger_date` datetime DEFAULT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 3
+  DEFAULT CHARSET = latin1;
+
+
 CREATE TABLE IF NOT EXISTS `wrf_rules`
 (
   `id` int(11) NOT NULL AUTO_INCREMENT,
