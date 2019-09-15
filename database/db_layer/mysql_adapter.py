@@ -111,10 +111,10 @@ class RuleEngineAdapter:
                                     'ignore_previous_run': row[10]})
         return flo2d_rules
 
-    def get_workflow_routines(self, schedule_date):
+    def get_workflow_routines(self, schedule_date, status):
         workflow_routines = []
-        query = 'select id,dss1,dss2,dss3 from dss.workflow_routines ' \
-                'where scheduled_date>=\'{}\''.format(schedule_date)
+        query = 'select id,dss1,dss2,dss3 from dss.workflow_routines where scheduled_date>=\'{}\' ' \
+                'and status={} order by priority asc '.format(schedule_date, status)
         results = self.get_multiple_result(query)
         if results is not None:
             for row in results:
@@ -157,6 +157,6 @@ if __name__ == "__main__":
     print(adapter.get_hechms_rule_info(1))
     print(adapter.get_flo2d_rule_info(1))
     adapter.update_rule_status('wrf', 'rule1', 0)
-    print(adapter.get_workflow_routines('2019-09-14'))
+    print(adapter.get_workflow_routines('2019-09-14', 0))
     adapter.close_connection()
 
