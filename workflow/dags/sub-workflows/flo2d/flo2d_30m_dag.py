@@ -4,7 +4,7 @@ from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 
-prod_dag_name = 'flo2d_30m'
+prod_dag_name = 'flo2d_30m_dag'
 
 
 default_args = {

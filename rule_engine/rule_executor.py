@@ -14,18 +14,14 @@ class RuleEngineExecutor:
         print('')
         return dag_name
 
-
     def execute_hechms_model_rules(self):
         print('')
-
 
     def execute_flo2d_model_rules(self):
         print('')
 
-
     def execute_accuracy_rules(self):
         print()
-
 
     def execute_variable_rules(self):
         print()

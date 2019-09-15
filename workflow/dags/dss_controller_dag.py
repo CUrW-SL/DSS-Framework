@@ -9,42 +9,42 @@ schedule_interval = '*/10 * * * *'
 def conditionally_trigger_dss_unit1(context, dag_run_obj):
     print('conditionally_trigger_dss_unit1')
     """This function decides whether or not to Trigger the remote DAG"""
-    c_p = context['params']['condition_param']
+    c_p = context['params']['check_rules']
     print("Controller DAG : conditionally_trigger = {}".format(c_p))
     if context['params']['check_rules']:
         allowed_rule_types = context['params']['rule_types']
-        dag_run_obj.payload = {'message': context['params']['message']}
-        return {'trigger_dag_id': 'wrfv4-pre-dag', 'dro': dag_run_obj}
+        dag_run_obj.payload = {'message': context['params']['rule_types']}
+        return {'trigger_dag_id': 'wrf_4_E_dag', 'dro': dag_run_obj}
 
 
 def conditionally_trigger_dss_unit2(context, dag_run_obj):
     print('conditionally_trigger_dss_unit2')
     """This function decides whether or not to Trigger the remote DAG"""
-    c_p = context['params']['condition_param']
+    c_p = context['params']['check_rules']
     print("Controller DAG : conditionally_trigger = {}".format(c_p))
     if context['params']['check_rules']:
-        dag_run_obj.payload = {'message': context['params']['message']}
-        return {'trigger_dag_id': 'wrfv4-E-dag', 'dro': dag_run_obj}
+        dag_run_obj.payload = {'message': context['params']['rule_types']}
+        return {'trigger_dag_id': 'hechms_single_dag', 'dro': dag_run_obj}
 
 
 def conditionally_trigger_dss_unit3(context, dag_run_obj):
     print('conditionally_trigger_dss_unit3')
     """This function decides whether or not to Trigger the remote DAG"""
-    c_p = context['params']['condition_param']
+    c_p = context['params']['check_rules']
     print("Controller DAG : conditionally_trigger = {}".format(c_p))
     if context['params']['check_rules']:
-        dag_run_obj.payload = {'message': context['params']['message']}
-        return {'trigger_dag_id': 'hec-hms-single-dag', 'dro': dag_run_obj}
+        dag_run_obj.payload = {'message': context['params']['rule_types']}
+        return {'trigger_dag_id': 'flo2d_250m_dag', 'dro': dag_run_obj}
 
 
 default_args = {
         'owner': 'dss admin',
-        'start_date': datetime.strptime('2019-07-24 11:00:00', '%Y-%m-%d %H:%M:%S'),
+        'start_date': datetime.strptime('2019-09-15 10:40:00', '%Y-%m-%d %H:%M:%S'),
         'email': ['hasithadkr7.com'],
         'email_on_failure': True,
     }
 
-with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
+with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=schedule_interval,
          description='Run DSS Controller DAG') as dag:
 
     dss_unit1 = ConditionTriggerDagRunOperator(
