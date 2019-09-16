@@ -144,6 +144,10 @@ class RuleEngineAdapter:
         query = 'update dss.workflow_routines set status={} where name=\'{}\''.format(status, routine_id)
         self.update_query(query)
 
+    def update_initial_workflow_routing_status(self, status, routine_id):
+        query = 'update dss.workflow_routines set status={},last_trigger_date=now()  where id=\'{}\''.format(status, routine_id)
+        self.update_query(query)
+
     def get_next_workflow_routine(self, schedule_date=None):
         if schedule_date is None:
             query = 'select id,dss1,dss2,dss3 from dss.workflow_routines where status=0 and scheduled_date<=now() order by priority asc limit 1;'
@@ -170,4 +174,5 @@ if __name__ == "__main__":
     adapter.update_rule_status('wrf', 'rule1', 0)
     print(adapter.get_workflow_routines('2019-09-14', 0))
     print(adapter.get_next_workflow_routine())
+    adapter.update_initial_workflow_routing_status(1, 1)
     adapter.close_connection()
