@@ -68,8 +68,8 @@ class RuleEngineAdapter:
         '''
         wrf_rules = []
         query = 'select name, target_model, version, run, data_hour, ignore_previous_run, ' \
-              'check_gfs_data_availability from dss.wrf_rules ' \
-              'where status = {} order by priority asc'.format(status)
+                'check_gfs_data_availability from dss.wrf_rules ' \
+                'where status = {} order by priority asc'.format(status)
         results = self.get_multiple_result(query)
         if results is not None:
             for row in results:
@@ -88,10 +88,10 @@ class RuleEngineAdapter:
         if results is not None:
             for row in results:
                 hechms_rules.append({'name': row[0], 'target_model': row[1],
-                                  'forecast_days': row[2], 'observed_days': row[3],
-                                  'init_run': row[4], 'no_forecast_continue': row[5],
-                                  'no_observed_continue': row[6], 'rainfall_data_from': row[7],
-                                  'ignore_previous_run': row[8]})
+                                     'forecast_days': row[2], 'observed_days': row[3],
+                                     'init_run': row[4], 'no_forecast_continue': row[5],
+                                     'no_observed_continue': row[6], 'rainfall_data_from': row[7],
+                                     'ignore_previous_run': row[8]})
         return hechms_rules
 
     def get_flo2d_rule_info(self, status=1):
@@ -144,6 +144,17 @@ class RuleEngineAdapter:
         query = 'update dss.workflow_routines set status={} where name=\'{}\''.format(status, routine_id)
         self.update_query(query)
 
+    def get_next_workflow_routine(self, schedule_date=None):
+        if schedule_date is None:
+            query = 'select id,dss1,dss2,dss3 from dss.workflow_routines where status=0 and scheduled_date<=now() order by priority asc limit 1;'
+        else:
+            query = 'select id,dss1,dss2,dss3 from dss.workflow_routines where status=0 and scheduled_date<=\'{}\' order by priority asc limit 1;'.format(schedule_date)
+        self.cursor.execute(query)
+        result = self.cursor.fetchone()
+        if result is not None:
+            print(result)
+            return {'id': result[0], 'dss1': result[1], 'dss2': result[2], 'dss3': result[3]}
+
 
 if __name__ == "__main__":
     adapter = RuleEngineAdapter('admin',
@@ -158,5 +169,5 @@ if __name__ == "__main__":
     print(adapter.get_flo2d_rule_info(1))
     adapter.update_rule_status('wrf', 'rule1', 0)
     print(adapter.get_workflow_routines('2019-09-14', 0))
+    print(adapter.get_next_workflow_routine())
     adapter.close_connection()
-
