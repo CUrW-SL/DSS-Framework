@@ -145,19 +145,31 @@ class RuleEngineAdapter:
         self.update_query(query)
 
     def update_initial_workflow_routing_status(self, status, routine_id):
-        query = 'update dss.workflow_routines set status={},last_trigger_date=now()  where id=\'{}\''.format(status, routine_id)
+        query = 'update dss.workflow_routines set status={},last_trigger_date=now()  ' \
+                'where id=\'{}\''.format(status, routine_id)
         self.update_query(query)
 
     def get_next_workflow_routine(self, schedule_date=None):
         if schedule_date is None:
-            query = 'select id,dss1,dss2,dss3 from dss.workflow_routines where status=0 and scheduled_date<=now() order by priority asc limit 1;'
+            query = 'select id,dss1,dss2,dss3 from dss.workflow_routines where status=0 and ' \
+                    'scheduled_date<=now() order by priority asc limit 1;'
         else:
-            query = 'select id,dss1,dss2,dss3 from dss.workflow_routines where status=0 and scheduled_date<=\'{}\' order by priority asc limit 1;'.format(schedule_date)
+            query = 'select id,dss1,dss2,dss3 from dss.workflow_routines where status=0 and ' \
+                    'scheduled_date<=\'{}\' order by priority asc limit 1;'.format(schedule_date)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
         if result is not None:
             print(result)
             return {'id': result[0], 'dss1': result[1], 'dss2': result[2], 'dss3': result[3]}
+
+
+def get_db_adapter():
+    adapter = RuleEngineAdapter('admin',
+                                'floody',
+                                'localhost',
+                                'dss',
+                                '/home/hasitha/PycharmProjects/DSS-Framework/log')
+    return adapter
 
 
 if __name__ == "__main__":
