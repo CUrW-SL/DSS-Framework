@@ -1,9 +1,13 @@
 from datetime import datetime
 from airflow import DAG
 from airflow.operators import ConditionTriggerDagRunOperator
+from airflow.operators.python_operator import PythonOperator
+from database.db_layer.mysql_adapter import get_db_adapter
 
 prod_dag_name = 'dss_controller_dag'
 schedule_interval = '*/10 * * * *'
+
+db_adapter = get_db_adapter()
 
 
 def conditionally_trigger_dss_unit1(context, dag_run_obj):
@@ -46,6 +50,13 @@ default_args = {
 
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=schedule_interval,
          description='Run DSS Controller DAG') as dag:
+
+    init_routine = PythonOperator(
+        task_id='init_routine',
+        python_callable=clean_up_wrf_run,
+        provide_context=True,
+        dag=dag,
+    )
 
     dss_unit1 = ConditionTriggerDagRunOperator(
         task_id='dss_unit1',
