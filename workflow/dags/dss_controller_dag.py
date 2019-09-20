@@ -2,12 +2,21 @@ from datetime import datetime
 from airflow import DAG
 from airflow.operators import ConditionTriggerDagRunOperator
 from airflow.operators.python_operator import PythonOperator
-from database.db_layer.mysql_adapter import get_db_adapter
+from database.db_layer.db_adapter import RuleEngineAdapter
+from airflow.models import Variable
 
 prod_dag_name = 'dss_controller_dag'
 schedule_interval = '*/10 * * * *'
 
-db_adapter = get_db_adapter()
+
+def init_workflow_routine(**context):
+    adapter = RuleEngineAdapter.get_instance(Variable.get('db_config', deserialize_json=True))
+    run_date = datetime.strptime(context["execution_date"], '%Y-%m-%d %H:%M:%S')
+    print('init_workflow_routine|run_date : ', run_date)
+    routine = adapter.get_next_workflow_routine(run_date)
+    route_id = 'route_{}'.format(routine['id'])
+    task_instance = context['task_instance']
+    task_instance.xcom_push(route_id, routine)
 
 
 def conditionally_trigger_dss_unit1(context, dag_run_obj):
@@ -53,7 +62,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=sche
 
     init_routine = PythonOperator(
         task_id='init_routine',
-        python_callable=clean_up_wrf_run,
+        python_callable=init_workflow_routine,
         provide_context=True,
         dag=dag,
     )
