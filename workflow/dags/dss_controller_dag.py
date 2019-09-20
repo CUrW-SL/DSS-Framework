@@ -43,7 +43,7 @@ def conditionally_trigger_dss_unit3(context, dag_run_obj):
 
 default_args = {
         'owner': 'dss admin',
-        'start_date': datetime.strptime('2019-09-15 10:40:00', '%Y-%m-%d %H:%M:%S'),
+        'start_date': datetime.strptime('2019-09-19 10:40:00', '%Y-%m-%d %H:%M:%S'),
         'email': ['hasithadkr7.com'],
         'email_on_failure': True,
     }
