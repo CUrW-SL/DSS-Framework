@@ -9,10 +9,12 @@ class RuleEngineAdapter:
     __instance = None
 
     @staticmethod
-    def get_instance(mysql_user, mysql_password, mysql_host, mysql_db, log_path):
+    def get_instance(db_config):
         """ Static access method. """
         if RuleEngineAdapter.__instance is None:
-            RuleEngineAdapter(mysql_user, mysql_password, mysql_host, mysql_db, log_path)
+            RuleEngineAdapter(db_config['mysql_user'], db_config['mysql_password'],
+                              db_config['mysql_host'], db_config['mysql_db'],
+                              db_config['log_path'])
         return RuleEngineAdapter.__instance
 
     def __init__(self, mysql_user, mysql_password, mysql_host, mysql_db, log_path):
@@ -164,7 +166,9 @@ class RuleEngineAdapter:
         result = self.cursor.fetchone()
         if result is not None:
             print(result)
-            return {'id': result[0], 'dss1': result[1], 'dss2': result[2], 'dss3': result[3]}
+            routine = {'id': result[0], 'dss1': result[1], 'dss2': result[2], 'dss3': result[3]}
+            self.update_initial_workflow_routing_status(1, routine['id'])
+            return routine
 
 
 if __name__ == "__main__":
