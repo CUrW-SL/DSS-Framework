@@ -1,1 +1,1 @@
-from .mysql_adapter import RuleEngineAdapter
+from .db_adapter import RuleEngineAdapter
