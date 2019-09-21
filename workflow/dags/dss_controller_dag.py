@@ -46,6 +46,17 @@ def conditionally_trigger_dss_unit1(context, dag_run_obj):
         return {'trigger_dag_id': 'wrf_4_E_dag', 'dro': dag_run_obj}
 
 
+def dss2_branch_func(**kwargs):
+    ti = kwargs['ti']
+    routine = int(ti.xcom_pull(key='routine', task_ids='init_routine'))
+    dss2_rule = routine['dss2']
+    print('dss2_rule : ', dss2_rule)
+    if dss2_rule == SKIP:
+        return 'dss2_dummy'
+    else:
+        return 'dss_unit2'
+
+
 def conditionally_trigger_dss_unit2(context, dag_run_obj):
     print('conditionally_trigger_dss_unit2')
     """This function decides whether or not to Trigger the remote DAG"""
@@ -54,6 +65,17 @@ def conditionally_trigger_dss_unit2(context, dag_run_obj):
     if context['params']['check_rules']:
         dag_run_obj.payload = {'message': context['params']['rule_types']}
         return {'trigger_dag_id': 'hechms_single_dag', 'dro': dag_run_obj}
+
+
+def dss3_branch_func(**kwargs):
+    ti = kwargs['ti']
+    routine = int(ti.xcom_pull(key='routine', task_ids='init_routine'))
+    dss3_rule = routine['dss3']
+    print('dss3_rule : ', dss3_rule)
+    if dss3_rule == SKIP:
+        return 'dss3_dummy'
+    else:
+        return 'dss_unit3'
 
 
 def conditionally_trigger_dss_unit3(context, dag_run_obj):
@@ -68,7 +90,7 @@ def conditionally_trigger_dss_unit3(context, dag_run_obj):
 
 default_args = {
         'owner': 'dss admin',
-        'start_date': datetime.strptime('2019-09-20 19:40:00', '%Y-%m-%d %H:%M:%S'),
+        'start_date': datetime.strptime('2019-09-21 18:10:00', '%Y-%m-%d %H:%M:%S'),
         'email': ['hasithadkr7.com'],
         'email_on_failure': True,
     }
@@ -100,11 +122,31 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=sche
         params={'check_rules': True, 'rule_types': ['wrf']}
     )
 
+    dss2_branch = BranchPythonOperator(
+        task_id='dss2_branch',
+        provide_context=True,
+        python_callable=dss2_branch_func
+    )
+
+    dss2_dummy = DummyOperator(
+        task_id='dss2_dummy'
+    )
+
     dss_unit2 = ConditionTriggerDagRunOperator(
         task_id='dss_unit2',
         default_trigger="dss_trigger_target_dag",
         python_callable=conditionally_trigger_dss_unit2,
         params={'check_rules': True, 'rule_types': ['hechms']}
+    )
+
+    dss3_branch = BranchPythonOperator(
+        task_id='dss3_branch',
+        provide_context=True,
+        python_callable=dss3_branch_func
+    )
+
+    dss3_dummy = DummyOperator(
+        task_id='dss3_dummy'
     )
 
     dss_unit3 = ConditionTriggerDagRunOperator(
@@ -114,5 +156,13 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=sche
         params={'check_rules': True, 'rule_types': ['flo2d']}
     )
 
-    init_routine >> dss1_branch >> [dss_unit1, dss1_dummy] >> dss_unit2 >> dss_unit3
+    end_routine = DummyOperator(
+        task_id='end_routine'
+    )
+
+    init_routine >> \
+    dss1_branch >> [dss_unit1, dss1_dummy] >> \
+    dss2_branch >> [dss_unit2, dss2_dummy] >> \
+    dss3_branch >> [dss_unit3, dss3_dummy] >> \
+    end_routine
 
