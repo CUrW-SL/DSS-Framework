@@ -10,13 +10,16 @@ sys.path.insert(0, '/home/hasitha/PycharmProjects/DSS-Framework/database')
 from db_adapter import RuleEngineAdapter
 
 
-prod_dag_name = 'dss_controller_dag'
+prod_dag_name = 'dss_controller_dag1'
 schedule_interval = '*/10 * * * *'
 SKIP = 0
 
 
 def init_workflow_routine(**context):
-    adapter = RuleEngineAdapter.get_instance(Variable.get('db_config', deserialize_json=True))
+    db_config = Variable.get('db_config', deserialize_json=True)
+    print('init_workflow_routine|db_config : ', db_config)
+    adapter = RuleEngineAdapter.get_instance(db_config)
+
     run_date = datetime.strptime(context["execution_date"], '%Y-%m-%d %H:%M:%S')
     print('init_workflow_routine|run_date : ', run_date)
     routine = adapter.get_next_workflow_routine(run_date)
@@ -90,7 +93,7 @@ def conditionally_trigger_dss_unit3(context, dag_run_obj):
 
 default_args = {
         'owner': 'dss admin',
-        'start_date': datetime.strptime('2019-09-21 18:10:00', '%Y-%m-%d %H:%M:%S'),
+        'start_date': datetime.strptime('2019-09-21 16:00:00', '%Y-%m-%d %H:%M:%S'),
         'email': ['hasithadkr7.com'],
         'email_on_failure': True,
     }

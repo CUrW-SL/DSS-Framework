@@ -11,6 +11,7 @@ class RuleEngineAdapter:
     @staticmethod
     def get_instance(db_config):
         """ Static access method. """
+        print('get_instance|db_config : ', db_config)
         if RuleEngineAdapter.__instance is None:
             RuleEngineAdapter(db_config['mysql_user'], db_config['mysql_password'],
                               db_config['mysql_host'], db_config['mysql_db'],
