@@ -4,7 +4,11 @@ from airflow.operators import ConditionTriggerDagRunOperator
 from airflow.operators.python_operator import PythonOperator, BranchPythonOperator
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.models import Variable
-from database import RuleEngineAdapter
+import sys
+print(sys.path)
+sys.path.insert(0, '/home/hasitha/PycharmProjects/DSS-Framework/database')
+from db_adapter import RuleEngineAdapter
+
 
 prod_dag_name = 'dss_controller_dag'
 schedule_interval = '*/10 * * * *'
