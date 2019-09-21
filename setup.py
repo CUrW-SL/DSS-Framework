@@ -9,10 +9,6 @@ setup(
     author='hasitha',
     author_email='hasithadkr7@gmail.com',
     description='Decision support system'
-    install_requires=['data_layer', 'pandas', 'numpy'],
-    dependency_links=[
-        'git+https://github.com/CUrW-SL/data_layer.git@master#egg=data_layer-0.0.1',
-        'git+https://github.com/CUrW-SL/algo_wrapper.git@master#egg=algo_wrapper-1.0.0'
-    ],
+    install_requires=['mysql.connector', 'pandas', 'numpy'],
     zip_safe=True
 )

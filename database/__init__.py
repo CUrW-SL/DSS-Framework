@@ -1,1 +1,1 @@
-from .db_layer import RuleEngineAdapter
+from .db_adapter import RuleEngineAdapter

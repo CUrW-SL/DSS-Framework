@@ -3,8 +3,8 @@ from airflow import DAG
 from airflow.operators import ConditionTriggerDagRunOperator
 from airflow.operators.python_operator import PythonOperator, BranchPythonOperator
 from airflow.operators.dummy_operator import DummyOperator
-from database.db_layer.db_adapter import RuleEngineAdapter
 from airflow.models import Variable
+from database import RuleEngineAdapter
 
 prod_dag_name = 'dss_controller_dag'
 schedule_interval = '*/10 * * * *'
