@@ -19,24 +19,17 @@ SKIP = 0
 def init_workflow_routine(**context):
     print('***************************init_workflow_routine**********************************')
     db_config = Variable.get('db_config', deserialize_json=True)
-    print('init_workflow_routine|db_config : ', db_config)
     adapter = RuleEngineAdapter.get_instance(db_config)
-    print('context["execution_date"] : ', context["execution_date"])
-    print('context["execution_date"] : ', type(context["execution_date"]))
     run_date = context["execution_date"].to_datetime_string()
     # run_date = datetime.strptime(context["execution_date"], '%Y-%m-%d %H:%M:%S')
     print('init_workflow_routine|run_date : ', run_date)
     routine = adapter.get_next_workflow_routine(run_date)
-    task_instance = context['task_instance']
-    task_instance.xcom_push('routine', routine)
+    return routine
 
 
-def dss1_branch_func(**kwargs):
+def dss1_branch_func(**context):
     print('***************************dss1_branch_func**********************************')
-    ti = kwargs['ti']
-    routine = ti.xcom_pull(key='routine', task_ids='init_routine')
-    print('dss1_branch_func|routine : ', routine)
-    dss1_rule = routine['dss1']
+    dss1_rule = context['task_instance'].xcom_pull(task_ids='init_routine')['dss1']
     print('dss1_branch_func|dss1_rule : ', dss1_rule)
     print('dss1_rule : ', dss1_rule)
     if dss1_rule == SKIP:
@@ -57,11 +50,9 @@ def conditionally_trigger_dss_unit1(context, dag_run_obj):
         return {'trigger_dag_id': 'wrf_4_E_dag', 'dro': dag_run_obj}
 
 
-def dss2_branch_func(**kwargs):
+def dss2_branch_func(**context):
     print('***************************dss2_branch_func**********************************')
-    ti = kwargs['ti']
-    routine = int(ti.xcom_pull(key='routine', task_ids='init_routine'))
-    dss2_rule = routine['dss2']
+    dss2_rule = context['task_instance'].xcom_pull(task_ids='init_routine')['dss2']
     print('dss2_rule : ', dss2_rule)
     if dss2_rule == SKIP:
         return 'dss2_dummy'
@@ -80,11 +71,9 @@ def conditionally_trigger_dss_unit2(context, dag_run_obj):
         return {'trigger_dag_id': 'hechms_single_dag', 'dro': dag_run_obj}
 
 
-def dss3_branch_func(**kwargs):
+def dss3_branch_func(**context):
     print('***************************dss3_branch_func**********************************')
-    ti = kwargs['ti']
-    routine = int(ti.xcom_pull(key='routine', task_ids='init_routine'))
-    dss3_rule = routine['dss3']
+    dss3_rule = context['task_instance'].xcom_pull(task_ids='init_routine')['dss3']
     print('dss3_rule : ', dss3_rule)
     if dss3_rule == SKIP:
         return 'dss3_dummy'
