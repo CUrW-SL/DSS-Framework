@@ -32,9 +32,12 @@ def init_workflow_routine(**context):
 
 
 def dss1_branch_func(**kwargs):
+    print('***************************dss1_branch_func**********************************')
     ti = kwargs['ti']
-    routine = int(ti.xcom_pull(key='routine', task_ids='init_routine'))
+    routine = ti.xcom_pull(key='routine', task_ids='init_routine')
+    print('dss1_branch_func|routine : ', routine)
     dss1_rule = routine['dss1']
+    print('dss1_branch_func|dss1_rule : ', dss1_rule)
     print('dss1_rule : ', dss1_rule)
     if dss1_rule == SKIP:
         return 'dss1_dummy'
@@ -43,6 +46,7 @@ def dss1_branch_func(**kwargs):
 
 
 def conditionally_trigger_dss_unit1(context, dag_run_obj):
+    print('***************************conditionally_trigger_dss_unit1**********************************')
     print('conditionally_trigger_dss_unit1')
     """This function decides whether or not to Trigger the remote DAG"""
     c_p = context['params']['check_rules']
@@ -54,6 +58,7 @@ def conditionally_trigger_dss_unit1(context, dag_run_obj):
 
 
 def dss2_branch_func(**kwargs):
+    print('***************************dss2_branch_func**********************************')
     ti = kwargs['ti']
     routine = int(ti.xcom_pull(key='routine', task_ids='init_routine'))
     dss2_rule = routine['dss2']
@@ -65,6 +70,7 @@ def dss2_branch_func(**kwargs):
 
 
 def conditionally_trigger_dss_unit2(context, dag_run_obj):
+    print('***************************conditionally_trigger_dss_unit2**********************************')
     print('conditionally_trigger_dss_unit2')
     """This function decides whether or not to Trigger the remote DAG"""
     c_p = context['params']['check_rules']
@@ -75,6 +81,7 @@ def conditionally_trigger_dss_unit2(context, dag_run_obj):
 
 
 def dss3_branch_func(**kwargs):
+    print('***************************dss3_branch_func**********************************')
     ti = kwargs['ti']
     routine = int(ti.xcom_pull(key='routine', task_ids='init_routine'))
     dss3_rule = routine['dss3']
@@ -86,6 +93,7 @@ def dss3_branch_func(**kwargs):
 
 
 def conditionally_trigger_dss_unit3(context, dag_run_obj):
+    print('***************************conditionally_trigger_dss_unit3**********************************')
     print('conditionally_trigger_dss_unit3')
     """This function decides whether or not to Trigger the remote DAG"""
     c_p = context['params']['check_rules']
