@@ -1,4 +1,5 @@
 from datetime import datetime
+import pendulum
 from airflow import DAG
 from airflow.operators import ConditionTriggerDagRunOperator
 from airflow.operators.python_operator import PythonOperator, BranchPythonOperator
@@ -16,11 +17,14 @@ SKIP = 0
 
 
 def init_workflow_routine(**context):
+    print('***************************init_workflow_routine**********************************')
     db_config = Variable.get('db_config', deserialize_json=True)
     print('init_workflow_routine|db_config : ', db_config)
     adapter = RuleEngineAdapter.get_instance(db_config)
-
-    run_date = datetime.strptime(context["execution_date"], '%Y-%m-%d %H:%M:%S')
+    print('context["execution_date"] : ', context["execution_date"])
+    print('context["execution_date"] : ', type(context["execution_date"]))
+    run_date = context["execution_date"].to_datetime_string()
+    # run_date = datetime.strptime(context["execution_date"], '%Y-%m-%d %H:%M:%S')
     print('init_workflow_routine|run_date : ', run_date)
     routine = adapter.get_next_workflow_routine(run_date)
     task_instance = context['task_instance']
