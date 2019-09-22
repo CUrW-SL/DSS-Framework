@@ -11,7 +11,7 @@ sys.path.insert(0, '/home/hasitha/PycharmProjects/DSS-Framework/database')
 from db_adapter import RuleEngineAdapter
 
 
-prod_dag_name = 'dss_controller_dag1'
+prod_dag_name = 'dss_controller_dag2'
 schedule_interval = '*/10 * * * *'
 SKIP = 0
 
@@ -24,11 +24,17 @@ def init_workflow_routine(**context):
     # run_date = datetime.strptime(context["execution_date"], '%Y-%m-%d %H:%M:%S')
     print('init_workflow_routine|run_date : ', run_date)
     routine = adapter.get_next_workflow_routine(run_date)
-    return routine
+    print('init_workflow_routine|routine : ', routine)
+    if routine is None:
+        return {'id': 0, 'dss1': 0, 'dss2': 0, 'dss3': 0}
+    else:
+        return routine
 
 
 def dss1_branch_func(**context):
     print('***************************dss1_branch_func**********************************')
+    routine = context['task_instance'].xcom_pull(task_ids='init_routine')
+    print('xxxxxxxxxxxxxxxxxxxxx---routine : ', routine)
     dss1_rule = context['task_instance'].xcom_pull(task_ids='init_routine')['dss1']
     print('dss1_branch_func|dss1_rule : ', dss1_rule)
     print('dss1_rule : ', dss1_rule)
@@ -94,7 +100,7 @@ def conditionally_trigger_dss_unit3(context, dag_run_obj):
 
 default_args = {
         'owner': 'dss admin',
-        'start_date': datetime.strptime('2019-09-21 16:00:00', '%Y-%m-%d %H:%M:%S'),
+        'start_date': datetime.strptime('2019-09-22 07:30:00', '%Y-%m-%d %H:%M:%S'),
         'email': ['hasithadkr7.com'],
         'email_on_failure': True,
     }
