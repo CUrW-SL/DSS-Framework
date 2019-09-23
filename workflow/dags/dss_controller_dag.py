@@ -34,7 +34,6 @@ def init_workflow_routine(**context):
 def dss1_branch_func(**context):
     print('***************************dss1_branch_func**********************************')
     routine = context['task_instance'].xcom_pull(task_ids='init_routine')
-    print('xxxxxxxxxxxxxxxxxxxxx---routine : ', routine)
     dss1_rule = context['task_instance'].xcom_pull(task_ids='init_routine')['dss1']
     print('dss1_branch_func|dss1_rule : ', dss1_rule)
     print('dss1_rule : ', dss1_rule)
@@ -134,7 +133,8 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=sche
     dss2_branch = BranchPythonOperator(
         task_id='dss2_branch',
         provide_context=True,
-        python_callable=dss2_branch_func
+        python_callable=dss2_branch_func,
+        trigger_rule='none_failed'
     )
 
     dss2_dummy = DummyOperator(
@@ -151,7 +151,8 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=sche
     dss3_branch = BranchPythonOperator(
         task_id='dss3_branch',
         provide_context=True,
-        python_callable=dss3_branch_func
+        python_callable=dss3_branch_func,
+        trigger_rule='none_failed'
     )
 
     dss3_dummy = DummyOperator(
@@ -166,7 +167,8 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=sche
     )
 
     end_routine = DummyOperator(
-        task_id='end_routine'
+        task_id='end_routine',
+        trigger_rule='none_failed'
     )
 
     init_routine >> \
