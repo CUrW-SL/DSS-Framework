@@ -111,8 +111,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=sche
     init_routine = PythonOperator(
         task_id='init_routine',
         python_callable=init_workflow_routine,
-        provide_context=True,
-        dag=dag,
+        provide_context=True
     )
 
     dss1_branch = BranchPythonOperator(
