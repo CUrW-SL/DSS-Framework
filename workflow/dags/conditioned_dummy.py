@@ -1,12 +1,9 @@
 from datetime import datetime
 from airflow import DAG
-from airflow.operators.python_operator import PythonOperator, BranchPythonOperator
+from airflow.operators.python_operator import BranchPythonOperator
 from airflow.operators.dummy_operator import DummyOperator
-import sys
 import random
 
-print(sys.path)
-sys.path.insert(0, '/home/hasitha/PycharmProjects/DSS-Framework/database')
 
 prod_dag_name = 'conditioned_dummy'
 schedule_interval = '*/10 * * * *'
