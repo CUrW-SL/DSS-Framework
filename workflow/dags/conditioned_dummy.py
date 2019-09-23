@@ -4,7 +4,6 @@ from airflow.operators.python_operator import BranchPythonOperator
 from airflow.operators.dummy_operator import DummyOperator
 import random
 
-
 prod_dag_name = 'conditioned_dummy'
 schedule_interval = '*/10 * * * *'
 
@@ -53,7 +52,8 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=sche
     )
 
     dss4_dummy = DummyOperator(
-        task_id='dss4_dummy'
+        task_id='dss4_dummy',
+        trigger_rule='none_failed'
     )
 
     branch2 = BranchPythonOperator(
@@ -73,7 +73,8 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=sche
     branch3 = BranchPythonOperator(
         task_id='branch3',
         provide_context=True,
-        python_callable=branch3_func
+        python_callable=branch3_func,
+        trigger_rule='none_failed'
     )
 
     dss7_dummy = DummyOperator(
@@ -85,7 +86,8 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=sche
     )
 
     end_routine = DummyOperator(
-        task_id='end_routine'
+        task_id='end_routine',
+        trigger_rule='none_failed'
     )
 
     init >> \
