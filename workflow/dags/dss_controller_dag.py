@@ -1,5 +1,4 @@
 from datetime import datetime
-import pendulum
 from airflow import DAG
 from airflow.operators import ConditionTriggerDagRunOperator
 from airflow.operators.python_operator import PythonOperator, BranchPythonOperator
