@@ -1,4 +1,4 @@
-from database.db_layer.mysql_adapter import RuleEngineAdapter
+from db_util.db_layer.mysql_adapter import RuleEngineAdapter
 
 
 class RuleEngineExecutor:

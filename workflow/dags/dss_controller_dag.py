@@ -7,7 +7,7 @@ from airflow.operators.dummy_operator import DummyOperator
 from airflow.models import Variable
 import sys
 print(sys.path)
-sys.path.insert(0, '/home/hasitha/PycharmProjects/DSS-Framework/database')
+sys.path.insert(0, '/home/hasitha/PycharmProjects/DSS-Framework/db_util')
 from db_adapter import RuleEngineAdapter
 
 

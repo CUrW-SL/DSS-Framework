@@ -5,7 +5,7 @@ from airflow.operators.dummy_operator import DummyOperator
 import sys
 
 print(sys.path)
-sys.path.insert(0, '/home/hasitha/PycharmProjects/DSS-Framework/database')
+sys.path.insert(0, '/home/hasitha/PycharmProjects/DSS-Framework/db_util')
 
 prod_dag_name = 'dummy_workflow'
 schedule_interval = '*/10 * * * *'
