@@ -397,7 +397,7 @@ def run_wps(wrf_config):
     wrf_home = wrf_config['wrf_home']
     wps_dir = get_wps_dir(wrf_home)
     output_dir = create_dir_if_not_exists(
-        os.path.join(wrf_config['nfs_dir'], 'results', wrf_config['run_id'], 'wps'))
+        os.path.join(wrf_config['nfs_dir'], 'wps'))
     print('run_wps|output_dir : ', output_dir)
 
     log.info('Cleaning up files')
@@ -500,8 +500,8 @@ def run_em_real(wrf_config):
     em_real_dir = get_em_real_dir(wrf_home)
     procs = wrf_config['procs']
     run_id = wrf_config['run_id']
-    output_dir = create_dir_if_not_exists(os.path.join(wrf_config['nfs_dir'], 'results', run_id, 'wrf'))
-    archive_dir = create_dir_if_not_exists(os.path.join(wrf_config['archive_dir'], 'results', run_id, 'wrf'))
+    output_dir = create_dir_if_not_exists(os.path.join(wrf_config['nfs_dir'], 'wrf'))
+    archive_dir = create_dir_if_not_exists(os.path.join(wrf_config['archive_dir'], 'archive'))
 
     print('run_em_real|output_dir: ', output_dir)
     print('run_em_real|archive_dir: ', archive_dir)
@@ -630,6 +630,7 @@ if __name__ == '__main__':
         wrf_config = json.load(json_file)
         wrf_conf = wrf_config['wrf_config']
         logging.info('**** WRF RUN **** wrf_conf: {}'.format(wrf_conf))
+        wrf_conf['gfs_dir'] = '{}/{}/d{}/{}/{}/{}'.format(home_dir, version, run, hour, model, exec_date)
         wrf_conf['nfs_dir'] = '{}/{}/d{}/{}/{}/{}'.format(home_dir, version, run, hour, model, exec_date)
         wrf_conf['archive_dir'] = '{}/{}/d{}/{}/{}/{}/archive'.format(home_dir, version, run, hour, model, exec_date)
         wrf_conf['namelist_input'] = 'template/wrf/A/namelist.input'
