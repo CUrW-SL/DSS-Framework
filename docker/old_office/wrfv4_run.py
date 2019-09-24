@@ -612,19 +612,29 @@ def run_wrf_model(run_mode, wrf_conf):
 if __name__ == '__main__':
     args = vars(parse_args())
     logging.info('Running arguments:\n%s' % json.dumps(args, sort_keys=True, indent=0))
-    start_date = args['start_date']
-    logging.info('**** WRF RUN **** start_date: {}'.format(start_date))
-    run_id = args['run_id']
-    logging.info('**** WRF RUN **** run_id: {}'.format(run_id))
-    run_mode = args['mode']
-    logging.info('**** WRF RUN Mode**** run_mode: {}'.format(run_mode))
+    exec_date = args['exec_date']
+    home_dir = args['home_dir']
+    check_gfs = args['check_gfs']
+    version = args['version']
+    run = args['run']
+    hour = args['hour']
+    model = args['model']
+    logging.info('**** WRF RUN **** exec_date: {}'.format(exec_date))
+    logging.info('**** WRF RUN **** home_dir: {}'.format(home_dir))
+    logging.info('**** WRF RUN **** check_gfs: {}'.format(check_gfs))
+    logging.info('**** WRF RUN **** version: {}'.format(version))
+    logging.info('**** WRF RUN **** run: {}'.format(run))
+    logging.info('**** WRF RUN **** hour: {}'.format(hour))
+    logging.info('**** WRF RUN **** model: {}'.format(model))
     with open('wrfv4_config.json') as json_file:
         wrf_config = json.load(json_file)
         wrf_conf = wrf_config['wrf_config']
         logging.info('**** WRF RUN **** wrf_conf: {}'.format(wrf_conf))
-        # wrf_conf['run_id'] = 'test_run8_05_02_2019'
-        # wrf_conf['start_date'] = '2019-08-03_00:00'
-        wrf_conf['run_id'] = run_id
-        wrf_conf['start_date'] = start_date
-        run_wrf_model(run_mode, wrf_conf)
+        wrf_conf['nfs_dir'] = '{}/{}/d{}/{}/{}/{}'.format(home_dir, version, run, hour, model, exec_date)
+        wrf_conf['archive_dir'] = '{}/{}/d{}/{}/{}/{}/archive'.format(home_dir, version, run, hour, model, exec_date)
+        wrf_conf['namelist_input'] = 'template/wrf/A/namelist.input'
+        wrf_conf['namelist_wps'] = 'template/wps/namelist.wps'
+        wrf_conf['run_id'] = 'wrfv4_2019-08-12_18_00'
+        wrf_conf['start_date'] = exec_date
+        run_wrf_model('wps', wrf_conf)
 
