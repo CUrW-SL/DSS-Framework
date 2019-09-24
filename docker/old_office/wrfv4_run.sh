@@ -28,6 +28,7 @@ echo "RUN : $RUN"
 echo "MODEL : $MODEL"
 
 OUTPUT_DIR='${HOME_DIR}/${VERSION}/d${RUN}/${HOUR}/${MODEL}/${EXEC_DATE}'
+ARCHIVE_DIR='${HOME_DIR}/${VERSION}/d${RUN}/${HOUR}/${MODEL}/${EXEC_DATE}/archive'
 
 echo "OUTPUT_DIR : $OUTPUT_DIR"
 
@@ -35,7 +36,11 @@ echo "#### Running WRF procedures..."
 cd /home/Build_WRF/code
 echo "Inside $(pwd)"
 python3 wrfv4_run.py \
-                    $( check_empty "$START_DATE" start_date ) \
-                    $( check_empty "$MODE" mode ) \
-                    $( check_empty "$RUN_ID" run_id )
+                    $( check_empty "$HOME_DIR" home_dir ) \
+                    $( check_empty "$EXEC_DATE" exec_date ) \
+                    $( check_empty "$CHECK_GFS" check_gfs ) \
+                    $( check_empty "$VERSION" version ) \
+                    $( check_empty "$RUN" run ) \
+                    $( check_empty "$HOUR" hour ) \
+                    $( check_empty "$MODEL" model )
 echo "####WRF procedures completed"
