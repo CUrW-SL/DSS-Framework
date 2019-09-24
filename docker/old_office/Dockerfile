@@ -142,13 +142,10 @@ RUN apt-get install -y curl \
 
 WORKDIR /home/Build_WRF/code
 
-COPY code /home/Build_WRF/code
-COPY code/namelist.wps /home/Build_WRF
-COPY code/namelist.input /home/Build_WRF
+COPY /mnt/disks/data/wrf_run/DSS-Framework/docker/old_office /home/Build_WRF/code
 
 #install required libs for python script
 RUN pip3 install -r requirements.yml
-COPY uwcc-admin.json /home/Build_WRF/code/gcs.json
 
 RUN chmod +x wrfv4_run.sh
 
