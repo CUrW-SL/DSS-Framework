@@ -36,6 +36,7 @@ RUN mkdir LIBRARIES \
     && mkdir -p /home/Build_WRF/gfs \
     && mkdir -p /home/Build_WRF/nfs \
     && mkdir -p /home/Build_WRF/geog \
+    && mkdir -p /home/Build_WRF/template \
     && mkdir -p /home/Build_WRF/archive
 
 WORKDIR /home/Build_WRF/LIBRARIES
@@ -142,6 +143,7 @@ RUN apt-get install -y curl \
 
 WORKDIR /home/Build_WRF/code
 
+COPY /mnt/disks/data/wrf_run/template /home/Build_WRF/template
 COPY /mnt/disks/data/wrf_run/DSS-Framework/docker/old_office /home/Build_WRF/code
 
 #install required libs for python script
