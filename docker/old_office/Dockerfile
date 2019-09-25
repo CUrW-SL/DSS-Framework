@@ -145,7 +145,7 @@ WORKDIR /home/Build_WRF/code
 
 COPY namelist_input_files /home/Build_WRF/template/namelist_input
 COPY namelist_wps_files /home/Build_WRF/template/namelist_wps
-COPY /mnt/disks/data/wrf_run/DSS-Framework/docker/old_office /home/Build_WRF/code
+COPY code /home/Build_WRF/code
 
 #install required libs for python script
 RUN pip3 install -r requirements.yml
