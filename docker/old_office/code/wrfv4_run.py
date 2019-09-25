@@ -641,8 +641,8 @@ if __name__ == '__main__':
         wrf_conf['gfs_dir'] = '{}/{}/d{}/{}/{}/{}'.format(home_dir, version, run, hour, model, exec_date)
         wrf_conf['nfs_dir'] = '{}/{}/d{}/{}/{}/{}'.format(home_dir, version, run, hour, model, exec_date)
         wrf_conf['archive_dir'] = '{}/{}/d{}/{}/{}/{}/archive'.format(home_dir, version, run, hour, model, exec_date)
-        wrf_conf['namelist_input'] = 'template/wrf/A/namelist.input'
-        wrf_conf['namelist_wps'] = 'template/wps/namelist.wps'
+        wrf_conf['namelist_input'] = 'template/namelist_input/namelist_{}.input'.format(model)
+        wrf_conf['namelist_wps'] = 'template/namelist_wps/namelist.wps'
         # run_id = 'wrf_0_4.0_20190925_06_A'
         date_str = (datetime.strptime(exec_date, '%Y-%m-%d')).strptime('%Y%m%d')
         wrf_conf['run_id'] = 'wrf_{}_{}_{}_{}_{}'.format(version, run, date_str, hour, model)
