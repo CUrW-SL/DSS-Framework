@@ -19,7 +19,6 @@ from zipfile import ZipFile, ZIP_DEFLATED
 
 import pkg_resources
 from joblib import Parallel, delayed
-#from docker.wrfv4_ubuntu import constants
 import constants
 
 
