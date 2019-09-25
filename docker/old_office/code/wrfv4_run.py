@@ -622,7 +622,6 @@ if __name__ == '__main__':
     args = vars(parse_args())
     logging.info('Running arguments:\n%s' % json.dumps(args, sort_keys=True, indent=0))
     exec_date = args['exec_date']
-    home_dir = args['home_dir']
     check_gfs = args['check_gfs']
     version = args['version']
     run = args['run']
@@ -630,7 +629,6 @@ if __name__ == '__main__':
     model = args['model']
     gfs_url = args['gfs_url']
     logging.info('**** WRF RUN **** exec_date: {}'.format(exec_date))
-    logging.info('**** WRF RUN **** home_dir: {}'.format(home_dir))
     logging.info('**** WRF RUN **** check_gfs: {}'.format(check_gfs))
     logging.info('**** WRF RUN **** version: {}'.format(version))
     logging.info('**** WRF RUN **** run: {}'.format(run))
@@ -641,9 +639,6 @@ if __name__ == '__main__':
         wrf_config = json.load(json_file)
         wrf_conf = wrf_config['wrf_config']
         logging.info('**** WRF RUN **** wrf_conf: {}'.format(wrf_conf))
-        wrf_conf['gfs_dir'] = '{}/{}/d{}/{}/{}/{}'.format(home_dir, version, run, hour, model, exec_date)
-        wrf_conf['nfs_dir'] = '{}/{}/d{}/{}/{}/{}'.format(home_dir, version, run, hour, model, exec_date)
-        wrf_conf['archive_dir'] = '{}/{}/d{}/{}/{}/{}/archive'.format(home_dir, version, run, hour, model, exec_date)
         wrf_conf['namelist_input'] = 'template/namelist_input/namelist_{}.input'.format(model)
         wrf_conf['namelist_wps'] = 'template/namelist_wps/namelist.wps'
         # run_id = 'wrf_0_4.0_20190925_06_A'
