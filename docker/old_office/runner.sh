@@ -36,4 +36,4 @@ echo "GFS_DIR : $GFS_DIR"
 mkdir -p ${ARCHIVE_DIR}
 echo "ARCHIVE_DIR : $ARCHIVE_DIR"
 
-docker run -i --rm --privileged -v /mnt/disks/data/samba/wrf-static-data/geog:/home/Build_WRF/geog curw-wrfv4:ubuntu1604  /home/Build_WRF/code/wrfv4_run.sh -d ${EXEC_DATE} -h ${HOME_DIR} -c ${CHECK_GFS}  -s ${VERSION} -r ${RUN} -m ${MODEL} -u ${GFS_URL} -v ${OUTPUT_DIR}:/home/Build_WRF/nfs  -v ${GFS_DIR}:/home/Build_WRF/gfs -v ${ARCHIVE_DIR}:/home/Build_WRF/archive
+docker run -i --rm --privileged -v /mnt/disks/data/samba/wrf-static-data/geog:/home/Build_WRF/geog curw-wrfv4:ubuntu1604  /home/Build_WRF/code/wrfv4_run.sh -d ${EXEC_DATE} -h ${HOUR} -c ${CHECK_GFS}  -s ${VERSION} -r ${RUN} -m ${MODEL} -u ${GFS_URL} -v ${OUTPUT_DIR}:/home/Build_WRF/nfs  -v ${GFS_DIR}:/home/Build_WRF/gfs -v ${ARCHIVE_DIR}:/home/Build_WRF/archive
