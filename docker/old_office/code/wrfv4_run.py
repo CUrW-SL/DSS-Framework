@@ -566,9 +566,14 @@ def run_em_real(wrf_config):
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-run_id')
-    parser.add_argument('-start_date')
-    parser.add_argument('-mode')
+    parser.add_argument('-exec_date')
+    parser.add_argument('-home_dir')
+    parser.add_argument('-check_gfs')
+    parser.add_argument('-version')
+    parser.add_argument('-run')
+    parser.add_argument('-hour')
+    parser.add_argument('-model')
+    parser.add_argument('-gfs_url')
     parser.add_argument('-wrf_config', default={})
     return parser.parse_args()
 
