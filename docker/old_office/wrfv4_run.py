@@ -574,11 +574,14 @@ def parse_args():
     return parser.parse_args()
 
 
-def run_wrf_model(run_mode, wrf_conf):
+def run_wrf_model(run_mode, wrf_conf, check_gfs):
     print('wrf_conf : ', wrf_conf)
     try:
         print('download_gfs_data.')
-        download_gfs_data(wrf_conf)
+        if check_gfs is not 'true':
+            download_gfs_data(wrf_conf)
+        else:
+            log.info('Continue with already downloaded gfs data.')
         try:
             if run_mode != 'wrf':
                 replace_namelist_wps(wrf_conf)
@@ -619,6 +622,7 @@ if __name__ == '__main__':
     run = args['run']
     hour = args['hour']
     model = args['model']
+    gfs_url = args['gfs_url']
     logging.info('**** WRF RUN **** exec_date: {}'.format(exec_date))
     logging.info('**** WRF RUN **** home_dir: {}'.format(home_dir))
     logging.info('**** WRF RUN **** check_gfs: {}'.format(check_gfs))
@@ -626,6 +630,7 @@ if __name__ == '__main__':
     logging.info('**** WRF RUN **** run: {}'.format(run))
     logging.info('**** WRF RUN **** hour: {}'.format(hour))
     logging.info('**** WRF RUN **** model: {}'.format(model))
+    logging.info('**** WRF RUN **** gfs_url: {}'.format(gfs_url))
     with open('wrfv4_config.json') as json_file:
         wrf_config = json.load(json_file)
         wrf_conf = wrf_config['wrf_config']
@@ -637,5 +642,5 @@ if __name__ == '__main__':
         wrf_conf['namelist_wps'] = 'template/wps/namelist.wps'
         wrf_conf['run_id'] = 'wrfv4_2019-08-12_18_00'
         wrf_conf['start_date'] = exec_date
-        run_wrf_model('wps', wrf_conf)
+        run_wrf_model('wps', wrf_conf, check_gfs)
 
