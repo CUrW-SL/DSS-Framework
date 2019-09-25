@@ -143,7 +143,8 @@ RUN apt-get install -y curl \
 
 WORKDIR /home/Build_WRF/code
 
-COPY /mnt/disks/data/wrf_run/template /home/Build_WRF/template
+COPY namelist_input_files /home/Build_WRF/template/namelist_input
+COPY namelist_wps_files /home/Build_WRF/template/namelist_wps
 COPY /mnt/disks/data/wrf_run/DSS-Framework/docker/old_office /home/Build_WRF/code
 
 #install required libs for python script
