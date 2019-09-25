@@ -5,9 +5,6 @@ echo "#### Reading running args..."
 HOME_DIR="/mnt/disks/data/wrf_run/wrf1"
 GFS_URL="ftp://ftpprd.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gfs.{RUN_DATE}/{DATA_HOUR}"
 GFS_DOWNLOAD_FILE_TEMPLATE="gfs.t{DATA_HOUR}z.pgrb2.0p50.f0{INDEX}" "gfs.tCCz.pgrb2.RRRR.fFFF"
-GFS_DOWNLOAD_FILE_TEMPLATE="gfs.t{DATA_HOUR}z.pgrb2.0p50.f0{INDEX}" "gfs.tCCz.pgrb2.RRRR.fFFF"
-"20190820.gfs.t00z.pgrb2.0p50.f000"
-
 
 while getopts ":h:d:c:s:r:m:" option; do
   case "${option}" in
