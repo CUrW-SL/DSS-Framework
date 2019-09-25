@@ -4,7 +4,7 @@ echo "#### Reading running args..."
 
 HOME_DIR="/mnt/disks/data/wrf_run/wrf1"
 GFS_URL="ftp://ftpprd.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gfs.{RUN_DATE}/{DATA_HOUR}"
-GFS_DOWNLOAD_FILE_TEMPLATE="gfs.t{DATA_HOUR}z.pgrb2.0p50.f0{INDEX}" "gfs.tCCz.pgrb2.RRRR.fFFF"
+GFS_DOWNLOAD_FILE_TEMPLATE="gfs.t{DATA_HOUR}z.pgrb2.0p50.f0{INDEX}"
 
 while getopts ":h:d:c:s:r:m:" option; do
   case "${option}" in
@@ -37,7 +37,7 @@ mkdir -p ${ARCHIVE_DIR}
 echo "ARCHIVE_DIR : $ARCHIVE_DIR"
 
 docker run -i --rm --privileged \
-    -v /mnt/disks/data/samba/wrf-static-data/geog:/home/Build_WRF/geog curw-wrfv4 \
+    -v /mnt/disks/data/samba/wrf-static-data/geog:/home/Build_WRF/geog curw-wrfv4:ubuntu1604 \
      /home/Build_WRF/code/wrfv4_run.sh -d ${EXEC_DATE} -h ${HOME_DIR} -c ${CHECK_GFS} \
      -s ${VERSION} -r ${RUN} -m ${MODEL} -u ${GFS_URL} -v ${OUTPUT_DIR}:/home/Build_WRF/nfs \
      -v ${GFS_DIR}:/home/Build_WRF/gfs \
