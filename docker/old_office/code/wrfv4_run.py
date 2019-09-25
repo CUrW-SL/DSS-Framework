@@ -642,8 +642,8 @@ if __name__ == '__main__':
         wrf_conf['namelist_input'] = 'template/namelist_input/namelist_{}.input'.format(model)
         wrf_conf['namelist_wps'] = 'template/namelist_wps/namelist.wps'
         # run_id = 'wrf_0_4.0_20190925_06_A'
-        date_str = (datetime.strptime(exec_date, '%Y-%m-%d')).strftime('%Y%m%d')
+        date_str = (datetime.strptime(exec_date, '%Y-%m-%d_%H:%M')).strftime('%Y%m%d')
         wrf_conf['run_id'] = 'wrf_{}_{}_{}_{}_{}'.format(version, run, date_str, hour, model)
-        wrf_conf['start_date'] = exec_date
+        wrf_conf['start_date'] = exec_date  # '2019-08-03_00:00'
         run_wrf_model('wps', wrf_conf, check_gfs)
 

@@ -8,7 +8,7 @@ GFS_DOWNLOAD_FILE_TEMPLATE="gfs.t{DATA_HOUR}z.pgrb2.0p50.f0{INDEX}"
 
 while getopts ":h:d:c:s:r:m:" option; do
   case "${option}" in
-  d) EXEC_DATE=$OPTARG ;; # 2019-09-24
+  d) EXEC_DATE=$OPTARG ;; # 2019-09-24_04:00
   c) CHECK_GFS=$OPTARG ;; # true
   s) VERSION=$OPTARG ;; # 4.0
   r) RUN=$OPTARG ;; # 0 or 1
