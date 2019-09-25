@@ -173,7 +173,7 @@ def download_parallel(url_dest_list, procs=multiprocessing.cpu_count(), retries=
         delayed(download_file)(i[0], i[1], retries, delay, overwrite, secondary_dest_dir) for i in url_dest_list)
 
 
-def download_gfs_data(wrf_conf):
+def download_gfs_data(wrf_conf, overwrite):
     """
     :param start_date: '2017-08-27_00:00'
     :return:
@@ -195,7 +195,7 @@ def download_gfs_data(wrf_conf):
 
         start_time = time.time()
         download_parallel(inventories, procs=gfs_threads, retries=wrf_conf['gfs_retries'],
-                              delay=wrf_conf['gfs_delay'], secondary_dest_dir=None)
+                              delay=wrf_conf['gfs_delay'], overwrite=overwrite, secondary_dest_dir=None)
 
         elapsed_time = time.time() - start_time
         log.info('Downloading GFS data: END Elapsed time: %f' % elapsed_time)
@@ -579,9 +579,12 @@ def run_wrf_model(run_mode, wrf_conf, check_gfs):
     try:
         print('download_gfs_data.')
         if check_gfs is not 'true':
-            download_gfs_data(wrf_conf)
+            log.info('Ignore already downloaded gfs data.')
+            overwrite = True
         else:
-            log.info('Continue with already downloaded gfs data.')
+            log.info('If available continue with already downloaded gfs data.')
+            overwrite = False
+        download_gfs_data(wrf_conf, overwrite)
         try:
             if run_mode != 'wrf':
                 replace_namelist_wps(wrf_conf)
@@ -640,7 +643,8 @@ if __name__ == '__main__':
         wrf_conf['archive_dir'] = '{}/{}/d{}/{}/{}/{}/archive'.format(home_dir, version, run, hour, model, exec_date)
         wrf_conf['namelist_input'] = 'template/wrf/A/namelist.input'
         wrf_conf['namelist_wps'] = 'template/wps/namelist.wps'
-        wrf_conf['run_id'] = 'wrfv4_2019-08-12_18_00'
+        # run_id = 'wrf_0_4.0_20190925_06_A'
+        wrf_conf['run_id'] = 'wrf_{}_{}_{}_{}_{}'.format(version, run, date, hour, model)
         wrf_conf['start_date'] = exec_date
         run_wrf_model('wps', wrf_conf, check_gfs)
 
