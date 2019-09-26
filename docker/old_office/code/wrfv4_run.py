@@ -297,7 +297,7 @@ def replace_namelist_wps(wrf_config, start_date=None, end_date=None):
     if os.path.exists(wrf_config['namelist_wps']):
         f = wrf_config['namelist_wps']
     else:
-        f = get_resource_path(os.path.join('execution', constants.DEFAULT_NAMELIST_WPS_TEMPLATE))
+        f = get_resource_path(os.path.join('/home/Build_WRF/template/namelist_wps', constants.DEFAULT_NAMELIST_WPS_TEMPLATE))
 
     dest = os.path.join(get_wps_dir(wrf_config['wrf_home']), 'namelist.wps')
     print('replace_namelist_wps|dest: ', dest)
