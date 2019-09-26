@@ -297,8 +297,7 @@ def replace_namelist_wps(wrf_config, start_date=None, end_date=None):
     if os.path.exists(wrf_config['namelist_wps']):
         f = wrf_config['namelist_wps']
     else:
-        f = get_resource_path(os.path.join('/home/Build_WRF/template/namelist_wps', constants.DEFAULT_NAMELIST_WPS_TEMPLATE))
-
+        f = os.path.join('/home/Build_WRF/template/namelist_wps', constants.DEFAULT_NAMELIST_WPS_TEMPLATE)
     dest = os.path.join(get_wps_dir(wrf_config['wrf_home']), 'namelist.wps')
     print('replace_namelist_wps|dest: ', dest)
     start_date = datetime.strptime(wrf_config['start_date'], '%Y-%m-%d_%H:%M')
@@ -639,8 +638,8 @@ if __name__ == '__main__':
         wrf_config = json.load(json_file)
         wrf_conf = wrf_config['wrf_config']
         logging.info('**** WRF RUN **** wrf_conf: {}'.format(wrf_conf))
-        wrf_conf['namelist_input'] = 'template/namelist_input/namelist_{}.input'.format(model)
-        wrf_conf['namelist_wps'] = 'template/namelist_wps/namelist.wps'
+        wrf_conf['namelist_input'] = '/home/Build_WRF/template/namelist_input/namelist_{}.input'.format(model)
+        wrf_conf['namelist_wps'] = '/home/Build_WRF/template/namelist_wps/namelist.wps'
         # run_id = 'wrf_0_4.0_20190925_06_A'
         date_str = (datetime.strptime(exec_date, '%Y-%m-%d_%H:%M')).strftime('%Y%m%d')
         wrf_conf['run_id'] = 'wrf_{}_{}_{}_{}_{}'.format(version, run, date_str, hour, model)
