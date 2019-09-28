@@ -124,6 +124,7 @@ def download_file(url, dest, retries=0, delay=60, overwrite=False, secondary_des
 
 
 def get_gfs_data_url_dest_tuple(url, inv, date_str, cycle, fcst_id, res, gfs_dir):
+    print('get_gfs_data_url_dest_tuple|cycle : ', cycle)
     url0 = url.replace('YYYY', date_str[0:4]).replace('MM', date_str[4:6]).replace('DD', date_str[6:8]).replace('CC',
                                                                                                                 cycle)
     inv0 = inv.replace('CC', cycle).replace('FFF', fcst_id).replace('RRRR', res).replace('YYYY', date_str[0:4]).replace(
@@ -172,6 +173,7 @@ def download_parallel(url_dest_list, procs=multiprocessing.cpu_count(), retries=
 
 
 def download_gfs_data(wrf_conf, overwrite, hour):
+    print('download_gfs_data| [overwrite, hour]: ', [overwrite, hour])
     """
     :param start_date: '2017-08-27_00:00'
     :return:
