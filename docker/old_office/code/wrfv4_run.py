@@ -335,9 +335,8 @@ def get_appropriate_gfs_inventory(wrf_config):
     else:
         floor_val = datetime_floor(st, 6 * 3600)
     gfs_date = floor_val.strftime('%Y%m%d')
-    gfs_cycle = str(floor_val.hour).zfill(2)
     start_inv = math.floor((st - floor_val).total_seconds() / 3600 / wrf_config['gfs_step']) * wrf_config['gfs_step']
-    return gfs_date, gfs_cycle, start_inv
+    return gfs_date, start_inv
 
 
 def run_subprocess(cmd, cwd=None, print_stdout=False):
@@ -391,7 +390,7 @@ def create_zip_with_prefix(src_dir, regex, dest_zip, comp=ZIP_DEFLATED, clean_up
     return dest_zip
 
 
-def run_wps(wrf_config):
+def run_wps(wrf_config, gfs_hour):
     log.info('Running WPS: START')
     wrf_home = wrf_config['wrf_home']
     wps_dir = get_wps_dir(wrf_home)
@@ -414,10 +413,11 @@ def run_wps(wrf_config):
         print('symlinks has created.')
 
     # Running link_grib.csh
-    gfs_date, gfs_cycle, start = get_appropriate_gfs_inventory(wrf_config)
-    dest = get_gfs_data_url_dest_tuple(wrf_config['gfs_url'], wrf_config['gfs_inv'], gfs_date, gfs_cycle,
+    gfs_date, start = get_appropriate_gfs_inventory(wrf_config)
+    dest = get_gfs_data_url_dest_tuple(wrf_config['gfs_url'], wrf_config['gfs_inv'], gfs_date, gfs_hour,
                                              '', wrf_config['gfs_res'], '')[1].replace('.grb2', '')
     print('----------------------gfs_dir : ', wrf_config['gfs_dir'])
+    print('----------------------gfs_hour : ', gfs_hour)
     print('----------------------wps_dir : ', wps_dir)
     print('----------------------dest : ', dest)
     run_subprocess(
@@ -577,7 +577,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def run_wrf_model(run_mode, wrf_conf, check_gfs, hour):
+def run_wrf_model(run_mode, wrf_conf, check_gfs, gfs_hour):
     print('wrf_conf : ', wrf_conf)
     try:
         print('download_gfs_data.')
@@ -587,11 +587,11 @@ def run_wrf_model(run_mode, wrf_conf, check_gfs, hour):
         else:
             log.info('If available continue with already downloaded gfs data.')
             overwrite = False
-        download_gfs_data(wrf_conf, overwrite, hour)
+        download_gfs_data(wrf_conf, overwrite, gfs_hour)
         try:
             if run_mode != 'wrf':
                 replace_namelist_wps(wrf_conf)
-                run_wps(wrf_conf)
+                run_wps(wrf_conf, gfs_hour)
             else:
                 log.info('-------------WRF only-------------')
             try:
@@ -625,14 +625,14 @@ if __name__ == '__main__':
     check_gfs = args['check_gfs']
     version = args['version']
     run = args['run']
-    hour = args['hour']
+    gfs_hour = args['hour']
     model = args['model']
     gfs_url = args['gfs_url']
     logging.info('**** WRF RUN **** exec_date: {}'.format(exec_date))
     logging.info('**** WRF RUN **** check_gfs: {}'.format(check_gfs))
     logging.info('**** WRF RUN **** version: {}'.format(version))
     logging.info('**** WRF RUN **** run: {}'.format(run))
-    logging.info('**** WRF RUN **** hour: {}'.format(hour))
+    logging.info('**** WRF RUN **** gfs_hour: {}'.format(gfs_hour))
     logging.info('**** WRF RUN **** model: {}'.format(model))
     logging.info('**** WRF RUN **** gfs_url: {}'.format(gfs_url))
     with open('wrfv4_config.json') as json_file:
@@ -643,7 +643,7 @@ if __name__ == '__main__':
         wrf_conf['namelist_wps'] = '/home/Build_WRF/template/namelist_wps/namelist.wps'
         # run_id = 'wrf_0_4.0_20190925_06_A'
         date_str = (datetime.strptime(exec_date, '%Y-%m-%d_%H:%M')).strftime('%Y%m%d')
-        wrf_conf['run_id'] = 'wrf_{}_{}_{}_{}_{}'.format(version, run, date_str, hour, model)
+        wrf_conf['run_id'] = 'wrf_{}_{}_{}_{}_{}'.format(version, run, date_str, gfs_hour, model)
         wrf_conf['start_date'] = exec_date  # '2019-08-03_00:00'
-        run_wrf_model('all', wrf_conf, check_gfs, hour)
+        run_wrf_model('all', wrf_conf, check_gfs, gfs_hour)
 
