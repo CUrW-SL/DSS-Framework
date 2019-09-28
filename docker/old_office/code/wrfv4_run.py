@@ -643,5 +643,5 @@ if __name__ == '__main__':
         date_str = (datetime.strptime(exec_date, '%Y-%m-%d_%H:%M')).strftime('%Y%m%d')
         wrf_conf['run_id'] = 'wrf_{}_{}_{}_{}_{}'.format(version, run, date_str, hour, model)
         wrf_conf['start_date'] = exec_date  # '2019-08-03_00:00'
-        run_wrf_model('wps', wrf_conf, check_gfs, hour)
+        run_wrf_model('all', wrf_conf, check_gfs, hour)
 
