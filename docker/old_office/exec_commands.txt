@@ -32,3 +32,8 @@ which will count the number of lines starting with "processor" in /proc/cpuinfo
 For systems with hyper-threading, you can use
 grep ^cpu\\scores /proc/cpuinfo | uniq |  awk '{print $4}'
 
+nohup ./runner.sh -d "2019-09-24" -t "00:00" -c "true" -s "4.0" -r 0 -h "06" -m "E" &
+
+
+
+
