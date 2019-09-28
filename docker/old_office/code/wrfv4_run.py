@@ -586,11 +586,11 @@ def parse_args():
     return parser.parse_args()
 
 
-def run_wrf_model(run_mode, wrf_conf, check_gfs, gfs_hour):
+def run_wrf_model(run_mode, wrf_conf, overwrite, gfs_hour):
     print('wrf_conf : ', wrf_conf)
     try:
         print('download_gfs_data.')
-        download_gfs_data(wrf_conf, check_gfs, gfs_hour)
+        download_gfs_data(wrf_conf, overwrite, gfs_hour)
         try:
             if run_mode != 'wrf':
                 replace_namelist_wps(wrf_conf)
