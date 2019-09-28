@@ -160,10 +160,9 @@ def get_appropriate_gfs_inventory(wrf_config):
     else:
         floor_val = datetime_floor(st, 6 * 3600)
     gfs_date = floor_val.strftime('%Y%m%d')
-    gfs_cycle = str(floor_val.hour).zfill(2)
     start_inv = math.floor((st - floor_val).total_seconds() / 3600 / wrf_config['gfs_step']) * wrf_config['gfs_step']
 
-    return gfs_date, gfs_cycle, start_inv
+    return gfs_date, start_inv
 
 
 def download_parallel(url_dest_list, procs=multiprocessing.cpu_count(), retries=0, delay=60, overwrite=False,
@@ -172,7 +171,7 @@ def download_parallel(url_dest_list, procs=multiprocessing.cpu_count(), retries=
         delayed(download_file)(i[0], i[1], retries, delay, overwrite, secondary_dest_dir) for i in url_dest_list)
 
 
-def download_gfs_data(wrf_conf, overwrite):
+def download_gfs_data(wrf_conf, overwrite, hour):
     """
     :param start_date: '2017-08-27_00:00'
     :return:
@@ -180,12 +179,12 @@ def download_gfs_data(wrf_conf, overwrite):
     print('Downloading GFS data: START')
     log.info('Downloading GFS data: START')
     try:
-        gfs_date, gfs_cycle, start_inv = get_appropriate_gfs_inventory(wrf_conf)
+        gfs_date, start_inv = get_appropriate_gfs_inventory(wrf_conf)
         inventories = get_gfs_inventory_url_dest_list(gfs_date, wrf_conf['period'],
-                                                          wrf_conf['gfs_url'],
-                                                          wrf_conf['gfs_inv'], wrf_conf['gfs_step'],
-                                                          gfs_cycle, wrf_conf['gfs_res'],
-                                                          wrf_conf['gfs_dir'], start=start_inv)
+                                                    wrf_conf['gfs_url'],
+                                                    wrf_conf['gfs_inv'], wrf_conf['gfs_step'],
+                                                    hour, wrf_conf['gfs_res'],
+                                                    wrf_conf['gfs_dir'], start=start_inv)
         gfs_threads = wrf_conf['gfs_threads']
         print('Following data will be downloaded in %d parallel threads\n%s' % (gfs_threads, '\n'.join(
                     ' '.join(map(str, i)) for i in inventories)))
@@ -576,7 +575,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def run_wrf_model(run_mode, wrf_conf, check_gfs):
+def run_wrf_model(run_mode, wrf_conf, check_gfs, hour):
     print('wrf_conf : ', wrf_conf)
     try:
         print('download_gfs_data.')
@@ -586,7 +585,7 @@ def run_wrf_model(run_mode, wrf_conf, check_gfs):
         else:
             log.info('If available continue with already downloaded gfs data.')
             overwrite = False
-        download_gfs_data(wrf_conf, overwrite)
+        download_gfs_data(wrf_conf, overwrite, hour)
         try:
             if run_mode != 'wrf':
                 replace_namelist_wps(wrf_conf)
@@ -644,5 +643,5 @@ if __name__ == '__main__':
         date_str = (datetime.strptime(exec_date, '%Y-%m-%d_%H:%M')).strftime('%Y%m%d')
         wrf_conf['run_id'] = 'wrf_{}_{}_{}_{}_{}'.format(version, run, date_str, hour, model)
         wrf_conf['start_date'] = exec_date  # '2019-08-03_00:00'
-        run_wrf_model('wps', wrf_conf, check_gfs)
+        run_wrf_model('wps', wrf_conf, check_gfs, hour)
 
