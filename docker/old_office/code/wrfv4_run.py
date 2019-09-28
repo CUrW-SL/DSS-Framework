@@ -181,8 +181,8 @@ def download_parallel(url_dest_list, procs=multiprocessing.cpu_count(), retries=
         delayed(download_file)(i[0], i[1], retries, delay, overwrite, secondary_dest_dir) for i in url_dest_list)
 
 
-def download_gfs_data(wrf_conf, overwrite, hour):
-    print('download_gfs_data| [overwrite, hour]: ', [overwrite, hour])
+def download_gfs_data(wrf_conf, overwrite):
+    print('download_gfs_data|overwrite: ', overwrite)
     """
     :param start_date: '2017-08-27_00:00'
     :return:
@@ -194,7 +194,7 @@ def download_gfs_data(wrf_conf, overwrite, hour):
         inventories = get_gfs_inventory_url_dest_list(gfs_date, wrf_conf['period'],
                                                       wrf_conf['gfs_url'],
                                                       wrf_conf['gfs_inv'], wrf_conf['gfs_step'],
-                                                      hour, wrf_conf['gfs_res'],
+                                                      wrf_config['gfs_cycle'], wrf_conf['gfs_res'],
                                                       wrf_conf['gfs_dir'], start=start_inv)
         gfs_threads = wrf_conf['gfs_threads']
         print('Following data will be downloaded in %d parallel threads\n%s' % (gfs_threads, '\n'.join(
@@ -399,7 +399,7 @@ def create_zip_with_prefix(src_dir, regex, dest_zip, comp=ZIP_DEFLATED, clean_up
     return dest_zip
 
 
-def run_wps(wrf_config, gfs_hour):
+def run_wps(wrf_config):
     log.info('Running WPS: START')
     wrf_home = wrf_config['wrf_home']
     wps_dir = get_wps_dir(wrf_home)
@@ -423,10 +423,10 @@ def run_wps(wrf_config, gfs_hour):
 
     # Running link_grib.csh
     gfs_date, start = get_appropriate_gfs_inventory(wrf_config)
-    dest = get_gfs_data_url_dest_tuple(wrf_config['gfs_url'], wrf_config['gfs_inv'], gfs_date, gfs_hour,
+    dest = get_gfs_data_url_dest_tuple(wrf_config['gfs_url'], wrf_config['gfs_inv'], gfs_date, wrf_config['gfs_cycle'],
                                        '', wrf_config['gfs_res'], '')[1].replace('.grb2', '')
     print('----------------------gfs_dir : ', wrf_config['gfs_dir'])
-    print('----------------------gfs_hour : ', gfs_hour)
+    print('----------------------gfs_hour : ', wrf_config['gfs_cycle'])
     print('----------------------wps_dir : ', wps_dir)
     print('----------------------dest : ', dest)
     run_subprocess(
@@ -586,15 +586,15 @@ def parse_args():
     return parser.parse_args()
 
 
-def run_wrf_model(run_mode, wrf_conf, overwrite, gfs_hour):
+def run_wrf_model(run_mode, wrf_conf, overwrite):
     print('wrf_conf : ', wrf_conf)
     try:
         print('download_gfs_data.')
-        download_gfs_data(wrf_conf, overwrite, gfs_hour)
+        download_gfs_data(wrf_conf, overwrite)
         try:
             if run_mode != 'wrf':
                 replace_namelist_wps(wrf_conf)
-                run_wps(wrf_conf, gfs_hour)
+                run_wps(wrf_conf)
             else:
                 log.info('-------------WRF only-------------')
             try:
@@ -648,4 +648,5 @@ if __name__ == '__main__':
         date_str = (datetime.strptime(exec_date, '%Y-%m-%d_%H:%M')).strftime('%Y%m%d')
         wrf_conf['run_id'] = 'wrf_{}_{}_{}_{}_{}'.format(version, run, date_str, gfs_hour, model)
         wrf_conf['start_date'] = exec_date  # '2019-08-03_00:00'
-        run_wrf_model('all', wrf_conf, string_to_boolean(overwrite), gfs_hour)
+        wrf_config['gfs_cycle'] = gfs_hour
+        run_wrf_model('all', wrf_conf, string_to_boolean(overwrite))
