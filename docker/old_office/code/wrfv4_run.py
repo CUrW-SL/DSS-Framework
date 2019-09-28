@@ -21,7 +21,6 @@ import pkg_resources
 from joblib import Parallel, delayed
 import constants
 
-
 LOG_FORMAT = '[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s'
 logging.basicConfig(filename='/home/Build_WRF/logs/wrf_preprocessing.log',
                     level=logging.DEBUG,
@@ -70,6 +69,16 @@ def get_wrf_config(wrf_config, start_date=None, **kwargs):
 
 def file_exists_nonempty(filename):
     return os.path.exists(filename) and os.path.isfile(filename) and os.stat(filename).st_size != 0
+
+
+def string_to_boolean(input):
+    if type(input) is str:
+        if input == 'false' or input == 'False':
+            return False
+        elif input == 'true' or input == 'True':
+            return True
+    elif type(input) is bool:
+        return input
 
 
 def download_file(url, dest, retries=0, delay=60, overwrite=False, secondary_dest_dir=None):
@@ -183,19 +192,19 @@ def download_gfs_data(wrf_conf, overwrite, hour):
     try:
         gfs_date, start_inv = get_appropriate_gfs_inventory(wrf_conf)
         inventories = get_gfs_inventory_url_dest_list(gfs_date, wrf_conf['period'],
-                                                    wrf_conf['gfs_url'],
-                                                    wrf_conf['gfs_inv'], wrf_conf['gfs_step'],
-                                                    hour, wrf_conf['gfs_res'],
-                                                    wrf_conf['gfs_dir'], start=start_inv)
+                                                      wrf_conf['gfs_url'],
+                                                      wrf_conf['gfs_inv'], wrf_conf['gfs_step'],
+                                                      hour, wrf_conf['gfs_res'],
+                                                      wrf_conf['gfs_dir'], start=start_inv)
         gfs_threads = wrf_conf['gfs_threads']
         print('Following data will be downloaded in %d parallel threads\n%s' % (gfs_threads, '\n'.join(
-                    ' '.join(map(str, i)) for i in inventories)))
+            ' '.join(map(str, i)) for i in inventories)))
         log.info('Following data will be downloaded in %d parallel threads\n%s' % (gfs_threads, '\n'.join(
             ' '.join(map(str, i)) for i in inventories)))
 
         start_time = time.time()
         download_parallel(inventories, procs=gfs_threads, retries=wrf_conf['gfs_retries'],
-                              delay=wrf_conf['gfs_delay'], overwrite=overwrite, secondary_dest_dir=None)
+                          delay=wrf_conf['gfs_delay'], overwrite=overwrite, secondary_dest_dir=None)
 
         elapsed_time = time.time() - start_time
         log.info('Downloading GFS data: END Elapsed time: %f' % elapsed_time)
@@ -260,7 +269,7 @@ def replace_file_with_values(source, destination, val_dict):
 def replace_file_with_values_with_dates(wrf_config, src, dest, aux_dict, start_date=None, end_date=None):
     if start_date is None:
         start_date = datetime_floor(datetime.strptime(wrf_config['start_date'], '%Y-%m-%d_%H:%M'),
-                                          wrf_config['gfs_step'] * 3600)
+                                    wrf_config['gfs_step'] * 3600)
 
     if end_date is None:
         end_date = start_date + timedelta(days=wrf_config['period'])
@@ -415,7 +424,7 @@ def run_wps(wrf_config, gfs_hour):
     # Running link_grib.csh
     gfs_date, start = get_appropriate_gfs_inventory(wrf_config)
     dest = get_gfs_data_url_dest_tuple(wrf_config['gfs_url'], wrf_config['gfs_inv'], gfs_date, gfs_hour,
-                                             '', wrf_config['gfs_res'], '')[1].replace('.grb2', '')
+                                       '', wrf_config['gfs_res'], '')[1].replace('.grb2', '')
     print('----------------------gfs_dir : ', wrf_config['gfs_dir'])
     print('----------------------gfs_hour : ', gfs_hour)
     print('----------------------wps_dir : ', wps_dir)
@@ -567,7 +576,7 @@ def run_em_real(wrf_config):
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-exec_date')
-    parser.add_argument('-check_gfs', default='false')
+    parser.add_argument('-overwrite', default='false')
     parser.add_argument('-version', default='4.0')
     parser.add_argument('-run', default=0)
     parser.add_argument('-hour')
@@ -581,13 +590,7 @@ def run_wrf_model(run_mode, wrf_conf, check_gfs, gfs_hour):
     print('wrf_conf : ', wrf_conf)
     try:
         print('download_gfs_data.')
-        if check_gfs is not 'true':
-            log.info('Ignore already downloaded gfs data.')
-            overwrite = True
-        else:
-            log.info('If available continue with already downloaded gfs data.')
-            overwrite = False
-        download_gfs_data(wrf_conf, overwrite, gfs_hour)
+        download_gfs_data(wrf_conf, check_gfs, gfs_hour)
         try:
             if run_mode != 'wrf':
                 replace_namelist_wps(wrf_conf)
@@ -599,7 +602,7 @@ def run_wrf_model(run_mode, wrf_conf, check_gfs, gfs_hour):
                 if run_mode != 'wps':
                     wps_dir = get_wps_dir(wrf_conf['wrf_home'])
                     print('wps_dir : ', wps_dir)
-                    #shutil.rmtree(wrf_conf['gfs_dir'])
+                    # shutil.rmtree(wrf_conf['gfs_dir'])
                     delete_files_with_prefix(wps_dir, 'FILE:*')
                     delete_files_with_prefix(wps_dir, 'PFILE:*')
                     delete_files_with_prefix(wps_dir, 'geo_em.*')
@@ -622,14 +625,14 @@ if __name__ == '__main__':
     args = vars(parse_args())
     logging.info('Running arguments:\n%s' % json.dumps(args, sort_keys=True, indent=0))
     exec_date = args['exec_date']
-    check_gfs = args['check_gfs']
+    overwrite = args['overwrite']
     version = args['version']
     run = args['run']
     gfs_hour = args['hour']
     model = args['model']
     gfs_url = args['gfs_url']
     logging.info('**** WRF RUN **** exec_date: {}'.format(exec_date))
-    logging.info('**** WRF RUN **** check_gfs: {}'.format(check_gfs))
+    logging.info('**** WRF RUN **** overwrite: {}'.format(overwrite))
     logging.info('**** WRF RUN **** version: {}'.format(version))
     logging.info('**** WRF RUN **** run: {}'.format(run))
     logging.info('**** WRF RUN **** gfs_hour: {}'.format(gfs_hour))
@@ -645,5 +648,4 @@ if __name__ == '__main__':
         date_str = (datetime.strptime(exec_date, '%Y-%m-%d_%H:%M')).strftime('%Y%m%d')
         wrf_conf['run_id'] = 'wrf_{}_{}_{}_{}_{}'.format(version, run, date_str, gfs_hour, model)
         wrf_conf['start_date'] = exec_date  # '2019-08-03_00:00'
-        run_wrf_model('all', wrf_conf, check_gfs, gfs_hour)
-
+        run_wrf_model('all', wrf_conf, string_to_boolean(overwrite), gfs_hour)

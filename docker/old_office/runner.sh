@@ -10,7 +10,7 @@ while getopts ":h:d:t:c:s:r:m:" option; do
   case "${option}" in
   d) EXEC_DATE=$OPTARG ;; # 2019-09-24
   t) EXEC_TIME=$OPTARG ;; # 04:00
-  c) CHECK_GFS=$OPTARG ;; # true
+  c) OVERWRITE=$OPTARG ;; # true
   s) VERSION=$OPTARG ;; # 4.0
   r) RUN=$OPTARG ;; # 0 or 1
   h) HOUR=$OPTARG ;; # 00 or 06 or 12 or 18
@@ -22,7 +22,7 @@ echo "EXEC_DATE : $EXEC_DATE"
 echo "EXEC_TIME : $EXEC_TIME"
 echo "HOME_DIR : $HOME_DIR"
 echo "HOUR : $HOUR"
-echo "CHECK_GFS : $CHECK_GFS"
+echo "OVERWRITE : $OVERWRITE"
 echo "VERSION : $VERSION"
 echo "RUN : $RUN"
 echo "MODEL : $MODEL"
@@ -44,4 +44,4 @@ docker run -i --rm --privileged \
     -v ${OUTPUT_DIR}:/home/Build_WRF/nfs  \
     -v ${GFS_DIR}:/home/Build_WRF/gfs  \
     -v ${ARCHIVE_DIR}:/home/Build_WRF/archive \
-    curw-wrfv4:ubuntu1604  /home/Build_WRF/code/wrfv4_run.sh -d ${START_DATE} -h ${HOUR} -c ${CHECK_GFS}  -s ${VERSION} -r ${RUN} -m ${MODEL} -u ${GFS_URL}
+    curw-wrfv4:ubuntu1604  /home/Build_WRF/code/wrfv4_run.sh -d ${START_DATE} -h ${HOUR} -c ${OVERWRITE}  -s ${VERSION} -r ${RUN} -m ${MODEL} -u ${GFS_URL}
