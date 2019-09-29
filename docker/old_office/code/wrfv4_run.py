@@ -54,17 +54,17 @@ def create_dir_if_not_exists(path):
     return path
 
 
-def get_wrf_config(wrf_config, start_date=None, **kwargs):
+def get_wrf_config(wrf_conf, start_date=None, **kwargs):
     """
-    precedence = kwargs > wrf_config.json > constants
+    precedence = kwargs > wrf_conf.json > constants
     """
     if start_date is not None:
-        wrf_config['start_date'] = start_date
+        wrf_conf['start_date'] = start_date
 
     for key in kwargs:
-        wrf_config[key] = kwargs[key]
+        wrf_conf[key] = kwargs[key]
 
-    return wrf_config
+    return wrf_conf
 
 
 def file_exists_nonempty(filename):
@@ -162,15 +162,15 @@ def datetime_floor(timestamp, floor_sec):
     return epoch_to_datetime(math.floor(datetime_to_epoch(timestamp) / floor_sec) * floor_sec)
 
 
-def get_appropriate_gfs_inventory(wrf_config):
-    st = datetime_floor(datetime.strptime(wrf_config['start_date'], '%Y-%m-%d_%H:%M'), 3600 * wrf_config['gfs_step'])
+def get_appropriate_gfs_inventory(wrf_conf):
+    st = datetime_floor(datetime.strptime(wrf_conf['start_date'], '%Y-%m-%d_%H:%M'), 3600 * wrf_conf['gfs_step'])
     # if the time difference between now and start time is lt gfs_lag, then the time will be adjusted
-    if (datetime.utcnow() - st).total_seconds() <= wrf_config['gfs_lag'] * 3600:
-        floor_val = datetime_floor(st - timedelta(hours=wrf_config['gfs_lag']), 6 * 3600)
+    if (datetime.utcnow() - st).total_seconds() <= wrf_conf['gfs_lag'] * 3600:
+        floor_val = datetime_floor(st - timedelta(hours=wrf_conf['gfs_lag']), 6 * 3600)
     else:
         floor_val = datetime_floor(st, 6 * 3600)
     gfs_date = floor_val.strftime('%Y%m%d')
-    start_inv = math.floor((st - floor_val).total_seconds() / 3600 / wrf_config['gfs_step']) * wrf_config['gfs_step']
+    start_inv = math.floor((st - floor_val).total_seconds() / 3600 / wrf_conf['gfs_step']) * wrf_conf['gfs_step']
 
     return gfs_date, start_inv
 
@@ -194,7 +194,7 @@ def download_gfs_data(wrf_conf, overwrite):
         inventories = get_gfs_inventory_url_dest_list(gfs_date, wrf_conf['period'],
                                                       wrf_conf['gfs_url'],
                                                       wrf_conf['gfs_inv'], wrf_conf['gfs_step'],
-                                                      wrf_config['gfs_cycle'], wrf_conf['gfs_res'],
+                                                      wrf_conf['gfs_cycle'], wrf_conf['gfs_res'],
                                                       wrf_conf['gfs_dir'], start=start_inv)
         gfs_threads = wrf_conf['gfs_threads']
         print('Following data will be downloaded in %d parallel threads\n%s' % (gfs_threads, '\n'.join(
@@ -228,11 +228,11 @@ def get_gfs_inventory_dest_list(date, period, inv, step, cycle, res, gfs_dir):
             range(0, period * 24 + 1, step)]
 
 
-def check_gfs_data_availability(date, wrf_config):
+def check_gfs_data_availability(date, wrf_conf):
     log.info('Checking gfs data availability...')
-    inventories = get_gfs_inventory_dest_list(date, wrf_config['period'], wrf_config['gfs_inv'],
-                                              wrf_config['gfs_step'], wrf_config['gfs_cycle'],
-                                              wrf_config['gfs_res'], wrf_config['gfs_dir'])
+    inventories = get_gfs_inventory_dest_list(date, wrf_conf['period'], wrf_conf['gfs_inv'],
+                                              wrf_conf['gfs_step'], wrf_conf['gfs_cycle'],
+                                              wrf_conf['gfs_res'], wrf_conf['gfs_dir'])
     missing_inv = []
     for inv in inventories:
         if not os.path.exists(inv):
@@ -266,15 +266,15 @@ def replace_file_with_values(source, destination, val_dict):
     log.debug('replace file final content \n' + out)
 
 
-def replace_file_with_values_with_dates(wrf_config, src, dest, aux_dict, start_date=None, end_date=None):
+def replace_file_with_values_with_dates(wrf_conf, src, dest, aux_dict, start_date=None, end_date=None):
     if start_date is None:
-        start_date = datetime_floor(datetime.strptime(wrf_config['start_date'], '%Y-%m-%d_%H:%M'),
-                                    wrf_config['gfs_step'] * 3600)
+        start_date = datetime_floor(datetime.strptime(wrf_conf['start_date'], '%Y-%m-%d_%H:%M'),
+                                    wrf_conf['gfs_step'] * 3600)
 
     if end_date is None:
-        end_date = start_date + timedelta(days=wrf_config['period'])
+        end_date = start_date + timedelta(days=wrf_conf['period'])
 
-    period = wrf_config['period']
+    period = wrf_conf['period']
 
     d = {
         'YYYY1': start_date.strftime('%Y'),
@@ -287,7 +287,7 @@ def replace_file_with_values_with_dates(wrf_config, src, dest, aux_dict, start_d
         'DD2': end_date.strftime('%d'),
         'hh2': end_date.strftime('%H'),
         'mm2': end_date.strftime('%M'),
-        'GEOG': wrf_config['geog_dir'],
+        'GEOG': wrf_conf['geog_dir'],
         'RD0': str(int(period)),
         'RH0': str(int(period * 24 % 24)),
         'RM0': str(int(period * 60 * 24 % 60)),
@@ -296,35 +296,35 @@ def replace_file_with_values_with_dates(wrf_config, src, dest, aux_dict, start_d
         'hi3': '60',
     }
 
-    if aux_dict and aux_dict in wrf_config:
-        d.update(wrf_config[aux_dict])
+    if aux_dict and aux_dict in wrf_conf:
+        d.update(wrf_conf[aux_dict])
 
     replace_file_with_values(src, dest, d)
 
 
-def replace_namelist_wps(wrf_config, start_date=None, end_date=None):
+def replace_namelist_wps(wrf_conf, start_date=None, end_date=None):
     log.info('Replacing namelist.wps...')
-    if os.path.exists(wrf_config['namelist_wps']):
-        f = wrf_config['namelist_wps']
+    if os.path.exists(wrf_conf['namelist_wps']):
+        f = wrf_conf['namelist_wps']
     else:
         f = os.path.join('/home/Build_WRF/template/namelist_wps', constants.DEFAULT_NAMELIST_WPS_TEMPLATE)
-    dest = os.path.join(get_wps_dir(wrf_config['wrf_home']), 'namelist.wps')
+    dest = os.path.join(get_wps_dir(wrf_conf['wrf_home']), 'namelist.wps')
     print('replace_namelist_wps|dest: ', dest)
-    start_date = datetime.strptime(wrf_config['start_date'], '%Y-%m-%d_%H:%M')
-    replace_file_with_values_with_dates(wrf_config, f, dest, 'namelist_wps_dict', start_date, end_date)
+    start_date = datetime.strptime(wrf_conf['start_date'], '%Y-%m-%d_%H:%M')
+    replace_file_with_values_with_dates(wrf_conf, f, dest, 'namelist_wps_dict', start_date, end_date)
 
 
-def replace_namelist_input(wrf_config, start_date=None, end_date=None):
+def replace_namelist_input(wrf_conf, start_date=None, end_date=None):
     log.info('Replacing namelist.input ...')
-    if os.path.exists(wrf_config['namelist_input']):
-        f = wrf_config['namelist_input']
+    if os.path.exists(wrf_conf['namelist_input']):
+        f = wrf_conf['namelist_input']
     else:
         f = get_resource_path(os.path.join('execution', constants.DEFAULT_NAMELIST_INPUT_TEMPLATE))
     print('replace_namelist_input|source : ', f)
-    dest = os.path.join(get_em_real_dir(wrf_config['wrf_home']), 'namelist.input')
+    dest = os.path.join(get_em_real_dir(wrf_conf['wrf_home']), 'namelist.input')
     print('replace_namelist_input|dest : ', dest)
-    start_date = datetime.strptime(wrf_config['start_date'], '%Y-%m-%d_%H:%M')
-    replace_file_with_values_with_dates(wrf_config, f, dest, 'namelist_input_dict', start_date, end_date)
+    start_date = datetime.strptime(wrf_conf['start_date'], '%Y-%m-%d_%H:%M')
+    replace_file_with_values_with_dates(wrf_conf, f, dest, 'namelist_input_dict', start_date, end_date)
 
 
 def get_em_real_dir(wrf_home=constants.DEFAULT_WRF_HOME):
@@ -336,15 +336,15 @@ def delete_files_with_prefix(src_dir, prefix):
         os.remove(filename)
 
 
-def get_appropriate_gfs_inventory(wrf_config):
-    st = datetime_floor(datetime.strptime(wrf_config['start_date'], '%Y-%m-%d_%H:%M'), 3600 * wrf_config['gfs_step'])
+def get_appropriate_gfs_inventory(wrf_conf):
+    st = datetime_floor(datetime.strptime(wrf_conf['start_date'], '%Y-%m-%d_%H:%M'), 3600 * wrf_conf['gfs_step'])
     # if the time difference between now and start time is lt gfs_lag, then the time will be adjusted
-    if (datetime.utcnow() - st).total_seconds() <= wrf_config['gfs_lag'] * 3600:
-        floor_val = datetime_floor(st - timedelta(hours=wrf_config['gfs_lag']), 6 * 3600)
+    if (datetime.utcnow() - st).total_seconds() <= wrf_conf['gfs_lag'] * 3600:
+        floor_val = datetime_floor(st - timedelta(hours=wrf_conf['gfs_lag']), 6 * 3600)
     else:
         floor_val = datetime_floor(st, 6 * 3600)
     gfs_date = floor_val.strftime('%Y%m%d')
-    start_inv = math.floor((st - floor_val).total_seconds() / 3600 / wrf_config['gfs_step']) * wrf_config['gfs_step']
+    start_inv = math.floor((st - floor_val).total_seconds() / 3600 / wrf_conf['gfs_step']) * wrf_conf['gfs_step']
     return gfs_date, start_inv
 
 
@@ -399,12 +399,12 @@ def create_zip_with_prefix(src_dir, regex, dest_zip, comp=ZIP_DEFLATED, clean_up
     return dest_zip
 
 
-def run_wps(wrf_config):
+def run_wps(wrf_conf):
     log.info('Running WPS: START')
-    wrf_home = wrf_config['wrf_home']
+    wrf_home = wrf_conf['wrf_home']
     wps_dir = get_wps_dir(wrf_home)
     output_dir = create_dir_if_not_exists(
-        os.path.join(wrf_config['nfs_dir'], 'wps'))
+        os.path.join(wrf_conf['nfs_dir'], 'wps'))
     print('run_wps|output_dir : ', output_dir)
 
     log.info('Cleaning up files')
@@ -422,15 +422,15 @@ def run_wps(wrf_config):
         print('symlinks has created.')
 
     # Running link_grib.csh
-    gfs_date, start = get_appropriate_gfs_inventory(wrf_config)
-    dest = get_gfs_data_url_dest_tuple(wrf_config['gfs_url'], wrf_config['gfs_inv'], gfs_date, wrf_config['gfs_cycle'],
-                                       '', wrf_config['gfs_res'], '')[1].replace('.grb2', '')
-    print('----------------------gfs_dir : ', wrf_config['gfs_dir'])
-    print('----------------------gfs_hour : ', wrf_config['gfs_cycle'])
+    gfs_date, start = get_appropriate_gfs_inventory(wrf_conf)
+    dest = get_gfs_data_url_dest_tuple(wrf_conf['gfs_url'], wrf_conf['gfs_inv'], gfs_date, wrf_conf['gfs_cycle'],
+                                       '', wrf_conf['gfs_res'], '')[1].replace('.grb2', '')
+    print('----------------------gfs_dir : ', wrf_conf['gfs_dir'])
+    print('----------------------gfs_hour : ', wrf_conf['gfs_cycle'])
     print('----------------------wps_dir : ', wps_dir)
     print('----------------------dest : ', dest)
     run_subprocess(
-        'csh link_grib.csh %s/%s' % (wrf_config['gfs_dir'], dest), cwd=wps_dir)
+        'csh link_grib.csh %s/%s' % (wrf_conf['gfs_dir'], dest), cwd=wps_dir)
     try:
         # Starting ungrib.exe
         try:
@@ -456,11 +456,11 @@ def run_wps(wrf_config):
     log.info('Running WPS: DONE')
 
     log.info('Zipping metgrid data')
-    metgrid_zip = os.path.join(wps_dir, wrf_config['run_id'] + '_metgrid.zip')
+    metgrid_zip = os.path.join(wps_dir, wrf_conf['run_id'] + '_metgrid.zip')
     create_zip_with_prefix(wps_dir, 'met_em.d*', metgrid_zip)
 
     log.info('Moving metgrid data')
-    dest_dir = os.path.join(wrf_config['nfs_dir'], 'metgrid')
+    dest_dir = os.path.join(wrf_conf['nfs_dir'], 'metgrid')
     move_files_with_prefix(wps_dir, metgrid_zip, dest_dir)
 
 
@@ -501,15 +501,15 @@ def copy_files_with_prefix(src_dir, prefix, dest_dir):
         shutil.copy(filename, os.path.join(dest_dir, ntpath.basename(filename)))
 
 
-def run_em_real(wrf_config):
+def run_em_real(wrf_conf):
     log.info('Running em_real...')
 
-    wrf_home = wrf_config['wrf_home']
+    wrf_home = wrf_conf['wrf_home']
     em_real_dir = get_em_real_dir(wrf_home)
-    procs = wrf_config['procs']
-    run_id = wrf_config['run_id']
-    output_dir = create_dir_if_not_exists(os.path.join(wrf_config['nfs_dir'], 'wrf'))
-    archive_dir = create_dir_if_not_exists(os.path.join(wrf_config['archive_dir'], 'archive'))
+    procs = wrf_conf['procs']
+    run_id = wrf_conf['run_id']
+    output_dir = create_dir_if_not_exists(os.path.join(wrf_conf['nfs_dir'], 'wrf'))
+    archive_dir = create_dir_if_not_exists(os.path.join(wrf_conf['archive_dir'], 'archive'))
 
     print('run_em_real|output_dir: ', output_dir)
     print('run_em_real|archive_dir: ', archive_dir)
@@ -520,10 +520,10 @@ def run_em_real(wrf_config):
     logs_dir = create_dir_if_not_exists(os.path.join(output_dir, 'logs'))
 
     log.info('Copying metgrid.zip')
-    metgrid_dir = os.path.join(wrf_config['nfs_dir'], 'metgrid')
+    metgrid_dir = os.path.join(wrf_conf['nfs_dir'], 'metgrid')
 
-    copy_files_with_prefix(metgrid_dir, wrf_config['run_id'] + '_metgrid.zip', em_real_dir)
-    metgrid_zip = os.path.join(em_real_dir, wrf_config['run_id'] + '_metgrid.zip')
+    copy_files_with_prefix(metgrid_dir, wrf_conf['run_id'] + '_metgrid.zip', em_real_dir)
+    metgrid_zip = os.path.join(em_real_dir, wrf_conf['run_id'] + '_metgrid.zip')
 
     log.info('Extracting metgrid.zip')
     ZipFile(metgrid_zip, 'r', compression=ZIP_DEFLATED).extractall(path=em_real_dir)
@@ -648,5 +648,5 @@ if __name__ == '__main__':
         date_str = (datetime.strptime(exec_date, '%Y-%m-%d_%H:%M')).strftime('%Y%m%d')
         wrf_conf['run_id'] = 'wrf_{}_{}_{}_{}_{}'.format(version, run, date_str, gfs_hour, model)
         wrf_conf['start_date'] = exec_date  # '2019-08-03_00:00'
-        wrf_config['gfs_cycle'] = gfs_hour
+        wrf_conf['gfs_cycle'] = gfs_hour
         run_wrf_model('all', wrf_conf, string_to_boolean(overwrite))
