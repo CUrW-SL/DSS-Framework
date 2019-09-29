@@ -162,6 +162,10 @@ def datetime_floor(timestamp, floor_sec):
     return epoch_to_datetime(math.floor(datetime_to_epoch(timestamp) / floor_sec) * floor_sec)
 
 
+def get_gfs_date(wrf_conf):
+    start_date = datetime.strptime(wrf_conf['start_date'], '%Y-%m-%d_%H:%M')
+    return start_date.strftime('%Y%m%d')
+
 def get_appropriate_gfs_inventory(wrf_conf):
     st = datetime_floor(datetime.strptime(wrf_conf['start_date'], '%Y-%m-%d_%H:%M'), 3600 * wrf_conf['gfs_step'])
     # if the time difference between now and start time is lt gfs_lag, then the time will be adjusted
@@ -191,7 +195,8 @@ def download_gfs_data(wrf_conf, overwrite):
     print('Downloading GFS data: START')
     log.info('Downloading GFS data: START')
     try:
-        gfs_date, start_inv = get_appropriate_gfs_inventory(wrf_conf)
+        gfs_date = get_gfs_date(wrf_conf)
+        start_inv = 0
         print('[gfs_date, start_inv] : ', [gfs_date, start_inv])
         inventories = get_gfs_inventory_url_dest_list(gfs_date, wrf_conf['period'],
                                                       wrf_conf['gfs_url'],
