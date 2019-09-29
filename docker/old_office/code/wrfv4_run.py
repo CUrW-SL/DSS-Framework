@@ -654,6 +654,6 @@ if __name__ == '__main__':
         # run_id = 'wrf_0_4.0_20190925_06_A'
         date_str = (datetime.strptime(exec_date, '%Y-%m-%d_%H:%M')).strftime('%Y%m%d')
         wrf_conf['run_id'] = 'wrf_{}_{}_{}_{}_{}'.format(version, run, date_str, gfs_hour, model)
-        wrf_conf['start_date'] = exec_date  # '2019-08-03_00:00'
+        wrf_conf['start_date'] = '{}_{}:00'.format(exec_date, gfs_hour)  # '2019-08-03_00:00'
         wrf_conf['gfs_cycle'] = gfs_hour
         run_wrf_model('all', wrf_conf, string_to_boolean(overwrite))
