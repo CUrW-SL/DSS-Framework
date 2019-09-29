@@ -38,7 +38,7 @@ mkdir -p ${ARCHIVE_DIR}
 echo "ARCHIVE_DIR : $ARCHIVE_DIR"
 
 docker run -i --rm --privileged \
-    -v /mnt/disks/data/samba/wrf-static-data/geog:/home/Build_WRF/geog  \
+    -v /mnt/disks/data/samba/wrf-static-data/new_geog/WPS_GEOG:/home/Build_WRF/geog  \
     -v ${OUTPUT_DIR}:/home/Build_WRF/nfs  \
     -v ${GFS_DIR}:/home/Build_WRF/gfs  \
     -v ${ARCHIVE_DIR}:/home/Build_WRF/archive \
