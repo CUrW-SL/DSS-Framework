@@ -183,6 +183,7 @@ def download_parallel(url_dest_list, procs=multiprocessing.cpu_count(), retries=
 
 def download_gfs_data(wrf_conf, overwrite):
     print('download_gfs_data|overwrite: ', overwrite)
+    print('download_gfs_data|wrf_conf: ', wrf_conf)
     """
     :param start_date: '2017-08-27_00:00'
     :return:
@@ -191,6 +192,7 @@ def download_gfs_data(wrf_conf, overwrite):
     log.info('Downloading GFS data: START')
     try:
         gfs_date, start_inv = get_appropriate_gfs_inventory(wrf_conf)
+        print('[gfs_date, start_inv] : ', [gfs_date, start_inv])
         inventories = get_gfs_inventory_url_dest_list(gfs_date, wrf_conf['period'],
                                                       wrf_conf['gfs_url'],
                                                       wrf_conf['gfs_inv'], wrf_conf['gfs_step'],
@@ -591,6 +593,7 @@ def run_wrf_model(run_mode, wrf_conf, overwrite):
     try:
         print('download_gfs_data.')
         download_gfs_data(wrf_conf, overwrite)
+        """
         try:
             if run_mode != 'wrf':
                 replace_namelist_wps(wrf_conf)
@@ -616,6 +619,7 @@ def run_wrf_model(run_mode, wrf_conf, overwrite):
         except Exception as ex:
             traceback.print_exc()
             log.error('run wps exception')
+        """
     except Exception as e:
         traceback.print_exc()
         log.error('download_gfs_data exception')
@@ -649,4 +653,4 @@ if __name__ == '__main__':
         wrf_conf['run_id'] = 'wrf_{}_{}_{}_{}_{}'.format(version, run, date_str, gfs_hour, model)
         wrf_conf['start_date'] = exec_date  # '2019-08-03_00:00'
         wrf_conf['gfs_cycle'] = gfs_hour
-        run_wrf_model('all', wrf_conf, string_to_boolean(overwrite))
+        run_wrf_model('wps', wrf_conf, string_to_boolean(overwrite))
