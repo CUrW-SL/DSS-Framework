@@ -598,7 +598,6 @@ def run_wrf_model(run_mode, wrf_conf, overwrite):
     try:
         print('download_gfs_data.')
         download_gfs_data(wrf_conf, overwrite)
-        """
         try:
             if run_mode != 'wrf':
                 replace_namelist_wps(wrf_conf)
@@ -624,7 +623,6 @@ def run_wrf_model(run_mode, wrf_conf, overwrite):
         except Exception as ex:
             traceback.print_exc()
             log.error('run wps exception')
-        """
     except Exception as e:
         traceback.print_exc()
         log.error('download_gfs_data exception')
@@ -658,4 +656,4 @@ if __name__ == '__main__':
         wrf_conf['run_id'] = 'wrf_{}_{}_{}_{}_{}'.format(version, run, date_str, gfs_hour, model)
         wrf_conf['start_date'] = exec_date  # '2019-08-03_00:00'
         wrf_conf['gfs_cycle'] = gfs_hour
-        run_wrf_model('wps', wrf_conf, string_to_boolean(overwrite))
+        run_wrf_model('all', wrf_conf, string_to_boolean(overwrite))
