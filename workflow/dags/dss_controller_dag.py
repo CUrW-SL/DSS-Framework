@@ -48,7 +48,6 @@ def conditionally_trigger_dss_unit1(context, dag_run_obj):
     c_p = context['params']['check_rules']
     print("Controller DAG : conditionally_trigger = {}".format(c_p))
     if context['params']['check_rules']:
-        allowed_rule_types = context['params']['rule_types']
         dag_run_obj.payload = {'message': context['params']['rule_types']}
         return {'trigger_dag_id': 'wrf_4_E_dag', 'dro': dag_run_obj}
 
