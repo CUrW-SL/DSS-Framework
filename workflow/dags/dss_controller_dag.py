@@ -19,7 +19,6 @@ def init_workflow_routine(**context):
     db_config = Variable.get('db_config', deserialize_json=True)
     adapter = RuleEngineAdapter.get_instance(db_config)
     run_date = context["execution_date"].to_datetime_string()
-    # run_date = datetime.strptime(context["execution_date"], '%Y-%m-%d %H:%M:%S')
     print('init_workflow_routine|run_date : ', run_date)
     routine = adapter.get_next_workflow_routine(run_date)
     print('init_workflow_routine|routine : ', routine)

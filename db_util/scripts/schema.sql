@@ -1,12 +1,11 @@
 CREATE TABLE IF NOT EXISTS `workflow_routines`
 (
     `id`                int(11) NOT NULL AUTO_INCREMENT,
-    `priority`          int(11)  DEFAULT NULL,
     `dss1`              int(11)  DEFAULT NULL COMMENT 'rule id related to wrf',
     `dss2`              int(11)  DEFAULT NULL COMMENT 'rule id related to hechms',
     `dss3`              int(11)  DEFAULT NULL COMMENT 'rule id related to flo2d',
     `status`            int(11)  DEFAULT NULL COMMENT '0-not triggered, 1- triggered, 2- running, 3- completed, 4- error',
-    `scheduled_date`    date DEFAULT NULL,
+    `schedule`          varchar(45) DEFAULT NULL,
     `last_trigger_date` datetime DEFAULT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
@@ -18,7 +17,6 @@ CREATE TABLE IF NOT EXISTS `wrf_rules`
 (
       `id`                          int(11) NOT NULL AUTO_INCREMENT,
       `name`                        varchar(45) DEFAULT NULL,
-      `priority`                    int(11) DEFAULT NULL,
       `status`                      int(11) DEFAULT NULL COMMENT '0 - disable, 1 - enable, 2 - running, 3 - completed',
       `target_model`                varchar(45) DEFAULT NULL,
       `version`                     varchar(45) DEFAULT NULL,
@@ -35,8 +33,6 @@ CREATE TABLE IF NOT EXISTS `hechms_rules`
 (
     `id`                          int(11) NOT NULL AUTO_INCREMENT,
     `name`                        varchar(45) DEFAULT NULL,
-    `run`                         varchar(45) DEFAULT NULL,
-    `hour`                        varchar(45) DEFAULT NULL,
     `status`                      int(11)  DEFAULT NULL COMMENT '0 - disable, 1 - enable, 2 - running, 3 - completed',
     `target_model`                varchar(45) DEFAULT NULL,
     `forecast_days`               int(11) DEFAULT NULL,
@@ -55,8 +51,6 @@ CREATE TABLE IF NOT EXISTS `flo2d_rules`
 (
     `id`                          int(11) NOT NULL AUTO_INCREMENT,
     `name`                        varchar(45)  DEFAULT NULL,
-    `run`                         varchar(45) DEFAULT NULL,
-    `hour`                        varchar(45) DEFAULT NULL,
     `status`                      int(11) DEFAULT NULL COMMENT '0 - disable, 1 - enable, 2 - running, 3 - completed',
     `target_model`                varchar(45) DEFAULT NULL,
     `forecast_days`               int(11) DEFAULT NULL,
