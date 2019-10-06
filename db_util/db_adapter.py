@@ -90,7 +90,7 @@ class RuleEngineAdapter:
         hechms_rules = []
         query = 'select name, target_model,forecast_days, observed_days, ' \
                 'init_run, no_forecast_continue, no_observed_continue, rainfall_data_from, ' \
-                'ignore_previous_run, run, hour from dss.hechms_rules where status = {}'.format(status)
+                'ignore_previous_run from dss.hechms_rules where status = {}'.format(status)
         results = self.get_multiple_result(query)
         if results is not None:
             for row in results:
@@ -98,14 +98,14 @@ class RuleEngineAdapter:
                                      'forecast_days': row[2], 'observed_days': row[3],
                                      'init_run': row[4], 'no_forecast_continue': row[5],
                                      'no_observed_continue': row[6], 'rainfall_data_from': row[7],
-                                     'ignore_previous_run': row[8], 'run': row[9], 'hour': row[10]})
+                                     'ignore_previous_run': row[8]})
         return hechms_rules
 
     def get_flo2d_rule_info(self, status=1):
         flo2d_rules = []
         query = 'select name, target_model, forecast_days, observed_days, ' \
                 'init_run, no_forecast_continue, no_observed_continue, raincell_data_from, ' \
-                'inflow_data_from, outflow_data_from, ignore_previous_run, run, hour ' \
+                'inflow_data_from, outflow_data_from, ignore_previous_run' \
                 'from dss.flo2d_rules where status=1'.format(status)
         results = self.get_multiple_result(query)
         if results is not None:
@@ -115,7 +115,7 @@ class RuleEngineAdapter:
                                     'init_run': row[4], 'no_forecast_continue': row[5],
                                     'no_observed_continue': row[6], 'raincell_data_from': row[7],
                                     'inflow_data_from': row[8], 'outflow_data_from': row[9],
-                                    'ignore_previous_run': row[10], 'run': row[11], 'hour': row[12]})
+                                    'ignore_previous_run': row[10]})
         return flo2d_rules
 
     def get_workflow_routines(self, schedule_date, status):
