@@ -204,7 +204,12 @@ class RuleEngineAdapter:
                 routines.append({'id': result[0], 'dss1': result[1], 'dss2': result[2],
                                  'dss3': result[3], 'schedule': result[4]})
         if len(routines) > 0:
-            return get_next_scheduled_workflow(schedule_date, routines)
+            routine = get_next_scheduled_workflow(schedule_date, routines)
+            if routine:
+                self.update_initial_workflow_routing_status(1, routine['id'])
+                return routine
+            else:
+                return None
         else:
             return None
 

@@ -20,7 +20,7 @@ def init_workflow_routine(**context):
     adapter = RuleEngineAdapter.get_instance(db_config)
     run_date = context["execution_date"].to_datetime_string()
     print('init_workflow_routine|run_date : ', run_date)
-    routine = adapter.get_next_workflow_routine(run_date)
+    routine = adapter.get_next_workflow_routines(run_date)
     print('init_workflow_routine|routine : ', routine)
     if routine is None:
         return {'id': 0, 'dss1': 0, 'dss2': 0, 'dss3': 0}
