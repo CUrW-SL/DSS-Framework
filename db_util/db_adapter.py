@@ -16,8 +16,6 @@ def get_next_scheduled_workflow(schedule_date, workflow_routines):
 
 def validate_workflow(workflow_routine, schedule_date):
     schedule = workflow_routine['schedule']
-    print('workflow_routine : ', workflow_routine)
-    print('schedule : ', schedule)
     cron = croniter.croniter(schedule, schedule_date)
     run_date = cron.get_next(datetime)
     if datetime.now() >= run_date:
@@ -197,6 +195,7 @@ class RuleEngineAdapter:
             schedule_date = schedule_date
         else:
             schedule_date = datetime.strptime(schedule_date, '%Y-%m-%d %H:%M:%S')
+        print('schedule_date : ', schedule_date)
         query = 'select id,dss1,dss2,dss3,schedule from dss.workflow_routines where status=0 ;'
         results = self.get_multiple_result(query)
         routines = []
@@ -205,7 +204,6 @@ class RuleEngineAdapter:
                 routines.append({'id': result[0], 'dss1': result[1], 'dss2': result[2],
                                  'dss3': result[3], 'schedule': result[4]})
         if len(routines) > 0:
-            print(routines)
             return get_next_scheduled_workflow(schedule_date, routines)
         else:
             return None
@@ -218,7 +216,8 @@ if __name__ == "__main__":
     print(adapter)
     adapter = RuleEngineAdapter.get_instance(db_config)
     print(adapter)
-    adapter.get_next_workflow_routines()
+    result = adapter.get_next_workflow_routines()
+    print(result)
 
 
 
