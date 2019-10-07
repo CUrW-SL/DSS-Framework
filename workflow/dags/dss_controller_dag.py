@@ -40,6 +40,7 @@ def dss1_branch_func(**context):
         return 'dss_unit1'
 
 
+# tobe implemented multiple model triggering.
 def conditionally_trigger_dss_unit1(context, dag_run_obj):
     print('***************************conditionally_trigger_dss_unit1**********************************')
     print('conditionally_trigger_dss_unit1')
@@ -95,7 +96,7 @@ def conditionally_trigger_dss_unit3(context, dag_run_obj):
 
 default_args = {
         'owner': 'dss admin',
-        'start_date': datetime.strptime('2019-10-07 15:00:00', '%Y-%m-%d %H:%M:%S'),
+        'start_date': datetime.strptime('2019-10-07 17:00:00', '%Y-%m-%d %H:%M:%S'),
         'email': ['hasithadkr7.com'],
         'email_on_failure': True,
     }
