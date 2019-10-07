@@ -16,8 +16,10 @@ def get_next_scheduled_workflow(schedule_date, workflow_routines):
 
 def validate_workflow(workflow_routine, schedule_date):
     schedule = workflow_routine['schedule']
+    print('workflow_routine : ', workflow_routine)
+    print('schedule : ', schedule)
     cron = croniter.croniter(schedule, schedule_date)
-    run_date = cron.get_next(datetime.datetime)
+    run_date = cron.get_next(datetime)
     if datetime.now() >= run_date:
         return True
     else:
@@ -195,35 +197,28 @@ class RuleEngineAdapter:
             schedule_date = schedule_date
         else:
             schedule_date = datetime.strptime(schedule_date, '%Y-%m-%d %H:%M:%S')
-        query = 'select id,dss1,dss2,dss3,schedule from dss.workflow_routines where status=0 and ;'
+        query = 'select id,dss1,dss2,dss3,schedule from dss.workflow_routines where status=0 ;'
         results = self.get_multiple_result(query)
         routines = []
         if results is not None:
             for result in results:
-                print(result)
                 routines.append({'id': result[0], 'dss1': result[1], 'dss2': result[2],
-                                 'dss3': result[3], 'schedule': result[3]})
+                                 'dss3': result[3], 'schedule': result[4]})
+        if len(routines) > 0:
+            print(routines)
+            return get_next_scheduled_workflow(schedule_date, routines)
+        else:
+            return None
 
 
 if __name__ == "__main__":
-    adapter = RuleEngineAdapter('admin',
-                                'floody',
-                                'localhost',
-                                'dss',
-                                '/home/hasitha/PycharmProjects/DSS-Framework/log')
+    db_config = {'mysql_user': 'admin', 'mysql_password': 'floody', 'mysql_host': 'localhost', 'mysql_db': 'dss',
+                 'log_path': '/home/hasitha/PycharmProjects/DSS-Framework/log'}
+    adapter = RuleEngineAdapter.get_instance(db_config)
     print(adapter)
-    adapter = RuleEngineAdapter.get_instance('admin',
-                                   'floody',
-                                   'localhost',
-                                   'dss',
-                                   '/home/hasitha/PycharmProjects/DSS-Framework/log')
+    adapter = RuleEngineAdapter.get_instance(db_config)
     print(adapter)
-    adapter = RuleEngineAdapter.get_instance('admin',
-                                             'floody',
-                                             'localhost',
-                                             'dss',
-                                             '/home/hasitha/PycharmProjects/DSS-Framework/log')
-    print(adapter)
+    adapter.get_next_workflow_routines()
 
 
 
