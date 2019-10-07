@@ -1,8 +1,27 @@
 import logging
 import mysql.connector
 import os
+from datetime import datetime
+import croniter
 
 LOG_FORMAT = '[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s'
+
+
+def get_next_scheduled_workflow(schedule_date, workflow_routines):
+    for workflow_routine in workflow_routines:
+        if validate_workflow(workflow_routine, schedule_date):
+            return workflow_routine
+    return None
+
+
+def validate_workflow(workflow_routine, schedule_date):
+    schedule = workflow_routine['schedule']
+    cron = croniter.croniter(schedule, schedule_date)
+    run_date = cron.get_next(datetime.datetime)
+    if datetime.now() >= run_date:
+        return True
+    else:
+        return False
 
 
 class RuleEngineAdapter:
@@ -170,6 +189,20 @@ class RuleEngineAdapter:
             routine = {'id': result[0], 'dss1': result[1], 'dss2': result[2], 'dss3': result[3]}
             self.update_initial_workflow_routing_status(1, routine['id'])
             return routine
+
+    def get_next_workflow_routines(self, schedule_date=datetime.now()):
+        if type(schedule_date) is datetime:
+            schedule_date = schedule_date
+        else:
+            schedule_date = datetime.strptime(schedule_date, '%Y-%m-%d %H:%M:%S')
+        query = 'select id,dss1,dss2,dss3,schedule from dss.workflow_routines where status=0 and ;'
+        results = self.get_multiple_result(query)
+        routines = []
+        if results is not None:
+            for result in results:
+                print(result)
+                routines.append({'id': result[0], 'dss1': result[1], 'dss2': result[2],
+                                 'dss3': result[3], 'schedule': result[3]})
 
 
 if __name__ == "__main__":

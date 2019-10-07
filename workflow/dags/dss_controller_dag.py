@@ -9,8 +9,8 @@ sys.path.insert(0, '/home/hasitha/PycharmProjects/DSS-Framework/db_util')
 from db_adapter import RuleEngineAdapter
 
 
-prod_dag_name = 'dss_controller_dag2'
-schedule_interval = '*/10 * * * *'
+prod_dag_name = 'dss_controller_dag3'
+schedule_interval = '*/5 * * * *'
 SKIP = 0
 
 
@@ -95,7 +95,7 @@ def conditionally_trigger_dss_unit3(context, dag_run_obj):
 
 default_args = {
         'owner': 'dss admin',
-        'start_date': datetime.strptime('2019-09-22 07:30:00', '%Y-%m-%d %H:%M:%S'),
+        'start_date': datetime.strptime('2019-10-07 15:00:00', '%Y-%m-%d %H:%M:%S'),
         'email': ['hasithadkr7.com'],
         'email_on_failure': True,
     }
