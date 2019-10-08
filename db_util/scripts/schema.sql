@@ -55,7 +55,6 @@ CREATE TABLE IF NOT EXISTS `flo2d_rules`
     `target_model`                varchar(45) DEFAULT NULL,
     `forecast_days`               int(11) DEFAULT NULL,
     `observed_days`               int(11) DEFAULT NULL,
-    `init_run`                    TINYINT(1) DEFAULT NULL,
     `no_forecast_continue`        TINYINT(1) DEFAULT NULL,
     `no_observed_continue`        TINYINT(1) DEFAULT NULL,
     `rain_cell_data_from`         int(11) DEFAULT NULL,
