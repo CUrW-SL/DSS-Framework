@@ -161,13 +161,12 @@ class RuleEngineAdapter:
                 'from dss.flo2d_rules where status=1'.format(status)
         results = self.get_multiple_result(query)
         if results is not None:
-            for row in results:
-                flo2d_rules.append({'name': row[0], 'target_model': row[1],
-                                    'forecast_days': row[2], 'observed_days': row[3],
-                                    'init_run': row[4], 'no_forecast_continue': row[5],
-                                    'no_observed_continue': row[6], 'raincell_data_from': row[7],
-                                    'inflow_data_from': row[8], 'outflow_data_from': row[9],
-                                    'ignore_previous_run': row[10]})
+            for result in results:
+                flo2d_rules.append({'name': result[0], 'target_model': result[1],
+                                    'forecast_days': result[2], 'observed_days': result[3],
+                                    'no_forecast_continue': result[4], 'no_observed_continue': result[5],
+                                    'raincell_data_from': result[6], 'inflow_data_from': result[7],
+                                    'outflow_data_from': result[8], 'ignore_previous_run': result[9]})
         return flo2d_rules
 
     def get_flo2d_rule_info_by_id(self, id, status=1):
@@ -180,11 +179,10 @@ class RuleEngineAdapter:
         result = self.cursor.fetchone()
         if result is not None:
             flo2d_rule = {'name': result[0], 'target_model': result[1],
-                                    'forecast_days': result[2], 'observed_days': result[3],
-                                    'init_run': result[4], 'no_forecast_continue': result[5],
-                                    'no_observed_continue': result[6], 'raincell_data_from': result[7],
-                                    'inflow_data_from': result[8], 'outflow_data_from': result[9],
-                                    'ignore_previous_run': result[10]}
+                          'forecast_days': result[2], 'observed_days': result[3],
+                          'no_forecast_continue': result[4], 'no_observed_continue': result[5],
+                          'raincell_data_from': result[6], 'inflow_data_from': result[7],
+                          'outflow_data_from': result[8], 'ignore_previous_run': result[9]}
         return flo2d_rule
 
     def get_workflow_routines(self, schedule_date, status):
