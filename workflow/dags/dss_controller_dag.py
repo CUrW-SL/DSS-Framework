@@ -120,11 +120,11 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=sche
         task_id='dss1_dummy'
     )
 
-    dss_unit1 = ConditionTriggerDagRunOperator(
+    dss_unit1 = ConditionMultiTriggerDagRunOperator(
         task_id='dss_unit1',
         default_trigger="dss_trigger_target_dag",
         python_callable=conditionally_trigger_dss_unit1,
-        params={'check_rules': True}
+        params={'check_rules': True, 'rule_types': ['wrf']}
     )
 
     dss2_branch = BranchPythonOperator(
@@ -138,7 +138,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=sche
         task_id='dss2_dummy'
     )
 
-    dss_unit2 = ConditionTriggerDagRunOperator(
+    dss_unit2 = ConditionMultiTriggerDagRunOperator(
         task_id='dss_unit2',
         default_trigger="dss_trigger_target_dag",
         python_callable=conditionally_trigger_dss_unit2,
@@ -156,7 +156,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=sche
         task_id='dss3_dummy'
     )
 
-    dss_unit3 = ConditionTriggerDagRunOperator(
+    dss_unit3 = ConditionMultiTriggerDagRunOperator(
         task_id='dss_unit3',
         default_trigger="dss_trigger_target_dag",
         python_callable=conditionally_trigger_dss_unit3,
