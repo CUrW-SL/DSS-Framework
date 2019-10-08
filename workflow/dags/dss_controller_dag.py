@@ -7,6 +7,7 @@ from airflow.models import Variable
 import sys
 sys.path.insert(0, '/home/hasitha/PycharmProjects/DSS-Framework/db_util')
 from db_adapter import RuleEngineAdapter
+from gen_util import get_triggering_dags
 
 
 prod_dag_name = 'dss_controller_dag3'
@@ -43,10 +44,10 @@ def conditionally_trigger_dss_unit1(context, dag_run_obj):
     print('***************************conditionally_trigger_dss_unit1**********************************')
     print('conditionally_trigger_dss_unit1')
     """This function decides whether or not to Trigger the remote DAG"""
-    dss1_rule = context['task_instance'].xcom_pull(task_ids='init_routine')['dss1']
-    print('dss1_branch_func|dss1_rule : ', dss1_rule)
-    c_p = context['params']['check_rules']
-    print("Controller DAG : conditionally_trigger = {}".format(c_p))
+    dss1_rule_id = context['task_instance'].xcom_pull(task_ids='init_routine')['dss1']
+    print('dss1_branch_func|dss1_rule : ', dss1_rule_id)
+    db_config = Variable.get('db_config', deserialize_json=True)
+    adapter = RuleEngineAdapter.get_instance(db_config)
     if context['params']['check_rules']:
         dag_run_obj.payload = {'message': context['params']['rule_types']}
         return {'trigger_dag_id': 'wrf_4_E_dag', 'dro': dag_run_obj}
