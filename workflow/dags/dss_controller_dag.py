@@ -1,6 +1,6 @@
 from datetime import datetime
 from airflow import DAG
-from airflow.operators import ConditionTriggerDagRunOperator
+from airflow.operators import ConditionMultiTriggerDagRunOperator
 from airflow.operators.python_operator import PythonOperator, BranchPythonOperator
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.models import Variable
@@ -30,10 +30,8 @@ def init_workflow_routine(**context):
 
 def dss1_branch_func(**context):
     print('***************************dss1_branch_func**********************************')
-    routine = context['task_instance'].xcom_pull(task_ids='init_routine')
     dss1_rule = context['task_instance'].xcom_pull(task_ids='init_routine')['dss1']
     print('dss1_branch_func|dss1_rule : ', dss1_rule)
-    print('dss1_rule : ', dss1_rule)
     if dss1_rule == SKIP:
         return 'dss1_dummy'
     else:
@@ -45,6 +43,8 @@ def conditionally_trigger_dss_unit1(context, dag_run_obj):
     print('***************************conditionally_trigger_dss_unit1**********************************')
     print('conditionally_trigger_dss_unit1')
     """This function decides whether or not to Trigger the remote DAG"""
+    dss1_rule = context['task_instance'].xcom_pull(task_ids='init_routine')['dss1']
+    print('dss1_branch_func|dss1_rule : ', dss1_rule)
     c_p = context['params']['check_rules']
     print("Controller DAG : conditionally_trigger = {}".format(c_p))
     if context['params']['check_rules']:
@@ -124,7 +124,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=sche
         task_id='dss_unit1',
         default_trigger="dss_trigger_target_dag",
         python_callable=conditionally_trigger_dss_unit1,
-        params={'check_rules': True, 'rule_types': ['wrf']}
+        params={'check_rules': True}
     )
 
     dss2_branch = BranchPythonOperator(
