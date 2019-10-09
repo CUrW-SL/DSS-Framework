@@ -56,16 +56,20 @@ class ConditionMultiTriggerDagRunOperator(BaseOperator):
     def execute(self, context):
         if self.python_callable is not None:
             condition_results = self.python_callable(context)
+            print('ConditionMultiTriggerDagRunOperator|execute|condition_results : ', condition_results)
             count = 1
             for condition_result in condition_results:
+                print('condition_result : ', condition_result)
                 if self.execution_date is not None:
                     run_id = 'trig_{}_{}'.format(count, self.execution_date)
                     self.execution_date = timezone.parse(self.execution_date)
                 else:
                     run_id = 'trig_{}_{}'.format(count, timezone.utcnow().isoformat())
                 dro = DagRunOrder(run_id=run_id)
-                trigger_dag_id = condition_result['trigger_dag_id']
+                trigger_dag_id = condition_result['dag_name']
+                print('trigger_dag_id : ', trigger_dag_id)
                 payload = condition_result['payload']
+                print('payload : ', payload)
                 trigger_dag(dag_id=trigger_dag_id,
                             run_id=dro.run_id,
                             conf=json.dumps(payload),
@@ -73,6 +77,7 @@ class ConditionMultiTriggerDagRunOperator(BaseOperator):
                             replace_microseconds=False)
                 count += 1
         else:
+            print('ConditionMultiTriggerDagRunOperator|python_callable is None.')
             self.log.info("Criteria not met, moving on")
 
 
