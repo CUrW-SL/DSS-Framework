@@ -19,8 +19,8 @@ upload_discharge_cmd = 'echo "upload_discharge_cmd" ;sleep $[($RANDOM % 10) + 1]
 
 
 def run_this_func(ds, **kwargs):
-    print("Remotely received value of {} for key=message".
-          format(kwargs['dag_run'].conf['message']))
+    print("Remotely received value of {} for key=payload".
+          format(kwargs['dag_run'].conf['payload']))
 
 
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,

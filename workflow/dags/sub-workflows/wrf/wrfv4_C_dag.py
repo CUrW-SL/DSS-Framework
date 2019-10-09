@@ -23,8 +23,8 @@ push_wrfv4_data_cmd = 'echo "push_wrfv4_data_cmd" ;sleep $[($RANDOM % 10) + 1]s'
 
 
 def run_this_func(ds, **kwargs):
-    print("Remotely received value of {} for key=message".
-          format(kwargs['dag_run'].conf['message']))
+    print("Remotely received value of {} for key=payload".
+          format(kwargs['dag_run'].conf['payload']))
 
 
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
