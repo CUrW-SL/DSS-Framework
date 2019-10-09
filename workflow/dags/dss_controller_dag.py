@@ -54,7 +54,7 @@ def conditionally_trigger_dss_unit1(context, dag_run_obj):
         if len(dag_info):
             return dag_info
         else:
-            []
+            return []
 
 
 def dss2_branch_func(**context):
@@ -71,11 +71,16 @@ def conditionally_trigger_dss_unit2(context, dag_run_obj):
     print('***************************conditionally_trigger_dss_unit2**********************************')
     print('conditionally_trigger_dss_unit2')
     """This function decides whether or not to Trigger the remote DAG"""
-    c_p = context['params']['check_rules']
-    print("Controller DAG : conditionally_trigger = {}".format(c_p))
+    dss2_rule_id = context['task_instance'].xcom_pull(task_ids='init_routine')['dss2']
+    print('dss2_branch_func|dss2_rule_id : ', dss2_rule_id)
+    db_config = Variable.get('db_config', deserialize_json=True)
+    adapter = RuleEngineAdapter.get_instance(db_config)
     if context['params']['check_rules']:
-        dag_run_obj.payload = {'message': context['params']['rule_types']}
-        return {'trigger_dag_id': 'hechms_single_dag', 'dro': dag_run_obj}
+        dag_info = get_triggering_dags(adapter, dss2_rule_id, 'hechms')
+        if len(dag_info):
+            return dag_info
+        else:
+            return []
 
 
 def dss3_branch_func(**context):
@@ -92,12 +97,16 @@ def conditionally_trigger_dss_unit3(context, dag_run_obj):
     print('***************************conditionally_trigger_dss_unit3**********************************')
     print('conditionally_trigger_dss_unit3')
     """This function decides whether or not to Trigger the remote DAG"""
-    c_p = context['params']['check_rules']
-    print("Controller DAG : conditionally_trigger = {}".format(c_p))
+    dss2_rule_id = context['task_instance'].xcom_pull(task_ids='init_routine')['dss3']
+    print('dss3_branch_func|dss2_rule_id : ', dss2_rule_id)
+    db_config = Variable.get('db_config', deserialize_json=True)
+    adapter = RuleEngineAdapter.get_instance(db_config)
     if context['params']['check_rules']:
-        dag_run_obj.payload = {'message': context['params']['rule_types']}
-        return {'trigger_dag_id': 'flo2d_250m_dag', 'dro': dag_run_obj}
-
+        dag_info = get_triggering_dags(adapter, dss2_rule_id, 'flo2d')
+        if len(dag_info):
+            return dag_info
+        else:
+            return []
 
 default_args = {
         'owner': 'dss admin',
