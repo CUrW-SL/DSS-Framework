@@ -25,7 +25,7 @@ def init_workflow_routine(**context):
     routine = adapter.get_next_workflow_routines(run_date)
     print('init_workflow_routine|routine : ', routine)
     if routine is None:
-        return {'id': 0, 'dss1': 0, 'dss2': 0, 'dss3': 0}
+        return {'id': 0, 'dss1': 0, 'dss2': 0, 'dss3': 0, 'schedule': ''}
     else:
         return routine
 
@@ -41,12 +41,12 @@ def dss1_branch_func(**context):
 
 
 # tobe implemented multiple model triggering.
-def conditionally_trigger_dss_unit1(context, dag_run_obj):
+def conditionally_trigger_dss_unit1(context):
     print('***************************conditionally_trigger_dss_unit1**********************************')
     print('conditionally_trigger_dss_unit1')
     """This function decides whether or not to Trigger the remote DAG"""
     dss1_rule_id = context['task_instance'].xcom_pull(task_ids='init_routine')['dss1']
-    print('dss1_branch_func|dss1_rule : ', dss1_rule_id)
+    print('dss1_branch_func|dss1_rule_id : ', dss1_rule_id)
     db_config = Variable.get('db_config', deserialize_json=True)
     adapter = RuleEngineAdapter.get_instance(db_config)
     if context['params']['check_rules']:
@@ -67,7 +67,7 @@ def dss2_branch_func(**context):
         return 'dss_unit2'
 
 
-def conditionally_trigger_dss_unit2(context, dag_run_obj):
+def conditionally_trigger_dss_unit2(context):
     print('***************************conditionally_trigger_dss_unit2**********************************')
     print('conditionally_trigger_dss_unit2')
     """This function decides whether or not to Trigger the remote DAG"""
@@ -93,7 +93,7 @@ def dss3_branch_func(**context):
         return 'dss_unit3'
 
 
-def conditionally_trigger_dss_unit3(context, dag_run_obj):
+def conditionally_trigger_dss_unit3(context):
     print('***************************conditionally_trigger_dss_unit3**********************************')
     print('conditionally_trigger_dss_unit3')
     """This function decides whether or not to Trigger the remote DAG"""
@@ -110,8 +110,8 @@ def conditionally_trigger_dss_unit3(context, dag_run_obj):
 
 default_args = {
         'owner': 'dss admin',
-        'start_date': datetime.strptime('2019-10-09 17:00:00', '%Y-%m-%d %H:%M:%S'),
-        'email': ['hasithadkr7.com'],
+        'start_date': datetime.strptime('2019-10-09 05:20:00', '%Y-%m-%d %H:%M:%S'),
+        'email': ['hasithadkr7@gmail.com'],
         'email_on_failure': True,
     }
 

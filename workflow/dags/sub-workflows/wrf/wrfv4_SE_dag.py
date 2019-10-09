@@ -3,13 +3,13 @@ from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 
-prod_dag_name = 'wrf_4_SE_dag'
+prod_dag_name = 'wrf_4.0_SE_dag'
 
 
 default_args = {
     'owner': 'dss admin',
     'start_date': datetime.utcnow(),
-    'email': ['hasithadkr7.com'],
+    'email': ['hasithadkr7@gmail.com'],
     'email_on_failure': True,
 }
 
