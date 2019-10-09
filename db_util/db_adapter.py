@@ -122,6 +122,7 @@ class RuleEngineAdapter:
         query = 'select name, target_model, version, run, hour, ignore_previous_run, ' \
                 'check_gfs_data_availability from dss.wrf_rules ' \
                 'where id = {} and status = {} '.format(rule_id, status)
+        print('get_wrf_rule_info_by_id|query : ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
         if result is not None:
@@ -151,6 +152,7 @@ class RuleEngineAdapter:
         query = 'select name, target_model,forecast_days, observed_days, ' \
                 'init_run, no_forecast_continue, no_observed_continue, rainfall_data_from, ' \
                 'ignore_previous_run from dss.hechms_rules where status = {} and id = {}'.format(status, id)
+        print('get_hechms_rule_info_by_id|query : ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
         if result is not None:
@@ -183,6 +185,7 @@ class RuleEngineAdapter:
                 'init_run, no_forecast_continue, no_observed_continue, raincell_data_from, ' \
                 'inflow_data_from, outflow_data_from, ignore_previous_run' \
                 'from dss.flo2d_rules where status={} and id={}'.format(status, id)
+        print('get_flo2d_rule_info_by_id|query : ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
         if result is not None:
