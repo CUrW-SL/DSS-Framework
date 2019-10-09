@@ -7,7 +7,8 @@ from airflow.models import Variable
 import sys
 sys.path.insert(0, '/home/hasitha/PycharmProjects/DSS-Framework/db_util')
 from db_adapter import RuleEngineAdapter
-from gen_util import get_triggering_dags
+sys.path.insert(0, '/home/hasitha/PycharmProjects/DSS-Framework/gen_util')
+from controller_util import get_triggering_dags
 
 
 prod_dag_name = 'dss_controller_dag3'
@@ -49,8 +50,11 @@ def conditionally_trigger_dss_unit1(context, dag_run_obj):
     db_config = Variable.get('db_config', deserialize_json=True)
     adapter = RuleEngineAdapter.get_instance(db_config)
     if context['params']['check_rules']:
-        dag_run_obj.payload = {'message': context['params']['rule_types']}
-        return {'trigger_dag_id': 'wrf_4_E_dag', 'dro': dag_run_obj}
+        dag_info = get_triggering_dags(adapter, dss1_rule_id, 'wrf')
+        if len(dag_info):
+            return dag_info
+        else:
+            []
 
 
 def dss2_branch_func(**context):
@@ -97,7 +101,7 @@ def conditionally_trigger_dss_unit3(context, dag_run_obj):
 
 default_args = {
         'owner': 'dss admin',
-        'start_date': datetime.strptime('2019-10-07 17:00:00', '%Y-%m-%d %H:%M:%S'),
+        'start_date': datetime.strptime('2019-10-09 17:00:00', '%Y-%m-%d %H:%M:%S'),
         'email': ['hasithadkr7.com'],
         'email_on_failure': True,
     }
