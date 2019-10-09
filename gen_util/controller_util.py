@@ -12,6 +12,7 @@ def get_triggering_dags(db_adapter, dss_rule_id, model_type):
     dag_info = []
     if model_type is 'wrf':
         wrf_rule_info = db_adapter.get_wrf_rule_info_by_id(dss_rule_id)
+        print('get_triggering_dags|wrf_rule_info : ', wrf_rule_info)
         if wrf_rule_info:
             target_models = wrf_rule_info['target_model'].split(',')
             for target_model in target_models:
@@ -29,7 +30,7 @@ def get_triggering_dags(db_adapter, dss_rule_id, model_type):
             target_models = hechms_rule_info['target_model'].split(',')
             for target_model in target_models:
                 print('target_model : ', target_model)
-                dag_name = 'wrf_{}_dag'.format(target_model)
+                dag_name = 'hechms_{}_dag'.format(target_model)
                 payload = {'forecast_days': hechms_rule_info['forecast_days'],
                            'observed_days': hechms_rule_info['observed_days'],
                            'init_run': hechms_rule_info['init_run'],
@@ -46,7 +47,7 @@ def get_triggering_dags(db_adapter, dss_rule_id, model_type):
             target_models = flo2d_rule_info['target_model'].split(',')
             for target_model in target_models:
                 print('target_model : ', target_model)
-                dag_name = 'wrf_{}_dag'.format(target_model)
+                dag_name = 'flo2d_{}_dag'.format(target_model)
                 payload = {'forecast_days': flo2d_rule_info['forecast_days'],
                            'observed_days': flo2d_rule_info['observed_days'],
                            'no_forecast_continue': flo2d_rule_info['no_forecast_continue'],
@@ -60,5 +61,6 @@ def get_triggering_dags(db_adapter, dss_rule_id, model_type):
             print('No flo2d rules found.')
     else:
         print('Undefined model_type type|model_type : ', model_type)
+    print('get_triggering_dags|dag_info : ', dag_info)
     return dag_info
 
