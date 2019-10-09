@@ -8,19 +8,27 @@ LOG_FORMAT = '[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)
 
 
 def get_next_scheduled_workflow(schedule_date, workflow_routines):
+    print('get_next_scheduled_workflow|schedule_date : ', schedule_date)
+    print('get_next_scheduled_workflow|workflow_routines : ', workflow_routines)
     for workflow_routine in workflow_routines:
         if validate_workflow(workflow_routine, schedule_date):
+            print('get_next_scheduled_workflow|validate_workflow|workflow_routine : ', workflow_routine)
             return workflow_routine
     return None
 
 
 def validate_workflow(workflow_routine, schedule_date):
     schedule = workflow_routine['schedule']
+    print('validate_workflow|workflow_routine : ', workflow_routine)
+    print('validate_workflow|[schedule, schedule_date] : ', [schedule, schedule_date])
     cron = croniter.croniter(schedule, schedule_date)
     run_date = cron.get_next(datetime)
+    print('validate_workflow|run_date : ', run_date)
     if datetime.now() >= run_date:
+        print('validate_workflow|True')
         return True
     else:
+        print('validate_workflow|False')
         return False
 
 
