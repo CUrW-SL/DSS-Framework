@@ -19,6 +19,7 @@ upload_discharge_cmd = 'echo "upload_discharge_cmd" ;sleep $[($RANDOM % 10) + 1]
 
 
 def run_this_func(ds, **kwargs):
+    print('hechms_distributed_dag|run_this_func|kwargs : ', kwargs)
     print("Remotely received value of {} for key=payload".
           format(kwargs['dag_run'].conf['payload']))
 

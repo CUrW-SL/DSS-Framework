@@ -16,6 +16,7 @@ def get_triggering_dags(db_adapter, dss_rule_id, model_type):
         if wrf_rule_info:
             target_models = wrf_rule_info['target_model'].split(',')
             for target_model in target_models:
+                target_model = target_model.strip()
                 print('target_model : ', target_model)
                 dag_name = 'wrf_{}_{}_dag'.format(wrf_rule_info['version'], target_model)
                 payload = {'run': wrf_rule_info['run'], 'hour': wrf_rule_info['hour'],
@@ -29,6 +30,7 @@ def get_triggering_dags(db_adapter, dss_rule_id, model_type):
         if hechms_rule_info:
             target_models = hechms_rule_info['target_model'].split(',')
             for target_model in target_models:
+                target_model = target_model.strip()
                 print('target_model : ', target_model)
                 dag_name = 'hechms_{}_dag'.format(target_model)
                 payload = {'forecast_days': hechms_rule_info['forecast_days'],
@@ -46,6 +48,7 @@ def get_triggering_dags(db_adapter, dss_rule_id, model_type):
         if flo2d_rule_info:
             target_models = flo2d_rule_info['target_model'].split(',')
             for target_model in target_models:
+                target_model = target_model.strip()
                 print('target_model : ', target_model)
                 dag_name = 'flo2d_{}_dag'.format(target_model)
                 payload = {'forecast_days': flo2d_rule_info['forecast_days'],
