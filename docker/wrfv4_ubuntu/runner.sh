@@ -4,15 +4,17 @@ echo "#### Running WRF procedures..."
 
 mkdir -p /mnt/disks/workspace1/wrf-data/gfs
 
-while getopts ":r:h:" option; do
+while getopts ":r:m:h:" option; do
   case "${option}" in
   r) WRF_RUN=$OPTARG ;; # 1/0
-  h) GFS_HOUR=$OPTARG ;; # 00/06/12/18
+  m) MODEL=$OPTARG ;; # 1/0
+  h) v4=$OPTARG ;; # 00/06/12/18
   esac
 done
 
 echo "WRF_RUN : $WRF_RUN"
 echo "GFS_HOUR : $GFS_HOUR"
+echo "MODEL : $MODEL"
 
 if [ ${WRF_RUN} == 0 ] || [ ${WRF_RUN} == "0" ]; then
     echo ""
