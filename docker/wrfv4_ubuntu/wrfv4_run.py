@@ -19,9 +19,8 @@ from zipfile import ZipFile, ZIP_DEFLATED
 
 import pkg_resources
 from joblib import Parallel, delayed
-#from docker.wrfv4_ubuntu import constants
+# from docker.wrfv4_ubuntu import constants
 import constants
-
 
 LOG_FORMAT = '[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s'
 logging.basicConfig(filename='/home/Build_WRF/logs/wrf_preprocessing.log',
@@ -183,19 +182,19 @@ def download_gfs_data(wrf_conf):
     try:
         gfs_date, gfs_cycle, start_inv = get_appropriate_gfs_inventory(wrf_conf)
         inventories = get_gfs_inventory_url_dest_list(gfs_date, wrf_conf['period'],
-                                                          wrf_conf['gfs_url'],
-                                                          wrf_conf['gfs_inv'], wrf_conf['gfs_step'],
-                                                          gfs_cycle, wrf_conf['gfs_res'],
-                                                          wrf_conf['gfs_dir'], start=start_inv)
+                                                      wrf_conf['gfs_url'],
+                                                      wrf_conf['gfs_inv'], wrf_conf['gfs_step'],
+                                                      gfs_cycle, wrf_conf['gfs_res'],
+                                                      wrf_conf['gfs_dir'], start=start_inv)
         gfs_threads = wrf_conf['gfs_threads']
         print('Following data will be downloaded in %d parallel threads\n%s' % (gfs_threads, '\n'.join(
-                    ' '.join(map(str, i)) for i in inventories)))
+            ' '.join(map(str, i)) for i in inventories)))
         log.info('Following data will be downloaded in %d parallel threads\n%s' % (gfs_threads, '\n'.join(
             ' '.join(map(str, i)) for i in inventories)))
 
         start_time = time.time()
         download_parallel(inventories, procs=gfs_threads, retries=wrf_conf['gfs_retries'],
-                              delay=wrf_conf['gfs_delay'], secondary_dest_dir=None)
+                          delay=wrf_conf['gfs_delay'], secondary_dest_dir=None)
 
         elapsed_time = time.time() - start_time
         log.info('Downloading GFS data: END Elapsed time: %f' % elapsed_time)
@@ -260,7 +259,7 @@ def replace_file_with_values(source, destination, val_dict):
 def replace_file_with_values_with_dates(wrf_config, src, dest, aux_dict, start_date=None, end_date=None):
     if start_date is None:
         start_date = datetime_floor(datetime.strptime(wrf_config['start_date'], '%Y-%m-%d_%H:%M'),
-                                          wrf_config['gfs_step'] * 3600)
+                                    wrf_config['gfs_step'] * 3600)
 
     if end_date is None:
         end_date = start_date + timedelta(days=wrf_config['period'])
@@ -417,7 +416,7 @@ def run_wps(wrf_config):
     # Running link_grib.csh
     gfs_date, gfs_cycle, start = get_appropriate_gfs_inventory(wrf_config)
     dest = get_gfs_data_url_dest_tuple(wrf_config['gfs_url'], wrf_config['gfs_inv'], gfs_date, gfs_cycle,
-                                             '', wrf_config['gfs_res'], '')[1].replace('.grb2', '')
+                                       '', wrf_config['gfs_res'], '')[1].replace('.grb2', '')
     print('----------------------gfs_dir : ', wrf_config['gfs_dir'])
     print('----------------------wps_dir : ', wps_dir)
     print('----------------------dest : ', dest)
@@ -483,8 +482,26 @@ def backup_dir(path):
             for file in bck_files:
                 shutil.move(os.path.join(path, file), bck_dir)
             return bck_dir
-
     return None
+
+
+def get_output_path_from_wrf_id(wrf_config):
+    wrf_id = wrf_config['wrf_id']
+    nfs_dir = wrf_config['nfs_dir']
+    print('get_output_path_from_wrf_id|wrf_id: ', wrf_id)
+    print('get_output_path_from_wrf_id|nfs_dir: ', nfs_dir)
+    input_list = wrf_id.split('_')
+    if len(input_list) >= 5:
+        version = input_list[1]
+        wrf_run = input_list[2]
+        gfs_hour = input_list[3]
+        exec_date = input_list[4]
+        model = input_list[5]
+        output_dir = os.path.join(nfs_dir, version, 'd{}'.format(wrf_run), gfs_hour, exec_date, model)
+    else:
+        output_dir = os.path.join(wrf_config['nfs_dir'], 'results', run_id, 'wrf')
+    print('get_output_path_from_wrf_id|output_dir: ', output_dir)
+    return output_dir
 
 
 def copy_files_with_prefix(src_dir, prefix, dest_dir):
@@ -500,7 +517,8 @@ def run_em_real(wrf_config):
     em_real_dir = get_em_real_dir(wrf_home)
     procs = wrf_config['procs']
     run_id = wrf_config['run_id']
-    output_dir = create_dir_if_not_exists(os.path.join(wrf_config['nfs_dir'], 'results', run_id, 'wrf'))
+    #output_dir = create_dir_if_not_exists(os.path.join(wrf_config['nfs_dir'], 'results', run_id, 'wrf'))
+    output_dir = create_dir_if_not_exists(get_output_path_from_wrf_id(wrf_config))
     archive_dir = create_dir_if_not_exists(os.path.join(wrf_config['archive_dir'], 'results', run_id, 'wrf'))
 
     print('run_em_real|output_dir: ', output_dir)
@@ -627,4 +645,3 @@ if __name__ == '__main__':
         wrf_conf['run_id'] = run_id
         wrf_conf['start_date'] = start_date
         run_wrf_model(run_mode, wrf_conf)
-
