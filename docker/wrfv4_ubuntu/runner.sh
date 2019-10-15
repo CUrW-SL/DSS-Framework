@@ -33,12 +33,17 @@ if [ ${WRF_RUN} == 1 ] || [ ${WRF_RUN} == "1" ]; then
     wrf_id="dwrf_${VERSION}_${WRF_RUN}_${GFS_HOUR}_${exec_date}_${MODEL}"
 fi
 
-echo "gfs_date ${gfs_date}"
-echo "exec_date ${exec_date}"
-echo "wrf_id ${wrf_id}"
+docker_tag="wrf_${VERSION}_${MODEL}"
+
+echo "gfs_date : ${gfs_date}"
+echo "exec_date : ${exec_date}"
+echo "wrf_id : ${wrf_id}"
+echo "docker_tag : ${docker_tag}"
+
+
 
 docker run -i --rm --privileged -v /mnt/disks/workspace1/wrf-data/geog:/home/Build_WRF/geog \
-    -v /home/uwcc-admin/uwcc-admin.json:/wrf/gcs.json curw-wrfv4:ubuntu1604 \
+    -v /home/uwcc-admin/uwcc-admin.json:/wrf/gcs.json curw-wrfv4:${docker_tag} \
     /home/Build_WRF/code/wrfv4_run.sh -d ${gfs_date} -k ${wrf_id} \
-    -v curwsl_nfs_1:/home/Build_WRF/nfs -v curwsl_archive_1:/home/Build_WRF/archive
+    -v wrf_nfs:/home/Build_WRF/nfs -v curwsl_archive_1:/home/Build_WRF/archive
 
