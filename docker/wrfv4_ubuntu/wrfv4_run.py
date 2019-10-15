@@ -395,8 +395,8 @@ def run_wps(wrf_config):
     log.info('Running WPS: START')
     wrf_home = wrf_config['wrf_home']
     wps_dir = get_wps_dir(wrf_home)
-    output_dir = create_dir_if_not_exists(
-        os.path.join(wrf_config['nfs_dir'], 'results', wrf_config['run_id'], 'wps'))
+    output_dir = create_dir_if_not_exists(os.path.join(get_output_path_from_wrf_id(wrf_config), 'wps'))
+    print('run_wps|output_dir : ', output_dir)
     print('run_wps|output_dir : ', output_dir)
 
     log.info('Cleaning up files')
@@ -451,7 +451,7 @@ def run_wps(wrf_config):
     create_zip_with_prefix(wps_dir, 'met_em.d*', metgrid_zip)
 
     log.info('Moving metgrid data')
-    dest_dir = os.path.join(wrf_config['nfs_dir'], 'metgrid')
+    dest_dir = os.path.join(get_output_path_from_wrf_id(wrf_config), 'metgrid')
     move_files_with_prefix(wps_dir, metgrid_zip, dest_dir)
 
 
@@ -486,9 +486,9 @@ def backup_dir(path):
 
 
 def get_output_path_from_wrf_id(wrf_config):
-    wrf_id = wrf_config['wrf_id']
+    wrf_id = wrf_config['run_id']
     nfs_dir = wrf_config['nfs_dir']
-    print('get_output_path_from_wrf_id|wrf_id: ', wrf_id)
+    print('get_output_path_from_wrf_id|run_id: ', run_id)
     print('get_output_path_from_wrf_id|nfs_dir: ', nfs_dir)
     input_list = wrf_id.split('_')
     if len(input_list) >= 5:
@@ -497,7 +497,7 @@ def get_output_path_from_wrf_id(wrf_config):
         gfs_hour = input_list[3]
         exec_date = input_list[4]
         model = input_list[5]
-        output_dir = os.path.join(nfs_dir, version, 'd{}'.format(wrf_run), gfs_hour, exec_date, model)
+        output_dir = os.path.join(nfs_dir, 'dwrf', version, 'd{}'.format(wrf_run), gfs_hour, exec_date, model)
     else:
         output_dir = os.path.join(wrf_config['nfs_dir'], 'results', run_id, 'wrf')
     print('get_output_path_from_wrf_id|output_dir: ', output_dir)
@@ -517,7 +517,6 @@ def run_em_real(wrf_config):
     em_real_dir = get_em_real_dir(wrf_home)
     procs = wrf_config['procs']
     run_id = wrf_config['run_id']
-    #output_dir = create_dir_if_not_exists(os.path.join(wrf_config['nfs_dir'], 'results', run_id, 'wrf'))
     output_dir = create_dir_if_not_exists(get_output_path_from_wrf_id(wrf_config))
     archive_dir = create_dir_if_not_exists(os.path.join(wrf_config['archive_dir'], 'results', run_id, 'wrf'))
 
