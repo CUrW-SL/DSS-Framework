@@ -17,16 +17,16 @@ echo "GFS_HOUR : $GFS_HOUR"
 if [ ${WRF_RUN} == 0 ] || [ ${WRF_RUN} == "0" ]; then
     echo ""
     tmp_date=`date '+%Y-%m-%d' --date="1 days ago"`
-    gfs_date="${tmp_date}_18:00"
+    gfs_date="${tmp_date}_${GFS_HOUR}:00"
     exec_date=`date '+%Y-%m-%d'`
-    wrf_id="wrfv4_${exec_date}"
+    wrf_id="wrfv4_${WRF_RUN}_${GFS_HOUR}_${exec_date}"
 fi
 
 if [ ${WRF_RUN} == 1 ] || [ ${WRF_RUN} == "1" ]; then
     tmp_date=`date '+%Y-%m-%d'`
-    gfs_date="${tmp_date}_18:00"
+    gfs_date="${tmp_date}_${GFS_HOUR}:00"
     exec_date=`date '+%Y-%m-%d'`
-    wrf_id="wrfv4_${exec_date}"
+    wrf_id="wrfv4_${WRF_RUN}_${GFS_HOUR}_${exec_date}"
 fi
 
 echo "gfs_date ${gfs_date}"
