@@ -23,14 +23,14 @@ if [ ${WRF_RUN} == 0 ] || [ ${WRF_RUN} == "0" ]; then
     tmp_date=`date '+%Y-%m-%d' --date="1 days ago"`
     gfs_date="${tmp_date}_${GFS_HOUR}:00"
     exec_date=`date '+%Y-%m-%d'`
-    wrf_id="dwrf_${VERSION}_${WRF_RUN}_${GFS_HOUR}_${exec_date}"
+    wrf_id="dwrf_${VERSION}_${WRF_RUN}_${GFS_HOUR}_${exec_date}_${MODEL}"
 fi
 
 if [ ${WRF_RUN} == 1 ] || [ ${WRF_RUN} == "1" ]; then
     tmp_date=`date '+%Y-%m-%d'`
     gfs_date="${tmp_date}_${GFS_HOUR}:00"
     exec_date=`date '+%Y-%m-%d'`
-    wrf_id="dwrf_${VERSION}_${WRF_RUN}_${GFS_HOUR}_${exec_date}"
+    wrf_id="dwrf_${VERSION}_${WRF_RUN}_${GFS_HOUR}_${exec_date}_${MODEL}"
 fi
 
 echo "gfs_date ${gfs_date}"
