@@ -562,12 +562,12 @@ def run_em_real(wrf_config):
 
     log.info('Extracting rf from domain3')
     d03_nc = glob.glob(os.path.join(em_real_dir, 'wrfout_d03_*'))[0]
-    ncks_query = 'ncks -v %s %s %s' % ('RAINNC,XLAT,XLONG,XTIME', d03_nc, 'd03_RAINNC.nc')
+    ncks_query = 'ncks -v %s %s %s' % ('RAINNC,XLAT,XLONG,XTIME', d03_nc, os.path.join(em_real_dir, 'd03_RAINNC.nc'))
     run_subprocess(ncks_query)
 
     log.info('Extracting rf from domain1')
     d01_nc = glob.glob(os.path.join(em_real_dir, 'wrfout_d01_*'))[0]
-    ncks_query = 'ncks -v %s %s %s' % ('RAINNC,XLAT,XLONG,XTIME', d01_nc, 'd01_RAINNC.nc')
+    ncks_query = 'ncks -v %s %s %s' % ('RAINNC,XLAT,XLONG,XTIME', d01_nc, os.path.join(em_real_dir, 'd01_RAINNC.nc'))
     run_subprocess(ncks_query)
 
     log.info('Moving data to the output dir')
