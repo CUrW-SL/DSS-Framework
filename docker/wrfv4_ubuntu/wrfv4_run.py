@@ -448,6 +448,9 @@ def run_wps(wrf_config):
     create_zip_with_prefix(wps_dir, 'met_em.d*', metgrid_zip)
 
     log.info('Moving metgrid data')
+    #dest_dir = os.path.join(wrf_config['nfs_dir'], 'metgrid')
+    #print('run_wps|dest_dir : ', dest_dir)
+    #move_files_with_prefix(wps_dir, metgrid_zip, dest_dir)
     dest_dir = os.path.join(get_output_path_from_wrf_id(wrf_config), 'metgrid')
     print('run_wps|dest_dir : ', dest_dir)
     move_files_with_prefix(wps_dir, metgrid_zip, dest_dir)
@@ -504,6 +507,7 @@ def get_output_path_from_wrf_id(wrf_config):
 
 def copy_files_with_prefix(src_dir, prefix, dest_dir):
     print('copy_files_with_prefix|src_dir:', src_dir)
+    print('copy_files_with_prefix|prefix:', prefix)
     print('copy_files_with_prefix|dest_dir:', dest_dir)
     create_dir_if_not_exists(dest_dir)
     for filename in glob.glob(os.path.join(src_dir, prefix)):
@@ -525,13 +529,14 @@ def run_em_real(wrf_config):
     print('run_em_real|output_dir: ', output_dir)
     print('run_em_real|archive_dir: ', archive_dir)
 
-    log.info('Backup the output dir')
-    backup_dir(output_dir)
+    #log.info('Backup the output dir')
+    #backup_dir(output_dir)
 
     logs_dir = create_dir_if_not_exists(os.path.join(output_dir, 'logs'))
 
     log.info('Copying metgrid.zip')
     metgrid_dir = os.path.join(get_output_path_from_wrf_id(wrf_config), 'metgrid')
+    #metgrid_dir = os.path.join(wrf_config['nfs_dir'], 'metgrid')
 
     print('run_em_real|metgrid_dir : ', metgrid_dir)
 
