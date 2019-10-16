@@ -503,9 +503,13 @@ def get_output_path_from_wrf_id(wrf_config):
 
 
 def copy_files_with_prefix(src_dir, prefix, dest_dir):
+    print('copy_files_with_prefix|src_dir:', src_dir)
+    print('copy_files_with_prefix|dest_dir:', dest_dir)
     create_dir_if_not_exists(dest_dir)
     for filename in glob.glob(os.path.join(src_dir, prefix)):
-        shutil.copy(filename, os.path.join(dest_dir, ntpath.basename(filename)))
+        dest_file_name = os.path.join(dest_dir, ntpath.basename(filename))
+        print('copy_files_with_prefix|dest_file_name:', dest_file_name)
+        shutil.copy(filename, dest_file_name)
 
 
 def run_em_real(wrf_config):
