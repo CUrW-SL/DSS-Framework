@@ -364,9 +364,13 @@ def run_subprocess(cmd, cwd=None, print_stdout=False):
 
 
 def move_files_with_prefix(src_dir, prefix, dest_dir):
+    print('move_files_with_prefix|src_dir : ', src_dir)
+    print('move_files_with_prefix|src_dir : ', dest_dir)
     create_dir_if_not_exists(dest_dir)
     for filename in glob.glob(os.path.join(src_dir, prefix)):
-        shutil.move(filename, os.path.join(dest_dir, ntpath.basename(filename)))
+        dest_file_path = os.path.join(dest_dir, ntpath.basename(filename))
+        print('move_files_with_prefix|dest_file_path : ', dest_file_path)
+        shutil.move(filename, dest_file_path)
 
 
 def check_geogrid_output(wps_dir):
@@ -374,12 +378,6 @@ def check_geogrid_output(wps_dir):
         if not os.path.exists(os.path.join(wps_dir, 'geo_em.d%02d.nc' % i)):
             return False
     return True
-
-
-def move_files_with_prefix(src_dir, prefix, dest_dir):
-    create_dir_if_not_exists(dest_dir)
-    for filename in glob.glob(os.path.join(src_dir, prefix)):
-        shutil.move(filename, os.path.join(dest_dir, ntpath.basename(filename)))
 
 
 def create_zip_with_prefix(src_dir, regex, dest_zip, comp=ZIP_DEFLATED, clean_up=False):
@@ -396,7 +394,6 @@ def run_wps(wrf_config):
     wrf_home = wrf_config['wrf_home']
     wps_dir = get_wps_dir(wrf_home)
     output_dir = create_dir_if_not_exists(os.path.join(get_output_path_from_wrf_id(wrf_config), 'wps'))
-    print('run_wps|output_dir : ', output_dir)
     print('run_wps|output_dir : ', output_dir)
 
     log.info('Cleaning up files')
@@ -452,6 +449,7 @@ def run_wps(wrf_config):
 
     log.info('Moving metgrid data')
     dest_dir = os.path.join(get_output_path_from_wrf_id(wrf_config), 'metgrid')
+    print('run_wps|dest_dir : ', dest_dir)
     move_files_with_prefix(wps_dir, metgrid_zip, dest_dir)
 
 
@@ -529,7 +527,9 @@ def run_em_real(wrf_config):
     logs_dir = create_dir_if_not_exists(os.path.join(output_dir, 'logs'))
 
     log.info('Copying metgrid.zip')
-    metgrid_dir = os.path.join(wrf_config['nfs_dir'], 'metgrid')
+    metgrid_dir = os.path.join(get_output_path_from_wrf_id(wrf_config), 'metgrid')
+
+    print('run_em_real|metgrid_dir : ', metgrid_dir)
 
     copy_files_with_prefix(metgrid_dir, wrf_config['run_id'] + '_metgrid.zip', em_real_dir)
     metgrid_zip = os.path.join(em_real_dir, wrf_config['run_id'] + '_metgrid.zip')
