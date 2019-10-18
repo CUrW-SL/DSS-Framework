@@ -28,7 +28,11 @@ def create_dir_if_not_exists(path):
     return path
 
 
-def read_netcdf_file(rainnc_net_cdf_file):
+def dataframe_to_rfield(ts_df, rfield_file):
+    ts_df.to_csv(rfield_file, columns=['Rain'], header=False, index=None)
+
+
+def read_netcdf_file(rainnc_net_cdf_file, rfield_path):
     if not os.path.exists(rainnc_net_cdf_file):
         print('no rainnc netcdf :: {}'.format(rainnc_net_cdf_file))
     else:
@@ -38,6 +42,7 @@ def read_netcdf_file(rainnc_net_cdf_file):
             time_unit_info = nnc_fid.variables['XTIME'].units
             print('time_unit_info : ', time_unit_info)
             time_unit_info_list = time_unit_info.split('since ')
+            print(time_unit_info_list)
 
             lats = nnc_fid.variables['XLAT'][0, :, 0]
             lons = nnc_fid.variables['XLONG'][0, 0, :]
@@ -57,39 +62,27 @@ def read_netcdf_file(rainnc_net_cdf_file):
             diff = get_per_time_slot_values(rainnc)
             width = len(lons)
             height = len(lats)
-
-            timeseries_dict = {}
-
-            # for i in range(len(diff)):
-            #     for y in range(height):
-            #         for x in range(width):
-            #             lat = float('%.6f' % lats[y])
-            #             lon = float('%.6f' % lons[x])
-
-            x_y_list = []
-            for y in range(height):
-                for x in range(width):
-                    lat = float('%.6f' % lats[y])
-                    lon = float('%.6f' % lons[x])
-                    x_y_list.append([lon, lat])
-            x_y_df = pd.DataFrame(x_y_list, columns=['Lon', 'Lat'])
-            print('x_y_df : ', x_y_df)
-                    # station = '{} {}'.format(lon, lat)
-                    # data_list = []
-                    # for i in range(len(diff)):
-                    #     data_list.append('%.3f' % float(diff[i, y, x]))
-                    # timeseries_dict[station] = data_list
-
-            # for i in range(len(diff)):
-            #     rfield = []
-            #     ts_time = datetime.strptime(time_unit_info_list[2], '%Y-%m-%dT%H:%M:%S') + timedelta(
-            #         minutes=times[i + 1].item())
-            #     t = datetime_utc_to_lk(ts_time, shift_mins=0)
-            #     timestamp = t.strftime('%Y-%m-%d_%H-%M')
-            #     for station in timeseries_dict.keys():
-            #         rfield.append('{} {}'.format(station, timeseries_dict.get(station)[i]))
-            #     write_to_file(
-            #         '/home/hasitha/Desktop/rfield/{}_{}_{}_rfield.txt'.format(model, version, timestamp), rfield)
+            first = True
+            for i in range(len(diff)):
+                ts_time = datetime.strptime(time_unit_info_list[1], '%Y-%m-%d %H:%M:%S') + timedelta(
+                    minutes=times[i + 1].item())
+                t = datetime_utc_to_lk(ts_time, shift_mins=0)
+                timestamp = t.strftime('%Y-%m-%d_%H-%M')
+                ts_list = []
+                for y in range(height):
+                    for x in range(width):
+                        lat = float('%.6f' % lats[y])
+                        lon = float('%.6f' % lons[x])
+                        rain = '%.3f' % float(diff[i, y, x])
+                        ts_list.append([lon, lat, rain])
+                ts_df = pd.DataFrame(ts_list, columns=['Lon', 'Lat', 'Rain'])
+                if first:
+                    x_y_file = os.path.join(rfield_path, 'dwrf_x_y.csv')
+                    ts_df.to_csv(x_y_file, columns=['Lon', 'Lat'], header=False, index=None)
+                    first = False
+                rfiled_file = os.path.join(rfield_path, 'dwrf_{}.txt'.format(timestamp))
+                print(rfiled_file)
+                ts_df.to_csv(rfiled_file, columns=['Rain'], header=False, index=None)
         except Exception as e:
             print("netcdf file at {} reading error.".format(rainnc_net_cdf_file))
             traceback.print_exc()
@@ -97,10 +90,15 @@ def read_netcdf_file(rainnc_net_cdf_file):
 
 if __name__ == '__main__':
     # nohup ./runner.sh -r 0 -m E -v 4.0 -h 18 &
+    #wrf_nfs / dwrf / 4.0 / d0 / 18 / 2019 - 10 - 17 / E
     model = 'E'
     version = '4.0'
     gfs_hour = '18'
     wrf_run = '0'
     base_dir = '/mnt/disks/wrf_nfs/dwrf'
-    read_netcdf_file('/home/hasitha/Desktop/dwrf_4.0_d0_18_2019-10-16_C_d03_RAINNC.nc')
+    rfield_date = '2019-10-17'
+    #rfield_dir = os.path.join(base_dir, version, 'd{}'.format(wrf_run), gfs_hour, rfield_date, model, 'rfield', 'd03')
+    #netcdf_file_path = os.path.join(base_dir, version, 'd{}'.format(wrf_run), gfs_hour, rfield_date, model, 'd03_RAINNC.nc')
+    #create_dir_if_not_exists(rfield_dir)
+    read_netcdf_file('/home/hasitha/Desktop/dwrf_4.0_d0_18_2019-10-17_E_d03_RAINNC.nc', '/home/hasitha/Desktop/rfield_2019-10-17')
 
