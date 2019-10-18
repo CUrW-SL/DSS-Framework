@@ -5,6 +5,7 @@ import os
 from datetime import datetime, timedelta
 import pandas as pd
 
+TMP_LOCATION = '/home/uwcc-admin/temp'
 
 def get_per_time_slot_values(prcp):
     per_interval_prcp = (prcp[1:] - prcp[:-1])
@@ -42,20 +43,21 @@ def execute_cmd(cmd):
 
 def create_zip_file(wrf_id):
     print('create_zip_file|wrf_id : ', wrf_id)
-    cmd = 'tar -xzvf /tmp/{}/rfield.tar.gz -C /tmp/{}/rfield/*'.format(wrf_id, wrf_id)
+    cmd = 'tar -czvf {}/{}/rfield.tar.gz {}/{}/rfield/*'.format(TMP_LOCATION, wrf_id,
+                                                                                   TMP_LOCATION, wrf_id)
     execute_cmd(cmd)
 
 
 def move_zip_file_to_bucket(wrf_id, bucket_path):
     print('move_zip_file_to_bucket|wrf_id : ', wrf_id)
     print('move_zip_file_to_bucket|bucket_path : ', bucket_path)
-    cmd = 'mv /tmp/{}/rfield.tar.gz {}'.format(wrf_id, bucket_path)
+    cmd = 'mv {}/{}/rfield.tar.gz {}'.format(TMP_LOCATION, wrf_id, bucket_path)
     execute_cmd(cmd)
 
 
 def remove_tmp_files(wrf_id):
     print('create_zip_file|wrf_id : ', wrf_id)
-    cmd = 'rm -rf /tmp/{}'.format(wrf_id)
+    cmd = 'rm -rf {}/{}'.format(TMP_LOCATION, wrf_id)
     execute_cmd(cmd)
 
 
@@ -66,6 +68,7 @@ def read_netcdf_file(netcdf_dir, rfield_dir, wrf_id):
     else:
         try:
             create_dir_if_not_exists(rfield_dir)
+            create_dir_if_not_exists(os.path.join(TMP_LOCATION, wrf_id))
             print('RAINNC netcdf data extraction')
             nnc_fid = Dataset(rainnc_net_cdf_file, mode='r')
             time_unit_info = nnc_fid.variables['XTIME'].units
@@ -109,7 +112,7 @@ def read_netcdf_file(netcdf_dir, rfield_dir, wrf_id):
                     x_y_file = os.path.join(rfield_dir, 'dwrf_x_y.csv')
                     ts_df.to_csv(x_y_file, columns=['Lon', 'Lat'], header=False, index=None)
                     first = False
-                tmp_rfield_path = os.path.join('/tmp', wrf_id, 'rfield')
+                tmp_rfield_path = os.path.join(TMP_LOCATION, wrf_id, 'rfield')
                 create_dir_if_not_exists(tmp_rfield_path)
                 rfiled_file = os.path.join(tmp_rfield_path, 'dwrf_{}.txt'.format(timestamp))
                 print(rfiled_file)
@@ -134,36 +137,36 @@ def parse_args():
     return parser.parse_args()
 
 
-if __name__ == '__main__':
-    args = vars(parse_args())
-    wrf_id = args['wrf_id']
-    base_dir = args['base_dir']
-    input_list = wrf_id.split('_')
-    if len(input_list) >= 5:
-        version = input_list[1]
-        wrf_run = input_list[2]
-        gfs_hour = input_list[3]
-        rfield_date = input_list[4]
-        model = input_list[5]
-        print('---------User inputs---------')
-        print('model : ', model)
-        print('version : ', version)
-        print('gfs_hour : ', gfs_hour)
-        print('rfield_date : ', rfield_date)
-        print('wrf_run : ', wrf_run)
-        print('base_dir : ', base_dir)
-        print('wrf_id : ', wrf_id)
-        print('------------------------------')
-        netcdf_dir = os.path.join(base_dir, 'dwrf', version, 'd{}'.format(wrf_run), gfs_hour, rfield_date, model)
-        rfield_dir = os.path.join(base_dir, 'dwrf', version, 'd{}'.format(wrf_run), gfs_hour, rfield_date, model, 'rfield')
-        print('netcdf_dir : ', netcdf_dir)
-        print('rfield_dir : ', rfield_dir)
-        read_netcdf_file(netcdf_dir, rfield_dir, wrf_id)
+# if __name__ == '__main__':
+#     args = vars(parse_args())
+#     wrf_id = args['wrf_id']
+#     base_dir = args['base_dir']
+#     input_list = wrf_id.split('_')
+#     if len(input_list) >= 5:
+#         version = input_list[1]
+#         wrf_run = input_list[2]
+#         gfs_hour = input_list[3]
+#         rfield_date = input_list[4]
+#         model = input_list[5]
+#         print('---------User inputs---------')
+#         print('model : ', model)
+#         print('version : ', version)
+#         print('gfs_hour : ', gfs_hour)
+#         print('rfield_date : ', rfield_date)
+#         print('wrf_run : ', wrf_run)
+#         print('base_dir : ', base_dir)
+#         print('wrf_id : ', wrf_id)
+#         print('------------------------------')
+#         netcdf_dir = os.path.join(base_dir, 'dwrf', version, 'd{}'.format(wrf_run), gfs_hour, rfield_date, model)
+#         rfield_dir = os.path.join(base_dir, 'dwrf', version, 'd{}'.format(wrf_run), gfs_hour, rfield_date, model, 'rfield')
+#         print('netcdf_dir : ', netcdf_dir)
+#         print('rfield_dir : ', rfield_dir)
+#         read_netcdf_file(netcdf_dir, rfield_dir, wrf_id)
 
 
 if __name__ == '__main__':
     wrf_id = 'dwrf_4.0_d0_18_2019-10-17_E'
-    base_dir = '/mnt/disks/wrf_nfs/dwrf'
+    base_dir = '/mnt/disks/wrf_nfs/'
     input_list = wrf_id.split('_')
     if len(input_list) >= 5:
         version = input_list[1]
@@ -180,8 +183,8 @@ if __name__ == '__main__':
         print('base_dir : ', base_dir)
         print('wrf_id : ', wrf_id)
         print('------------------------------')
-        netcdf_dir = os.path.join(base_dir, 'dwrf', version, 'd{}'.format(wrf_run), gfs_hour, rfield_date, model)
-        rfield_dir = os.path.join(base_dir, 'dwrf', version, 'd{}'.format(wrf_run), gfs_hour, rfield_date, model,
+        netcdf_dir = os.path.join(base_dir, 'dwrf', version, wrf_run, gfs_hour, rfield_date, model)
+        rfield_dir = os.path.join(base_dir, 'dwrf', version, wrf_run, gfs_hour, rfield_date, model,
                                   'rfield')
         print('netcdf_dir : ', netcdf_dir)
         print('rfield_dir : ', rfield_dir)

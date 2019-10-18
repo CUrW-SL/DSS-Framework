@@ -35,3 +35,7 @@ grep ^cpu\\scores /proc/cpuinfo | uniq |  awk '{print $4}'
 # run wrf in cloud docker vm.
 nohup ./runner.sh -r 0 -m E -v 4.0 -h 18 &
 
+nohup ./rfielder.sh -r 0 -m E -v 4.0 -h 18 &
+
+
+
