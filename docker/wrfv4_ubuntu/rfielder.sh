@@ -11,7 +11,7 @@ while getopts ":r:m:v:h:" option; do
   esac
 done
 
-BASE_DIR='/mnt/disks/wrf_nfs/dwrf'
+BASE_DIR='/mnt/disks/wrf_nfs/'
 
 echo "WRF_RUN : $WRF_RUN"
 echo "GFS_HOUR : $GFS_HOUR"
@@ -68,8 +68,8 @@ then
 fi
 
 # Run rfield generating scripts
-echo "Running update_obs_rainfall_flo2d_250.py"
-python code/wrfv4_rfied.py $( check_empty "${run_id}" wrf_id )  \
+echo "Running wrfv4_rfield.py"
+python wrfv4_rfield.py $( check_empty "${run_id}" wrf_id )  \
                             $( check_empty "${BASE_DIR}" base_dir ) >> docker_rfield.log 2>&1
 
 # Deactivating virtual environment
