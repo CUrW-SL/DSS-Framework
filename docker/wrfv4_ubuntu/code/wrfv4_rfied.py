@@ -43,7 +43,7 @@ def execute_cmd(cmd):
 
 def create_zip_file(wrf_id):
     print('create_zip_file|wrf_id : ', wrf_id)
-    cmd = 'tar -czvf {}/{}/rfield.tar.gz {}/{}/rfield/*'.format(TMP_LOCATION, wrf_id,
+    cmd = 'tar -czvf {}/{}/rfield.tar.gz --absolute-names {}/{}/rfield/*'.format(TMP_LOCATION, wrf_id,
                                                                                    TMP_LOCATION, wrf_id)
     execute_cmd(cmd)
 
@@ -165,7 +165,7 @@ def parse_args():
 
 
 if __name__ == '__main__':
-    wrf_id = 'dwrf_4.0_d0_18_2019-10-17_E'
+    wrf_id = 'dwrf_4.0_d0_18_2019-10-18_E'
     base_dir = '/mnt/disks/wrf_nfs/'
     input_list = wrf_id.split('_')
     if len(input_list) >= 5:
