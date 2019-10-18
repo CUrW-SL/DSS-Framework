@@ -1,5 +1,4 @@
 import argparse
-import traceback
 from netCDF4 import Dataset
 import numpy as np
 import os
@@ -31,6 +30,33 @@ def create_dir_if_not_exists(path):
 
 def dataframe_to_rfield(ts_df, rfield_file):
     ts_df.to_csv(rfield_file, columns=['Rain'], header=False, index=None)
+
+
+def execute_cmd(cmd):
+    print('execute_cmd|cmd : ', cmd)
+    try:
+        os.system(cmd)
+    except Exception as e:
+        print('execute_cmd|Exception : ', str(e))
+
+
+def create_zip_file(wrf_id):
+    print('create_zip_file|wrf_id : ', wrf_id)
+    cmd = 'tar -xzvf /tmp/{}/rfield.tar.gz -C /tmp/{}/rfield/*'.format(wrf_id, wrf_id)
+    execute_cmd(cmd)
+
+
+def move_zip_file_to_bucket(wrf_id, bucket_path):
+    print('move_zip_file_to_bucket|wrf_id : ', wrf_id)
+    print('move_zip_file_to_bucket|bucket_path : ', bucket_path)
+    cmd = 'mv /tmp/{}/rfield.tar.gz {}'.format(wrf_id, bucket_path)
+    execute_cmd(cmd)
+
+
+def remove_tmp_files(wrf_id):
+    print('create_zip_file|wrf_id : ', wrf_id)
+    cmd = 'rm -rf /tmp/{}'.format(wrf_id)
+    execute_cmd(cmd)
 
 
 def read_netcdf_file(netcdf_dir, rfield_dir, wrf_id):
@@ -83,15 +109,17 @@ def read_netcdf_file(netcdf_dir, rfield_dir, wrf_id):
                     x_y_file = os.path.join(rfield_dir, 'dwrf_x_y.csv')
                     ts_df.to_csv(x_y_file, columns=['Lon', 'Lat'], header=False, index=None)
                     first = False
-                tmp_rfield_path = os.path.join('/tmp', wrf_id)
+                tmp_rfield_path = os.path.join('/tmp', wrf_id, 'rfield')
                 create_dir_if_not_exists(tmp_rfield_path)
                 rfiled_file = os.path.join(tmp_rfield_path, 'dwrf_{}.txt'.format(timestamp))
                 print(rfiled_file)
                 ts_df.to_csv(rfiled_file, columns=['Rain'], header=False, index=None)
-
+            create_zip_file(wrf_id)
+            move_zip_file_to_bucket(wrf_id, rfield_dir)
+            remove_tmp_files(wrf_id)
         except Exception as e:
             print("netcdf file at {} reading error.".format(rainnc_net_cdf_file))
-            traceback.print_exc()
+            print('read_netcdf_file|Exception : ', str(e))
 
 
 def parse_args():
@@ -128,6 +156,33 @@ if __name__ == '__main__':
         print('------------------------------')
         netcdf_dir = os.path.join(base_dir, 'dwrf', version, 'd{}'.format(wrf_run), gfs_hour, rfield_date, model)
         rfield_dir = os.path.join(base_dir, 'dwrf', version, 'd{}'.format(wrf_run), gfs_hour, rfield_date, model, 'rfield')
+        print('netcdf_dir : ', netcdf_dir)
+        print('rfield_dir : ', rfield_dir)
+        read_netcdf_file(netcdf_dir, rfield_dir, wrf_id)
+
+
+if __name__ == '__main__':
+    wrf_id = 'dwrf_4.0_d0_18_2019-10-17_E'
+    base_dir = '/mnt/disks/wrf_nfs/dwrf'
+    input_list = wrf_id.split('_')
+    if len(input_list) >= 5:
+        version = input_list[1]
+        wrf_run = input_list[2]
+        gfs_hour = input_list[3]
+        rfield_date = input_list[4]
+        model = input_list[5]
+        print('---------User inputs---------')
+        print('model : ', model)
+        print('version : ', version)
+        print('gfs_hour : ', gfs_hour)
+        print('rfield_date : ', rfield_date)
+        print('wrf_run : ', wrf_run)
+        print('base_dir : ', base_dir)
+        print('wrf_id : ', wrf_id)
+        print('------------------------------')
+        netcdf_dir = os.path.join(base_dir, 'dwrf', version, 'd{}'.format(wrf_run), gfs_hour, rfield_date, model)
+        rfield_dir = os.path.join(base_dir, 'dwrf', version, 'd{}'.format(wrf_run), gfs_hour, rfield_date, model,
+                                  'rfield')
         print('netcdf_dir : ', netcdf_dir)
         print('rfield_dir : ', rfield_dir)
         read_netcdf_file(netcdf_dir, rfield_dir, wrf_id)
