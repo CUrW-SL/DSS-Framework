@@ -46,3 +46,5 @@ docker run -i --rm --privileged -v /mnt/disks/workspace1/wrf-data/geog:/home/Bui
     /home/Build_WRF/code/wrfv4_run.sh -d ${gfs_date} -k ${wrf_id} \
     -v wrf_nfs:/home/Build_WRF/nfs -v curwsl_archive_1:/home/Build_WRF/archive
 
+/home/uwcc-admin/wrf_docker/rfielder.sh  -r ${WRF_RUN} -m ${MODEL} -v ${VERSION} -h ${GFS_HOUR}
+
