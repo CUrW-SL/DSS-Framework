@@ -137,36 +137,10 @@ def parse_args():
     return parser.parse_args()
 
 
-# if __name__ == '__main__':
-#     args = vars(parse_args())
-#     wrf_id = args['wrf_id']
-#     base_dir = args['base_dir']
-#     input_list = wrf_id.split('_')
-#     if len(input_list) >= 5:
-#         version = input_list[1]
-#         wrf_run = input_list[2]
-#         gfs_hour = input_list[3]
-#         rfield_date = input_list[4]
-#         model = input_list[5]
-#         print('---------User inputs---------')
-#         print('model : ', model)
-#         print('version : ', version)
-#         print('gfs_hour : ', gfs_hour)
-#         print('rfield_date : ', rfield_date)
-#         print('wrf_run : ', wrf_run)
-#         print('base_dir : ', base_dir)
-#         print('wrf_id : ', wrf_id)
-#         print('------------------------------')
-#         netcdf_dir = os.path.join(base_dir, 'dwrf', version, 'd{}'.format(wrf_run), gfs_hour, rfield_date, model)
-#         rfield_dir = os.path.join(base_dir, 'dwrf', version, 'd{}'.format(wrf_run), gfs_hour, rfield_date, model, 'rfield')
-#         print('netcdf_dir : ', netcdf_dir)
-#         print('rfield_dir : ', rfield_dir)
-#         read_netcdf_file(netcdf_dir, rfield_dir, wrf_id)
-
-
 if __name__ == '__main__':
-    wrf_id = 'dwrf_4.0_d0_18_2019-10-18_E'
-    base_dir = '/mnt/disks/wrf_nfs/'
+    args = vars(parse_args())
+    wrf_id = args['wrf_id']
+    base_dir = args['base_dir']
     input_list = wrf_id.split('_')
     if len(input_list) >= 5:
         version = input_list[1]
@@ -183,12 +157,38 @@ if __name__ == '__main__':
         print('base_dir : ', base_dir)
         print('wrf_id : ', wrf_id)
         print('------------------------------')
-        netcdf_dir = os.path.join(base_dir, 'dwrf', version, wrf_run, gfs_hour, rfield_date, model)
-        rfield_dir = os.path.join(base_dir, 'dwrf', version, wrf_run, gfs_hour, rfield_date, model,
-                                  'rfield')
+        netcdf_dir = os.path.join(base_dir, 'dwrf', version, 'd{}'.format(wrf_run), gfs_hour, rfield_date, model)
+        rfield_dir = os.path.join(base_dir, 'dwrf', version, 'd{}'.format(wrf_run), gfs_hour, rfield_date, model, 'rfield')
         print('netcdf_dir : ', netcdf_dir)
         print('rfield_dir : ', rfield_dir)
         read_netcdf_file(netcdf_dir, rfield_dir, wrf_id)
+
+
+# if __name__ == '__main__':
+#     wrf_id = 'dwrf_4.0_d0_18_2019-10-18_E'
+#     base_dir = '/mnt/disks/wrf_nfs/'
+#     input_list = wrf_id.split('_')
+#     if len(input_list) >= 5:
+#         version = input_list[1]
+#         wrf_run = input_list[2]
+#         gfs_hour = input_list[3]
+#         rfield_date = input_list[4]
+#         model = input_list[5]
+#         print('---------User inputs---------')
+#         print('model : ', model)
+#         print('version : ', version)
+#         print('gfs_hour : ', gfs_hour)
+#         print('rfield_date : ', rfield_date)
+#         print('wrf_run : ', wrf_run)
+#         print('base_dir : ', base_dir)
+#         print('wrf_id : ', wrf_id)
+#         print('------------------------------')
+#         netcdf_dir = os.path.join(base_dir, 'dwrf', version, wrf_run, gfs_hour, rfield_date, model)
+#         rfield_dir = os.path.join(base_dir, 'dwrf', version, wrf_run, gfs_hour, rfield_date, model,
+#                                   'rfield')
+#         print('netcdf_dir : ', netcdf_dir)
+#         print('rfield_dir : ', rfield_dir)
+#         read_netcdf_file(netcdf_dir, rfield_dir, wrf_id)
 
 # if __name__ == '__main__':
 #     # nohup ./runner.sh -r 0 -m E -v 4.0 -h 18 &
