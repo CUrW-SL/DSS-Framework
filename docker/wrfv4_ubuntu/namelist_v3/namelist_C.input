@@ -5,7 +5,7 @@
  run_seconds                         = 0,
  start_year                          = YYYY1, YYYY1,  YYYY1,
  start_month                         = MM1, MM1,  MM1,
- start_day                           = DD1, DD1,  DD1,rsl.error.0000
+ start_day                           = DD1, DD1,  DD1,
  start_hour                          = hh1,   hh1,   hh1,
  start_minute                        = mm1,   mm1,   mm1,
  start_second                        = 00,   00,   00,
