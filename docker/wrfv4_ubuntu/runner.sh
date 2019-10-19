@@ -46,5 +46,16 @@ docker run -i --rm --privileged -v /mnt/disks/workspace1/wrf-data/geog:/home/Bui
     /home/Build_WRF/code/wrfv4_run.sh -d ${gfs_date} -k ${wrf_id} \
     -v wrf_nfs:/home/Build_WRF/nfs -v curwsl_archive_1:/home/Build_WRF/archive
 
-/home/uwcc-admin/wrf_docker/rfielder.sh  -r ${WRF_RUN} -m ${MODEL} -v ${VERSION} -h ${GFS_HOUR}
+#output_dir = os.path.join(nfs_dir, 'dwrf', version, 'd{}'.format(wrf_run), gfs_hour, exec_date, model)
+d03_netcdf_path="/mnt/disks/worker-disk/wrf_nfs/dwrf/${VERSION}/d${WRF_RUN}/${GFS_HOUR}/${exec_date}/${MODEL}/d03_RAINNC.nc"
+
+echo "d03_netcdf_path : ${d03_netcdf_path}"
+
+if [[ -r "${d03_netcdf_path}" ]]; then
+    eval /home/uwcc-admin/wrf_docker/rfielder.sh  -r ${WRF_RUN} -m ${MODEL} -v ${VERSION} -h ${GFS_HOUR}
+else
+    echo "${d03_netcdf_path} does not exist."
+fi
+
+
 
