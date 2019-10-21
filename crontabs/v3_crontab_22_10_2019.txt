@@ -1,0 +1,27 @@
+#* * * * * export DISPLAY=:0 && <command>
+0,15,30,45 0-1 * * * /mnt/disks/wrf-mod/progs/get_docker.bash 00 75 > /mnt/disks/wrf-mod/progs/GFS_00.log
+0,15,30,45 0-1 * * * /mnt/disks/wrf-mod/progs/runwps4_docker.bash 00 75 > /mnt/disks/wrf-mod/progs/wps_00.log
+0,15,30,45 1-2 * * * /mnt/disks/wrf-mod/progs/runwrf4_docker.bash 00 A > /mnt/disks/wrf-mod/progs/run_00_A.log
+0,15,30,45 1-2 * * * /mnt/disks/wrf-mod/progs/runwrf4_docker.bash 00 C > /mnt/disks/wrf-mod/progs/run_00_C.log
+0,15,30,45 1-2 * * * /mnt/disks/wrf-mod/progs/runwrf4_docker.bash 00 E > /mnt/disks/wrf-mod/progs/run_00_E.log
+0,15,30,45 1-2 * * * /mnt/disks/wrf-mod/progs/runwrf4_docker.bash 00 SE > /mnt/disks/wrf-mod/progs/run_00_SE.log
+#0,15,30,45 16-23 * * * /mnt/disks/wrf-mod/progs/stations_docker.sh > /mnt/disks/wrf-mod/progs/stations.log
+0,15,30,45 13-20 * * * /mnt/disks/wrf-mod/progs/export_wt_docker.sh 00 A d0 > /mnt/disks/wrf-mod/progs/export_wt_A.log
+0,15,30,45 13-20 * * * /mnt/disks/wrf-mod/progs/export_wt_docker.sh 00 C d0 > /mnt/disks/wrf-mod/progs/export_wt_C.log
+0,15,30,45 13-20 * * * /mnt/disks/wrf-mod/progs/export_wt_docker.sh 00 E d0 > /mnt/disks/wrf-mod/progs/export_wt_E.log
+0,15,30,45 13-20 * * * /mnt/disks/wrf-mod/progs/export_wt_docker.sh 00 SE d0 > /mnt/disks/wrf-mod/progs/export_wt_SE.log
+
+
+
+#0,15,30,45 23 * * * /mnt/disks/wrf-mod/get_18.bash > /mnt/disks/wrf-mod/get.log
+#30 0 * * * /mnt/disks/wrf-mod/runwps4_18.bash > /mnt/disks/wrf-mod/runwps4.log
+#15 1 * * * /mnt/disks/wrf-mod/wt.sh > /mnt/disks/wrf-mod/wt.log
+#15 1 * * * /mnt/disks/wrf-mod/runwrf_A.bash > /mnt/disks/wrf-mod/run_A.log
+#15 1 * * * /mnt/disks/wrf-mod/runwrf_C.bash > /mnt/disks/wrf-mod/run_C.log
+#15 1 * * * /mnt/disks/wrf-mod/runwrf_E.bash > /mnt/disks/wrf-mod/run_E.log
+#15 1 * * * /mnt/disks/wrf-mod/runwrf_SE.bash > /mnt/disks/wrf-mod/run_SE.log
+#0 11-16 * * * /mnt/disks/wrf-mod/stations.sh > /mnt/disks/wrf-mod/stations.log
+#0 23 * * * /mnt/disks/wrf-mod/gsmap.sh > /mnt/disks/wrf-mod/gsmap.log
+#15 23 * * * /mnt/disks/wrf-mod/wrf.sh > /mnt/disks/wrf-mod/wrf.log
+#0,15,30,45 1-2 * * * /mnt/disks/wrf-mod/Scratch_Jean/Run_daily/Select_wt.sh
+#0 8-16 * * * /mnt/disks/wrf-mod/Plots/cpgif.bash
