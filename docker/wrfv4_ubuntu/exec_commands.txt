@@ -38,4 +38,8 @@ nohup ./runner.sh -r 0 -m E -v 4.0 -h 18 &
 nohup ./rfielder.sh -r 0 -m E -v 4.0 -h 18 &
 
 
+docker build -t curw-wrfv4:wrf_4.0_A .
+docker build -t curw-wrfv4:wrf_4.0_C .
+docker build -t curw-wrfv4:wrf_4.0_E .
+docker build -t curw-wrfv4:wrf_4.0_SE .
 
