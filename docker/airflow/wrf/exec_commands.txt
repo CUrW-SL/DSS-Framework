@@ -1,0 +1,45 @@
+# building docker image
+docker build -t curw-wrfv4:ubuntu1604 .
+
+# build docker image without using cache
+docker build --no-cache -t curw-wrfv4:ubuntu1604 .
+
+# Run already built docker image and connect to its shell
+docker run -it curw-wrfv4:ubuntu1604 /bin/bash
+
+# view <none><none> docker images
+docker images -f dangling=true -q
+
+# remove <none><none> docker images
+docker rmi -f $(docker images -f dangling=true -q --no-trunc)
+
+# wrfv4 run inside docker image
+docker run -i --rm --privileged
+-v /mnt/disks/workspace1/wrf-data/geog:/home/Build_WRF/geog
+-v /home/uwcc-admin/uwcc-admin.json:/wrf/gcs.json
+curw-wrfv4
+/home/Build_WRF/code/wrfv4_run.sh
+    -d "2019-08-11_18:00"
+    -k "wrfv4_2019-08-11_18_00"
+-v curwsl_nfs_1:/home/Build_WRF/nfs
+-v curwsl_archive_1:/home/Build_WRF/archive
+
+# processor core count
+cat /proc/cpuinfo | awk '/^processor/{print $3}' | wc -l
+or
+grep -c ^processor /proc/cpuinfo
+which will count the number of lines starting with "processor" in /proc/cpuinfo
+For systems with hyper-threading, you can use
+grep ^cpu\\scores /proc/cpuinfo | uniq |  awk '{print $4}'
+
+# run wrf in cloud docker vm.
+nohup ./runner.sh -r 0 -m E -v 4.0 -h 18 &
+
+nohup ./rfielder.sh -r 0 -m E -v 4.0 -h 18 &
+
+
+docker build -t curw-wrfv4:wrf_4.0_A .
+docker build -t curw-wrfv4:wrf_4.0_C .
+docker build -t curw-wrfv4:wrf_4.0_E .
+docker build -t curw-wrfv4:wrf_4.0_SE .
+
