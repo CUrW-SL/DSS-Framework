@@ -12,7 +12,6 @@
 0,15,30,45 13-20 * * * /mnt/disks/wrf-mod/progs/export_wt_docker.sh 00 SE d0 > /mnt/disks/wrf-mod/progs/export_wt_SE.log
 
 
-
 #0,15,30,45 23 * * * /mnt/disks/wrf-mod/get_18.bash > /mnt/disks/wrf-mod/get.log
 #30 0 * * * /mnt/disks/wrf-mod/runwps4_18.bash > /mnt/disks/wrf-mod/runwps4.log
 #15 1 * * * /mnt/disks/wrf-mod/wt.sh > /mnt/disks/wrf-mod/wt.log
