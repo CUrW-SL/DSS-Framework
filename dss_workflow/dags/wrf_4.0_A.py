@@ -12,6 +12,9 @@ default_args = {
     'email_on_failure': True,
 }
 
+#./runner.sh -r 0 -m E -v 4.0 -h 18
+#./rfielder.sh -r 0 -m E -v 4.0 -h 18
+
 download_gfs_cmd = 'echo "download_gfs_cmd" ;sleep $[($RANDOM % 10) + 1]s'
 run_wrf4_A_cmd = 'echo "run_wrf_A_cmd" ;sleep $[($RANDOM % 1000) + 1]s'
 rfield_gen_cmd = 'echo "rfield_gen_cmd" ;sleep $[($RANDOM % 100) + 1]s'
