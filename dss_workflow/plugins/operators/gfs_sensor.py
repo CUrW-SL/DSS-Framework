@@ -1,6 +1,7 @@
 from airflow.exceptions import AirflowSensorTimeout
 from airflow.operators.sensors import BaseSensorOperator
 from airflow.utils.decorators import apply_defaults
+from airflow.plugins_manager import AirflowPlugin
 from datetime import datetime
 from ftplib import FTP
 
@@ -46,13 +47,13 @@ def check_gfs_data(gfs_hour,
         return gfs_data_downloadable
 
 
-class GFSsensor(BaseSensorOperator):
+class GfsSensorOperator(BaseSensorOperator):
     @apply_defaults
     def __init__(self, *args, **kwargs):
         self.wrf_date = kwargs['wrf_date']
         self.gfs_hour = kwargs['gfs_hour']
         print("GFSsensor inputs: ", [self.wrf_date, self.gfs_hour])
-        super(GFSsensor, self).__init__(*args, **kwargs)
+        super(GfsSensorOperator, self).__init__(*args, **kwargs)
 
     def poke(self, context):
         try:
@@ -66,3 +67,6 @@ class GFSsensor(BaseSensorOperator):
             raise AirflowSensorTimeout('GFSsensor. Time is OUT.')
 
 
+class GfsSensor(AirflowPlugin):
+    name = "conditional_multi_trigger_operator"
+    operators = [GfsSensorOperator]
