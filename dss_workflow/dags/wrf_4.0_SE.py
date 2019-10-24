@@ -1,7 +1,7 @@
 from datetime import datetime
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
-from dss_workflow.plugins.operators import GfsSensor
+from airflow.operators import GfsSensorOperator
 
 prod_dag_name = 'wrf_4.0_SE'
 
@@ -20,7 +20,7 @@ data_push_cmd = 'echo "data_push_cmd" ;sleep $[($RSENDOM % 10) + 1]s'
 
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
          description='Run WRF v4 SE DAG') as dag:
-    check_gfs_availability = GfsSensor(
+    check_gfs_availability = GfsSensorOperator(
         task_id='check_gfs_availability',
         poke_interval=60,
         timeout=60 * 30,
