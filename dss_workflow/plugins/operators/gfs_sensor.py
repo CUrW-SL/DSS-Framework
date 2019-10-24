@@ -67,6 +67,6 @@ class GfsSensorOperator(BaseSensorOperator):
             raise AirflowSensorTimeout('GFSsensor. Time is OUT.')
 
 
-class GfsSensor(AirflowPlugin):
-    name = "conditional_multi_trigger_operator"
+class MyFirstPlugin(AirflowPlugin):
+    name = "gfs_sensor"
     operators = [GfsSensorOperator]
