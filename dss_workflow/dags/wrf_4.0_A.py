@@ -12,7 +12,7 @@ default_args = {
     'email_on_failure': True,
 }
 
-#./runner.sh -r 0 -m E -v 4.0 -h 18
+#./runner.sh -r 0 -m E -v 4.0 -h 18 -d 2019-10-24
 #./rfielder.sh -r 0 -m E -v 4.0 -h 18
 
 download_gfs_cmd = 'echo "download_gfs_cmd" ;sleep $[($RANDOM % 10) + 1]s'
