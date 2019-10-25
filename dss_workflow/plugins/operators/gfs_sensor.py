@@ -2,11 +2,11 @@ from airflow.exceptions import AirflowSensorTimeout
 from airflow.operators.sensors import BaseSensorOperator
 from airflow.utils.decorators import apply_defaults
 from airflow.plugins_manager import AirflowPlugin
-from datetime import datetime
+from datetime import datetime, timedelta
 from ftplib import FTP
 
 
-def check_gfs_data(gfs_hour,
+def check_gfs_data(gfs_hour, wrf_run,
                    last_gfs_file_format='gfs.t{}z.pgrb2.0p50.f075',
                    check_dt=None,
                    gfs_server='ftp.ncep.noaa.gov',
@@ -16,6 +16,8 @@ def check_gfs_data(gfs_hour,
     :return:
     """
     gfs_data_downloadable = False
+    print('check_gfs_data|gfs_hour: ', gfs_hour)
+    print('check_gfs_data|wrf_run: ', wrf_run)
     print('check_gfs_data|check_dt: ', check_dt)
     print('check_gfs_data|gfs_server: ', gfs_server)
     print('check_gfs_data|gfs_home: ', gfs_home)
@@ -23,7 +25,7 @@ def check_gfs_data(gfs_hour,
     if check_dt is not None:
         gfs_dt = datetime.strptime(check_dt, '%Y-%m-%d %H:%M:%S')
     else:
-        gfs_dt = datetime.strptime(datetime.now().strftime('%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S')
+        gfs_dt = datetime.strptime((datetime.now() - timedelta(days=int(wrf_run))).strftime('%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S')
     print('check_gfs_data|gfs_dt: ', gfs_dt)
     ftp = FTP(gfs_server)
     ftp.login()
@@ -50,15 +52,18 @@ def check_gfs_data(gfs_hour,
 class GfsSensorOperator(BaseSensorOperator):
     @apply_defaults
     def __init__(self, *args, **kwargs):
-        self.wrf_date = kwargs['wrf_date']
-        self.gfs_hour = kwargs['gfs_hour']
-        print("GFSsensor inputs: ", [self.wrf_date, self.gfs_hour])
         super(GfsSensorOperator, self).__init__(*args, **kwargs)
 
     def poke(self, context):
         try:
             print('-----------------------------------------------------------------------')
-            condition = check_gfs_data(self.gfs_hour, check_dt=self.wrf_date)
+            rule_info = context['task_instance'].xcom_pull(task_ids='init_wrfv4_A')['rule_info']
+            print('GfsSensorOperator|rule_info : ', rule_info)
+            gfs_hour = rule_info['hour']
+            wrf_run = rule_info['run']
+            print('GfsSensorOperator|gfs_hour : ', gfs_hour)
+            print('GfsSensorOperator|wrf_run : ', wrf_run)
+            condition = check_gfs_data(gfs_hour, wrf_run)
             print('GFSsensor|condition : ', condition)
             print('-----------------------------------------------------------------------')
             return condition
