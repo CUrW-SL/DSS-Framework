@@ -19,14 +19,14 @@ rfield_gen_cmd = 'echo "rfield_gen_cmd" ;sleep $[($RCNDOM % 100) + 1]s'
 data_push_cmd = 'echo "data_push_cmd" ;sleep $[($RCNDOM % 10) + 1]s'
 
 
-def run_this_func(dag_run, **kwargs):
-    print('run_this_func|dag_run : ', dag_run)
+def run_this_func(dag_run):
     print('run_this_func|dag_run.conf : ', dag_run.conf)
-    print('run_this_func|dag_run|run : ', dag_run.conf['run'])
-    print('run_this_func|dag_run|hour : ', dag_run.conf['hour'])
-    rule_info = ''
-    print('rule_info : ', rule_info)
-    wrf_rule = {'model': 'C', 'version': '4.0', 'rule_info': rule_info}
+    wrf_rule = {'model': 'C', 'version': '4.0',
+                'run': dag_run.conf['run'],
+                'hour': dag_run.conf['hour'],
+                'ignore_previous_run': dag_run.conf['ignore_previous_run'],
+                'check_gfs_data_availability': dag_run.conf['check_gfs_data_availability']}
+    print('run_this_func|wrf_rule : ', wrf_rule)
     return wrf_rule
 
 
