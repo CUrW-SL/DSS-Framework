@@ -57,6 +57,8 @@ class GfsSensorOperator(BaseSensorOperator):
     def poke(self, context):
         try:
             print('-----------------------------------------------------------------------')
+            task_info = context['task_instance'].xcom_pull(task_ids='init_wrfv4_A')
+            print('GfsSensorOperator|task_info : ', task_info)
             rule_info = context['task_instance'].xcom_pull(task_ids='init_wrfv4_A')['rule_info']
             print('GfsSensorOperator|rule_info : ', rule_info)
             gfs_hour = rule_info['hour']

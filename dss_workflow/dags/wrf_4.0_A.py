@@ -22,18 +22,17 @@ rfield_gen_cmd = 'echo "rfield_gen_cmd" ;sleep $[($RANDOM % 100) + 1]s'
 data_push_cmd = 'echo "data_push_cmd" ;sleep $[($RANDOM % 10) + 1]s'
 
 
-def run_this_func(**context):
-    print('run_this_func|context : ', context)
-    rule_info = ''
-    print('rule_info : ', rule_info)
-    wrf_rule = {'model': 'A', 'version': '4.0', 'rule_info': rule_info}
+def run_this_func(dag_run, **kwargs):
+    print('run_this_func|dag_run : ', dag_run)
+    wrf_rule = {'model': 'A', 'version': '4.0', 'rule_info': dag_run.conf}
+    print('run_this_func|wrf_rule : ', wrf_rule)
     return wrf_rule
 
 
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
          description='Run WRF v4 A DAG') as dag:
     init_wrfv4_A = PythonOperator(
-        task_id='init_wrfv4_A',
+        task_id='init_wrfv4',
         provide_context=True,
         python_callable=run_this_func,
         dag=dag,

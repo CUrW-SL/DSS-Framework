@@ -19,13 +19,9 @@ rfield_gen_cmd = 'echo "rfield_gen_cmd" ;sleep $[($RCNDOM % 100) + 1]s'
 data_push_cmd = 'echo "data_push_cmd" ;sleep $[($RCNDOM % 10) + 1]s'
 
 
-def run_this_func(dag_run):
-    print('run_this_func|dag_run.conf : ', dag_run.conf)
-    wrf_rule = {'model': 'C', 'version': '4.0',
-                'run': dag_run.conf['run'],
-                'hour': dag_run.conf['hour'],
-                'ignore_previous_run': dag_run.conf['ignore_previous_run'],
-                'check_gfs_data_availability': dag_run.conf['check_gfs_data_availability']}
+def run_this_func(dag_run, **kwargs):
+    print('run_this_func|dag_run : ', dag_run)
+    wrf_rule = {'model': 'C', 'version': '4.0', 'rule_info': dag_run.conf}
     print('run_this_func|wrf_rule : ', wrf_rule)
     return wrf_rule
 
@@ -33,7 +29,7 @@ def run_this_func(dag_run):
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
          description='Run WRF v4 C DAG') as dag:
     init_wrfv4_C = PythonOperator(
-        task_id='init_wrfv4_C',
+        task_id='init_wrfv4',
         provide_context=True,
         python_callable=run_this_func,
         dag=dag,
