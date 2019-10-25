@@ -63,5 +63,5 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         bash_command=data_push_cmd,
     )
 
-    check_gfs_availability >> run_wrf4_A >> rfield_gen >> wrf_data_push
+    init_wrfv4_A >> check_gfs_availability >> run_wrf4_A >> rfield_gen >> wrf_data_push
 

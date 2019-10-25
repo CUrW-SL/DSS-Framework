@@ -2,6 +2,7 @@ from datetime import datetime
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators import GfsSensorOperator
+from airflow.operators.python_operator import PythonOperator
 
 prod_dag_name = 'wrf_4.0_E'
 
@@ -18,8 +19,25 @@ rfield_gen_cmd = 'echo "rfield_gen_cmd" ;sleep $[($RENDOM % 100) + 1]s'
 data_push_cmd = 'echo "data_push_cmd" ;sleep $[($RENDOM % 10) + 1]s'
 
 
+def run_this_func(ds, **kwargs):
+    print("Remotely received value of {} for key=payload".
+          format(kwargs['dag_run'].conf['payload']))
+    # {'dag_name': dag_name, 'payload': payload}
+    rule_info = kwargs['dag_run'].conf['payload']
+    print('rule_info : ', rule_info)
+    wrf_rule = {'model': 'E', 'version': '4.0', 'rule_info': rule_info}
+    return wrf_rule
+
+
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
          description='Run WRF v4 E DAG') as dag:
+    init_wrfv4_E = PythonOperator(
+        task_id='init_wrfv4_E',
+        provide_context=True,
+        python_callable=run_this_func,
+        dag=dag,
+    )
+
     check_gfs_availability = GfsSensorOperator(
         task_id='check_gfs_availability',
         poke_interval=60,
@@ -42,5 +60,5 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         bash_command=data_push_cmd,
     )
 
-    check_gfs_availability >> run_wrf4_E >> rfield_gen >> wrf_data_push
+    init_wrfv4_E >> check_gfs_availability >> run_wrf4_E >> rfield_gen >> wrf_data_push
 
