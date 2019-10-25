@@ -13,10 +13,10 @@ default_args = {
     'email_on_failure': True,
 }
 
-download_gfs_cmd = 'echo "download_gfs_cmd" ;sleep $[($RENDOM % 10) + 1]s'
-run_wrf4_E_cmd = 'echo "run_wrf_E_cmd" ;sleep $[($RENDOM % 1000) + 1]s'
-rfield_gen_cmd = 'echo "rfield_gen_cmd" ;sleep $[($RENDOM % 100) + 1]s'
-data_push_cmd = 'echo "data_push_cmd" ;sleep $[($RENDOM % 10) + 1]s'
+download_gfs_cmd = 'echo "download_gfs_cmd" ;sleep $[($RANDOM % 10) + 1]s'
+run_wrf4_E_cmd = 'echo "run_wrf_E_cmd" ;sleep $[($RANDOM % 1000) + 1]s'
+rfield_gen_cmd = 'echo "rfield_gen_cmd" ;sleep $[($RANDOM % 100) + 1]s'
+data_push_cmd = 'echo "data_push_cmd" ;sleep $[($RANDOM % 10) + 1]s'
 
 
 def run_this_func(dag_run, **kwargs):
