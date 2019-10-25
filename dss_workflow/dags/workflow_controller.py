@@ -12,7 +12,7 @@ from db_adapter import RuleEngineAdapter
 sys.path.insert(0, '/home/hasitha/PycharmProjects/DSS-Framework/gen_util')
 from controller_util import get_triggering_dags
 
-prod_dag_name = 'dss_controller_dag3'
+prod_dag_name = 'dss_controller_dag4'
 schedule_interval = '*/5 * * * *'
 SKIP = 0
 

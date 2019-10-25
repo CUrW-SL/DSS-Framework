@@ -4,7 +4,7 @@ from airflow.operators.bash_operator import BashOperator
 from airflow.operators import GfsSensorOperator
 from airflow.operators.python_operator import PythonOperator
 
-prod_dag_name = 'wrf_4.0_E'
+prod_dag_name = 'wrf_4.0_E_dag'
 
 default_args = {
     'owner': 'dss admin',
