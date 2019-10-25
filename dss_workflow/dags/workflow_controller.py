@@ -12,7 +12,7 @@ from db_adapter import RuleEngineAdapter
 sys.path.insert(0, '/home/hasitha/PycharmProjects/DSS-Framework/gen_util')
 from controller_util import get_triggering_dags
 
-prod_dag_name = 'dss_controller_dag4'
+prod_dag_name = 'dss_controller_dag6'
 schedule_interval = '*/5 * * * *'
 SKIP = 0
 
@@ -113,7 +113,7 @@ def conditionally_trigger_dss_unit3(context):
 
 default_args = {
     'owner': 'dss admin',
-    'start_date': datetime.strptime('2019-10-09 05:20:00', '%Y-%m-%d %H:%M:%S'),
+    'start_date': datetime.strptime('2019-10-25 06:00:00', '%Y-%m-%d %H:%M:%S'),
     'email': ['hasithadkr7@gmail.com'],
     'email_on_failure': True,
 }

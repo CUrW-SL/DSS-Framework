@@ -19,11 +19,12 @@ rfield_gen_cmd = 'echo "rfield_gen_cmd" ;sleep $[($RCNDOM % 100) + 1]s'
 data_push_cmd = 'echo "data_push_cmd" ;sleep $[($RCNDOM % 10) + 1]s'
 
 
-def run_this_func(ds, **kwargs):
-    print("Remotely received value of {} for key=payload".
-          format(kwargs['dag_run'].conf['payload']))
-    # {'dag_name': dag_name, 'payload': payload}
-    rule_info = kwargs['dag_run'].conf['payload']
+def run_this_func(dag_run, **kwargs):
+    print('run_this_func|dag_run : ', dag_run)
+    print('run_this_func|dag_run.conf : ', dag_run.conf)
+    print('run_this_func|dag_run|run : ', dag_run.conf['run'])
+    print('run_this_func|dag_run|hour : ', dag_run.conf['hour'])
+    rule_info = ''
     print('rule_info : ', rule_info)
     wrf_rule = {'model': 'C', 'version': '4.0', 'rule_info': rule_info}
     return wrf_rule
