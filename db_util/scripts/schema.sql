@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS `wrf_rules`
       `hour`                        varchar(45) DEFAULT NULL,
       `ignore_previous_run`         TINYINT(1) DEFAULT NULL,
       `check_gfs_data_availability` TINYINT(1) DEFAULT NULL,
+      `triggered_by`                int(11) DEFAULT NULL,
       PRIMARY KEY (`id`),
       PRIMARY KEY (`name`)
 ) ENGINE=InnoDB
@@ -42,6 +43,7 @@ CREATE TABLE IF NOT EXISTS `hechms_rules`
     `no_observed_continue`        TINYINT(1) DEFAULT NULL,
     `rainfall_data_from`          int(11) DEFAULT NULL,
     `ignore_previous_run`         TINYINT(1)  DEFAULT NULL,
+    `triggered_by`                int(11) DEFAULT NULL,
     PRIMARY KEY (`id`),
     PRIMARY KEY (`name`)
 ) ENGINE = InnoDB
@@ -61,6 +63,7 @@ CREATE TABLE IF NOT EXISTS `flo2d_rules`
     `inflow_data_from`            int(11) DEFAULT NULL,
     `outflow_data_from`           int(11) DEFAULT NULL,
     `ignore_previous_run`         TINYINT(1) DEFAULT NULL,
+    `triggered_by`                int(11) DEFAULT NULL,
     PRIMARY KEY (`id`),
     PRIMARY KEY (`name`)
 ) ENGINE = InnoDB
