@@ -9,7 +9,7 @@ prod_dag_name = 'hechms_single'
 default_args = {
     'owner': 'dss admin',
     'start_date': datetime.utcnow(),
-    'email': ['hasithadkr7.com'],
+    'email': ['hasithadkr7@gmail.com'],
     'email_on_failure': True,
 }
 
