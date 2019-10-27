@@ -105,16 +105,17 @@ class RuleEngineAdapter:
         :return:[{}{}]
         '''
         wrf_rules = []
-        query = 'select name, target_model, version, run, hour, ignore_previous_run, ' \
+        query = 'select id, name, target_model, version, run, hour, ignore_previous_run, ' \
                 'check_gfs_data_availability from dss.wrf_rules ' \
                 'where status = {} '.format(status)
         results = self.get_multiple_result(query)
         if results is not None:
             for row in results:
-                wrf_rules.append({'name': row[0], 'target_model': row[1],
-                                  'version': row[2], 'run': row[3],
-                                  'hour': row[4], 'ignore_previous_run': row[5],
-                                  'check_gfs_data_availability': row[6]})
+                wrf_rules.append({'id': row[0], 'name': row[1],
+                                  'target_model': row[2], 'version': row[3],
+                                  'run': row[4], 'hour': row[5],
+                                  'ignore_previous_run': row[6],
+                                  'check_gfs_data_availability': row[7]})
         return wrf_rules
 
     def get_wrf_rule_info_by_id(self, rule_id, status=1):
@@ -123,69 +124,69 @@ class RuleEngineAdapter:
         :return:[{}{}]
         '''
         wrf_rule = None
-        query = 'select name, target_model, version, run, hour, ignore_previous_run, ' \
+        query = 'select id, name, target_model, version, run, hour, ignore_previous_run, ' \
                 'check_gfs_data_availability from dss.wrf_rules ' \
                 'where id = {} and status = {} '.format(rule_id, status)
         print('get_wrf_rule_info_by_id|query : ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
         if result is not None:
-            wrf_rule = {'name': result[0], 'target_model': result[1],
-                                  'version': result[2], 'run': result[3],
-                                  'hour': result[4], 'ignore_previous_run': result[5],
-                                  'check_gfs_data_availability': result[6]}
+            wrf_rule = {'id': result[0], 'name': result[1], 'target_model': result[2],
+                        'version': result[3], 'run': result[4],
+                        'hour': result[5], 'ignore_previous_run': result[6],
+                        'check_gfs_data_availability': result[7]}
         return wrf_rule
 
     def get_hechms_rule_info(self, status=1):
         hechms_rules = []
-        query = 'select name, target_model,forecast_days, observed_days, ' \
+        query = 'select id, name, target_model,forecast_days, observed_days, ' \
                 'init_run, no_forecast_continue, no_observed_continue, rainfall_data_from, ' \
                 'ignore_previous_run from dss.hechms_rules where status = {}'.format(status)
         results = self.get_multiple_result(query)
         if results is not None:
             for row in results:
-                hechms_rules.append({'name': row[0], 'target_model': row[1],
-                                     'forecast_days': row[2], 'observed_days': row[3],
-                                     'init_run': row[4], 'no_forecast_continue': row[5],
-                                     'no_observed_continue': row[6], 'rainfall_data_from': row[7],
-                                     'ignore_previous_run': row[8]})
+                hechms_rules.append({'id': row[0], 'name': row[1], 'target_model': row[2],
+                                     'forecast_days': row[3], 'observed_days': row[4],
+                                     'init_run': row[5], 'no_forecast_continue': row[6],
+                                     'no_observed_continue': row[7], 'rainfall_data_from': row[8],
+                                     'ignore_previous_run': row[9]})
         return hechms_rules
 
     def get_hechms_rule_info_by_id(self, id, status=1):
         hechms_rule = None
-        query = 'select name, target_model,forecast_days, observed_days, ' \
+        query = 'select id, name, target_model,forecast_days, observed_days, ' \
                 'init_run, no_forecast_continue, no_observed_continue, rainfall_data_from, ' \
                 'ignore_previous_run from dss.hechms_rules where status = {} and id = {}'.format(status, id)
         print('get_hechms_rule_info_by_id|query : ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
         if result is not None:
-            hechms_rule = {'name': result[0], 'target_model': result[1],
-                                     'forecast_days': result[2], 'observed_days': result[3],
-                                     'init_run': result[4], 'no_forecast_continue': result[5],
-                                     'no_observed_continue': result[6], 'rainfall_data_from': result[7],
-                                     'ignore_previous_run': result[8]}
+            hechms_rule = {'id': result[0], 'name': result[1], 'target_model': result[2],
+                            'forecast_days': result[3], 'observed_days': result[4],
+                            'init_run': result[5], 'no_forecast_continue': result[6],
+                            'no_observed_continue': result[7], 'rainfall_data_from': result[8],
+                            'ignore_previous_run': result[89]}
         return hechms_rule
 
     def get_flo2d_rule_info(self, status=1):
         flo2d_rules = []
-        query = 'select name, target_model, forecast_days, observed_days, ' \
+        query = 'select id, name, target_model, forecast_days, observed_days, ' \
                 'no_forecast_continue, no_observed_continue, raincell_data_from, ' \
                 'inflow_data_from, outflow_data_from, ignore_previous_run ' \
                 'from dss.flo2d_rules where status=1'.format(status)
         results = self.get_multiple_result(query)
         if results is not None:
             for result in results:
-                flo2d_rules.append({'name': result[0], 'target_model': result[1],
-                                    'forecast_days': result[2], 'observed_days': result[3],
-                                    'no_forecast_continue': result[4], 'no_observed_continue': result[5],
-                                    'raincell_data_from': result[6], 'inflow_data_from': result[7],
-                                    'outflow_data_from': result[8], 'ignore_previous_run': result[9]})
+                flo2d_rules.append({'id': result[0], 'name': result[1], 'target_model': result[2],
+                                    'forecast_days': result[3], 'observed_days': result[4],
+                                    'no_forecast_continue': result[5], 'no_observed_continue': result[6],
+                                    'raincell_data_from': result[7], 'inflow_data_from': result[8],
+                                    'outflow_data_from': result[9], 'ignore_previous_run': result[10]})
         return flo2d_rules
 
     def get_flo2d_rule_info_by_id(self, id, status=1):
         flo2d_rule = None
-        query = 'select name, target_model, forecast_days, observed_days, ' \
+        query = 'select id, name, target_model, forecast_days, observed_days, ' \
                 'no_forecast_continue, no_observed_continue, raincell_data_from, ' \
                 'inflow_data_from, outflow_data_from, ignore_previous_run ' \
                 'from dss.flo2d_rules where status={} and id={}'.format(status, id)
@@ -193,11 +194,11 @@ class RuleEngineAdapter:
         self.cursor.execute(query)
         result = self.cursor.fetchone()
         if result is not None:
-            flo2d_rule = {'name': result[0], 'target_model': result[1],
-                          'forecast_days': result[2], 'observed_days': result[3],
-                          'no_forecast_continue': result[4], 'no_observed_continue': result[5],
-                          'raincell_data_from': result[6], 'inflow_data_from': result[7],
-                          'outflow_data_from': result[8], 'ignore_previous_run': result[9]}
+            flo2d_rule = {'id': result[0], 'name': result[1], 'target_model': result[2],
+                          'forecast_days': result[3], 'observed_days': result[4],
+                          'no_forecast_continue': result[5], 'no_observed_continue': result[6],
+                          'raincell_data_from': result[7], 'inflow_data_from': result[8],
+                          'outflow_data_from': result[9], 'ignore_previous_run': result[10]}
         return flo2d_rule
 
     def get_workflow_routines(self, schedule_date, status):
