@@ -20,9 +20,11 @@ run_flo2d_150m_cmd = 'echo "run_flo2d_150m_cmd" ;sleep $[($RANDOM % 10) + 1]s'
 extract_water_level_cmd = 'echo "extract_water_level_cmd" ;sleep $[($RANDOM % 10) + 1]s'
 
 
-def run_this_func(ds, **kwargs):
-    print("Remotely received value of {} for key=payload".
-          format(kwargs['dag_run'].conf['payload']))
+def run_this_func(dag_run, **kwargs):
+    print('run_this_func|dag_run : ', dag_run)
+    flo2d_rule = {'model': '150m', 'rule_info': dag_run.conf}
+    print('run_this_func|flo2d_rule : ', flo2d_rule)
+    return flo2d_rule
 
 
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
