@@ -9,7 +9,7 @@ prod_dag_name = 'flo2d_150m'
 default_args = {
     'owner': 'dss admin',
     'start_date': datetime.utcnow(),
-    'email': ['hasithadkr7.com'],
+    'email': ['hasithadkr7gmail.com'],
     'email_on_failure': True,
 }
 
