@@ -113,10 +113,11 @@ def conditionally_trigger_dss_unit3(context):
 
 default_args = {
     'owner': 'dss admin',
-    'start_date': datetime.strptime('2019-10-25 06:00:00', '%Y-%m-%d %H:%M:%S'),
+    'start_date': datetime.strptime('2019-10-27 13:20:00', '%Y-%m-%d %H:%M:%S'),
     'email': ['hasithadkr7@gmail.com'],
     'email_on_failure': True,
 }
+
 
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=schedule_interval,
          description='Run DSS Controller DAG') as dag:
