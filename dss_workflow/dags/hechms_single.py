@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 
-prod_dag_name = 'hechms_single_dag'
+prod_dag_name = 'hechms_single'
 
 
 default_args = {
@@ -18,9 +18,11 @@ run_hechms_single_cmd = 'echo "run_hechms_single_cmd" ;sleep $[($RANDOM % 10) + 
 upload_discharge_cmd = 'echo "upload_discharge_cmd" ;sleep $[($RANDOM % 10) + 1]s'
 
 
-def run_this_func(ds, **kwargs):
-    print("Remotely received value of {} for key=payload".
-          format(kwargs['dag_run'].conf['payload']))
+def run_this_func(dag_run, **kwargs):
+    print('run_this_func|dag_run : ', dag_run)
+    hechms_rule = {'model': 'single', 'rule_info': dag_run.conf}
+    print('run_this_func|hechms_rule : ', hechms_rule)
+    return hechms_rule
 
 
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
