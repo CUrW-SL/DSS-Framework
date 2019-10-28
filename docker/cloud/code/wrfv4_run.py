@@ -498,7 +498,8 @@ def get_output_path_from_wrf_id(wrf_config):
         gfs_hour = input_list[3]
         exec_date = input_list[4]
         model = input_list[5]
-        output_dir = os.path.join(nfs_dir, 'dwrf', version, 'd{}'.format(wrf_run), gfs_hour, exec_date, model)
+        output_dir = os.path.join(nfs_dir, 'wrf', version, 'd{}'.format(wrf_run),
+                                  gfs_hour, exec_date, 'output', 'dwrf', model)
     else:
         output_dir = os.path.join(wrf_config['nfs_dir'], 'results', run_id, 'wrf')
     print('get_output_path_from_wrf_id|output_dir: ', output_dir)
