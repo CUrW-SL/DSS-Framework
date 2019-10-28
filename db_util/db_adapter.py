@@ -199,10 +199,9 @@ class RuleEngineAdapter:
                           'outflow_data_from': result[9], 'ignore_previous_run': result[10]}
         return flo2d_rule
 
-    def get_workflow_routines(self, schedule_date, status):
+    def get_workflow_routines(self, status):
         workflow_routines = []
-        query = 'select id,dss1,dss2,dss3 from dss.workflow_routines where scheduled_date>=\'{}\' ' \
-                'and status={} order by priority asc '.format(schedule_date, status)
+        query = 'select id,dss1,dss2,dss3 from dss.workflow_routines where status={}'.format(status)
         results = self.get_multiple_result(query)
         if results is not None:
             for row in results:
