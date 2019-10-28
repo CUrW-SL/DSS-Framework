@@ -34,8 +34,6 @@ def validate_workflow(workflow_routine, schedule_date):
         return False
 
 
-
-
 class RuleEngineAdapter:
     __instance = None
 
@@ -220,6 +218,15 @@ class RuleEngineAdapter:
         except Exception as ex:
             print('update_rule_status|Exception: ', str(ex))
             self.log.error('update_rule_status|query:{}'.format(query))
+
+    def update_rule_status_by_id(self, model, rule_id, status):
+        if model == 'wrf':
+            query = 'update dss.wrf_rules set status={} where id=\'{}\''.format(status, rule_id)
+        elif model == 'hechms':
+            query = 'update dss.hechms_rules set status={} where id=\'{}\''.format(status, rule_id)
+        elif model == 'flo2d':
+            query = 'update dss.flo2d_rules set status={} where id=\'{}\''.format(status, rule_id)
+        self.update_query(query)
 
     def update_rule_status(self, model, rule_name, status):
         if model == 'wrf':
