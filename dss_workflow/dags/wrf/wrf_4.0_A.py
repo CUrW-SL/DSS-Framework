@@ -84,7 +84,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     running_state = PythonOperator(
         task_id='running_state',
         provide_context=True,
-        python_callable=run_this_func,
+        python_callable=set_running_status,
         dag=dag,
     )
 
@@ -110,5 +110,12 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         bash_command=data_push_cmd,
     )
 
-    init_wrfv4_A >> check_gfs_availability >> run_wrf4_A >> rfield_gen >> wrf_data_push
+    complete_state = PythonOperator(
+        task_id='complete_state',
+        provide_context=True,
+        python_callable=set_complete_status,
+        dag=dag,
+    )
+
+    init_wrfv4_A >> running_state >>check_gfs_availability >> run_wrf4_A >> rfield_gen >> wrf_data_push >> complete_state
 
