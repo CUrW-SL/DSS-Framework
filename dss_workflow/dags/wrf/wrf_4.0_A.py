@@ -117,5 +117,5 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         dag=dag,
     )
 
-    init_wrfv4_A >> running_state >>check_gfs_availability >> run_wrf4_A >> rfield_gen >> wrf_data_push >> complete_state
+    init_wrfv4_A >> running_state >> check_gfs_availability >> run_wrf4_A >> rfield_gen >> wrf_data_push >> complete_state
 
