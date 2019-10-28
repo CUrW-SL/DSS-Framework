@@ -54,10 +54,10 @@ echo "wrf_id : ${wrf_id}"
 echo "docker_tag : ${docker_tag}"
 
 
-docker run -i --rm --privileged -v /mnt/disks/workspace1/wrf-data/geog:/home/Build_WRF/geog \
-    -v /home/uwcc-admin/uwcc-admin.json:/wrf/gcs.json curw-wrfv4:${docker_tag} \
-    /home/Build_WRF/code/wrfv4_run.sh -d ${gfs_date} -k ${wrf_id} \
-    -v wrf_nfs:/home/Build_WRF/nfs -v curwsl_archive_1:/home/Build_WRF/archive
+#docker run -i --rm --privileged -v /mnt/disks/workspace1/wrf-data/geog:/home/Build_WRF/geog \
+#    -v /home/uwcc-admin/uwcc-admin.json:/wrf/gcs.json curw-wrfv4:${docker_tag} \
+#    /home/Build_WRF/code/wrfv4_run.sh -d ${gfs_date} -k ${wrf_id} \
+#    -v wrf_nfs:/home/Build_WRF/nfs -v curwsl_archive_1:/home/Build_WRF/archive
 
 #d03_netcdf_path="/mnt/disks/worker-disk/wrf_nfs/dwrf/${VERSION}/d${WRF_RUN}/${GFS_HOUR}/${exec_date}/${MODEL}/d03_RAINNC.nc"
 #echo "d03_netcdf_path : ${d03_netcdf_path}"
@@ -68,4 +68,7 @@ docker run -i --rm --privileged -v /mnt/disks/workspace1/wrf-data/geog:/home/Bui
 #    echo "${d03_netcdf_path} does not exist."
 #fi
 
-echo "success"
+#result=eval /home/hasitha/PycharmProjects/DSS-Framework/docker/cloud/rfielder.sh  -i "dwrf_${VERSION}_${WRF_RUN}_${GFS_HOUR}_${exec_date}_${MODEL}"
+result=echo /home/hasitha/PycharmProjects/DSS-Framework/docker/cloud/rfielder.sh  -i "dwrf_${VERSION}_${WRF_RUN}_${GFS_HOUR}_${exec_date}_${MODEL}"
+
+echo "result : ${result}"
