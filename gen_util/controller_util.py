@@ -67,3 +67,6 @@ def get_triggering_dags(db_adapter, dss_rule_id, model_type):
     print('get_triggering_dags|dag_info : ', dag_info)
     return dag_info
 
+
+def update_workflow_routine_status(db_adapter):
+    print('update_workflow_routine_status')
