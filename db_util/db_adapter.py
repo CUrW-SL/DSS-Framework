@@ -135,6 +135,20 @@ class RuleEngineAdapter:
                         'check_gfs_data_availability': result[7]}
         return wrf_rule
 
+    def get_wrf_rule_status_by_id(self, rule_id):
+        '''
+        :param status:0-disable,1-enable,2-running,3-completed
+        :return:[{}{}]
+        '''
+        wrf_rule = None
+        query = 'select id, status from dss.wrf_rules where id = {}'.format(rule_id)
+        print('get_wrf_rule_info_by_id|query : ', query)
+        self.cursor.execute(query)
+        result = self.cursor.fetchone()
+        if result is not None:
+            wrf_rule = {'id': result[0], 'status': result[1]}
+        return wrf_rule
+
     def get_hechms_rule_info(self, status=1):
         hechms_rules = []
         query = 'select id, name, target_model,forecast_days, observed_days, ' \
@@ -163,7 +177,17 @@ class RuleEngineAdapter:
                             'forecast_days': result[3], 'observed_days': result[4],
                             'init_run': result[5], 'no_forecast_continue': result[6],
                             'no_observed_continue': result[7], 'rainfall_data_from': result[8],
-                            'ignore_previous_run': result[89]}
+                            'ignore_previous_run': result[9]}
+        return hechms_rule
+
+    def get_hechms_rule_status_by_id(self, id):
+        hechms_rule = None
+        query = 'select id, status from dss.hechms_rules where id = {}'.format(id)
+        print('get_hechms_rule_info_by_id|query : ', query)
+        self.cursor.execute(query)
+        result = self.cursor.fetchone()
+        if result is not None:
+            hechms_rule = {'id': result[0], 'status': result[1]}
         return hechms_rule
 
     def get_flo2d_rule_info(self, status=1):
@@ -197,6 +221,16 @@ class RuleEngineAdapter:
                           'no_forecast_continue': result[5], 'no_observed_continue': result[6],
                           'raincell_data_from': result[7], 'inflow_data_from': result[8],
                           'outflow_data_from': result[9], 'ignore_previous_run': result[10]}
+        return flo2d_rule
+
+    def get_flo2d_rule_status_by_id(self, id):
+        flo2d_rule = None
+        query = 'select id, status from dss.flo2d_rules where id={}'.format(id)
+        print('get_flo2d_rule_info_by_id|query : ', query)
+        self.cursor.execute(query)
+        result = self.cursor.fetchone()
+        if result is not None:
+            flo2d_rule = {'id': result[0], 'status': result[1]}
         return flo2d_rule
 
     def get_workflow_routines(self, status):
