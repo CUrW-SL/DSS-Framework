@@ -70,3 +70,49 @@ def get_triggering_dags(db_adapter, dss_rule_id, model_type):
 
 def update_workflow_routine_status(db_adapter):
     print('update_workflow_routine_status')
+    running_routines = db_adapter.get_workflow_routines(2)
+    if len(running_routines) > 0:
+        for running_routine in running_routines:
+            wrf_completed = False
+            hechms_completed = False
+            flo2d_completed = False
+            print('update_workflow_routine_status|running_routine : ', running_routine)
+            routine_id = running_routine['id']
+            wrf_rule_id = running_routine['dss1']
+            hechms_rule_id = running_routine['dss2']
+            flo2d_rule_id = running_routine['dss3']
+
+            if wrf_rule_id == 0 or wrf_rule_id == '0':
+                wrf_completed = True
+            else:
+                wrf_rule_info = db_adapter.get_wrf_rule_status_by_id(wrf_rule_id)
+                if wrf_rule_info is not None:
+                    wrf_rule_status = wrf_rule_info['status']
+                    if wrf_rule_status == 3 or wrf_rule_status == '3':
+                        wrf_completed = True
+
+            if hechms_rule_id == 0 or hechms_rule_id == '0':
+                hechms_completed = True
+            else:
+                hechms_rule_info = db_adapter.get_hechms_rule_status_by_id(hechms_rule_id)
+                if hechms_rule_info is not None:
+                    hechms_rule_status = hechms_rule_info['status']
+                    if hechms_rule_status == 3 or hechms_rule_status == '3':
+                        hechms_completed = True
+
+            if flo2d_rule_id == 0 or flo2d_rule_id == '0':
+                flo2d_completed = True
+            else:
+                flo2d_rule_info = db_adapter.get_flo2d_rule_status_by_id(flo2d_rule_id)
+                if flo2d_rule_info is not None:
+                    flo2d_rule_status = flo2d_rule_info['status']
+                    if flo2d_rule_status == 3 or flo2d_rule_status == '3':
+                        flo2d_completed = True
+            if wrf_completed and hechms_completed and flo2d_completed:
+                db_adapter.update_workflow_routing_status(3, routine_id)
+                print('routine has completed.')
+            else:
+                print('routine hasn\'t completed.')
+    else:
+        print('No running workflows.')
+
