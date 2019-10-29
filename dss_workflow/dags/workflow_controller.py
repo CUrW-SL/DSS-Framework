@@ -10,7 +10,7 @@ sys.path.insert(0, '/home/hasitha/PycharmProjects/DSS-Framework/db_util')
 from db_adapter import RuleEngineAdapter
 
 sys.path.insert(0, '/home/hasitha/PycharmProjects/DSS-Framework/gen_util')
-from controller_util import get_triggering_dags
+from controller_util import get_triggering_dags, update_workflow_routine_status
 
 prod_dag_name = 'dss_controller_dag6'
 schedule_interval = '*/5 * * * *'
@@ -111,6 +111,13 @@ def conditionally_trigger_dss_unit3(context):
             return []
 
 
+def end_workflow_routine():
+    print('***************************end_workflow_routine**********************************')
+    db_config = Variable.get('db_config', deserialize_json=True)
+    adapter = RuleEngineAdapter.get_instance(db_config)
+    update_workflow_routine_status(adapter)
+
+
 default_args = {
     'owner': 'dss admin',
     'start_date': datetime.strptime('2019-10-27 13:20:00', '%Y-%m-%d %H:%M:%S'),
@@ -180,9 +187,11 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=sche
         params={'check_rules': True, 'rule_types': ['flo2d']}
     )
 
-    end_routine = DummyOperator(
+    end_routine = PythonOperator(
         task_id='end_routine',
-        trigger_rule='none_failed'
+        python_callable=end_workflow_routine,
+        trigger_rule='none_failed',
+        provide_context=True
     )
 
     init_routine >> \
