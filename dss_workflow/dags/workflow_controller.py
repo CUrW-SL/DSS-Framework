@@ -120,13 +120,14 @@ def end_workflow_routine():
 
 default_args = {
     'owner': 'dss admin',
-    'start_date': datetime.strptime('2019-10-30 07:00:00', '%Y-%m-%d %H:%M:%S'),
+    'start_date': datetime.strptime('2019-10-31 13:00:00', '%Y-%m-%d %H:%M:%S'),
     'email': ['hasithadkr7@gmail.com'],
     'email_on_failure': True,
 }
 
 
-with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=schedule_interval,
+with DAG(dag_id=prod_dag_name, default_args=default_args,
+         catchup=False, schedule_interval=schedule_interval,
          description='Run DSS Controller DAG') as dag:
     init_routine = PythonOperator(
         task_id='init_routine',
