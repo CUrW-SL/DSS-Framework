@@ -120,7 +120,7 @@ def end_workflow_routine():
 
 default_args = {
     'owner': 'dss admin',
-    'start_date': datetime.strptime('2019-10-31 13:00:00', '%Y-%m-%d %H:%M:%S'),
+    'start_date': datetime.strptime('2019-11-01 12:30:00', '%Y-%m-%d %H:%M:%S'),
     'email': ['hasithadkr7@gmail.com'],
     'email_on_failure': True,
 }
