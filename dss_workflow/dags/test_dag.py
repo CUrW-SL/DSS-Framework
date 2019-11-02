@@ -15,7 +15,7 @@ default_args = {
 
 test_task1_cmd = 'echo "download_gfs_cmd" ;sleep $[($RANDOM % 10) + 1]s'
 test_task2_cmd = '/home/hasitha/PycharmProjects/DSS-Framework/docker/cloud/testing.sh '
-test_task3_cmd = 'echo "rfield_gen_cmd" ;sleep $[($RANDOM % 100) + 1]s'
+test_task3_cmd = 'echo "rfield_gen_cmd" ;sleep $[($RANDOM % 10) + 1]s'
 
 
 with DAG(dag_id=prod_dag_name, default_args=default_args,
