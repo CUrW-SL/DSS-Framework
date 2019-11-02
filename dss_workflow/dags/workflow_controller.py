@@ -6,10 +6,10 @@ from airflow.operators.dummy_operator import DummyOperator
 from airflow.models import Variable
 import sys
 
-sys.path.insert(0, '/home/hasitha/PycharmProjects/DSS-Framework/db_util')
+sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 from db_adapter import RuleEngineAdapter
 
-sys.path.insert(0, '/home/hasitha/PycharmProjects/DSS-Framework/gen_util')
+sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/gen_util')
 from controller_util import get_triggering_dags, update_workflow_routine_status
 
 prod_dag_name = 'dss_controller_dag6'
@@ -120,7 +120,7 @@ def end_workflow_routine():
 
 default_args = {
     'owner': 'dss admin',
-    'start_date': datetime.strptime('2019-11-01 12:30:00', '%Y-%m-%d %H:%M:%S'),
+        'start_date': datetime.strptime('2019-11-01 12:30:00', '%Y-%m-%d %H:%M:%S'),
     'email': ['hasithadkr7@gmail.com'],
     'email_on_failure': True,
 }
