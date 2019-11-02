@@ -8,17 +8,18 @@ schedule_interval = '*/5 * * * *'
 
 default_args = {
     'owner': 'dss admin',
-    'start_date': datetime.strptime('2019-11-01 12:30:00', '%Y-%m-%d %H:%M:%S'),
+    'start_date': datetime.strptime('2019-11-01 18:00:00', '%Y-%m-%d %H:%M:%S'),
     'email': ['hasithadkr7@gmail.com'],
     'email_on_failure': True,
 }
 
 test_task1_cmd = 'echo "download_gfs_cmd" ;sleep $[($RANDOM % 10) + 1]s'
-test_task2_cmd = 'echo "run_wrf_A_cmd" ;sleep $[($RANDOM % 1000) + 1]s'
+test_task2_cmd = '/home/hasitha/PycharmProjects/DSS-Framework/docker/cloud/testing.sh '
 test_task3_cmd = 'echo "rfield_gen_cmd" ;sleep $[($RANDOM % 100) + 1]s'
 
 
-with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
+with DAG(dag_id=prod_dag_name, default_args=default_args,
+         schedule_interval=schedule_interval,
          description='Run TEST DAG') as dag:
     test_task1 = BashOperator(
         task_id='test_task1',
