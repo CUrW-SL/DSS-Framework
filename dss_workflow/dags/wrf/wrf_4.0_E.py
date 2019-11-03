@@ -6,7 +6,8 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.models import Variable
 import sys
 
-from dss_workflow.plugins.operators.gfs_sensor import GfsSensorOperator
+sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/dss_workflow/plugins/operators')
+from gfs_sensor import GfsSensorOperator
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 from db_adapter import RuleEngineAdapter
