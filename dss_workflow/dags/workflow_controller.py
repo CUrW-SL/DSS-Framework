@@ -12,7 +12,7 @@ from db_adapter import RuleEngineAdapter
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/gen_util')
 from controller_util import get_triggering_dags, update_workflow_routine_status
 
-prod_dag_name = 'dss_controller_dag6'
+prod_dag_name = 'dss_controller_v1'
 schedule_interval = '*/5 * * * *'
 SKIP = 0
 
