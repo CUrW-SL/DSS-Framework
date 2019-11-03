@@ -19,7 +19,7 @@ test_task3_cmd = 'echo "rfield_gen_cmd" ;sleep $[($RANDOM % 10) + 1]s'
 
 
 with DAG(dag_id=prod_dag_name, default_args=default_args,
-         schedule_interval=schedule_interval,
+         schedule_interval=schedule_interval, catchup=False,
          description='Run TEST DAG') as dag:
     test_task1 = BashOperator(
         task_id='test_task1',
