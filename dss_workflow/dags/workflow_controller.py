@@ -114,7 +114,7 @@ def conditionally_trigger_dss_unit3(context):
             return []
 
 
-def end_workflow_routine(context):
+def end_workflow_routine(**context):
     print('***************************end_workflow_routine**********************************')
     db_config = Variable.get('db_config', deserialize_json=True)
     adapter = RuleEngineAdapter.get_instance(db_config)
