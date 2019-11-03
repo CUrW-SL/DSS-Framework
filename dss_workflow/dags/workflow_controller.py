@@ -1,10 +1,12 @@
 from datetime import datetime
 from airflow import DAG
-from airflow.operators import ConditionMultiTriggerDagRunOperator
+#from airflow.operators import ConditionMultiTriggerDagRunOperator
 from airflow.operators.python_operator import PythonOperator, BranchPythonOperator
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.models import Variable
 import sys
+
+from dss_workflow.plugins.operators.condition_multi_dag_run_operator import ConditionMultiTriggerDagRunOperator
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 from db_adapter import RuleEngineAdapter

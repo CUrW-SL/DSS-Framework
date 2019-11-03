@@ -1,10 +1,12 @@
 from datetime import datetime
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
-from airflow.operators import GfsSensorOperator
+#from airflow.operators import GfsSensorOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow.models import Variable
 import sys
+
+from dss_workflow.plugins.operators.gfs_sensor import GfsSensorOperator
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 from db_adapter import RuleEngineAdapter
