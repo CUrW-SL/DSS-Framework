@@ -6,7 +6,7 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.models import Variable
 import sys
 
-sys.path.insert(0, '/home/hasitha/PycharmProjects/DSS-Framework/db_util')
+sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 from db_adapter import RuleEngineAdapter
 
 prod_dag_name = 'wrf_4.0_E_dag'
