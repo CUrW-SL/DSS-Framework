@@ -8,7 +8,7 @@ import sys
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 from db_adapter import RuleEngineAdapter
 
-prod_dag_name = 'flo2d_150m'
+prod_dag_name = 'flo2d_150m_dag'
 
 
 default_args = {

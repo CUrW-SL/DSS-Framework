@@ -8,7 +8,7 @@ import sys
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 from db_adapter import RuleEngineAdapter
 
-prod_dag_name = 'hechms_single'
+prod_dag_name = 'hechms_single_dag'
 
 
 default_args = {
