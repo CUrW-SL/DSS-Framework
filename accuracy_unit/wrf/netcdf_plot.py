@@ -158,7 +158,7 @@ class ObservationMean:
 
     def calc_station_fraction(self, stations, precision_decimal_points=3):
         """
-        Given station lat lon points must reside inside the KUB shape, otherwise could give incorrect results.
+        Given station lat lon points must reside inside the KB shape, otherwise could give incorrect results.
         :param stations: dict of station_name: [lon, lat] pairs
         :param precision_decimal_points: int
         :return: dict of station_id: area percentage
@@ -202,7 +202,7 @@ class ObservationMean:
 
         return station_fractions
 
-    def calc_klb_mean(self, timerseries_dict, normalizing_factor='H', filler=0.0, precision_decimal_points=3):
+    def calc_kb_mean(self, timerseries_dict, normalizing_factor='H', filler=0.0, precision_decimal_points=3):
         """
         :param timeseries: dict of (station_name: dict_inside) pairs. dict_inside should have
             ('lon_lat': [lon, lat]) and ('timeseries': pandas df with time(index), value columns)
@@ -252,8 +252,8 @@ class ObservationMean:
         weights = pd.DataFrame.from_dict(data=station_fractions, orient='index', dtype='float')
         weights = weights.divide(self.percentage_factor, axis='columns')
 
-        klb_mean = matrix.dot(weights).sum(axis='columns')
-        klb_mean_timeseries = klb_mean.to_frame(name='value')
-        return klb_mean_timeseries
+        kb_mean = matrix.dot(weights).sum(axis='columns')
+        kb_mean_timeseries = kb_mean.to_frame(name='value')
+        return kb_mean_timeseries
 
 
