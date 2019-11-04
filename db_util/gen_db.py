@@ -8,6 +8,23 @@ from decimal import Decimal
 
 LOG_FORMAT = '[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s'
 
+MISSING_VALUE = -99999
+FILL_VALUE = 0
+
+
+def validate_dataframe(df, allowed_error):
+    row_count = len(df.index)
+    missing_count = df['value'][df['value'] == MISSING_VALUE].count()
+    df_error = missing_count / row_count
+    print('validate_dataframe|[row_count, missing_count, df_error]:',
+          [row_count, missing_count, df_error, allowed_error])
+    if df_error > allowed_error:
+        print('Invalid')
+        return False
+    else:
+        print('Valid')
+        return True
+
 
 class CurwSimAdapter:
     __instance = None
@@ -40,7 +57,6 @@ class CurwSimAdapter:
                 CurwSimAdapter.__instance = self
             except ConnectionError as ex:
                 print('ConnectionError|ex: ', ex)
-
 
     def close_connection(self):
         self.cursor.close()
@@ -173,23 +189,24 @@ class CurwSimAdapter:
                 time_step_count = int((datetime.strptime(timeseries_end, '%Y-%m-%d %H:%M:%S')
                                        - datetime.strptime(timeseries_start,
                                                            '%Y-%m-%d %H:%M:%S')).total_seconds() / (
-                                                  60 * time_step_size))
+                                              60 * time_step_size))
                 print('timeseries_start : {}'.format(timeseries_start))
                 print('timeseries_end : {}'.format(timeseries_end))
                 print('time_step_count : {}'.format(time_step_count))
                 print('len(results) : {}'.format(len(results)))
                 data_error = ((time_step_count - len(results)) / time_step_count) * 100
-                if data_error < 1:
+                if data_error < 0:
                     df = pd.DataFrame(data=results, columns=['time', 'value']).set_index(keys='time')
                     return df
-                else:
+                elif data_error < 30:
                     print('data_error : {}'.format(data_error))
                     print('filling missing data.')
                     formatted_ts = []
                     i = 0
-                    for step in range(time_step_count):
+                    for step in range(time_step_count + 1):
                         tms_step = datetime.strptime(timeseries_start, '%Y-%m-%d %H:%M:%S') + timedelta(
                             minutes=step * time_step_size)
+                        # print('tms_step : ', tms_step)
                         if step < len(results):
                             if tms_step == results[i][0]:
                                 formatted_ts.append(results[i])
@@ -201,6 +218,10 @@ class CurwSimAdapter:
                     df = pd.DataFrame(data=formatted_ts, columns=['time', 'value']).set_index(keys='time')
                     print('get_station_timeseries|df: ', df)
                     return df
+                else:
+                    print('data_error : {}'.format(data_error))
+                    print('Data error is too large')
+                    return None
             else:
                 print('No data.')
                 return None
@@ -255,6 +276,58 @@ class CurwSimAdapter:
             print('get_available_stations_info|Exception:', e)
         finally:
             return available_stations
+
+    def get_available_stations_in_sub_basin(self, sub_basin_shape_file, date_time):
+        """
+        Getting station points resides in the given shapefile
+        :param db_adapter:
+        :param sub_basin_shape_file:
+        :param date_time: '2019-08-28 11:00:00'
+        :return: {station1:{'hash_id': hash_id1, 'latitude': latitude1, 'longitude': longitude1}, station2:{}}
+        """
+        available_stations = self.get_available_stations_info(date_time)
+        corrected_available_stations = {}
+        if len(available_stations):
+            for station, info in available_stations.items():
+                shape_attribute = ['OBJECTID', 1]
+                shape_df = gpd.GeoDataFrame.from_file(sub_basin_shape_file)
+                shape_polygon_idx = shape_df.index[shape_df[shape_attribute[0]] == shape_attribute[1]][0]
+                shape_polygon = shape_df['geometry'][shape_polygon_idx]
+                if Point(info['longitude'], info['latitude']).within(
+                        shape_polygon):  # make a point and see if it's in the polygon
+                    corrected_available_stations[station] = info
+                    print('Station {} in the sub-basin'.format(station))
+            return corrected_available_stations
+        else:
+            print('Not available stations..')
+            return {}
+
+    def get_basin_available_stations_timeseries(self, shape_file, start_time, end_time, allowed_error=0.7):
+        """
+        Add time series to the given available station list.
+        :param shape_file:
+        :param hourly_csv_file_dir:
+        :param adapter:
+        :param start_time: '2019-08-28 11:00:00'
+        :param end_time: '2019-08-28 11:00:00'
+        :return: {station1:{'hash_id': hash_id1, 'latitude': latitude1, 'longitude': longitude1, 'timeseries': timeseries1}, station2:{}}
+        """
+        basin_available_stations = self.get_available_stations_in_sub_basin(shape_file, start_time)
+        print('get_basin_available_stations_timeseries|basin_available_stations: ', basin_available_stations)
+        for station in list(basin_available_stations):
+            hash_id = basin_available_stations[station]['hash_id']
+            station_df = self.get_timeseries_by_id(hash_id, start_time, end_time)
+            if station_df is not None:
+                if validate_dataframe(station_df, allowed_error):
+                    basin_available_stations[station]['timeseries'] = station_df.replace(MISSING_VALUE,
+                                                                                         FILL_VALUE)
+                else:
+                    print('Invalid dataframe station : ', station)
+                    basin_available_stations.pop(station, None)
+            else:
+                print('No times series data avaialble for the station ', station)
+                basin_available_stations.pop(station, None)
+        return basin_available_stations
 
 
 class CurwFcstAdapter:
