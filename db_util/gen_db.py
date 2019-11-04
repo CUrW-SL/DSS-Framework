@@ -413,3 +413,162 @@ class CurwFcstAdapter:
             print('save_init_state|Exception:', e)
             return None
 
+
+class CurwObsAdapter:
+    __instance = None
+
+    @staticmethod
+    def get_instance(db_config):
+        """ Static access method. """
+        print('get_instance|db_config : ', db_config)
+        if CurwObsAdapter.__instance is None:
+            CurwObsAdapter(db_config['mysql_user'], db_config['mysql_password'],
+                            db_config['mysql_host'], db_config['mysql_db'],
+                            db_config['log_path'])
+        return CurwObsAdapter.__instance
+
+    def __init__(self, mysql_user, mysql_password, mysql_host, mysql_db, log_path):
+        """ Virtually private constructor. """
+        if CurwObsAdapter.__instance is not None:
+            raise Exception("This class is a singleton!")
+        else:
+            try:
+                self.connection = mysql.connector.connect(user=mysql_user,
+                                                          password=mysql_password,
+                                                          host=mysql_host,
+                                                          database=mysql_db)
+                self.cursor = self.connection.cursor(buffered=True)
+                logging.basicConfig(filename=os.path.join(log_path, 'curw_fcst_db_adapter.log'),
+                                    level=logging.DEBUG,
+                                    format=LOG_FORMAT)
+                self.log = logging.getLogger()
+                CurwObsAdapter.__instance = self
+            except ConnectionError as ex:
+                print('ConnectionError|ex: ', ex)
+
+    def __init__(self, mysql_user, mysql_password, mysql_host, mysql_db):
+        print('[mysql_user, mysql_password, mysql_host, mysql_db] : ',
+              [mysql_user, mysql_password, mysql_host, mysql_db])
+        try:
+            self.connection = mysql.connector.connect(user=mysql_user,
+                                                      password=mysql_password,
+                                                      host=mysql_host,
+                                                      database=mysql_db)
+            self.cursor = self.connection.cursor()
+        except ConnectionError as ex:
+            print('ConnectionError|ex: ', ex)
+
+    def close_connection(self):
+        self.cursor.close()
+        self.connection.close()
+
+    def get_single_result(self, sql_query):
+        value = None
+        cursor = self.cursor
+        try:
+            cursor.execute(sql_query)
+            result = cursor.fetchone()
+            if result:
+                value = result
+            else:
+                self.log.error('no result|query:'.format(sql_query))
+        except Exception as ex:
+            print('get_single_result|Exception : ', str(ex))
+            self.log.error('exception|query:'.format(sql_query))
+        finally:
+            return value
+
+    def get_multiple_result(self, sql_query):
+        cursor = self.cursor
+        try:
+            cursor.execute(sql_query)
+            result = cursor.fetchall()
+            if result:
+                return result
+            else:
+                self.log.error('no result|query:'.format(sql_query))
+                return None
+        except Exception as ex:
+            print('get_single_result|Exception : ', str(ex))
+            self.log.error('exception|query:'.format(sql_query))
+            return None
+
+    def get_station_id_by_lat_lon(self, lat, lon):
+        sql_query = 'select id,name curw_obs.station where latitude={} and longitude={}'.format(lat, lon)
+        result = self.get_single_result(self, sql_query)
+        if result is not None:
+            return {'id': result[0], 'name': result[1]}
+        else:
+            return {}
+
+    def get_hash_by_id(self, station_id, start_time):
+        sql_query = 'select id from curw_obs.run where station={} and end_date > {}'.format(station_id, start_time)
+        result = self.get_single_result(self, sql_query)
+        if result is not None:
+            hash_id = result[0]
+            return hash_id
+        return None
+
+    def get_timeseries_by_id(self, hash_id, timeseries_start, timeseries_end, time_step_size=5):
+        cursor = self.cursor
+        data_sql = 'select time,value from curw_obs.data where time>=\'{}\' and time<=\'{}\' and id=\'{}\' '.format(
+            timeseries_start, timeseries_end, hash_id)
+        try:
+            print('data_sql : ', data_sql)
+            cursor.execute(data_sql)
+            results = cursor.fetchall()
+            # print('results : ', results)
+            if len(results) > 0:
+                time_step_count = int((datetime.strptime(timeseries_end, '%Y-%m-%d %H:%M:%S')
+                                       - datetime.strptime(timeseries_start,
+                                                           '%Y-%m-%d %H:%M:%S')).total_seconds() / (
+                                              60 * time_step_size))
+                print('timeseries_start : {}'.format(timeseries_start))
+                print('timeseries_end : {}'.format(timeseries_end))
+                print('time_step_count : {}'.format(time_step_count))
+                print('len(results) : {}'.format(len(results)))
+                data_error = ((time_step_count - len(results)) / time_step_count) * 100
+                if data_error < 0:
+                    df = pd.DataFrame(data=results, columns=['time', 'value']).set_index(keys='time')
+                    return df
+                elif data_error < 30:
+                    print('data_error : {}'.format(data_error))
+                    print('filling missing data.')
+                    formatted_ts = []
+                    i = 0
+                    for step in range(time_step_count + 1):
+                        tms_step = datetime.strptime(timeseries_start, '%Y-%m-%d %H:%M:%S') + timedelta(
+                            minutes=step * time_step_size)
+                        # print('tms_step : ', tms_step)
+                        if step < len(results):
+                            if tms_step == results[i][0]:
+                                formatted_ts.append(results[i])
+                            else:
+                                formatted_ts.append((tms_step, Decimal(0)))
+                        else:
+                            formatted_ts.append((tms_step, Decimal(0)))
+                        i += 1
+                    df = pd.DataFrame(data=formatted_ts, columns=['time', 'value']).set_index(keys='time')
+                    print('get_station_timeseries|df: ', df)
+                    return df
+                else:
+                    print('data_error : {}'.format(data_error))
+                    print('Data error is too large')
+                    return None
+            else:
+                print('No data.')
+                return None
+        except Exception as e:
+            print('get_timeseries_by_id|data fetch|Exception:', e)
+            return None
+
+    def get_ts_df(self, lat, lon, start_time, end_time):
+        print('get_ts_df|[lat, lon, start_time, end_time] : ', lat, lon, start_time, end_time)
+        station_meta = self.get_station_id_by_lat_lon(lat, lon)
+        if len(station_meta.keys())>0:
+            station_id = station_meta['id']
+            station_name = station_meta['name']
+            hash_id = self.get_hash_by_id(station_id, start_time)
+            if hash_id is not None:
+                ts_df = self.get_timeseries_by_id(hash_id, start_time, end_time)
+
