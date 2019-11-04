@@ -152,8 +152,9 @@ def get_voronoi_polygons(points_dict, shape_file, shape_attribute=None, output_s
 
 
 class ObservationMean:
-    def __init__(self):
-        self.shape_file = get_resource_path('resources/shap_files/kelani_basin/kelani_basin.shp')
+    def __init__(self, shape_file):
+        #self.shape_file = get_resource_path('resources/shap_files/kelani_basin/kelani_basin.shp')
+        self.shape_file = shape_file
         self.percentage_factor = 100
 
     def calc_station_fraction(self, stations, precision_decimal_points=3):
