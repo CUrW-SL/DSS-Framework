@@ -10,7 +10,7 @@ sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/dss_workflow/plugins/oper
 from condition_multi_dag_run_operator import ConditionMultiTriggerDagRunOperator
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
-from db_adapter import RuleEngineAdapter
+from dss_db import RuleEngineAdapter
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/gen_util')
 from controller_util import get_triggering_dags, update_workflow_routine_status

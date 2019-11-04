@@ -1,1 +1,1 @@
-from .db_adapter import RuleEngineAdapter
+from .dss_db import RuleEngineAdapter

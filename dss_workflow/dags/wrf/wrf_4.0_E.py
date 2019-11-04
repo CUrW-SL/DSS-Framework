@@ -10,7 +10,7 @@ sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/dss_workflow/plugins/oper
 from gfs_sensor import GfsSensorOperator
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
-from db_adapter import RuleEngineAdapter
+from dss_db import RuleEngineAdapter
 
 prod_dag_name = 'wrf_4.0_E_dag'
 
