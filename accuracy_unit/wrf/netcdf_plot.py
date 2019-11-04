@@ -1,8 +1,7 @@
 import numpy as np
 import pkg_resources
 from scipy.spatial import Voronoi
-from shapely.geometry import Polygon, Point
-from shapely.geometry import shape
+from shapely.geometry import Polygon
 import geopandas as gpd
 import pandas as pd
 import os

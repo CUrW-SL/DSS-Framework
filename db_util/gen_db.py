@@ -1,10 +1,11 @@
 import logging
 import os
-
 import mysql.connector
 import pandas as pd
 from datetime import datetime, timedelta
 from decimal import Decimal
+from shapely.geometry import Point
+import geopandas as gpd
 
 LOG_FORMAT = '[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s'
 
