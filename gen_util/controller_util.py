@@ -19,7 +19,7 @@ def get_triggering_dags(db_adapter, dss_rule_id, model_type):
                 target_model = target_model.strip()
                 print('target_model : ', target_model)
                 dag_name = 'wrf_{}_{}_dag'.format(wrf_rule_info['version'], target_model)
-                payload = {'run': wrf_rule_info['run'], 'hour': wrf_rule_info['hour'],
+                payload = {'id': wrf_rule_info['id'], 'run': wrf_rule_info['run'], 'hour': wrf_rule_info['hour'],
                            'ignore_previous_run': wrf_rule_info['ignore_previous_run'],
                            'check_gfs_data_availability': wrf_rule_info['check_gfs_data_availability']}
                 dag_info.append({'dag_name': dag_name, 'payload': payload})
@@ -33,7 +33,7 @@ def get_triggering_dags(db_adapter, dss_rule_id, model_type):
                 target_model = target_model.strip()
                 print('target_model : ', target_model)
                 dag_name = 'hechms_{}_dag'.format(target_model)
-                payload = {'forecast_days': hechms_rule_info['forecast_days'],
+                payload = {'id': hechms_rule_info['id'], 'forecast_days': hechms_rule_info['forecast_days'],
                            'observed_days': hechms_rule_info['observed_days'],
                            'init_run': hechms_rule_info['init_run'],
                            'no_forecast_continue': hechms_rule_info['no_forecast_continue'],
@@ -51,7 +51,7 @@ def get_triggering_dags(db_adapter, dss_rule_id, model_type):
                 target_model = target_model.strip()
                 print('target_model : ', target_model)
                 dag_name = 'flo2d_{}_dag'.format(target_model)
-                payload = {'forecast_days': flo2d_rule_info['forecast_days'],
+                payload = {'id': flo2d_rule_info['id'], 'forecast_days': flo2d_rule_info['forecast_days'],
                            'observed_days': flo2d_rule_info['observed_days'],
                            'no_forecast_continue': flo2d_rule_info['no_forecast_continue'],
                            'no_observed_continue': flo2d_rule_info['no_observed_continue'],
