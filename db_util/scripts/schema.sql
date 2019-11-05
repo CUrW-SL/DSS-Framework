@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS `workflow_routines`
     `dss1`              int(11)  DEFAULT NULL COMMENT 'rule id related to wrf',
     `dss2`              int(11)  DEFAULT NULL COMMENT 'rule id related to hechms',
     `dss3`              int(11)  DEFAULT NULL COMMENT 'rule id related to flo2d',
-    `status`            int(11)  DEFAULT NULL COMMENT '0-not triggered, 1- triggered, 2- running, 3- completed, 4- error',
+    `status`            int(11)  DEFAULT NULL COMMENT '0-disable, 1- enable, 2- running, 3- completed, 4- error',
     `schedule`          varchar(45) DEFAULT NULL,
     `last_trigger_date` datetime DEFAULT NULL,
     PRIMARY KEY (`id`)
