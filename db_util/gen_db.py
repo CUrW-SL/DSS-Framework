@@ -562,13 +562,21 @@ class CurwObsAdapter:
             print('get_timeseries_by_id|data fetch|Exception:', e)
             return None
 
+    def get_data_by_hash(self, hash_id, start_time, end_time):
+        data_sql = 'select time,value from curw_obs.data where time>=\'{}\' and time<=\'{}\' and id=\'{}\' '.format(
+            start_time, end_time, hash_id)
+        results = self.get_multiple_result(data_sql)
+        if results is not None:
+            df = pd.DataFrame(data=results, columns=['time', 'value']).set_index(keys='time')
+
     def get_ts_df(self, lat, lon, start_time, end_time):
         print('get_ts_df|[lat, lon, start_time, end_time] : ', lat, lon, start_time, end_time)
         station_meta = self.get_station_id_by_lat_lon(lat, lon)
-        if len(station_meta.keys())>0:
+        if len(station_meta.keys()) > 0:
             station_id = station_meta['id']
             station_name = station_meta['name']
             hash_id = self.get_hash_by_id(station_id, start_time)
             if hash_id is not None:
                 ts_df = self.get_timeseries_by_id(hash_id, start_time, end_time)
+
 
