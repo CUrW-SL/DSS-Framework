@@ -118,11 +118,7 @@ def end_workflow_routine(**context):
     print('***************************end_workflow_routine**********************************')
     db_config = Variable.get('db_config', deserialize_json=True)
     adapter = RuleEngineAdapter.get_instance(db_config)
-    routing_id = context['task_instance'].xcom_pull(task_ids='init_routine')['id']
-    print('end_workflow_routine|routing_id : ', routing_id)
-    print('end_workflow_routine|type(routing_id) : ', type(routing_id))
-    if routing_id != 0 or routing_id != '0':
-        adapter.update_workflow_routing_status(3, routing_id)
+    update_workflow_routine_status(adapter)
     print('******rounting completed**********')
 
 
