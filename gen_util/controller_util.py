@@ -116,3 +116,8 @@ def update_workflow_routine_status(db_adapter):
     else:
         print('No running workflows.')
 
+
+def set_running_state(db_adapter, routine_id):
+    print('set_running_state|routine_id: ', routine_id)
+    db_adapter.update_workflow_routing_status(2, routine_id)
+
