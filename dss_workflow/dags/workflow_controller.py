@@ -13,7 +13,9 @@ sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/gen_util')
-from controller_util import get_triggering_dags, update_workflow_routine_status
+from controller_util import get_triggering_dags, \
+    update_workflow_routine_status, \
+    set_running_state
 
 prod_dag_name = 'dss_controller_v1'
 schedule_interval = '*/5 * * * *'
@@ -29,9 +31,10 @@ def init_workflow_routine(**context):
     routine = adapter.get_next_workflow_routines(run_date)
     print('init_workflow_routine|routine : ', routine)
     if routine is None:
+        set_running_state(adapter, routine['id'])
         return {'id': 0, 'dss1': 0, 'dss2': 0, 'dss3': 0, 'schedule': ''}
-        #self._do_skip_downstream_tasks(context)
     else:
+        set_running_state(adapter, routine['id'])
         return routine
 
 
