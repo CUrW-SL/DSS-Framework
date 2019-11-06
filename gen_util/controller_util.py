@@ -112,6 +112,20 @@ def update_workflow_routine_status(db_adapter):
             print('update_workflow_routine_status|flo2d_completed : ', flo2d_completed)
             if wrf_completed and hechms_completed and flo2d_completed:
                 db_adapter.update_workflow_routing_status(3, routine_id)
+                if wrf_rule_id != 0 or wrf_rule_id != 0:
+                    if wrf_rule_status == 3 or wrf_rule_status == '3':
+                        db_adapter.update_rule_status_by_id('wrf', wrf_rule_id, 1)
+                        print('update_workflow_routine_status|update_rule_status_by_id|wrf|wrf_rule_id : ', wrf_rule_id)
+                if hechms_rule_id != 0 or hechms_rule_id != 0:
+                    if hechms_rule_status == 3 or hechms_rule_status == '3':
+                        db_adapter.update_rule_status_by_id('hechms', hechms_rule_id, 1)
+                        print('update_workflow_routine_status|update_rule_status_by_id|hechms|hechms_rule_id : ',
+                              hechms_rule_id)
+                if flo2d_rule_id != 0 or flo2d_rule_id != 0:
+                    if flo2d_rule_status == 3 or flo2d_rule_status == '3':
+                        db_adapter.update_rule_status_by_id('flo2d', flo2d_rule_id, 1)
+                        print('update_workflow_routine_status|update_rule_status_by_id|flo2d|flo2d_rule_id : ',
+                              flo2d_rule_id)
                 print('routine has completed.')
             else:
                 print('routine hasn\'t completed.')
