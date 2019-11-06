@@ -71,6 +71,7 @@ def get_triggering_dags(db_adapter, dss_rule_id, model_type):
 def update_workflow_routine_status(db_adapter):
     print('update_workflow_routine_status')
     running_routines = db_adapter.get_workflow_routines(2)
+    print('update_workflow_routine_status|running_routines : ', running_routines)
     if len(running_routines) > 0:
         for running_routine in running_routines:
             wrf_completed = False

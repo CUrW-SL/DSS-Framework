@@ -40,7 +40,7 @@ class RuleEngineAdapter:
     @staticmethod
     def get_instance(db_config):
         """ Static access method. """
-        print('get_instance|db_config : ', db_config)
+        #print('get_instance|db_config : ', db_config)
         if RuleEngineAdapter.__instance is None:
             RuleEngineAdapter(db_config['mysql_user'], db_config['mysql_password'],
                               db_config['mysql_host'], db_config['mysql_db'],
@@ -236,6 +236,7 @@ class RuleEngineAdapter:
     def get_workflow_routines(self, status):
         workflow_routines = []
         query = 'select id,dss1,dss2,dss3 from dss.workflow_routines where status={}'.format(status)
+        print('get_workflow_routines|query : ', query)
         results = self.get_multiple_result(query)
         if results is not None:
             for row in results:
@@ -259,6 +260,7 @@ class RuleEngineAdapter:
             query = 'update dss.hechms_rules set status={} where id=\'{}\''.format(status, rule_id)
         elif model == 'flo2d':
             query = 'update dss.flo2d_rules set status={} where id=\'{}\''.format(status, rule_id)
+        print('update_rule_status_by_id|query : ', query)
         self.update_query(query)
 
     def update_rule_status(self, model, rule_name, status):
@@ -268,15 +270,18 @@ class RuleEngineAdapter:
             query = 'update dss.hechms_rules set status={} where name=\'{}\''.format(status, rule_name)
         elif model == 'flo2d':
             query = 'update dss.flo2d_rules set status={} where name=\'{}\''.format(status, rule_name)
+        print('update_rule_status|query : ', query)
         self.update_query(query)
 
     def update_workflow_routing_status(self, status, routine_id):
         query = 'update dss.workflow_routines set status={} where name=\'{}\''.format(status, routine_id)
+        print('update_workflow_routing_status|query : ', query)
         self.update_query(query)
 
     def update_initial_workflow_routing_status(self, status, routine_id):
         query = 'update dss.workflow_routines set status={},last_trigger_date=now()  ' \
                 'where id=\'{}\''.format(status, routine_id)
+        print('update_initial_workflow_routing_status|query : ', query)
         self.update_query(query)
 
     def get_next_workflow_routine(self, schedule_date=None):
@@ -286,6 +291,7 @@ class RuleEngineAdapter:
         else:
             query = 'select id,dss1,dss2,dss3 from dss.workflow_routines where status in (0,3,4)  and ' \
                     'scheduled_date<=\'{}\' order by priority asc limit 1;'.format(schedule_date)
+        print('get_next_workflow_routine|query : ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
         if result is not None:
@@ -301,6 +307,7 @@ class RuleEngineAdapter:
             schedule_date = datetime.strptime(schedule_date, '%Y-%m-%d %H:%M:%S')
         print('schedule_date : ', schedule_date)
         query = 'select id,dss1,dss2,dss3,schedule from dss.workflow_routines where status=1 ;'
+        print('get_next_workflow_routines|query : ', query)
         results = self.get_multiple_result(query)
         routines = []
         if results is not None:
