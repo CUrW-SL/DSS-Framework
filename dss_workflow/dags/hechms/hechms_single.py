@@ -9,6 +9,7 @@ sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
 prod_dag_name = 'hechms_single_dag'
+dag_pool = 'hechms_pool'
 
 
 default_args = {
@@ -69,11 +70,12 @@ def run_this_func(dag_run, **kwargs):
 
 
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
-         description='Run HecHms DAG') as dag:
+         description='Run HecHms DAG', catchup=False) as dag:
     init_hec_single = PythonOperator(
         task_id='init_hec_single',
         provide_context=True,
         python_callable=run_this_func,
+        pool=dag_pool
     )
 
     running_state = PythonOperator(
@@ -81,21 +83,25 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         provide_context=True,
         python_callable=set_running_status,
         dag=dag,
+        pool=dag_pool
     )
 
     create_rainfall = BashOperator(
         task_id='create_rainfall',
         bash_command=create_rainfall_cmd,
+        pool=dag_pool
     )
 
     run_hechms_single = BashOperator(
         task_id='run_hechms_single',
         bash_command=run_hechms_single_cmd,
+        pool=dag_pool
     )
 
     upload_discharge = BashOperator(
         task_id='upload_discharge',
         bash_command=upload_discharge_cmd,
+        pool=dag_pool
     )
 
     complete_state = PythonOperator(
@@ -103,6 +109,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         provide_context=True,
         python_callable=set_complete_status,
         dag=dag,
+        pool=dag_pool
     )
 
     init_hec_single >> running_state >> create_rainfall >> run_hechms_single >> upload_discharge >> complete_state
