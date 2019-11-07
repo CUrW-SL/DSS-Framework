@@ -9,6 +9,7 @@ sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
 prod_dag_name = 'flo2d_250m_dag'
+dag_pool = 'flo2d_pool'
 
 
 default_args = {
@@ -71,12 +72,13 @@ def run_this_func(dag_run, **kwargs):
 
 
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
-         description='Run Flo2d 250m DAG') as dag:
+         description='Run Flo2d 250m DAG', catchup=False) as dag:
 
     init_flo2d_250m = PythonOperator(
         task_id='init_flo2d_250m',
         provide_context=True,
         python_callable=run_this_func,
+        pool=dag_pool
     )
 
     running_state = PythonOperator(
@@ -84,31 +86,37 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         provide_context=True,
         python_callable=set_running_status,
         dag=dag,
+        pool=dag_pool
     )
 
     create_raincell = BashOperator(
         task_id='create_raincell',
         bash_command=create_raincell_cmd,
+        pool=dag_pool
     )
 
     create_inflow = BashOperator(
         task_id='create_inflow',
         bash_command=create_inflow_cmd,
+        pool=dag_pool
     )
 
     create_outflow = BashOperator(
         task_id='create_outflow',
         bash_command=create_outflow_cmd,
+        pool=dag_pool
     )
 
     run_flo2d_250m = BashOperator(
         task_id='run_flo2d_250m',
         bash_command=run_flo2d_250m_cmd,
+        pool=dag_pool
     )
 
     extract_water_level = BashOperator(
         task_id='extract_water_level',
         bash_command=extract_water_level_cmd,
+        pool=dag_pool
     )
 
     complete_state = PythonOperator(
@@ -116,6 +124,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         provide_context=True,
         python_callable=set_complete_status,
         dag=dag,
+        pool=dag_pool
     )
 
     init_flo2d_250m >> running_state >> create_raincell >> create_inflow >> create_outflow >> run_flo2d_250m >> extract_water_level >> complete_state
