@@ -19,6 +19,7 @@ from controller_util import get_triggering_dags, \
 
 prod_dag_name = 'dss_controller_v1'
 schedule_interval = '*/5 * * * *'
+dag_pool = 'parent_pool'
 SKIP = 0
 
 
@@ -138,67 +139,78 @@ with DAG(dag_id=prod_dag_name, default_args=default_args,
     init_routine = PythonOperator(
         task_id='init_routine',
         python_callable=init_workflow_routine,
-        provide_context=True
+        provide_context=True,
+        pool=dag_pool
     )
 
     dss1_branch = BranchPythonOperator(
         task_id='dss1_branch',
         provide_context=True,
-        python_callable=dss1_branch_func
+        python_callable=dss1_branch_func,
+        pool=dag_pool
     )
 
     dss1_dummy = DummyOperator(
-        task_id='dss1_dummy'
+        task_id='dss1_dummy',
+        pool=dag_pool
     )
 
     dss_unit1 = ConditionMultiTriggerDagRunOperator(
         task_id='dss_unit1',
         default_trigger="dss_trigger_target_dag",
         python_callable=conditionally_trigger_dss_unit1,
-        params={'check_rules': True, 'rule_types': ['wrf']}
+        params={'check_rules': True, 'rule_types': ['wrf']},
+        pool=dag_pool
     )
 
     dss2_branch = BranchPythonOperator(
         task_id='dss2_branch',
         provide_context=True,
         python_callable=dss2_branch_func,
-        trigger_rule='none_failed'
+        trigger_rule='none_failed',
+        pool=dag_pool
     )
 
     dss2_dummy = DummyOperator(
-        task_id='dss2_dummy'
+        task_id='dss2_dummy',
+        pool=dag_pool
     )
 
     dss_unit2 = ConditionMultiTriggerDagRunOperator(
         task_id='dss_unit2',
         default_trigger="dss_trigger_target_dag",
         python_callable=conditionally_trigger_dss_unit2,
-        params={'check_rules': True, 'rule_types': ['hechms']}
+        params={'check_rules': True, 'rule_types': ['hechms']},
+        pool=dag_pool
     )
 
     dss3_branch = BranchPythonOperator(
         task_id='dss3_branch',
         provide_context=True,
         python_callable=dss3_branch_func,
-        trigger_rule='none_failed'
+        trigger_rule='none_failed',
+        pool=dag_pool
     )
 
     dss3_dummy = DummyOperator(
-        task_id='dss3_dummy'
+        task_id='dss3_dummy',
+        pool=dag_pool
     )
 
     dss_unit3 = ConditionMultiTriggerDagRunOperator(
         task_id='dss_unit3',
         default_trigger="dss_trigger_target_dag",
         python_callable=conditionally_trigger_dss_unit3,
-        params={'check_rules': True, 'rule_types': ['flo2d']}
+        params={'check_rules': True, 'rule_types': ['flo2d']},
+        pool=dag_pool
     )
 
     end_routine = PythonOperator(
         task_id='end_routine',
         python_callable=end_workflow_routine,
         trigger_rule='none_failed',
-        provide_context=True
+        provide_context=True,
+        pool=dag_pool
     )
 
     init_routine >> \
