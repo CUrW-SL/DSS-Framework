@@ -13,6 +13,7 @@ sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
 prod_dag_name = 'wrf_4.0_SE_dag'
+dag_pool = 'wrf_pool'
 
 default_args = {
     'owner': 'dss admin',
@@ -21,7 +22,6 @@ default_args = {
     'email_on_failure': True,
 }
 
-download_gfs_cmd = 'echo "download_gfs_cmd" ;sleep $[($RANDOM % 10) + 1]s'
 run_wrf4_SE_cmd = 'echo "run_wrf_SE_cmd" ;sleep $[($RANDOM % 1000) + 1]s'
 rfield_gen_cmd = 'echo "rfield_gen_cmd" ;sleep $[($RANDOM % 100) + 1]s'
 data_push_cmd = 'echo "data_push_cmd" ;sleep $[($RANDOM % 10) + 1]s'
@@ -73,12 +73,13 @@ def run_this_func(dag_run, **kwargs):
 
 
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
-         description='Run WRF v4 SE DAG') as dag:
+         description='Run WRF v4 SE DAG', catchup=False) as dag:
     init_wrfv4_SE = PythonOperator(
         task_id='init_wrfv4',
         provide_context=True,
         python_callable=run_this_func,
         dag=dag,
+        pool=dag_pool
     )
 
     running_state = PythonOperator(
@@ -86,6 +87,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         provide_context=True,
         python_callable=set_running_status,
         dag=dag,
+        pool=dag_pool
     )
 
     check_gfs_availability = GfsSensorOperator(
@@ -93,21 +95,25 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         poke_interval=60,
         timeout=60 * 30,
         dag=dag,
+        pool=dag_pool
     )
 
     run_wrf4_SE = BashOperator(
         task_id='run_wrf4_SE',
         bash_command=run_wrf4_SE_cmd,
+        pool=dag_pool
     )
 
     rfield_gen = BashOperator(
         task_id='rfield_gen',
         bash_command=rfield_gen_cmd,
+        pool=dag_pool
     )
 
     wrf_data_push = BashOperator(
         task_id='wrf_data_push',
         bash_command=data_push_cmd,
+        pool=dag_pool
     )
 
     complete_state = PythonOperator(
@@ -115,6 +121,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         provide_context=True,
         python_callable=set_complete_status,
         dag=dag,
+        pool=dag_pool
     )
 
     init_wrfv4_SE >> running_state >> check_gfs_availability >> run_wrf4_SE >> rfield_gen >> wrf_data_push >> complete_state
