@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from airflow import DAG
 #from airflow.operators import ConditionMultiTriggerDagRunOperator
 from airflow.operators.python_operator import PythonOperator, BranchPythonOperator
@@ -130,6 +130,8 @@ default_args = {
     'start_date': datetime.strptime('2019-11-03 02:15:00', '%Y-%m-%d %H:%M:%S'),
     'email': ['hasithadkr7@gmail.com'],
     'email_on_failure': True,
+    'retries': 1,
+    'retry_delay': timedelta(seconds=30),
 }
 
 
