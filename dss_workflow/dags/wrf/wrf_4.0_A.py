@@ -24,7 +24,6 @@ default_args = {
 #./runner.sh -r 0 -m E -v 4.0 -h 18 -d 2019-10-24
 #./rfielder.sh -r 0 -m E -v 4.0 -h 18
 
-download_gfs_cmd = 'echo "download_gfs_cmd" ;sleep $[($RANDOM % 10) + 1]s'
 run_wrf4_A_cmd = 'echo "run_wrf_A_cmd" ;sleep $[($RANDOM % 1000) + 1]s'
 rfield_gen_cmd = 'echo "rfield_gen_cmd" ;sleep $[($RANDOM % 100) + 1]s'
 data_push_cmd = 'echo "data_push_cmd" ;sleep $[($RANDOM % 10) + 1]s'
@@ -76,7 +75,7 @@ def run_this_func(dag_run, **kwargs):
 
 
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
-         description='Run WRF v4 A DAG') as dag:
+         description='Run WRF v4 A DAG', catchup=False) as dag:
     init_wrfv4_A = PythonOperator(
         task_id='init_wrfv4',
         provide_context=True,
