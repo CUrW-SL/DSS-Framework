@@ -1,5 +1,9 @@
 # building docker image
 docker build -t curw-wrfv4:ubuntu1604 .
+docker build -t curw-wrfv4:wrf_4.0_A .
+docker build -t curw-wrfv4:wrf_4.0_C .
+docker build -t curw-wrfv4:wrf_4.0_E .
+docker build -t curw-wrfv4:wrf_4.0_SE .
 
 # build docker image without using cache
 docker build --no-cache -t curw-wrfv4:ubuntu1604 .
