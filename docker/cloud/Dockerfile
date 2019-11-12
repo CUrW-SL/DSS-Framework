@@ -122,7 +122,8 @@ RUN wget https://github.com/wrf-model/WRF/archive/v4.1.2.tar.gz \
 # Installing & building WRF. WRF-4.1.2.tar.gz
 #RUN tar -xvzf  WRFV$WRF_VERSION.TAR.gz \
 RUN tar -xvzf  v4.1.2.tar.gz \
-    && cd ./WRF-4.1.2 \
+    && mv WRF-4.1.2 WRF \
+    && cd ./WRF \
     && echo $WRF_CONFIGURE_OPTION | ./configure  \
     && ./compile em_real >> log.compile 2>&1 \
     && cd ..
