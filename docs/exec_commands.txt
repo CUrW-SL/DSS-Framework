@@ -69,4 +69,6 @@ smtp_mail_from = curwalerts@gmail.com
 "ssh -i /home/uwcc-admin/.ssh/uwcc-admin -o \"StrictHostKeyChecking no\" uwcc-admin@10.138.0.9 " \
 "\'bash -c \"/home/uwcc-admin/jaxa/create_jaxa_rfield.sh\"'"
 
+# remove docker image
+docker rmi curw-wrfv4:wrf_4.1_A
 
