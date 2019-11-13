@@ -26,12 +26,17 @@ RUN apt-get update \
         m4 \
         nco \
         libhdf5-mpich-dev \
-        libjasper-dev \
         libnetcdff-dev \
         netcdf-bin \
         ncl-ncarg \
         python3.6 \
         python3-pip
+
+RUN add-apt-repository "deb http://security.ubuntu.com/ubuntu xenial-security main" \
+    && apt update \
+    && apt install -y --allow-unauthenticated \
+        libjasper1 \
+        libjasper-dev
 
 RUN echo "deb http://mirrors.kernel.org/ubuntu/ xenial main" | tee -a /etc/apt/sources.list \
     && apt-get update \
