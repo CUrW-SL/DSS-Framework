@@ -1,7 +1,7 @@
 FROM centos:latest
 MAINTAINER niranda perera <niranda.17@cse.mrt.ac.lk>
 #
-# This Dockerfile compiles WRF from source during "docker build" step
+# This Dockerfile_wrf_4.0.0 compiles WRF from source during "docker build" step
 ENV WRF_VERSION 3.9.1.1
 ENV WPS_VERSION 3.9.1
 
