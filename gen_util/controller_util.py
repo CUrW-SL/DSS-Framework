@@ -11,7 +11,7 @@ def get_triggering_dags(db_adapter, dss_rule_id, model_type):
     print('get_triggering_dags|model_type : ', model_type)
     dag_info = []
     if model_type is 'wrf':
-        wrf_rule_info = db_adapter.get_wrf_rule_info_by_id(dss_rule_id)
+        wrf_rule_info = db_adapter.get_eligible_wrf_rule_info_by_id(dss_rule_id)
         print('get_triggering_dags|wrf_rule_info : ', wrf_rule_info)
         if wrf_rule_info:
             target_models = wrf_rule_info['target_model'].split(',')
@@ -26,7 +26,7 @@ def get_triggering_dags(db_adapter, dss_rule_id, model_type):
         else:
             print('No wrf rules found.')
     elif model_type is 'hechms':
-        hechms_rule_info = db_adapter.get_hechms_rule_info_by_id(dss_rule_id)
+        hechms_rule_info = db_adapter.get_eligible_hechms_rule_info_by_id(dss_rule_id)
         if hechms_rule_info:
             target_models = hechms_rule_info['target_model'].split(',')
             for target_model in target_models:
@@ -44,7 +44,7 @@ def get_triggering_dags(db_adapter, dss_rule_id, model_type):
         else:
             print('No hechms rules found.')
     elif model_type is 'flo2d':
-        flo2d_rule_info = db_adapter.get_flo2d_rule_info_by_id(dss_rule_id)
+        flo2d_rule_info = db_adapter.get_eligible_flo2d_rule_info_by_id(dss_rule_id)
         if flo2d_rule_info:
             target_models = flo2d_rule_info['target_model'].split(',')
             for target_model in target_models:
