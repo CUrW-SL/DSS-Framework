@@ -5,7 +5,7 @@
  run_seconds                         = 0,
  start_year                          = YYYY1, YYYY1,  YYYY1,
  start_month                         = MM1, MM1,  MM1,
- start_day                           = DD1, DD1,  DD1,rsl.error.0000
+ start_day                           = DD1, DD1,  DD1,
  start_hour                          = hh1,   hh1,   hh1,
  start_minute                        = mm1,   mm1,   mm1,
  start_second                        = 00,   00,   00,
@@ -29,13 +29,13 @@
  /
 
  &domains
- time_step                           = 150,
+ time_step                           = 180,
  time_step_fract_num                 = 0,
  time_step_fract_den                 = 1,
  max_dom                             = 3,
  e_we                                = 80,    103,   100,
- e_sn                                = 90,    121,   163,
- e_vert                              = 35,    35,    35,
+ e_sn                                = 90,    121,    163,
+ e_vert                              = 42,    42,    42,
  p_top_requested                     = 5000,
  num_metgrid_levels                  = 34,
  num_metgrid_soil_levels             = 4,
@@ -60,7 +60,7 @@
  sf_surface_physics                  = 2,     2,     2,
  bl_pbl_physics                      = 1,     1,     1,
  bldt                                = 0,     0,     0,
- cu_physics                          = 1,     1,     0,
+ cu_physics                          = 1,     1,     1,
  cudt                                = 5,     5,     5,
  isfflx                              = 1,
  ifsnow                              = 0,
@@ -68,8 +68,7 @@
  surface_input_source                = 1,
  num_soil_layers                     = 4,
  sf_urban_physics                    = 0,     0,     0,
- kfeta_trigger                       = 2,
-/
+ /
 
  &fdda
  /
