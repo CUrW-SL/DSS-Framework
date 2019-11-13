@@ -2,7 +2,7 @@ FROM ubuntu:18.04
 MAINTAINER Hasitha Dhananjaya <hasitha.10@cse.mrt.ac.lk>
 
 ENV WRF_VERSION 4.1.2
-ENV WPS_VERSION 4.0
+ENV WPS_VERSION 4.1
 ENV WRF_CONFIGURE_OPTION 34
 ENV WPS_CONFIGURE_OPTION 1
 
@@ -25,9 +25,6 @@ RUN apt-get update \
         file \
         m4 \
         nco \
-        libhdf5-mpich-dev \
-        libnetcdff-dev \
-        netcdf-bin \
         ncl-ncarg \
         python3.6 \
         python3-pip
