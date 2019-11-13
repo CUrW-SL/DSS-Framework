@@ -13,6 +13,8 @@ RUN apt-get update \
     && apt-get update \
     && apt-get install -y --allow-unauthenticated \
         wget \
+        zip \
+        unzip \
         gcc \
         csh \
         gfortran \
@@ -114,7 +116,7 @@ ENV JASPERINC "$DIR/grib2/include"
 WORKDIR /home/Build_WRF
 
 RUN wget https://github.com/wrf-model/WRF/archive/v4.1.2.tar.gz \
-    && wget http://www2.mmm.ucar.edu/wrf/src/WPSV$WPS_VERSION.TAR.gz
+    && wget https://github.com/wrf-model/WPS/archive/master.zip
 
 # Installing & building WRF. WRF-4.1.2.tar.gz
 RUN tar -xvzf  v4.1.2.tar.gz \
@@ -125,7 +127,8 @@ RUN tar -xvzf  v4.1.2.tar.gz \
     && cd ..
 
 # Installing & building WPS
-RUN tar -xvzf  WPSV$WPS_VERSION.TAR.gz \
+RUN unzip  master.zip \
+    && mv WPS-master WPS \
     && cd ./WPS \
     && export JASPERLIB=$DIR/grib2/lib \
     && export JASPERINC=$DIR/grib2/include \
