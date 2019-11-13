@@ -1,7 +1,7 @@
 FROM ubuntu:16.04
 MAINTAINER Hasitha Dhananjaya <hasitha.10@cse.mrt.ac.lk>
 
-ENV WRF_VERSION 4.1.2
+ENV WRF_VERSION 4.0
 ENV WPS_VERSION 4.0
 ENV WRF_CONFIGURE_OPTION 34
 ENV WPS_CONFIGURE_OPTION 1
@@ -120,9 +120,9 @@ RUN wget https://github.com/wrf-model/WRF/archive/v4.1.2.tar.gz \
     && wget http://www2.mmm.ucar.edu/wrf/src/WPSV$WPS_VERSION.TAR.gz
 
 # Installing & building WRF. WRF-4.1.2.tar.gz
-#RUN tar -xvzf  WRFV$WRF_VERSION.TAR.gz \
-RUN tar -xvzf  v4.1.2.tar.gz \
-    && mv WRF-4.1.2 WRF \
+RUN tar -xvzf  WRFV$WRF_VERSION.TAR.gz \
+#RUN tar -xvzf  v4.1.2.tar.gz \
+#    && mv WRF-4.1.2 WRF \
     && cd ./WRF \
     && echo $WRF_CONFIGURE_OPTION | ./configure  \
     && ./compile em_real >> log.compile 2>&1 \
