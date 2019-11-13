@@ -135,6 +135,25 @@ class RuleEngineAdapter:
                         'check_gfs_data_availability': result[7]}
         return wrf_rule
 
+    def get_eligible_wrf_rule_info_by_id(self, rule_id):
+        '''
+        :param status:0-disable,1-enable,2-running,3-completed
+        :return:[{}{}]
+        '''
+        wrf_rule = None
+        query = 'select id, name, target_model, version, run, hour, ignore_previous_run, ' \
+                'check_gfs_data_availability from dss.wrf_rules ' \
+                'where id = {} and status in (1,3)  '.format(rule_id)
+        print('get_wrf_rule_info_by_id|query : ', query)
+        self.cursor.execute(query)
+        result = self.cursor.fetchone()
+        if result is not None:
+            wrf_rule = {'id': result[0], 'name': result[1], 'target_model': result[2],
+                        'version': result[3], 'run': result[4],
+                        'hour': result[5], 'ignore_previous_run': result[6],
+                        'check_gfs_data_availability': result[7]}
+        return wrf_rule
+
     def get_wrf_rule_status_by_id(self, rule_id):
         '''
         :param status:0-disable,1-enable,2-running,3-completed
@@ -180,6 +199,22 @@ class RuleEngineAdapter:
                             'ignore_previous_run': result[9]}
         return hechms_rule
 
+    def get_eligible_hechms_rule_info_by_id(self, id):
+        hechms_rule = None
+        query = 'select id, name, target_model,forecast_days, observed_days, ' \
+                'init_run, no_forecast_continue, no_observed_continue, rainfall_data_from, ' \
+                'ignore_previous_run from dss.hechms_rules where status in (1,3) and id = {}'.format(id)
+        print('get_hechms_rule_info_by_id|query : ', query)
+        self.cursor.execute(query)
+        result = self.cursor.fetchone()
+        if result is not None:
+            hechms_rule = {'id': result[0], 'name': result[1], 'target_model': result[2],
+                           'forecast_days': result[3], 'observed_days': result[4],
+                           'init_run': result[5], 'no_forecast_continue': result[6],
+                           'no_observed_continue': result[7], 'rainfall_data_from': result[8],
+                           'ignore_previous_run': result[9]}
+        return hechms_rule
+
     def get_hechms_rule_status_by_id(self, id):
         hechms_rule = None
         query = 'select id, status from dss.hechms_rules where id = {}'.format(id)
@@ -212,6 +247,23 @@ class RuleEngineAdapter:
                 'no_forecast_continue, no_observed_continue, raincell_data_from, ' \
                 'inflow_data_from, outflow_data_from, ignore_previous_run ' \
                 'from dss.flo2d_rules where status={} and id={}'.format(status, id)
+        print('get_flo2d_rule_info_by_id|query : ', query)
+        self.cursor.execute(query)
+        result = self.cursor.fetchone()
+        if result is not None:
+            flo2d_rule = {'id': result[0], 'name': result[1], 'target_model': result[2],
+                          'forecast_days': result[3], 'observed_days': result[4],
+                          'no_forecast_continue': result[5], 'no_observed_continue': result[6],
+                          'raincell_data_from': result[7], 'inflow_data_from': result[8],
+                          'outflow_data_from': result[9], 'ignore_previous_run': result[10]}
+        return flo2d_rule
+
+    def get_eligible_flo2d_rule_info_by_id(self, id):
+        flo2d_rule = None
+        query = 'select id, name, target_model, forecast_days, observed_days, ' \
+                'no_forecast_continue, no_observed_continue, raincell_data_from, ' \
+                'inflow_data_from, outflow_data_from, ignore_previous_run ' \
+                'from dss.flo2d_rules where status in (1,3) and id={}'.format(id)
         print('get_flo2d_rule_info_by_id|query : ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
