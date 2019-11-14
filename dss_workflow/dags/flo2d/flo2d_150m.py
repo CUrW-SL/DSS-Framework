@@ -8,6 +8,9 @@ import sys
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
+sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/dss_workflow/plugins/operators')
+from workflow_completion_sensor import WorkflowSensorOperator
+
 prod_dag_name = 'flo2d_150m_dag'
 dag_pool = 'flo2d_pool'
 
