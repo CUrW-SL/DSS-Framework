@@ -16,21 +16,21 @@ def check_completion(model, rule_id):
     try:
         adapter = RuleEngineAdapter.get_instance(db_config)
         if model == 'wrf':
-            print('WRF')
+            print('check_completion|WRF')
             wrf_rule = adapter.get_wrf_rule_status_by_id(rule_id)
             if wrf_rule is not None:
                 wrf_rule_status = wrf_rule['status']
                 if wrf_rule_status == 3 or wrf_rule_status == '3':
                     completed = True
         elif model == 'hechms':
-            print('HecHms')
+            print('check_completion|HecHms')
             hechms_rule = adapter.get_hechms_rule_status_by_id(rule_id)
             if hechms_rule is not None:
                 hechms_rule_rule_status = hechms_rule['status']
                 if hechms_rule_rule_status == 3 or hechms_rule_rule_status == '3':
                     completed = True
         elif model == 'flo2d':
-            print('Flo2d')
+            print('check_completion|Flo2d')
             flo2d_rule = adapter.get_hechms_rule_status_by_id(rule_id)
             if flo2d_rule is not None:
                 flo2d_rule_rule_status = flo2d_rule['status']
