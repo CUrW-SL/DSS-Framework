@@ -25,6 +25,9 @@ echo "START_DATE : $START_DATE"
 echo "RUN_ID : $RUN_ID"
 echo "MODE : $MODE"
 echo "#### Running WRF procedures..."
+
+ulimit -s unlimited
+
 cd /home/Build_WRF/code
 echo "Inside $(pwd)"
 python3 wrfv4_run.py \
