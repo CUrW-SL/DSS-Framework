@@ -110,6 +110,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         task_id='check_hechms_completion',
         poke_interval=60,
         timeout=30,
+        params={'model': 'hechms'},
         provide_context=True,
         dag=dag)
 
