@@ -93,7 +93,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         task_id='check_wrf_completion',
         poke_interval=60,
         timeout=60 * 6 * 60,
-        params={'model': 'wrf'},
+        params={'model': 'wrf', 'init_task_id': 'init_hec_single'},
         provide_context=True,
         dag=dag)
 
