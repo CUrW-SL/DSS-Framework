@@ -143,5 +143,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    init_flo2d_150m >> running_state >> create_raincell >> create_inflow >> create_outflow >> run_flo2d_150m >> extract_water_level >> complete_state
+    init_flo2d_150m >> running_state >> check_wrf_completion >> create_raincell >> \
+    check_hechms_completion >> create_inflow >> create_outflow >> run_flo2d_150m >> \
+    extract_water_level >> complete_state
 
