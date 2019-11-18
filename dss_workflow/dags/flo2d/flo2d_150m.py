@@ -91,11 +91,25 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
+    check_wrf_completion = WorkflowSensorOperator(
+        task_id='check_wrf_completion',
+        poke_interval=60,
+        timeout=60 * 6 * 60,
+        provide_context=True,
+        dag=dag)
+
     create_raincell = BashOperator(
         task_id='create_raincell',
         bash_command=create_raincell_cmd,
         pool=dag_pool
     )
+
+    check_hechms_completion = WorkflowSensorOperator(
+        task_id='check_hechms_completion',
+        poke_interval=60,
+        timeout=30,
+        provide_context=True,
+        dag=dag)
 
     create_inflow = BashOperator(
         task_id='create_inflow',
