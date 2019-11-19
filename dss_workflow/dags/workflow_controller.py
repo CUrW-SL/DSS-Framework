@@ -60,16 +60,24 @@ def conditionally_trigger_dss_unit1(context):
     print('***************************conditionally_trigger_dss_unit1**********************************')
     print('conditionally_trigger_dss_unit1')
     """This function decides whether or not to Trigger the remote DAG"""
-    dss1_rule_id = context['task_instance'].xcom_pull(task_ids='init_routine')['dss1']
-    print('dss1_branch_func|dss1_rule_id : ', dss1_rule_id)
+    routine_id = context['task_instance'].xcom_pull(task_ids='init_routine')['id']
+    print('dss1_branch_func|routine_id : ', routine_id)
     db_config = Variable.get('db_config', deserialize_json=True)
     adapter = RuleEngineAdapter.get_instance(db_config)
-    if context['params']['check_rules']:
-        dag_info = get_triggering_dags(adapter, dss1_rule_id, 'wrf')
-        if len(dag_info):
-            return dag_info
+    workflow_routine = adapter.get_workflow_routine_info(routine_id)
+    if workflow_routine is not None:
+        dss_unit_id = workflow_routine['dss1']
+        print('dss1_branch_func|dss_unit_id : ', dss_unit_id)
+        if context['params']['check_rules']:
+            dag_info = get_triggering_dags(adapter, dss_unit_id, 'wrf')
+            if len(dag_info):
+                return dag_info
+            else:
+                return []
         else:
             return []
+    else:
+        return []
 
 
 def dss2_branch_func(**context):
