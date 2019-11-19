@@ -166,6 +166,7 @@ class RuleEngineAdapter:
         result = self.cursor.fetchone()
         if result is not None:
             wrf_rule = {'id': result[0], 'status': result[1]}
+            print('get_wrf_rule_status_by_id|wrf_rule : ', wrf_rule)
         return wrf_rule
 
     def get_hechms_rule_info(self, status=1):

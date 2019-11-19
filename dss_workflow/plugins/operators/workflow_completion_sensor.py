@@ -18,6 +18,7 @@ def check_completion(model, rule_id):
         if model == 'wrf':
             print('check_completion|WRF')
             wrf_rule = adapter.get_wrf_rule_status_by_id(rule_id)
+            print('check_completion|wrf_rule : ', wrf_rule)
             if wrf_rule is not None:
                 wrf_rule_status = wrf_rule['status']
                 if wrf_rule_status == 3 or wrf_rule_status == '3':
@@ -25,6 +26,7 @@ def check_completion(model, rule_id):
         elif model == 'hechms':
             print('check_completion|HecHms')
             hechms_rule = adapter.get_hechms_rule_status_by_id(rule_id)
+            print('check_completion|hechms_rule : ', hechms_rule)
             if hechms_rule is not None:
                 hechms_rule_rule_status = hechms_rule['status']
                 if hechms_rule_rule_status == 3 or hechms_rule_rule_status == '3':
@@ -32,12 +34,13 @@ def check_completion(model, rule_id):
         elif model == 'flo2d':
             print('check_completion|Flo2d')
             flo2d_rule = adapter.get_hechms_rule_status_by_id(rule_id)
+            print('check_completion|flo2d_rule : ', flo2d_rule)
             if flo2d_rule is not None:
                 flo2d_rule_rule_status = flo2d_rule['status']
                 if flo2d_rule_rule_status == 3 or flo2d_rule_rule_status == '3':
                     completed = True
     except Exception as ex:
-        print('update_workflow_status|db_adapter|Exception: ', str(ex))
+        print('check_completion|Exception: ', str(ex))
     return completed
 
 
