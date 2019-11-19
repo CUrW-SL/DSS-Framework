@@ -40,7 +40,6 @@ def init_workflow_routine(**context):
 
 def dss1_branch_func(**context):
     print('***************************dss1_branch_func**********************************')
-    # dss1_rule = context['task_instance'].xcom_pull(task_ids='init_routine')['dss1']
     routine_id = context['task_instance'].xcom_pull(task_ids='init_routine')['id']
     print('dss1_branch_func|routine_id : ', routine_id)
     db_config = Variable.get('db_config', deserialize_json=True)
@@ -75,12 +74,19 @@ def conditionally_trigger_dss_unit1(context):
 
 def dss2_branch_func(**context):
     print('***************************dss2_branch_func**********************************')
-    dss2_rule = context['task_instance'].xcom_pull(task_ids='init_routine')['dss2']
-    print('dss2_rule : ', dss2_rule)
-    if dss2_rule == SKIP:
-        return 'dss2_dummy'
+    routine_id = context['task_instance'].xcom_pull(task_ids='init_routine')['id']
+    print('dss2_branch_func|routine_id : ', routine_id)
+    db_config = Variable.get('db_config', deserialize_json=True)
+    adapter = RuleEngineAdapter.get_instance(db_config)
+    workflow_routine = adapter.get_workflow_routine_info(routine_id)
+    if workflow_routine is not None:
+        dss_unit_id = workflow_routine['dss2']
+        if dss_unit_id == SKIP:
+            return 'dss2_dummy'
+        else:
+            return 'dss_unit2'
     else:
-        return 'dss_unit2'
+        return 'dss2_dummy'
 
 
 def conditionally_trigger_dss_unit2(context):
