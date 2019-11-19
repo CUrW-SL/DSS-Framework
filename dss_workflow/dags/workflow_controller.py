@@ -107,12 +107,19 @@ def conditionally_trigger_dss_unit2(context):
 
 def dss3_branch_func(**context):
     print('***************************dss3_branch_func**********************************')
-    dss3_rule = context['task_instance'].xcom_pull(task_ids='init_routine')['dss3']
-    print('dss3_rule : ', dss3_rule)
-    if dss3_rule == SKIP:
-        return 'dss3_dummy'
+    routine_id = context['task_instance'].xcom_pull(task_ids='init_routine')['id']
+    print('dss2_branch_func|routine_id : ', routine_id)
+    db_config = Variable.get('db_config', deserialize_json=True)
+    adapter = RuleEngineAdapter.get_instance(db_config)
+    workflow_routine = adapter.get_workflow_routine_info(routine_id)
+    if workflow_routine is not None:
+        dss_unit_id = workflow_routine['dss3']
+        if dss_unit_id == SKIP:
+            return 'dss3_dummy'
+        else:
+            return 'dss_unit3'
     else:
-        return 'dss_unit3'
+        return 'dss3_dummy'
 
 
 def conditionally_trigger_dss_unit3(context):
