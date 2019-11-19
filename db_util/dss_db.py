@@ -93,7 +93,7 @@ class RuleEngineAdapter:
                 self.log.error('no result|query:'.format(sql_query))
                 return None
         except Exception as ex:
-            print('get_single_result|Exception : ', str(ex))
+            print('get_multiple_result|Exception : ', str(ex))
             self.log.error('exception|query:'.format(sql_query))
             return None
 
@@ -294,6 +294,15 @@ class RuleEngineAdapter:
             for row in results:
                 workflow_routines.append({'id': row[0], 'dss1': row[1], 'dss2': row[2], 'dss3': row[3]})
         return workflow_routines
+
+    def get_workflow_routine_info(self, routine_id):
+        workflow_routine = None
+        query = 'select id,dss1,dss2,dss3 from dss.workflow_routines where routine_id={}'.format(routine_id)
+        print('get_workflow_routines|query : ', query)
+        result = self.get_single_result(query)
+        if result is not None:
+            workflow_routine = {'id': result[0], 'dss1': result[1], 'dss2': result[2], 'dss3': result[3]}
+        return workflow_routine
 
     def update_query(self, query):
         cursor = self.cursor
