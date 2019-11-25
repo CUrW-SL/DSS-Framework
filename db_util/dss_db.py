@@ -299,8 +299,9 @@ class RuleEngineAdapter:
     def get_workflow_routine_info(self, routine_id):
         workflow_routine = None
         query = 'select id,dss1,dss2,dss3 from dss.workflow_routines where id={}'.format(routine_id)
-        print('get_workflow_routines|query : ', query)
+        print('get_workflow_routine_info|query : ', query)
         result = self.get_single_result(query)
+        print('get_workflow_routine_info|result : ', result)
         if result is not None:
             workflow_routine = {'id': result[0], 'dss1': result[1], 'dss2': result[2], 'dss3': result[3]}
         return workflow_routine
