@@ -11,9 +11,6 @@ from dss_db import RuleEngineAdapter
 
 def check_completion(model, rule_id):
     completed = False
-    wrf_rule = None
-    hechms_rule = None
-    flo2d_rule = None
     print('check_completion|[model, rule_id] : ', [model, rule_id])
     db_config = Variable.get('db_config', deserialize_json=True)
     try:
@@ -36,7 +33,7 @@ def check_completion(model, rule_id):
                     completed = True
         elif model == 'flo2d':
             print('check_completion|Flo2d')
-            flo2d_rule = adapter.get_hechms_rule_status_by_id(rule_id)
+            flo2d_rule = adapter.get_flo2d_rule_info_by_id(rule_id)
             print('check_completion|flo2d_rule : ', flo2d_rule)
             if flo2d_rule is not None:
                 flo2d_rule_rule_status = flo2d_rule['status']
