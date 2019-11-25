@@ -388,7 +388,7 @@ class RuleEngineAdapter:
 
 
 if __name__ == "__main__":
-    db_config = {'mysql_user': 'admin', 'mysql_password': 'floody', 'mysql_host': 'localhost', 'mysql_db': 'dss',
+    db_config = {'mysql_user': 'admin', 'mysql_password': 'floody', 'mysql_host': '35.227.163.211', 'mysql_db': 'dss',
                  'log_path': '/home/hasitha/PycharmProjects/DSS-Framework/log'}
     adapter = RuleEngineAdapter.get_instance(db_config)
     print(adapter)
