@@ -349,10 +349,10 @@ class RuleEngineAdapter:
     def get_next_workflow_routine(self, schedule_date=None):
         if schedule_date is None:
             query = 'select id,dss1,dss2,dss3 from dss.workflow_routines where status in (0,3,4) and ' \
-                    'scheduled_date<=now() order by priority asc limit 1;'
+                    'scheduled_date<=now() ;'
         else:
             query = 'select id,dss1,dss2,dss3 from dss.workflow_routines where status in (0,3,4)  and ' \
-                    'scheduled_date<=\'{}\' order by priority asc limit 1;'.format(schedule_date)
+                    'scheduled_date<=\'{}\';'.format(schedule_date)
         print('get_next_workflow_routine|query : ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
