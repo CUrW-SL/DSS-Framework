@@ -81,7 +81,6 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         task_id='init_wrfv4A',
         provide_context=True,
         python_callable=run_this_func,
-        dag=dag,
         pool=dag_pool
     )
 
@@ -89,7 +88,6 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         task_id='running_state_wrfv4A',
         provide_context=True,
         python_callable=set_running_status,
-        dag=dag,
         pool=dag_pool
     )
 
@@ -97,7 +95,6 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         task_id='check_gfs_availability_wrfv4A',
         poke_interval=60,
         timeout=60 * 30,
-        dag=dag,
         pool=dag_pool
     )
 
@@ -123,7 +120,6 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         task_id='complete_state_wrfv4A',
         provide_context=True,
         python_callable=set_complete_status,
-        dag=dag,
         pool=dag_pool
     )
 
