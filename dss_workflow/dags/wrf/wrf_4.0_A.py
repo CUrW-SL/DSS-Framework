@@ -95,6 +95,8 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         task_id='check_gfs_availability_wrfv4A',
         poke_interval=60,
         timeout=60 * 30,
+        params={'model': 'A', 'init_task_id': 'init_wrfv4A'},
+        provide_context=True,
         pool=dag_pool
     )
 
