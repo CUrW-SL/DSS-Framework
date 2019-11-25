@@ -374,11 +374,14 @@ class RuleEngineAdapter:
         routines = []
         if results is not None:
             for result in results:
+                print('get_next_workflow_routines|result : ', result)
                 routines.append({'id': result[0], 'dss1': result[1], 'dss2': result[2],
                                  'dss3': result[3], 'schedule': result[4]})
+        print('get_next_workflow_routines|routines : ', routines)
         if len(routines) > 0:
             routine = get_next_scheduled_workflow(schedule_date, routines)
             if routine:
+                print('update_initial_workflow_routing_status.')
                 self.update_initial_workflow_routing_status(1, routine['id'])
                 return routine
             else:
