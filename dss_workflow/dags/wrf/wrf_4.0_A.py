@@ -43,7 +43,7 @@ def update_workflow_status(status, rule_id):
 
 
 def get_rule_id(context):
-    rule_info = context['task_instance'].xcom_pull(task_ids='init_wrfv4')['rule_info']
+    rule_info = context['task_instance'].xcom_pull(task_ids='init_wrfv4A')['rule_info']
     if rule_info:
         rule_id = rule_info['id']
         print('get_rule_id|rule_id : ', rule_id)
@@ -78,23 +78,23 @@ def run_this_func(dag_run, **kwargs):
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
          description='Run WRF v4 A DAG', catchup=False) as dag:
     init_wrfv4_A = PythonOperator(
-        task_id='init_wrfv4',
+        task_id='init_wrfv4A',
         provide_context=True,
         python_callable=run_this_func,
         dag=dag,
         pool=dag_pool
     )
 
-    running_state = PythonOperator(
-        task_id='running_state',
+    running_state_wrfv4A = PythonOperator(
+        task_id='running_state_wrfv4A',
         provide_context=True,
         python_callable=set_running_status,
         dag=dag,
         pool=dag_pool
     )
 
-    check_gfs_availability = GfsSensorOperator(
-        task_id='check_gfs_availability',
+    check_gfs_availability_wrfv4A = GfsSensorOperator(
+        task_id='check_gfs_availability_wrfv4A',
         poke_interval=60,
         timeout=60 * 30,
         dag=dag,
@@ -107,25 +107,25 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    rfield_gen = BashOperator(
-        task_id='rfield_gen',
+    rfield_gen_wrfv4A = BashOperator(
+        task_id='rfield_gen_wrfv4A',
         bash_command=rfield_gen_cmd,
         pool=dag_pool
     )
 
-    wrf_data_push = BashOperator(
-        task_id='wrf_data_push',
+    wrf_data_push_wrfv4A = BashOperator(
+        task_id='wrf_data_push_wrfv4A',
         bash_command=data_push_cmd,
         pool=dag_pool
     )
 
-    complete_state = PythonOperator(
-        task_id='complete_state',
+    complete_state_wrfv4A = PythonOperator(
+        task_id='complete_state_wrfv4A',
         provide_context=True,
         python_callable=set_complete_status,
         dag=dag,
         pool=dag_pool
     )
 
-    init_wrfv4_A >> running_state >> check_gfs_availability >> run_wrf4_A >> rfield_gen >> wrf_data_push >> complete_state
+    init_wrfv4_A >> running_state_wrfv4A >> check_gfs_availability_wrfv4A >> run_wrf4_A >> rfield_gen_wrfv4A >> wrf_data_push_wrfv4A >> complete_state_wrfv4A
 

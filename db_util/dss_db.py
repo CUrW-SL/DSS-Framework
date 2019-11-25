@@ -400,7 +400,8 @@ if __name__ == "__main__":
     print(adapter)
     adapter = RuleEngineAdapter.get_instance(db_config)
     print(adapter)
-    result = adapter.get_next_workflow_routines()
+    # result = adapter.get_next_workflow_routines()
+    result = adapter.get_wrf_rule_status_by_id(2)
     print(result)
 
 

@@ -81,24 +81,24 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    running_state = PythonOperator(
-        task_id='running_state',
+    running_state_hec_dis = PythonOperator(
+        task_id='running_state_hec_dis',
         provide_context=True,
         python_callable=set_running_status,
         dag=dag,
         pool=dag_pool
     )
 
-    check_wrf_completion = WorkflowSensorOperator(
-        task_id='check_wrf_completion',
+    check_wrf_hec_dis = WorkflowSensorOperator(
+        task_id='check_wrf_hec_dis',
         poke_interval=60,
         timeout=60 * 6 * 60,
         params={'model': 'wrf', 'init_task_id': 'init_hec_distributed'},
         provide_context=True,
         dag=dag)
 
-    create_rainfall = BashOperator(
-        task_id='create_rainfall',
+    create_rainfall_hec_dis = BashOperator(
+        task_id='create_rainfall_hec_dis',
         bash_command=create_rainfall_cmd,
         pool=dag_pool
     )
@@ -109,21 +109,21 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    upload_discharge = BashOperator(
-        task_id='upload_discharge',
+    upload_discharge_hec_dis = BashOperator(
+        task_id='upload_discharge_hec_dis',
         bash_command=upload_discharge_cmd,
         pool=dag_pool
     )
 
-    complete_state = PythonOperator(
-        task_id='complete_state',
+    complete_state_hec_dis = PythonOperator(
+        task_id='complete_state_hec_dis',
         provide_context=True,
         python_callable=set_complete_status,
         dag=dag,
         pool=dag_pool
     )
 
-    init_hec_distributed >> running_state >> check_wrf_completion\
-    >> create_rainfall >> run_hechms_distributed >> upload_discharge\
-    >> complete_state
+    init_hec_distributed >> running_state_hec_dis >> check_wrf_hec_dis\
+    >> create_rainfall_hec_dis >> run_hechms_distributed >> upload_discharge_hec_dis\
+    >> complete_state_hec_dis
 

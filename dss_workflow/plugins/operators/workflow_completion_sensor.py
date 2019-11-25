@@ -11,6 +11,9 @@ from dss_db import RuleEngineAdapter
 
 def check_completion(model, rule_id):
     completed = False
+    wrf_rule = None
+    hechms_rule = None
+    flo2d_rule = None
     print('check_completion|[model, rule_id] : ', [model, rule_id])
     db_config = Variable.get('db_config', deserialize_json=True)
     try:

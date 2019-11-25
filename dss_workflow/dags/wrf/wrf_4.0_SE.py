@@ -40,7 +40,7 @@ def update_workflow_status(status, rule_id):
 
 
 def get_rule_id(context):
-    rule_info = context['task_instance'].xcom_pull(task_ids='init_wrfv4')['rule_info']
+    rule_info = context['task_instance'].xcom_pull(task_ids='init_wrfv4SE')['rule_info']
     if rule_info:
         rule_id = rule_info['id']
         print('get_rule_id|rule_id : ', rule_id)
@@ -75,7 +75,7 @@ def run_this_func(dag_run, **kwargs):
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
          description='Run WRF v4 SE DAG', catchup=False) as dag:
     init_wrfv4_SE = PythonOperator(
-        task_id='init_wrfv4',
+        task_id='init_wrfv4SE',
         provide_context=True,
         python_callable=run_this_func,
         dag=dag,
