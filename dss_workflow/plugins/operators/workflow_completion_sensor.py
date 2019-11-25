@@ -13,6 +13,7 @@ def check_completion(model, rule_id):
     completed = False
     print('check_completion|[model, rule_id] : ', [model, rule_id])
     db_config = Variable.get('db_config', deserialize_json=True)
+    print('check_completion|db_config : ', db_config)
     try:
         adapter = RuleEngineAdapter.get_instance(db_config)
         if model == 'wrf':
