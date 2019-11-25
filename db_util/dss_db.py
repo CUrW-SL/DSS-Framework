@@ -161,9 +161,10 @@ class RuleEngineAdapter:
         '''
         wrf_rule = None
         query = 'select id, status from dss.wrf_rules where id = {}'.format(rule_id)
-        print('get_wrf_rule_info_by_id|query : ', query)
+        print('get_wrf_rule_status_by_id|query : ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
+        print('get_wrf_rule_status_by_id|result : ', result)
         if result is not None:
             wrf_rule = {'id': result[0], 'status': result[1]}
             print('get_wrf_rule_status_by_id|wrf_rule : ', wrf_rule)
