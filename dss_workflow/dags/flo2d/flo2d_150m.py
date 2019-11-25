@@ -87,7 +87,6 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         task_id='running_state_flo2d_150m',
         provide_context=True,
         python_callable=set_running_status,
-        dag=dag,
         pool=dag_pool
     )
 
@@ -96,8 +95,8 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         poke_interval=60,
         timeout=60 * 6 * 60,
         params={'model': 'wrf', 'init_task_id': 'init_flo2d_150m'},
-        provide_context=True,
-        dag=dag)
+        provide_context=True
+    )
 
     create_raincell_flo2d_150m = BashOperator(
         task_id='create_raincell_flo2d_150m',
@@ -110,8 +109,8 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         poke_interval=60,
         timeout=30,
         params={'model': 'hechms', 'init_task_id': 'init_flo2d_150m'},
-        provide_context=True,
-        dag=dag)
+        provide_context=True
+    )
 
     create_inflow_flo2d_150m = BashOperator(
         task_id='create_inflow_flo2d_150m',
@@ -141,7 +140,6 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         task_id='complete_state_flo2d_150m',
         provide_context=True,
         python_callable=set_complete_status,
-        dag=dag,
         pool=dag_pool
     )
 

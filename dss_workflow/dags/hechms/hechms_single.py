@@ -94,8 +94,8 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         poke_interval=60,
         timeout=60 * 6 * 60,
         params={'model': 'wrf', 'init_task_id': 'init_hec_single'},
-        provide_context=True,
-        dag=dag)
+        provide_context=True
+    )
 
     create_rainfall_hec_sin = BashOperator(
         task_id='create_rainfall_hec_sin',
