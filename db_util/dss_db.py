@@ -295,7 +295,7 @@ class RuleEngineAdapter:
         if results is not None:
             for row in results:
                 workflow_routines.append({'id': row[0], 'dss1': row[1], 'dss2': row[2], 'dss3': row[3],
-                                          'cascade_on': result[4]})
+                                          'cascade_on': row[4]})
         return workflow_routines
 
     def get_workflow_routine_info(self, routine_id):
