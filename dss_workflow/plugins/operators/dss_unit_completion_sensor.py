@@ -23,7 +23,7 @@ class DssUnitSensorOperator(BaseSensorOperator):
             print('DssUnitSensorOperator|routine_info : ', routine_info)
             rule_id = routine_info[self.dss]
             print('DssUnitSensorOperator|rule_id : ', rule_id)
-            cascade_on = routine_info['cascade']
+            cascade_on = routine_info['cascade_on']
             condition = self.check_completion(rule_id)
             print('DssUnitSensorOperator|condition : ', condition)
             print('-----------------------------------------------------------------------')
