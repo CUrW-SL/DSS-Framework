@@ -216,7 +216,8 @@ with DAG(dag_id=prod_dag_name, default_args=default_args,
         poke_interval=60,
         timeout=3600,
         params={'model': 'wrf', 'dss': 'dss1'},
-        provide_context=True
+        provide_context=True,
+        trigger_rule='none_failed'
     )
 
     dss2_branch = BranchPythonOperator(
@@ -245,7 +246,8 @@ with DAG(dag_id=prod_dag_name, default_args=default_args,
         poke_interval=60,
         timeout=3600,
         params={'model': 'hechms', 'dss': 'dss2'},
-        provide_context=True
+        provide_context=True,
+        trigger_rule='none_failed',
     )
 
     dss3_branch = BranchPythonOperator(
@@ -274,7 +276,8 @@ with DAG(dag_id=prod_dag_name, default_args=default_args,
         poke_interval=60,
         timeout=3600,
         params={'model': 'flo2d', 'dss': 'dss3'},
-        provide_context=True
+        provide_context=True,
+        trigger_rule='none_failed'
     )
 
     end_routine = PythonOperator(
