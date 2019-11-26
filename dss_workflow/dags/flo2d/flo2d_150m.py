@@ -90,26 +90,10 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    check_wrf_completion_flo2d_150m = WorkflowSensorOperator(
-        task_id='check_wrf_completion_flo2d_150m',
-        poke_interval=60,
-        timeout=60 * 6 * 60,
-        params={'model': 'wrf', 'init_task_id': 'init_flo2d_150m'},
-        provide_context=True
-    )
-
     create_raincell_flo2d_150m = BashOperator(
         task_id='create_raincell_flo2d_150m',
         bash_command=create_raincell_cmd,
         pool=dag_pool
-    )
-
-    check_hechms_completion_flo2d_150m = WorkflowSensorOperator(
-        task_id='check_hechms_completion_flo2d_150m',
-        poke_interval=60,
-        timeout=30,
-        params={'model': 'hechms', 'init_task_id': 'init_flo2d_150m'},
-        provide_context=True
     )
 
     create_inflow_flo2d_150m = BashOperator(
@@ -143,7 +127,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    init_flo2d_150m >> running_state_flo2d_150m >> check_wrf_completion_flo2d_150m >> create_raincell_flo2d_150m >> \
-    check_hechms_completion_flo2d_150m >> create_inflow_flo2d_150m >> create_outflow_flo2d_150m >> run_flo2d_150m_flo2d_150m >> \
+    init_flo2d_150m >> running_state_flo2d_150m >> create_raincell_flo2d_150m >> \
+    create_inflow_flo2d_150m >> create_outflow_flo2d_150m >> run_flo2d_150m_flo2d_150m >> \
     extract_water_level_flo2d_150m >> complete_state_flo2d_150m
 
