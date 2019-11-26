@@ -89,14 +89,6 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    check_wrf_hec_dis = WorkflowSensorOperator(
-        task_id='check_wrf_hec_dis',
-        poke_interval=60,
-        timeout=60 * 6 * 60,
-        params={'model': 'wrf', 'init_task_id': 'init_hec_distributed'},
-        provide_context=True
-    )
-
     create_rainfall_hec_dis = BashOperator(
         task_id='create_rainfall_hec_dis',
         bash_command=create_rainfall_cmd,
@@ -123,7 +115,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    init_hec_distributed >> running_state_hec_dis >> check_wrf_hec_dis\
+    init_hec_distributed >> running_state_hec_dis \
     >> create_rainfall_hec_dis >> run_hechms_distributed >> upload_discharge_hec_dis\
     >> complete_state_hec_dis
 
