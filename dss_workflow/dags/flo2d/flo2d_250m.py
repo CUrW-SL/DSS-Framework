@@ -94,7 +94,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     check_wrf_completion_flo2d_250m = WorkflowSensorOperator(
         task_id='check_wrf_completion_flo2d_250m',
         poke_interval=60,
-        timeout=60 * 6 * 60,
+        timeout=3600,
         params={'model': 'wrf', 'init_task_id': 'init_flo2d_250m'},
         provide_context=True
      )
@@ -108,7 +108,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     check_hechms_completion_flo2d_250m = WorkflowSensorOperator(
         task_id='check_hechms_completion_flo2d_250m',
         poke_interval=60,
-        timeout=30,
+        timeout=1800,
         params={'model': 'hechms', 'init_task_id': 'init_flo2d_250m'},
         provide_context=True
      )
