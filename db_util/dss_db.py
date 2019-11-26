@@ -373,7 +373,7 @@ class RuleEngineAdapter:
         else:
             schedule_date = datetime.strptime(schedule_date, '%Y-%m-%d %H:%M:%S')
         print('schedule_date : ', schedule_date)
-        query = 'select id,dss1,dss2,dss3,schedule from dss.workflow_routines where status in (1,3);'
+        query = 'select id,dss1,dss2,dss3,schedule,cascade_on from dss.workflow_routines where status in (1,3);'
         print('get_next_workflow_routines|query : ', query)
         results = self.get_multiple_result(query)
         routines = []
@@ -381,7 +381,8 @@ class RuleEngineAdapter:
             for result in results:
                 print('get_next_workflow_routines|result : ', result)
                 routines.append({'id': result[0], 'dss1': result[1], 'dss2': result[2],
-                                 'dss3': result[3], 'schedule': result[4]})
+                                 'dss3': result[3], 'schedule': result[4],
+                                 'cascade_on': result[5]})
         print('get_next_workflow_routines|routines : ', routines)
         if len(routines) > 0:
             routine = get_next_scheduled_workflow(schedule_date, routines)
