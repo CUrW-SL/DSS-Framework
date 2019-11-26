@@ -406,6 +406,8 @@ if __name__ == "__main__":
     # result = adapter.get_next_workflow_routines()
     result = adapter.get_workflow_routine_info(2)
     print(result)
+    print(result['cascade_on'])
+    print(type(result['cascade_on']))
 
 
 
