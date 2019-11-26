@@ -45,28 +45,26 @@ def check_completion(model, rule_id):
     return completed
 
 
-class WorkflowSensorOperator(BaseSensorOperator):
+class DssUnitSensorOperator(BaseSensorOperator):
     @apply_defaults
     def __init__(self, params, *args, **kwargs):
-        self.init_task_id = params['init_task_id']
-        self.model = params['model']
-        super(WorkflowSensorOperator, self).__init__(*args, **kwargs)
+        self.dss = params['dss']
+        super(DssUnitSensorOperator, self).__init__(*args, **kwargs)
 
     def poke(self, context):
         try:
             print('-----------------------------------------------------------------------')
-            rule_info = context['task_instance'].xcom_pull(task_ids=self.init_task_id)['rule_info']
-            print('WorkflowSensorOperator|rule_info : ', rule_info)
-            rule_id = rule_info['id']
+            routine_info = context['task_instance'].xcom_pull(task_ids='init_routine')
+            print('DssUnitSensorOperator|routine_info : ', routine_info)
             condition = check_completion(self.model, rule_id)
-            print('WorkflowSensorOperator|condition : ', condition)
+            print('DssUnitSensorOperator|condition : ', condition)
             print('-----------------------------------------------------------------------')
             return condition
         except AirflowSensorTimeout as to:
             self._do_skip_downstream_tasks(context)
-            raise AirflowSensorTimeout('WorkflowSensorOperator. Time is OUT.')
+            raise AirflowSensorTimeout('DssUnitSensorOperator. Time is OUT.')
 
 
 class MyFirstPlugin(AirflowPlugin):
-    name = "workflow_sensor"
-    operators = [WorkflowSensorOperator]
+    name = "branch_sensor"
+    operators = [DssUnitSensorOperator]
