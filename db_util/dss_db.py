@@ -289,23 +289,25 @@ class RuleEngineAdapter:
 
     def get_workflow_routines(self, status):
         workflow_routines = []
-        query = 'select id,dss1,dss2,dss3 from dss.workflow_routines where status={}'.format(status)
+        query = 'select id,dss1,dss2,dss3,cascade_on from dss.workflow_routines where status={}'.format(status)
         print('get_workflow_routines|query : ', query)
         results = self.get_multiple_result(query)
         if results is not None:
             for row in results:
-                workflow_routines.append({'id': row[0], 'dss1': row[1], 'dss2': row[2], 'dss3': row[3]})
+                workflow_routines.append({'id': row[0], 'dss1': row[1], 'dss2': row[2], 'dss3': row[3],
+                                          'cascade_on': result[4]})
         return workflow_routines
 
     def get_workflow_routine_info(self, routine_id):
         workflow_routine = None
-        query = 'select id,dss1,dss2,dss3 from dss.workflow_routines where id={}'.format(routine_id)
+        query = 'select id,dss1,dss2,dss3,cascade_on from dss.workflow_routines where id={}'.format(routine_id)
         print('get_workflow_routine_info|query : ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
         print('get_workflow_routine_info|result : ', result)
         if result is not None:
-            workflow_routine = {'id': result[0], 'dss1': result[1], 'dss2': result[2], 'dss3': result[3]}
+            workflow_routine = {'id': result[0], 'dss1': result[1], 'dss2': result[2], 'dss3': result[3],
+                                'cascade_on': result[4]}
         return workflow_routine
 
     def update_query(self, query):
@@ -401,7 +403,7 @@ if __name__ == "__main__":
     adapter = RuleEngineAdapter.get_instance(db_config)
     print(adapter)
     # result = adapter.get_next_workflow_routines()
-    result = adapter.get_wrf_rule_status_by_id(2)
+    result = adapter.get_workflow_routine_info(2)
     print(result)
 
 
