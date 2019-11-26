@@ -8,6 +8,7 @@ import sys
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/dss_workflow/plugins/operators')
 from condition_multi_dag_run_operator import ConditionMultiTriggerDagRunOperator
+from dss_unit_completion_sensor import DssUnitSensorOperator
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
@@ -17,7 +18,7 @@ from controller_util import get_triggering_dags, \
     update_workflow_routine_status, \
     set_running_state
 
-prod_dag_name = 'dss_controller_v1'
+prod_dag_name = 'dss_controller_v2'
 schedule_interval = '*/5 * * * *'
 dag_pool = 'parent_pool'
 SKIP = 0
@@ -210,6 +211,14 @@ with DAG(dag_id=prod_dag_name, default_args=default_args,
         pool=dag_pool
     )
 
+    check_dss1_completion = DssUnitSensorOperator(
+        task_id='check_dss1_completion',
+        poke_interval=60,
+        timeout=3600,
+        params={'model': 'wrf', 'dss': 'dss1'},
+        provide_context=True
+    )
+
     dss2_branch = BranchPythonOperator(
         task_id='dss2_branch',
         provide_context=True,
@@ -229,6 +238,14 @@ with DAG(dag_id=prod_dag_name, default_args=default_args,
         python_callable=conditionally_trigger_dss_unit2,
         params={'check_rules': True, 'rule_types': ['hechms']},
         pool=dag_pool
+    )
+
+    check_dss2_completion = DssUnitSensorOperator(
+        task_id='check_dss2_completion',
+        poke_interval=60,
+        timeout=3600,
+        params={'model': 'hechms', 'dss': 'dss2'},
+        provide_context=True
     )
 
     dss3_branch = BranchPythonOperator(
@@ -252,6 +269,14 @@ with DAG(dag_id=prod_dag_name, default_args=default_args,
         pool=dag_pool
     )
 
+    check_dss3_completion = DssUnitSensorOperator(
+        task_id='check_dss3_completion',
+        poke_interval=60,
+        timeout=3600,
+        params={'model': 'flo2d', 'dss': 'dss3'},
+        provide_context=True
+    )
+
     end_routine = PythonOperator(
         task_id='end_routine',
         python_callable=end_workflow_routine,
@@ -262,7 +287,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args,
 
     init_routine >> \
     dss1_branch >> [dss_unit1, dss1_dummy] >> \
-    dss2_branch >> [dss_unit2, dss2_dummy] >> \
-    dss3_branch >> [dss_unit3, dss3_dummy] >> \
-    end_routine
+    check_dss1_completion >> dss2_branch >> [dss_unit2, dss2_dummy] >> \
+    check_dss2_completion >> dss3_branch >> [dss_unit3, dss3_dummy] >> \
+    check_dss3_completion >> end_routine
 
