@@ -32,7 +32,7 @@ def init_workflow_routine(**context):
     routine = adapter.get_next_workflow_routines(run_date)
     print('init_workflow_routine|routine : ', routine)
     if routine is None:
-        return {'id': 0, 'dss1': 0, 'dss2': 0, 'dss3': 0, 'schedule': ''}
+        return {'id': 0, 'cascade_on': 0, 'dss1': 0, 'dss2': 0, 'dss3': 0, 'schedule': ''}
     else:
         set_running_state(adapter, routine['id'])
         return routine
