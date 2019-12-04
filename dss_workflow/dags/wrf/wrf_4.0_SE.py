@@ -72,6 +72,14 @@ def run_this_func(dag_run, **kwargs):
     return wrf_rule
 
 
+def check_accuracy(**context):
+    print('check_accuracy|context : ', context)
+    rule_info = context['task_instance'].xcom_pull(task_ids='init_wrfv4SE')['rule_info']
+    print('check_accuracy|rule_info : ', rule_info)
+    wrf_rule = {'model': 'SE', 'version': '4.0', 'rule_info': rule_info}
+    print('check_accuracy|wrf_rule : ', wrf_rule)
+
+
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
          description='Run WRF v4 SE DAG', catchup=False) as dag:
     init_wrfv4_SE = PythonOperator(
@@ -81,15 +89,15 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    running_state = PythonOperator(
-        task_id='running_state',
+    running_state_wrfv4SE = PythonOperator(
+        task_id='running_state_wrfv4SE',
         provide_context=True,
         python_callable=set_running_status,
         pool=dag_pool
     )
 
-    check_gfs_availability = GfsSensorOperator(
-        task_id='check_gfs_availability',
+    check_gfs_availability_wrfv4SE = GfsSensorOperator(
+        task_id='check_gfs_availability_wrfv4SE',
         poke_interval=60,
         timeout=60 * 30,
         params={'model': 'SE', 'init_task_id': 'init_wrfv4SE'},
@@ -103,24 +111,33 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    rfield_gen = BashOperator(
-        task_id='rfield_gen',
+    rfield_gen_wrfv4SE = BashOperator(
+        task_id='rfield_gen_wrfv4SE',
         bash_command=rfield_gen_cmd,
         pool=dag_pool
     )
 
-    wrf_data_push = BashOperator(
-        task_id='wrf_data_push',
+    wrf_data_push_wrfv4SE = BashOperator(
+        task_id='wrf_data_push_wrfv4SE',
         bash_command=data_push_cmd,
         pool=dag_pool
     )
 
-    complete_state = PythonOperator(
-        task_id='complete_state',
+    check_accuracy_wrfv4SE = PythonOperator(
+        task_id='check_accuracy_wrfv4SE',
+        provide_context=True,
+        python_callable=check_accuracy,
+        pool=dag_pool
+    )
+
+    complete_state_wrfv4SE = PythonOperator(
+        task_id='complete_state_wrfv4SE',
         provide_context=True,
         python_callable=set_complete_status,
         pool=dag_pool
     )
 
-    init_wrfv4_SE >> running_state >> check_gfs_availability >> run_wrf4_SE >> rfield_gen >> wrf_data_push >> complete_state
+    init_wrfv4_SE >> running_state_wrfv4SE >> check_gfs_availability_wrfv4SE >> \
+    run_wrf4_SE >> rfield_gen_wrfv4SE >> wrf_data_push_wrfv4SE >> \
+    check_accuracy_wrfv4SE >> complete_state_wrfv4SE
 

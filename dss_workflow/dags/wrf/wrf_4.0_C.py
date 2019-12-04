@@ -72,6 +72,14 @@ def run_this_func(dag_run, **kwargs):
     return wrf_rule
 
 
+def check_accuracy(**context):
+    print('check_accuracy|context : ', context)
+    rule_info = context['task_instance'].xcom_pull(task_ids='init_wrfv4C')['rule_info']
+    print('check_accuracy|rule_info : ', rule_info)
+    wrf_rule = {'model': 'C', 'version': '4.0', 'rule_info': rule_info}
+    print('check_accuracy|wrf_rule : ', wrf_rule)
+
+
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
          description='Run WRF v4 C DAG', catchup=False) as dag:
     init_wrfv4_C = PythonOperator(
@@ -115,6 +123,13 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
+    check_accuracy_wrfv4C = PythonOperator(
+        task_id='check_accuracy_wrfv4C',
+        provide_context=True,
+        python_callable=check_accuracy,
+        pool=dag_pool
+    )
+
     complete_state_wrfv4C = PythonOperator(
         task_id='complete_state_wrfv4C',
         provide_context=True,
@@ -122,5 +137,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    init_wrfv4_C >> running_state_wrfv4C >> check_gfs_availability_wrfv4C >> run_wrf4_C >> rfield_gen_wrfv4C >> wrf_data_push_wrfv4C >> complete_state_wrfv4C
+    init_wrfv4_C >> running_state_wrfv4C >> check_gfs_availability_wrfv4C >> \
+    run_wrf4_C >> rfield_gen_wrfv4C >> wrf_data_push_wrfv4C >> \
+    check_accuracy_wrfv4C >> complete_state_wrfv4C
 

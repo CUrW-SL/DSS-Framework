@@ -77,6 +77,10 @@ def run_this_func(dag_run, **kwargs):
 
 def check_accuracy(**context):
     print('check_accuracy|context : ', context)
+    rule_info = context['task_instance'].xcom_pull(task_ids='init_wrfv4A')['rule_info']
+    print('check_accuracy|rule_info : ', rule_info)
+    wrf_rule = {'model': 'A', 'version': '4.0', 'rule_info': rule_info}
+    print('check_accuracy|wrf_rule : ', wrf_rule)
 
 
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
