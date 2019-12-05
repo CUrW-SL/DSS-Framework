@@ -34,7 +34,7 @@ def generate_dag_run(context):
 
 default_args = {
     'owner': 'dss admin',
-    'start_date': datetime.strptime('2019-15-05 22:15:00', '%Y-%m-%d %H:%M:%S'),
+    'start_date': datetime.strptime('2019-12-05 12:00:00', '%Y-%m-%d %H:%M:%S'),
     'email': ['hasithadkr7@gmail.com'],
     'email_on_failure': True,
     'retries': 1,
