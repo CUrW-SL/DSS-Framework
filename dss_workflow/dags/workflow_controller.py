@@ -174,7 +174,7 @@ default_args = {
 }
 
 
-with DAG(dag_id=prod_dag_name, default_args=default_args,
+with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
          catchup=False,description='Run DSS Controller DAG') as dag:
     init_routine = PythonOperator(
         task_id='init_routine',
