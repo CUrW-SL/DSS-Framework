@@ -24,12 +24,13 @@ def generate_dag_run(context):
     print('init_workflow_routine|run_date : ', run_date)
     routines = adapter.get_next_workflows(run_date)
     print('init_workflow_routines|routines : ', routines)
+    next_workflows = []
     if routines is not None:
         for workflow_routine in routines:
-            routines.append(DagRunOrder(payload={'workflow_routine': workflow_routine}))
+            next_workflows.append(DagRunOrder(payload={'workflow_routine': workflow_routine}))
     else:
         print('No workflow routine to schedule.')
-    return routines
+    return next_workflows
 
 
 default_args = {
