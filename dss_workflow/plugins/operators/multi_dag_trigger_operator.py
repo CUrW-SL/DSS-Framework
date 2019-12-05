@@ -23,7 +23,7 @@ class TriggerMultiDagRunOperator(TriggerDagRunOperator):
 
             if dro.run_id is None:
                 dro.run_id = 'trig__' + datetime.utcnow().isoformat()
-
+            print('TriggerMultiDagRunOperator|dro : ', dro)
             dbag = DagBag(settings.DAGS_FOLDER)
             trigger_dag = dbag.get_dag(self.trigger_dag_id)
             dr = trigger_dag.create_dagrun(
