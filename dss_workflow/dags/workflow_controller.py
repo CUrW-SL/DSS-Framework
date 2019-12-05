@@ -34,9 +34,9 @@ def init_workflow_routine(dag_run, **kwargs):
 
 def dss1_branch_func(**context):
     print('***************************dss1_branch_func**********************************')
-    routine = context['task_instance'].xcom_pull(task_ids='init_routine')
+    routine = context['task_instance'].xcom_pull(task_ids='init_routine')['workflow_routine']
     print('dss1_branch_func|routine : ', routine)
-    routine_id = context['task_instance'].xcom_pull(task_ids='init_routine')['id']
+    routine_id = routine['id']
     print('dss1_branch_func|routine_id : ', routine_id)
     db_config = Variable.get('db_config', deserialize_json=True)
     adapter = RuleEngineAdapter.get_instance(db_config)
@@ -56,7 +56,9 @@ def conditionally_trigger_dss_unit1(context):
     print('***************************conditionally_trigger_dss_unit1**********************************')
     print('conditionally_trigger_dss_unit1')
     """This function decides whether or not to Trigger the remote DAG"""
-    routine_id = context['task_instance'].xcom_pull(task_ids='init_routine')['id']
+    routine = context['task_instance'].xcom_pull(task_ids='init_routine')['workflow_routine']
+    print('conditionally_trigger_dss_unit1|routine : ', routine)
+    routine_id = routine['id']
     print('dss1_branch_func|routine_id : ', routine_id)
     db_config = Variable.get('db_config', deserialize_json=True)
     adapter = RuleEngineAdapter.get_instance(db_config)
@@ -78,7 +80,9 @@ def conditionally_trigger_dss_unit1(context):
 
 def dss2_branch_func(**context):
     print('***************************dss2_branch_func**********************************')
-    routine_id = context['task_instance'].xcom_pull(task_ids='init_routine')['id']
+    routine = context['task_instance'].xcom_pull(task_ids='init_routine')['workflow_routine']
+    print('dss1_branch_func|routine : ', routine)
+    routine_id = routine['id']
     print('dss2_branch_func|routine_id : ', routine_id)
     db_config = Variable.get('db_config', deserialize_json=True)
     adapter = RuleEngineAdapter.get_instance(db_config)
@@ -97,7 +101,9 @@ def conditionally_trigger_dss_unit2(context):
     print('***************************conditionally_trigger_dss_unit2**********************************')
     print('conditionally_trigger_dss_unit2')
     """This function decides whether or not to Trigger the remote DAG"""
-    routine_id = context['task_instance'].xcom_pull(task_ids='init_routine')['id']
+    routine = context['task_instance'].xcom_pull(task_ids='init_routine')['workflow_routine']
+    print('dss1_branch_func|routine : ', routine)
+    routine_id = routine['id']
     print('dss1_branch_func|routine_id : ', routine_id)
     db_config = Variable.get('db_config', deserialize_json=True)
     adapter = RuleEngineAdapter.get_instance(db_config)
@@ -119,7 +125,9 @@ def conditionally_trigger_dss_unit2(context):
 
 def dss3_branch_func(**context):
     print('***************************dss3_branch_func**********************************')
-    routine_id = context['task_instance'].xcom_pull(task_ids='init_routine')['id']
+    routine = context['task_instance'].xcom_pull(task_ids='init_routine')['workflow_routine']
+    print('dss1_branch_func|routine : ', routine)
+    routine_id = routine['id']
     print('dss2_branch_func|routine_id : ', routine_id)
     db_config = Variable.get('db_config', deserialize_json=True)
     adapter = RuleEngineAdapter.get_instance(db_config)
@@ -138,7 +146,9 @@ def conditionally_trigger_dss_unit3(context):
     print('***************************conditionally_trigger_dss_unit3**********************************')
     print('conditionally_trigger_dss_unit3')
     """This function decides whether or not to Trigger the remote DAG"""
-    routine_id = context['task_instance'].xcom_pull(task_ids='init_routine')['id']
+    routine = context['task_instance'].xcom_pull(task_ids='init_routine')['workflow_routine']
+    print('dss1_branch_func|routine : ', routine)
+    routine_id = routine['id']
     print('dss1_branch_func|routine_id : ', routine_id)
     db_config = Variable.get('db_config', deserialize_json=True)
     adapter = RuleEngineAdapter.get_instance(db_config)
