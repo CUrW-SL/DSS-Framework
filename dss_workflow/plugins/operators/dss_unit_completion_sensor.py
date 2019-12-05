@@ -19,7 +19,7 @@ class DssUnitSensorOperator(BaseSensorOperator):
     def poke(self, context):
         try:
             print('-----------------------------------------------------------------------')
-            routine_info = context['task_instance'].xcom_pull(task_ids='init_routine')
+            routine_info = context['task_instance'].xcom_pull(task_ids='init_routine')['workflow_routine']
             print('DssUnitSensorOperator|routine_info : ', routine_info)
             rule_id = routine_info[self.dss]
             print('DssUnitSensorOperator|rule_id : ', rule_id)
