@@ -385,11 +385,7 @@ class RuleEngineAdapter:
                 for routine in routines:
                     print('update_initial_workflow_routing_status.')
                     self.update_initial_workflow_routing_status(1, routine['id'])
-                return routines
-            else:
-                return None
-        else:
-            return None
+        return routines
 
     def get_next_workflow_routines(self, schedule_date=datetime.now()):
         if type(schedule_date) is datetime:
