@@ -18,8 +18,7 @@ from controller_util import get_triggering_dags, \
     update_workflow_routine_status, \
     set_running_state
 
-prod_dag_name = 'dss_controller_v2'
-schedule_interval = '*/5 * * * *'
+prod_dag_name = 'dss_controller_v3'
 dag_pool = 'parent_pool'
 SKIP = 0
 
@@ -182,8 +181,7 @@ default_args = {
 
 
 with DAG(dag_id=prod_dag_name, default_args=default_args,
-         catchup=False, schedule_interval=schedule_interval,
-         description='Run DSS Controller DAG') as dag:
+         catchup=False,description='Run DSS Controller DAG') as dag:
     init_routine = PythonOperator(
         task_id='init_routine',
         python_callable=init_workflow_routine,
