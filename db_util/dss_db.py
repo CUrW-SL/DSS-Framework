@@ -351,21 +351,21 @@ class RuleEngineAdapter:
         print('update_initial_workflow_routing_status|query : ', query)
         self.update_query(query)
 
-    def get_next_workflow_routine(self, schedule_date=None):
-        if schedule_date is None:
-            query = 'select id,dss1,dss2,dss3 from dss.workflow_routines where status in (0,3,4) and ' \
-                    'scheduled_date<=now() ;'
-        else:
-            query = 'select id,dss1,dss2,dss3 from dss.workflow_routines where status in (0,3,4)  and ' \
-                    'scheduled_date<=\'{}\';'.format(schedule_date)
-        print('get_next_workflow_routine|query : ', query)
-        self.cursor.execute(query)
-        result = self.cursor.fetchone()
-        if result is not None:
-            print(result)
-            routine = {'id': result[0], 'dss1': result[1], 'dss2': result[2], 'dss3': result[3]}
-            self.update_initial_workflow_routing_status(1, routine['id'])
-            return routine
+    # def get_next_workflow_routine(self, schedule_date=None):
+    #     if schedule_date is None:
+    #         query = 'select id,dss1,dss2,dss3 from dss.workflow_routines where status in (0,3,4) and ' \
+    #                 'scheduled_date<=now() ;'
+    #     else:
+    #         query = 'select id,dss1,dss2,dss3 from dss.workflow_routines where status in (0,3,4)  and ' \
+    #                 'scheduled_date<=\'{}\';'.format(schedule_date)
+    #     print('get_next_workflow_routine|query : ', query)
+    #     self.cursor.execute(query)
+    #     result = self.cursor.fetchone()
+    #     if result is not None:
+    #         print(result)
+    #         routine = {'id': result[0], 'dss1': result[1], 'dss2': result[2], 'dss3': result[3]}
+    #         self.update_initial_workflow_routing_status(1, routine['id'])
+    #         return routine
 
     def get_next_workflow_routines(self, schedule_date=datetime.now()):
         if type(schedule_date) is datetime:
