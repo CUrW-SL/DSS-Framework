@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from airflow import settings
 from airflow.models import DagBag
 from airflow.operators.dagrun_operator import TriggerDagRunOperator, DagRunOrder
