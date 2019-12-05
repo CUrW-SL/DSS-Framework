@@ -34,6 +34,8 @@ def init_workflow_routine(dag_run, **kwargs):
 
 def dss1_branch_func(**context):
     print('***************************dss1_branch_func**********************************')
+    routine = context['task_instance'].xcom_pull(task_ids='init_routine')
+    print('dss1_branch_func|routine : ', routine)
     routine_id = context['task_instance'].xcom_pull(task_ids='init_routine')['id']
     print('dss1_branch_func|routine_id : ', routine_id)
     db_config = Variable.get('db_config', deserialize_json=True)
