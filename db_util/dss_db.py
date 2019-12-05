@@ -7,6 +7,17 @@ import croniter
 LOG_FORMAT = '[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s'
 
 
+def get_next_scheduled_routines(schedule_date, workflow_routines):
+    scheduled_list = []
+    print('get_next_scheduled_workflow|schedule_date : ', schedule_date)
+    print('get_next_scheduled_workflow|workflow_routines : ', workflow_routines)
+    for workflow_routine in workflow_routines:
+        if validate_workflow(workflow_routine, schedule_date):
+            print('get_next_scheduled_workflow|validate_workflow|workflow_routine : ', workflow_routine)
+            scheduled_list.append(workflow_routine)
+    return scheduled_list
+
+
 def get_next_scheduled_workflow(schedule_date, workflow_routines):
     print('get_next_scheduled_workflow|schedule_date : ', schedule_date)
     print('get_next_scheduled_workflow|workflow_routines : ', workflow_routines)
@@ -40,7 +51,7 @@ class RuleEngineAdapter:
     @staticmethod
     def get_instance(db_config):
         """ Static access method. """
-        #print('get_instance|db_config : ', db_config)
+        # print('get_instance|db_config : ', db_config)
         if RuleEngineAdapter.__instance is None:
             RuleEngineAdapter(db_config['mysql_user'], db_config['mysql_password'],
                               db_config['mysql_host'], db_config['mysql_db'],
@@ -195,10 +206,10 @@ class RuleEngineAdapter:
         result = self.cursor.fetchone()
         if result is not None:
             hechms_rule = {'id': result[0], 'name': result[1], 'target_model': result[2],
-                            'forecast_days': result[3], 'observed_days': result[4],
-                            'init_run': result[5], 'no_forecast_continue': result[6],
-                            'no_observed_continue': result[7], 'rainfall_data_from': result[8],
-                            'ignore_previous_run': result[9]}
+                           'forecast_days': result[3], 'observed_days': result[4],
+                           'init_run': result[5], 'no_forecast_continue': result[6],
+                           'no_observed_continue': result[7], 'rainfall_data_from': result[8],
+                           'ignore_previous_run': result[9]}
         return hechms_rule
 
     def get_eligible_hechms_rule_info_by_id(self, id):
@@ -351,21 +362,34 @@ class RuleEngineAdapter:
         print('update_initial_workflow_routing_status|query : ', query)
         self.update_query(query)
 
-    # def get_next_workflow_routine(self, schedule_date=None):
-    #     if schedule_date is None:
-    #         query = 'select id,dss1,dss2,dss3 from dss.workflow_routines where status in (0,3,4) and ' \
-    #                 'scheduled_date<=now() ;'
-    #     else:
-    #         query = 'select id,dss1,dss2,dss3 from dss.workflow_routines where status in (0,3,4)  and ' \
-    #                 'scheduled_date<=\'{}\';'.format(schedule_date)
-    #     print('get_next_workflow_routine|query : ', query)
-    #     self.cursor.execute(query)
-    #     result = self.cursor.fetchone()
-    #     if result is not None:
-    #         print(result)
-    #         routine = {'id': result[0], 'dss1': result[1], 'dss2': result[2], 'dss3': result[3]}
-    #         self.update_initial_workflow_routing_status(1, routine['id'])
-    #         return routine
+    def get_next_workflows(self, schedule_date=datetime.now()):
+        if type(schedule_date) is datetime:
+            schedule_date = schedule_date
+        else:
+            schedule_date = datetime.strptime(schedule_date, '%Y-%m-%d %H:%M:%S')
+        print('schedule_date : ', schedule_date)
+        query = 'select id,dss1,dss2,dss3,schedule,cascade_on from dss.workflow_routines where status in (1,3);'
+        print('get_next_workflow_routines|query : ', query)
+        results = self.get_multiple_result(query)
+        routines = []
+        if results is not None:
+            for result in results:
+                print('get_next_workflow_routines|result : ', result)
+                routines.append({'id': result[0], 'dss1': result[1], 'dss2': result[2],
+                                 'dss3': result[3], 'schedule': result[4],
+                                 'cascade_on': result[5]})
+        print('get_next_workflow_routines|routines : ', routines)
+        if len(routines) > 0:
+            routines = get_next_scheduled_routines(schedule_date, routines)
+            if len(routines) > 0:
+                for routine in routines:
+                    print('update_initial_workflow_routing_status.')
+                    self.update_initial_workflow_routing_status(1, routine['id'])
+                return routines
+            else:
+                return None
+        else:
+            return None
 
     def get_next_workflow_routines(self, schedule_date=datetime.now()):
         if type(schedule_date) is datetime:
@@ -408,7 +432,3 @@ if __name__ == "__main__":
     print(result)
     print(result['cascade_on'])
     print(type(result['cascade_on']))
-
-
-
-
