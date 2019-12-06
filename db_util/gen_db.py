@@ -63,6 +63,37 @@ class CurwSimAdapter:
         self.cursor.close()
         self.connection.close()
 
+    def get_single_result(self, sql_query):
+        value = None
+        cursor = self.cursor
+        try:
+            cursor.execute(sql_query)
+            result = cursor.fetchone()
+            if result:
+                value = result
+            else:
+                self.log.error('no result|query:'.format(sql_query))
+        except Exception as ex:
+            print('get_single_result|Exception : ', str(ex))
+            self.log.error('exception|query:'.format(sql_query))
+        finally:
+            return value
+
+    def get_multiple_result(self, sql_query):
+        cursor = self.cursor
+        try:
+            cursor.execute(sql_query)
+            result = cursor.fetchall()
+            if result:
+                return result
+            else:
+                self.log.error('no result|query:'.format(sql_query))
+                return None
+        except Exception as ex:
+            print('get_single_result|Exception : ', str(ex))
+            self.log.error('exception|query:'.format(sql_query))
+            return None
+
     def get_flo2d_tms_ids(self, model, method):
         id_date_list = []
         cursor = self.cursor
@@ -332,7 +363,7 @@ class CurwSimAdapter:
 
     def get_matching_wrf_station_by_grid_id(self, grid_id):
         query = 'select d03_1 from curw_sim.grid_map_obs where grid_id=\'{}\';'.format(grid_id)
-        result = self.get_single_result(self, query)
+        result = self.get_single_result(query)
         if result is not None:
             station_id = result[0]
             return station_id
@@ -370,21 +401,41 @@ class CurwFcstAdapter:
                 CurwFcstAdapter.__instance = self
             except ConnectionError as ex:
                 print('ConnectionError|ex: ', ex)
-    def __init__(self, mysql_user, mysql_password, mysql_host, mysql_db):
-        print('[mysql_user, mysql_password, mysql_host, mysql_db] : ',
-              [mysql_user, mysql_password, mysql_host, mysql_db])
-        try:
-            self.connection = mysql.connector.connect(user=mysql_user,
-                                                      password=mysql_password,
-                                                      host=mysql_host,
-                                                      database=mysql_db)
-            self.cursor = self.connection.cursor()
-        except ConnectionError as ex:
-            print('ConnectionError|ex: ', ex)
 
     def close_connection(self):
         self.cursor.close()
         self.connection.close()
+
+    def get_single_result(self, sql_query):
+        value = None
+        cursor = self.cursor
+        try:
+            cursor.execute(sql_query)
+            result = cursor.fetchone()
+            if result:
+                value = result
+            else:
+                self.log.error('no result|query:'.format(sql_query))
+        except Exception as ex:
+            print('get_single_result|Exception : ', str(ex))
+            self.log.error('exception|query:'.format(sql_query))
+        finally:
+            return value
+
+    def get_multiple_result(self, sql_query):
+        cursor = self.cursor
+        try:
+            cursor.execute(sql_query)
+            result = cursor.fetchall()
+            if result:
+                return result
+            else:
+                self.log.error('no result|query:'.format(sql_query))
+                return None
+        except Exception as ex:
+            print('get_single_result|Exception : ', str(ex))
+            self.log.error('exception|query:'.format(sql_query))
+            return None
 
     def get_station_fcst_rainfall(self, station_ids, fcst_start, fcst_end, source=8, sim_tag='evening_18hrs'):
         """
@@ -431,8 +482,7 @@ class CurwObsAdapter:
         print('get_instance|db_config : ', db_config)
         if CurwObsAdapter.__instance is None:
             CurwObsAdapter(db_config['mysql_user'], db_config['mysql_password'],
-                            db_config['mysql_host'], db_config['mysql_db'],
-                            db_config['log_path'])
+                           db_config['mysql_host'], db_config['mysql_db'], db_config['log_path'])
         return CurwObsAdapter.__instance
 
     def __init__(self, mysql_user, mysql_password, mysql_host, mysql_db, log_path):
@@ -453,18 +503,6 @@ class CurwObsAdapter:
                 CurwObsAdapter.__instance = self
             except ConnectionError as ex:
                 print('ConnectionError|ex: ', ex)
-
-    def __init__(self, mysql_user, mysql_password, mysql_host, mysql_db):
-        print('[mysql_user, mysql_password, mysql_host, mysql_db] : ',
-              [mysql_user, mysql_password, mysql_host, mysql_db])
-        try:
-            self.connection = mysql.connector.connect(user=mysql_user,
-                                                      password=mysql_password,
-                                                      host=mysql_host,
-                                                      database=mysql_db)
-            self.cursor = self.connection.cursor()
-        except ConnectionError as ex:
-            print('ConnectionError|ex: ', ex)
 
     def close_connection(self):
         self.cursor.close()
@@ -587,10 +625,11 @@ class CurwObsAdapter:
             if hash_id is not None:
                 ts_df = self.get_timeseries_by_id(hash_id, start_time, end_time)
 
-    def get_station_id_by_name(self, station_name, station_type):
+    def get_station_id_by_name(self, station_type, station_name):
         query = 'select id,latitude,longitude from curw_obs.station where ' \
                 'station_type = \'{}\' and name = \'{}\''.format(station_type, station_name)
-        result = self.get_single_result(self, query)
+        print('get_station_id_by_name|query : ', query)
+        result = self.get_single_result(query)
         if result is not None:
             station_id = result[0]
             return station_id
