@@ -330,6 +330,14 @@ class CurwSimAdapter:
                 basin_available_stations.pop(station, None)
         return basin_available_stations
 
+    def get_matching_wrf_station_by_grid_id(self, grid_id):
+        query = 'select d03_1 from curw_sim.grid_map_obs where grid_id=\'{}\';'.format(grid_id)
+        result = self.get_single_result(self, query)
+        if result is not None:
+            station_id = result[0]
+            return station_id
+        return None
+
 
 class CurwFcstAdapter:
     __instance = None
@@ -579,4 +587,11 @@ class CurwObsAdapter:
             if hash_id is not None:
                 ts_df = self.get_timeseries_by_id(hash_id, start_time, end_time)
 
-
+    def get_station_id_by_name(self, station_name, station_type):
+        query = 'select id,latitude,longitude from curw_obs.station where ' \
+                'station_type = \'{}\' and name = \'{}\''.format(station_type, station_name)
+        result = self.get_single_result(self, query)
+        if result is not None:
+            station_id = result[0]
+            return station_id
+        return None
