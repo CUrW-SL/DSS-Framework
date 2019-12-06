@@ -29,6 +29,10 @@ def init_workflow_routine(dag_run, **kwargs):
     routine = dag_run.conf
     print('init_workflow_routine|routine : ', routine)
     if routine is not None:
+        db_config = Variable.get('db_config', deserialize_json=True)
+        adapter = RuleEngineAdapter.get_instance(db_config)
+        routine_id = routine['workflow_routine']['id']
+        set_running_state(adapter, routine_id)
         return routine
 
 
