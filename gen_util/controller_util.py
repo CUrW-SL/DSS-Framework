@@ -21,7 +21,8 @@ def get_triggering_dags(db_adapter, dss_rule_id, model_type):
                 dag_name = 'wrf_{}_{}_dag'.format(wrf_rule_info['version'], target_model)
                 payload = {'id': wrf_rule_info['id'], 'run': wrf_rule_info['run'], 'hour': wrf_rule_info['hour'],
                            'ignore_previous_run': wrf_rule_info['ignore_previous_run'],
-                           'check_gfs_data_availability': wrf_rule_info['check_gfs_data_availability']}
+                           'check_gfs_data_availability': wrf_rule_info['check_gfs_data_availability'],
+                           'accuracy_rule': wrf_rule_info['accuracy_rule']}
                 dag_info.append({'dag_name': dag_name, 'payload': payload})
         else:
             print('No wrf rules found.')
@@ -39,7 +40,8 @@ def get_triggering_dags(db_adapter, dss_rule_id, model_type):
                            'no_forecast_continue': hechms_rule_info['no_forecast_continue'],
                            'no_observed_continue': hechms_rule_info['no_observed_continue'],
                            'rainfall_data_from': hechms_rule_info['rainfall_data_from'],
-                           'ignore_previous_run': hechms_rule_info['ignore_previous_run']}
+                           'ignore_previous_run': hechms_rule_info['ignore_previous_run'],
+                           'accuracy_rule': hechms_rule_info['accuracy_rule']}
                 dag_info.append({'dag_name': dag_name, 'payload': payload})
         else:
             print('No hechms rules found.')
@@ -58,7 +60,8 @@ def get_triggering_dags(db_adapter, dss_rule_id, model_type):
                            'raincell_data_from': flo2d_rule_info['raincell_data_from'],
                            'inflow_data_from': flo2d_rule_info['inflow_data_from'],
                            'outflow_data_from': flo2d_rule_info['outflow_data_from'],
-                           'ignore_previous_run': flo2d_rule_info['ignore_previous_run']}
+                           'ignore_previous_run': flo2d_rule_info['ignore_previous_run'],
+                           'accuracy_rule': flo2d_rule_info['accuracy_rule']}
                 dag_info.append({'dag_name': dag_name, 'payload': payload})
         else:
             print('No flo2d rules found.')
