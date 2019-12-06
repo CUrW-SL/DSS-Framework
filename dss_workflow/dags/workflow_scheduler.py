@@ -5,11 +5,18 @@ from airflow.operators.dummy_operator import DummyOperator
 from airflow.models import Variable
 import sys
 
+from airflow.operators.python_operator import PythonOperator
+
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/dss_workflow/plugins/operators')
 from multi_dag_trigger_operator import TriggerMultiDagRunOperator
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
+
+sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/gen_util')
+from controller_util import get_triggering_dags, \
+    update_workflow_routine_status, \
+    set_running_state
 
 prod_dag_name = 'dss_scheduler_v1'
 schedule_interval = '*/5 * * * *'
@@ -31,6 +38,14 @@ def generate_dag_run(context):
     else:
         print('No workflow routine to schedule.')
     return next_workflows
+
+
+def end_routine(**context):
+    print('***************end_routine******************')
+    db_config = Variable.get('db_config', deserialize_json=True)
+    adapter = RuleEngineAdapter.get_instance(db_config)
+    update_workflow_routine_status(adapter)
+    print('******rounting has completed**********')
 
 
 default_args = {
@@ -58,8 +73,11 @@ with DAG(dag_id=prod_dag_name, default_args=default_args,
         pool=dag_pool
     )
 
-    scheduler_end = DummyOperator(
+    scheduler_end = PythonOperator(
         task_id='scheduler_end',
+        python_callable=end_routine,
+        trigger_rule='none_failed',
+        provide_context=True,
         pool=dag_pool
     )
 
