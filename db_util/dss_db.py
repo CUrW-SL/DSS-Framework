@@ -417,6 +417,17 @@ class RuleEngineAdapter:
         else:
             return None
 
+    def get_accuracy_rule_info_by_id(self, rule_id):
+        query = 'select id,model_type, model, observed_stations, station_accuracy, rule_accuracy from dss.accuracy_rules where id=1;'
+        print('get_accuracy_rule_info_by_id|query: ', query)
+        self.cursor.execute(query)
+        result = self.cursor.fetchone()
+        print('get_accuracy_rule_info_by_id|result : ', result)
+        if result is not None:
+            workflow_routine = {'id': result[0], 'model_type': result[1], 'model': result[2],
+                                'observed_stations': result[3],
+                                'station_accuracy': result[4], 'rule_accuracy': result[4]}
+        return workflow_routine
 
 if __name__ == "__main__":
     db_config = {'mysql_user': 'admin', 'mysql_password': 'floody', 'mysql_host': '35.227.163.211', 'mysql_db': 'dss',
