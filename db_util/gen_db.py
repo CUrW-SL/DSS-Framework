@@ -472,6 +472,26 @@ class CurwFcstAdapter:
             print('save_init_state|Exception:', e)
             return None
 
+    def get_source_id(self, model, version):
+        sql_query = 'select id from curw_fcst.source where model=\'{}\' and version=\'{}\';'.format(model, version)
+        print('get_source_id|sql_query : ', sql_query)
+        result = self.get_single_result(self, sql_query)
+        if result is not None:
+            return result[0]
+        else:
+            return None
+
+    def get_hash_id_of_wrf_station(self, variable, unit, source, station_id, exec_date, sim_tag):
+        sql_query = 'select id from curw_fcst.run where variable={} and unit={} and source={} ' \
+                    'and station={} and sim_tag={} end_date > \'{}\';'.format(variable, unit, source, station_id,
+                                                                              sim_tag, exec_date)
+        print('get_hash_id_of_wrf_station|sql_query : ', sql_query)
+        result = self.get_single_result(self, sql_query)
+        if result is not None:
+            return result[0]
+        else:
+            return None
+
 
 class CurwObsAdapter:
     __instance = None

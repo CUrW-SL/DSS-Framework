@@ -9,6 +9,8 @@ from gen_db import CurwFcstAdapter, CurwObsAdapter, CurwSimAdapter
 STATION_TYPE = 'CUrW_WeatherStation'
 MME_TAG = 'MDPA'
 VARIABLE_TYPE = 'rainfall'
+VARIABLE = 1
+UNIT = 1
 
 
 def get_curw_fcst_adapter(db_config=None):
@@ -59,6 +61,18 @@ def get_matching_wrf_station(obs_station, obs_adapter=None, sim_adapter=None):
             print('get_matching_wrf_station|wrf_station_id : ', wrf_station_id)
             return wrf_station_id
     return None
+
+
+def get_wrf_station_hash_id(wrf_model, wrf_version, wrf_station_id, exec_date, sim_tag, fcst_adapter=None):
+    if fcst_adapter is None:
+        fcst_adapter = get_curw_fcst_adapter()
+    source_id = fcst_adapter.get_source_id(wrf_model, wrf_version)
+    if source_id is not None:
+        print('get_wrf_station_hash_id|source_id : ', source_id)
+        hash_id = fcst_adapter.get_hash_id_of_wrf_station(VARIABLE, UNIT, source_id, wrf_station_id, sim_tag, exec_date)
+        if hash_id is not None:
+            print('get_wrf_station_hash_id|hash_id : ', hash_id)
+            return hash_id
 
 
 if __name__ == "__main__":
