@@ -12,6 +12,9 @@ from gfs_sensor import GfsSensorOperator
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
+sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/accuracy_unit/wrf')
+from wrf_accuracy import calculate_wrf_rule_accuracy
+
 prod_dag_name = 'wrf_4.0_A_dag'
 dag_pool = 'wrf_pool'
 
@@ -81,6 +84,9 @@ def check_accuracy(**context):
     print('check_accuracy|rule_info : ', rule_info)
     wrf_rule = {'model': 'A', 'version': '4.0', 'rule_info': rule_info}
     print('check_accuracy|wrf_rule : ', wrf_rule)
+    exec_date = context["execution_date"].to_datetime_string()
+    print('check_accuracy|exec_date : ', wrf_rule)
+    calculate_wrf_rule_accuracy(wrf_rule, exec_date)
 
 
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
