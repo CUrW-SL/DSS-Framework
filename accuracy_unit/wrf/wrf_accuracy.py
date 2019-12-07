@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import sys
 from airflow.models import Variable
 
@@ -73,6 +73,10 @@ def get_wrf_station_hash_id(wrf_model, wrf_version, wrf_station_id, exec_date, s
         if hash_id is not None:
             print('get_wrf_station_hash_id|hash_id : ', hash_id)
             return hash_id
+
+
+def get_wrf_ts_start_end(exec_datetime, wrf_run, gfs_hour):
+    print('')
 
 
 if __name__ == "__main__":
