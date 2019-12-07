@@ -5,6 +5,8 @@ from airflow.models import Variable
 # sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 sys.path.insert(0, '/home/hasitha/PycharmProjects/DSS-Framework/db_util')
 from gen_db import CurwFcstAdapter, CurwObsAdapter, CurwSimAdapter
+from dss_db import RuleEngineAdapter
+
 
 STATION_TYPE = 'CUrW_WeatherStation'
 MME_TAG = 'MDPA'
@@ -12,6 +14,13 @@ VARIABLE_TYPE = 'rainfall'
 VARIABLE = 1
 UNIT = 1
 GFS_DAYS = 3
+
+
+def get_curw_dss_adapter(db_config=None):
+    if db_config is None:
+        db_config = Variable.get('db_config', deserialize_json=True)
+    adapter = RuleEngineAdapter.get_instance(db_config)
+    return adapter
 
 
 def get_curw_fcst_adapter(db_config=None):
@@ -43,17 +52,35 @@ def calculate_wrf_rule_accuracy(wrf_rule, execution_date):
     wrf_version = wrf_rule['version']
     wrf_run = wrf_rule['rule_info']['run']
     gfs_hour = wrf_rule['rule_info']['hour']
-    accuracy_rule = wrf_rule['rule_info']['accuracy_rule']
+    accuracy_rule_id = wrf_rule['rule_info']['accuracy_rule']
     sim_tag = 'gfs_d{}_{}'.format(wrf_run, gfs_hour)
     print('calculate_wrf_rule_accuracy|sim_tag : ', sim_tag)
+    dss_adapter = get_curw_dss_adapter()
+    accuracy_rule = dss_adapter.get_accuracy_rule_info_by_id(accuracy_rule_id)
+    print('calculate_wrf_rule_accuracy|accuracy_rule : ', accuracy_rule)
 
 
-def get_matching_wrf_station(obs_station, obs_adapter=None, sim_adapter=None):
+def get_obs_station_id(obs_station, obs_adapter=None):
     if obs_adapter is None:
         obs_adapter = get_curw_obs_adapter()
     station_id = obs_adapter.get_station_id_by_name(STATION_TYPE, obs_station)
     if station_id is not None:
-        grid_id = '{}_{}_{}_{}'.format(VARIABLE_TYPE, station_id, obs_station, MME_TAG)
+        print('get_obs_station_id|station_id : ', station_id)
+        return station_id
+
+
+def get_obs_station_hash_id(obs_station_id, obs_adapter=None):
+    if obs_adapter is None:
+        obs_adapter = get_curw_obs_adapter()
+    hash_id = obs_adapter.get_station_hash_id(obs_station_id, VARIABLE, UNIT)
+    if hash_id is not None:
+        print('get_obs_station_hash_id|hash_id : ', hash_id)
+        return hash_id
+
+
+def get_matching_wrf_station(obs_station, obs_station_id, obs_adapter=None, sim_adapter=None):
+    if obs_station_id is not None:
+        grid_id = '{}_{}_{}_{}'.format(VARIABLE_TYPE, obs_station_id, obs_station, MME_TAG)
         print('get_matching_wrf_station|grid_id : ', grid_id)
         if sim_adapter is None:
             sim_adapter = get_curw_sim_adapter()
@@ -92,6 +119,21 @@ def get_wrf_ts_start_end(exec_datetime, wrf_run, gfs_hour):
     gfs_ts_start_local = gfs_ts_start_utc + timedelta(hours=5, minutes=30)
     gfs_ts_end_local = gfs_ts_start_local + timedelta(days=GFS_DAYS)
     return [gfs_ts_start_local, gfs_ts_end_local]
+
+
+def get_fcst_tms(wrf_station_hash_id, exec_datetime, tms_start, fcst_adapter=None):
+    tms_end = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    tms_df = fcst_adapter.get_wrf_station_tms(wrf_station_hash_id, exec_datetime, tms_start, tms_end)
+    if tms_df is not None:
+        print('get_fcst_tms|tms_df: ', tms_df)
+        return tms_df
+
+
+def get_obs_tms(wrf_station_hash_id, exec_datetime, tms_start, tms_end, fcst_adapter=None):
+    tms_df = fcst_adapter.get_wrf_station_tms(wrf_station_hash_id, exec_datetime, tms_start, tms_end)
+    if tms_df is not None:
+        print('get_fcst_tms|tms_df: ', tms_df)
+        return tms_df
 
 
 if __name__ == "__main__":
