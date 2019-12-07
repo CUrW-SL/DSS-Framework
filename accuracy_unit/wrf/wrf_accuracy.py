@@ -12,6 +12,8 @@ MME_TAG = 'MDPA'
 VARIABLE_TYPE = 'rainfall'
 VARIABLE = 1
 UNIT = 1
+OBS_VARIABLE = 10
+OBS_UNIT = 9
 GFS_DAYS = 3
 
 
@@ -112,7 +114,7 @@ def get_obs_station_id(obs_station, obs_adapter=None):
 def get_obs_station_hash_id(obs_station_id, obs_adapter=None):
     if obs_adapter is None:
         obs_adapter = get_curw_obs_adapter()
-    hash_id = obs_adapter.get_station_hash_id(obs_station_id, VARIABLE, UNIT)
+    hash_id = obs_adapter.get_station_hash_id(obs_station_id, OBS_VARIABLE, OBS_UNIT)
     if hash_id is not None:
         print('get_obs_station_hash_id|hash_id : ', hash_id)
         return hash_id
