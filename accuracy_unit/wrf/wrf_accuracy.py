@@ -7,7 +7,6 @@ sys.path.insert(0, '/home/hasitha/PycharmProjects/DSS-Framework/db_util')
 from gen_db import CurwFcstAdapter, CurwObsAdapter, CurwSimAdapter
 from dss_db import RuleEngineAdapter
 
-
 STATION_TYPE = 'CUrW_WeatherStation'
 MME_TAG = 'MDPA'
 VARIABLE_TYPE = 'rainfall'
@@ -44,9 +43,9 @@ def get_curw_sim_adapter(db_config=None):
     return adapter
 
 
-def calculate_wrf_rule_accuracy(wrf_rule, execution_date):
+def calculate_wrf_rule_accuracy(wrf_rule, exec_datetime):
     print('calculate_wrf_rule_accuracy|wrf_rule : ', wrf_rule)
-    print('calculate_wrf_rule_accuracy|execution_date : ', execution_date)
+    print('calculate_wrf_rule_accuracy|execution_date : ', exec_datetime)
     wrf_model = 'WRF_{}'.format(wrf_rule['model'])
     print('calculate_wrf_rule_accuracy|wrf_model : ', wrf_model)
     wrf_version = wrf_rule['version']
@@ -58,6 +57,47 @@ def calculate_wrf_rule_accuracy(wrf_rule, execution_date):
     dss_adapter = get_curw_dss_adapter()
     accuracy_rule = dss_adapter.get_accuracy_rule_info_by_id(accuracy_rule_id)
     print('calculate_wrf_rule_accuracy|accuracy_rule : ', accuracy_rule)
+    obs_station_list = format_obs_station_list(accuracy_rule['observed_stations'], accuracy_rule['station_accuracy'])
+    if len(obs_station_list) > 0:
+        for [obs_station, accuracy_level] in obs_station_list:
+            calculate_station_accuracy(obs_station, wrf_model, wrf_version, wrf_run, gfs_hour, exec_datetime, sim_tag)
+
+
+def calculate_station_accuracy(obs_station, wrf_model, wrf_version, wrf_run, gfs_hour, exec_datetime, sim_tag):
+    obs_adapter = get_curw_obs_adapter()
+    obs_station_id = get_obs_station_id(obs_station, obs_adapter)
+    [tms_start, tms_end] = get_wrf_ts_start_end(exec_datetime, wrf_run, gfs_hour)
+    tms_start = tms_start.strftime('%Y-%m-%d %H:%M:%S')
+    tms_end = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    if obs_station_id is not None:
+        obs_hash_id = get_obs_station_hash_id(obs_station_id, obs_adapter)
+        obs_df = get_obs_tms(obs_hash_id, exec_datetime, tms_start, tms_end)
+        if obs_df is not None:
+            sim_adapter = get_curw_sim_adapter()
+            wrf_station_id = get_matching_wrf_station(obs_station, obs_station_id, sim_adapter)
+            if wrf_station_id is not None:
+                fcst_adapter = get_curw_fcst_adapter()
+                wrf_hash_id = get_wrf_station_hash_id(wrf_model, wrf_version, wrf_station_id, exec_datetime, sim_tag,
+                                                      fcst_adapter)
+                if wrf_hash_id is not None:
+                    fcst_df = get_fcst_tms(wrf_hash_id, exec_datetime, tms_start, tms_end, fcst_adapter)
+                    if fcst_df is not None:
+                        print('calculate_station_accuracy|obs_df : ', obs_df)
+                        print('calculate_station_accuracy|fcst_df : ', fcst_df)
+
+
+def format_obs_station_list(obs_stations, station_accuracy):
+    station_list = obs_stations.split(",")
+    print(station_list)
+    formatted_list = []
+    for station in station_list:
+        station_val = station.split('-')
+        if len(station_val) == 2:
+            formatted_list.append([station_val[0], station_val[1]])
+        else:
+            formatted_list.append([station_val[0], station_accuracy])
+    print(formatted_list)
+    return formatted_list
 
 
 def get_obs_station_id(obs_station, obs_adapter=None):
@@ -78,7 +118,7 @@ def get_obs_station_hash_id(obs_station_id, obs_adapter=None):
         return hash_id
 
 
-def get_matching_wrf_station(obs_station, obs_station_id, obs_adapter=None, sim_adapter=None):
+def get_matching_wrf_station(obs_station, obs_station_id, sim_adapter=None):
     if obs_station_id is not None:
         grid_id = '{}_{}_{}_{}'.format(VARIABLE_TYPE, obs_station_id, obs_station, MME_TAG)
         print('get_matching_wrf_station|grid_id : ', grid_id)
@@ -121,16 +161,15 @@ def get_wrf_ts_start_end(exec_datetime, wrf_run, gfs_hour):
     return [gfs_ts_start_local, gfs_ts_end_local]
 
 
-def get_fcst_tms(wrf_station_hash_id, exec_datetime, tms_start, fcst_adapter=None):
-    tms_end = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+def get_fcst_tms(wrf_station_hash_id, exec_datetime, tms_start, tms_end, fcst_adapter=None):
     tms_df = fcst_adapter.get_wrf_station_tms(wrf_station_hash_id, exec_datetime, tms_start, tms_end)
     if tms_df is not None:
         print('get_fcst_tms|tms_df: ', tms_df)
         return tms_df
 
 
-def get_obs_tms(wrf_station_hash_id, exec_datetime, tms_start, tms_end, fcst_adapter=None):
-    tms_df = fcst_adapter.get_wrf_station_tms(wrf_station_hash_id, exec_datetime, tms_start, tms_end)
+def get_obs_tms(obs_station_hash_id, exec_datetime, tms_start, tms_end, obs_adapter=None):
+    tms_df = obs_adapter.get_timeseries_by_id(obs_station_hash_id, tms_start, tms_end)
     if tms_df is not None:
         print('get_fcst_tms|tms_df: ', tms_df)
         return tms_df
