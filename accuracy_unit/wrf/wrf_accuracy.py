@@ -11,6 +11,7 @@ MME_TAG = 'MDPA'
 VARIABLE_TYPE = 'rainfall'
 VARIABLE = 1
 UNIT = 1
+GFS_DAYS = 3
 
 
 def get_curw_fcst_adapter(db_config=None):
@@ -76,18 +77,33 @@ def get_wrf_station_hash_id(wrf_model, wrf_version, wrf_station_id, exec_date, s
 
 
 def get_wrf_ts_start_end(exec_datetime, wrf_run, gfs_hour):
-    print('')
+    wrf_run = int(wrf_run)
+    exec_datetime = datetime.strptime(exec_datetime, '%Y-%m-%d %H:%M:%S')
+    print(exec_datetime)
+    exec_date_str = exec_datetime.strftime('%Y-%m-%d')
+    exec_date = datetime.strptime(exec_date_str, '%Y-%m-%d')
+    print(exec_date)
+    ts_start_date = exec_date - timedelta(days=wrf_run)
+    ts_start_date_str = ts_start_date.strftime('%Y-%m-%d')
+    print(ts_start_date_str)
+    gfs_ts_start_utc_str = '{} {}:00:00'.format(ts_start_date_str, gfs_hour)
+    print(gfs_ts_start_utc_str)
+    gfs_ts_start_utc = datetime.strptime(gfs_ts_start_utc_str, '%Y-%m-%d %H:%M:%S')
+    gfs_ts_start_local = gfs_ts_start_utc + timedelta(hours=5, minutes=30)
+    gfs_ts_end_local = gfs_ts_start_local + timedelta(days=GFS_DAYS)
+    return [gfs_ts_start_local, gfs_ts_end_local]
 
 
 if __name__ == "__main__":
-    obs_db_config = {'mysql_user': 'admin', 'mysql_password': 'floody', 'mysql_host': '35.227.163.211',
-                     'mysql_db': 'curw_obs', 'log_path': '/home/hasitha/PycharmProjects/DSS-Framework/log'}
-    print(len(obs_db_config.keys()))
-    sim_db_config = {'mysql_user': 'admin', 'mysql_password': 'floody', 'mysql_host': '35.227.163.211',
-                     'mysql_db': 'curw_sim', 'log_path': '/home/hasitha/PycharmProjects/DSS-Framework/log'}
-    fcst_db_config = {'mysql_user': 'admin', 'mysql_password': 'floody', 'mysql_host': '35.227.163.211',
-                      'mysql_db': 'curw_fcst', 'log_path': '/home/hasitha/PycharmProjects/DSS-Framework/log'}
-    obs_adapter = get_curw_obs_adapter(obs_db_config)
-    sim_adapter = get_curw_sim_adapter(sim_db_config)
-    fcst_adapter = get_curw_fcst_adapter(fcst_db_config)
-    print(get_matching_wrf_station('Arangala', obs_adapter, sim_adapter))
+    # obs_db_config = {'mysql_user': 'admin', 'mysql_password': 'floody', 'mysql_host': '35.227.163.211',
+    #                  'mysql_db': 'curw_obs', 'log_path': '/home/hasitha/PycharmProjects/DSS-Framework/log'}
+    # print(len(obs_db_config.keys()))
+    # sim_db_config = {'mysql_user': 'admin', 'mysql_password': 'floody', 'mysql_host': '35.227.163.211',
+    #                  'mysql_db': 'curw_sim', 'log_path': '/home/hasitha/PycharmProjects/DSS-Framework/log'}
+    # fcst_db_config = {'mysql_user': 'admin', 'mysql_password': 'floody', 'mysql_host': '35.227.163.211',
+    #                   'mysql_db': 'curw_fcst', 'log_path': '/home/hasitha/PycharmProjects/DSS-Framework/log'}
+    # obs_adapter = get_curw_obs_adapter(obs_db_config)
+    # sim_adapter = get_curw_sim_adapter(sim_db_config)
+    # fcst_adapter = get_curw_fcst_adapter(fcst_db_config)
+    # print(get_matching_wrf_station('Arangala', obs_adapter, sim_adapter))
+    print(get_wrf_ts_start_end('2019-12-07 07:21:32', '2', '12'))
