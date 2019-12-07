@@ -424,10 +424,11 @@ class RuleEngineAdapter:
         result = self.cursor.fetchone()
         print('get_accuracy_rule_info_by_id|result : ', result)
         if result is not None:
-            workflow_routine = {'id': result[0], 'model_type': result[1], 'model': result[2],
+            accuracy_rule = {'id': result[0], 'model_type': result[1], 'model': result[2],
                                 'observed_stations': result[3],
                                 'station_accuracy': result[4], 'rule_accuracy': result[4]}
-        return workflow_routine
+        return accuracy_rule
+
 
 if __name__ == "__main__":
     db_config = {'mysql_user': 'admin', 'mysql_password': 'floody', 'mysql_host': '35.227.163.211', 'mysql_db': 'dss',

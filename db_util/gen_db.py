@@ -492,6 +492,16 @@ class CurwFcstAdapter:
         else:
             return None
 
+    def get_wrf_station_tms(self, hash_id, exec_date, tms_start, tms_end):
+        sql_query = 'select time,value from curw_fcst.data where id=\'{}\' and ' \
+                    'time >= \'{}\' and time <= \'{}\' and ' \
+                    'fgt >= \'{}\';'.format(hash_id, tms_start, tms_end, exec_date)
+        print('get_wrf_station_tms|sql_query : ', sql_query)
+        results = self.get_multiple_result(sql_query)
+        if results is not None:
+            df = pd.DataFrame(data=results, columns=['time', 'value']).set_index(keys='time')
+            return df
+        return None
 
 class CurwObsAdapter:
     __instance = None
@@ -646,11 +656,21 @@ class CurwObsAdapter:
                 ts_df = self.get_timeseries_by_id(hash_id, start_time, end_time)
 
     def get_station_id_by_name(self, station_type, station_name):
-        query = 'select id,latitude,longitude from curw_obs.station where ' \
-                'station_type = \'{}\' and name = \'{}\''.format(station_type, station_name)
-        print('get_station_id_by_name|query : ', query)
-        result = self.get_single_result(query)
+        sql_query = 'select id,latitude,longitude from curw_obs.station where ' \
+                    'station_type = \'{}\' and name = \'{}\''.format(station_type, station_name)
+        print('get_station_id_by_name|sql_query : ', sql_query)
+        result = self.get_single_result(sql_query)
         if result is not None:
             station_id = result[0]
             return station_id
+        return None
+
+    def get_station_hash_id(self, station_id, variable, unit):
+        sql_query = 'select id from curw_obs.run where station=\'{}\' and ' \
+                    'variable=\'{}\' and unit=\'{}\';'.format(station_id, variable, unit)
+        print('get_station_hash_id|sql_query : ', sql_query)
+        result = self.get_single_result(sql_query)
+        if result is not None:
+            hash_id = result[0]
+            return hash_id
         return None
