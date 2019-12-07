@@ -1,7 +1,7 @@
 from datetime import datetime
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
-#from airflow.operators import GfsSensorOperator
+# from airflow.operators import GfsSensorOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow.models import Variable
 import sys
@@ -25,8 +25,8 @@ default_args = {
     'email_on_failure': True,
 }
 
-#./runner.sh -r 0 -m E -v 4.0 -h 18 -d 2019-10-24
-#./rfielder.sh -r 0 -m E -v 4.0 -h 18
+# ./runner.sh -r 0 -m E -v 4.0 -h 18 -d 2019-10-24
+# ./rfielder.sh -r 0 -m E -v 4.0 -h 18
 
 run_wrf4_A_cmd = 'echo "run_wrf_A_cmd" ;sleep $[($RANDOM % 1000) + 1]s'
 rfield_gen_cmd = 'echo "rfield_gen_cmd" ;sleep $[($RANDOM % 100) + 1]s'
@@ -86,6 +86,7 @@ def check_accuracy(**context):
     print('check_accuracy|wrf_rule : ', wrf_rule)
     exec_date = context["execution_date"].to_datetime_string()
     print('check_accuracy|exec_date : ', wrf_rule)
+    # TODO: condition tobe added
     calculate_wrf_rule_accuracy(wrf_rule, exec_date)
 
 
@@ -149,4 +150,3 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     init_wrfv4_A >> running_state_wrfv4A >> check_gfs_availability_wrfv4A >> \
     run_wrf4_A >> rfield_gen_wrfv4A >> wrf_data_push_wrfv4A >> \
     check_accuracy_wrfv4A >> complete_state_wrfv4A
-

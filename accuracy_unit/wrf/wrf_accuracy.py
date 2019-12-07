@@ -2,8 +2,8 @@ from datetime import datetime, timedelta
 import sys
 from airflow.models import Variable
 
-# sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
-sys.path.insert(0, '/home/hasitha/PycharmProjects/DSS-Framework/db_util')
+sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
+# sys.path.insert(0, '/home/hasitha/PycharmProjects/DSS-Framework/db_util')
 from gen_db import CurwFcstAdapter, CurwObsAdapter, CurwSimAdapter
 from dss_db import RuleEngineAdapter
 
