@@ -504,6 +504,7 @@ class CurwFcstAdapter:
             return df
         return None
 
+
 class CurwObsAdapter:
     __instance = None
 
