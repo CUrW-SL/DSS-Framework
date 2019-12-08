@@ -483,8 +483,9 @@ class CurwFcstAdapter:
 
     def get_hash_id_of_wrf_station(self, variable, unit, source, station_id, sim_tag, exec_date):
         sql_query = 'select id from curw_fcst.run where variable={} and unit={} and source={} ' \
-                    'and station={} and sim_tag={} end_date > \'{}\';'.format(variable, unit, source, station_id,
-                                                                              sim_tag, exec_date)
+                    'and station=\'{}\' and sim_tag=\'{}\' and end_date >= \'{}\';'.format(variable, unit, source,
+                                                                                           station_id,
+                                                                                           sim_tag, exec_date)
         print('get_hash_id_of_wrf_station|sql_query : ', sql_query)
         result = self.get_single_result(sql_query)
         if result is not None:
