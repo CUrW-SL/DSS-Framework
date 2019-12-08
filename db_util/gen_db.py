@@ -475,7 +475,7 @@ class CurwFcstAdapter:
     def get_source_id(self, model, version):
         sql_query = 'select id from curw_fcst.source where model=\'{}\' and version=\'{}\';'.format(model, version)
         print('get_source_id|sql_query : ', sql_query)
-        result = self.get_single_result(self, sql_query)
+        result = self.get_single_result(sql_query)
         if result is not None:
             return result[0]
         else:
@@ -486,7 +486,7 @@ class CurwFcstAdapter:
                     'and station={} and sim_tag={} end_date > \'{}\';'.format(variable, unit, source, station_id,
                                                                               sim_tag, exec_date)
         print('get_hash_id_of_wrf_station|sql_query : ', sql_query)
-        result = self.get_single_result(self, sql_query)
+        result = self.get_single_result(sql_query)
         if result is not None:
             return result[0]
         else:
@@ -571,7 +571,7 @@ class CurwObsAdapter:
 
     def get_station_id_by_lat_lon(self, lat, lon):
         sql_query = 'select id,name curw_obs.station where latitude={} and longitude={}'.format(lat, lon)
-        result = self.get_single_result(self, sql_query)
+        result = self.get_single_result(sql_query)
         if result is not None:
             return {'id': result[0], 'name': result[1]}
         else:
@@ -579,7 +579,7 @@ class CurwObsAdapter:
 
     def get_hash_by_id(self, station_id, start_time):
         sql_query = 'select id from curw_obs.run where station={} and end_date > {}'.format(station_id, start_time)
-        result = self.get_single_result(self, sql_query)
+        result = self.get_single_result(sql_query)
         if result is not None:
             hash_id = result[0]
             return hash_id
