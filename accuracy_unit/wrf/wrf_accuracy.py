@@ -73,7 +73,7 @@ def calculate_station_accuracy(obs_station, wrf_model, wrf_version, wrf_run, gfs
     tms_end = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     if obs_station_id is not None:
         obs_hash_id = get_obs_station_hash_id(obs_station_id, obs_adapter)
-        obs_df = get_obs_tms(obs_hash_id, exec_datetime, tms_start, tms_end)
+        obs_df = get_obs_tms(obs_hash_id, exec_datetime, tms_start, tms_end, obs_adapter)
         if obs_df is not None:
             sim_adapter = get_curw_sim_adapter()
             wrf_station_id = get_matching_wrf_station(obs_station, obs_station_id, sim_adapter)
@@ -164,6 +164,8 @@ def get_wrf_ts_start_end(exec_datetime, wrf_run, gfs_hour):
 
 
 def get_fcst_tms(wrf_station_hash_id, exec_datetime, tms_start, tms_end, fcst_adapter=None):
+    if fcst_adapter is None:
+        fcst_adapter = get_curw_fcst_adapter()
     tms_df = fcst_adapter.get_wrf_station_tms(wrf_station_hash_id, exec_datetime, tms_start, tms_end)
     if tms_df is not None:
         print('get_fcst_tms|tms_df: ', tms_df)
@@ -171,6 +173,8 @@ def get_fcst_tms(wrf_station_hash_id, exec_datetime, tms_start, tms_end, fcst_ad
 
 
 def get_obs_tms(obs_station_hash_id, exec_datetime, tms_start, tms_end, obs_adapter=None):
+    if obs_adapter is None:
+        obs_adapter = get_curw_obs_adapter()
     tms_df = obs_adapter.get_timeseries_by_id(obs_station_hash_id, tms_start, tms_end)
     if tms_df is not None:
         print('get_fcst_tms|tms_df: ', tms_df)
