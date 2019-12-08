@@ -77,10 +77,12 @@ def calculate_station_accuracy(obs_station, wrf_model, wrf_version, wrf_run, gfs
         if obs_df is not None:
             sim_adapter = get_curw_sim_adapter()
             wrf_station_id = get_matching_wrf_station(obs_station, obs_station_id, sim_adapter)
+            print('calculate_station_accuracy|wrf_station_id : ', wrf_station_id)
             if wrf_station_id is not None:
                 fcst_adapter = get_curw_fcst_adapter()
                 wrf_hash_id = get_wrf_station_hash_id(wrf_model, wrf_version, wrf_station_id, exec_datetime, sim_tag,
                                                       fcst_adapter)
+                print('calculate_station_accuracy|wrf_hash_id : ', wrf_hash_id)
                 if wrf_hash_id is not None:
                     fcst_df = get_fcst_tms(wrf_hash_id, exec_datetime, tms_start, tms_end, fcst_adapter)
                     if fcst_df is not None:
@@ -177,7 +179,7 @@ def get_obs_tms(obs_station_hash_id, exec_datetime, tms_start, tms_end, obs_adap
         obs_adapter = get_curw_obs_adapter()
     tms_df = obs_adapter.get_timeseries_by_id(obs_station_hash_id, tms_start, tms_end)
     if tms_df is not None:
-        print('get_fcst_tms|tms_df: ', tms_df)
+        print('get_obs_tms|tms_df: ', tms_df)
         return tms_df
 
 
