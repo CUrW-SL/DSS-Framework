@@ -1,12 +1,14 @@
 from datetime import datetime, timedelta
 import sys
 from airflow.models import Variable
+import pandas as pd
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 # sys.path.insert(0, '/home/hasitha/PycharmProjects/DSS-Framework/db_util')
 from gen_db import CurwFcstAdapter, CurwObsAdapter, CurwSimAdapter
 from dss_db import RuleEngineAdapter
 
+COMMON_DATE_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 STATION_TYPE = 'CUrW_WeatherStation'
 MME_TAG = 'MDPA'
 VARIABLE_TYPE = 'rainfall'
@@ -180,7 +182,16 @@ def get_obs_tms(obs_station_hash_id, exec_datetime, tms_start, tms_end, obs_adap
     tms_df = obs_adapter.get_timeseries_by_id(obs_station_hash_id, tms_start, tms_end)
     if tms_df is not None:
         print('get_obs_tms|tms_df: ', tms_df)
-        return tms_df
+        return format_df_to_15min_intervals(tms_df)
+
+
+def format_df_to_15min_intervals(tms_df):
+    tms_df['time'] = pd.to_datetime(tms_df['time'], format=COMMON_DATE_TIME_FORMAT)
+    tms_df.set_index('time', inplace=True)
+    min15_ts = pd.DataFrame()
+    min15_ts['value'] = tms_df['value'].resample('15min', label='right', closed='right').sum()
+    print(min15_ts)
+    return min15_ts
 
 
 if __name__ == "__main__":
