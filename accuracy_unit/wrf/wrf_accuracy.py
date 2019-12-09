@@ -172,8 +172,13 @@ def get_fcst_tms(wrf_station_hash_id, exec_datetime, tms_start, tms_end, fcst_ad
         fcst_adapter = get_curw_fcst_adapter()
     tms_df = fcst_adapter.get_wrf_station_tms(wrf_station_hash_id, exec_datetime, tms_start, tms_end)
     if tms_df is not None:
-        print('get_fcst_tms|tms_df: ', tms_df)
-        return tms_df
+        return format_df_to_time_indexing(tms_df)
+
+
+def format_df_to_time_indexing(tms_df):
+    tms_df['time'] = pd.to_datetime(tms_df['time'], format=COMMON_DATE_TIME_FORMAT)
+    tms_df.set_index('time', inplace=True)
+    return tms_df
 
 
 def get_obs_tms(obs_station_hash_id, exec_datetime, tms_start, tms_end, obs_adapter=None):
@@ -181,13 +186,11 @@ def get_obs_tms(obs_station_hash_id, exec_datetime, tms_start, tms_end, obs_adap
         obs_adapter = get_curw_obs_adapter()
     tms_df = obs_adapter.get_timeseries_by_id(obs_station_hash_id, tms_start, tms_end)
     if tms_df is not None:
-        print('get_obs_tms|tms_df: ', tms_df)
         return format_df_to_15min_intervals(tms_df)
 
 
 def format_df_to_15min_intervals(tms_df):
-    tms_df['time'] = pd.to_datetime(tms_df['time'], format=COMMON_DATE_TIME_FORMAT)
-    tms_df.set_index('time', inplace=True)
+    tms_df = format_df_to_time_indexing(tms_df)
     min15_ts = pd.DataFrame()
     min15_ts['value'] = tms_df['value'].resample('15min', label='right', closed='right').sum()
     print(min15_ts)
