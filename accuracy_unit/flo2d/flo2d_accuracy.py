@@ -82,7 +82,7 @@ def calculate_flo2d_rule_accuracy(flo2d_rule, exec_datetime):
         print('calculate_flo2d_rule_accuracy|total_stations : ', total_stations)
         print('calculate_flo2d_rule_accuracy|success_count : ', success_count)
         accuracy_percentage = (success_count / total_stations) * 100
-        print('calculate_flo2d_rule_accuracy|accuracy_percentage : ', total_stations)
+        print('calculate_flo2d_rule_accuracy|accuracy_percentage : ', accuracy_percentage)
         dss_adapter.update_flo2d_rule_accuracy_level(accuracy_percentage, flo2d_rule_id)
         print('flo2d rule current accuracy successfully updated.')
 

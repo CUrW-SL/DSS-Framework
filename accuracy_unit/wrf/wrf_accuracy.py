@@ -65,7 +65,6 @@ def calculate_wrf_rule_accuracy(wrf_rule, exec_datetime):
     accuracy_rule = dss_adapter.get_accuracy_rule_info_by_id(accuracy_rule_id)
     print('calculate_wrf_rule_accuracy|accuracy_rule : ', accuracy_rule)
     obs_station_list = format_obs_station_list(accuracy_rule['observed_stations'], accuracy_rule['allowed_error'])
-    station_result = {}
     success_count = 0
     if len(obs_station_list) > 0:
         for [obs_station, allowed_error] in obs_station_list:
@@ -73,13 +72,8 @@ def calculate_wrf_rule_accuracy(wrf_rule, exec_datetime):
                                                        exec_datetime, sim_tag)
             if station_error is not None:
                 if station_error <= allowed_error:
-                    station_result[obs_station] = True
                     success_count + 1
-                else:
-                    station_result[obs_station] = False
-            else:
-                station_result[obs_station] = False
-        total_stations = len(station_result.keys())
+        total_stations = len(obs_station_list)
         print('calculate_wrf_rule_accuracy|total_stations : ', total_stations)
         print('calculate_wrf_rule_accuracy|success_count : ', success_count)
         accuracy_percentage = (success_count / total_stations) * 100
