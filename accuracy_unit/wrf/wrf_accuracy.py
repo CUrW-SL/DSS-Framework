@@ -67,7 +67,8 @@ def calculate_wrf_rule_accuracy(wrf_rule, exec_datetime):
             calculate_station_accuracy(obs_station, wrf_model, wrf_version, wrf_run, gfs_hour, exec_datetime, sim_tag)
 
 
-def calculate_station_accuracy(obs_station, wrf_model, wrf_version, wrf_run, gfs_hour, exec_datetime, sim_tag):
+def calculate_station_accuracy(obs_station, wrf_model, wrf_version, wrf_run, gfs_hour,
+                               exec_datetime, sim_tag, method='MAD'):
     obs_adapter = get_curw_obs_adapter()
     obs_station_id = get_obs_station_id(obs_station, obs_adapter)
     [tms_start, tms_end] = get_wrf_ts_start_end(exec_datetime, wrf_run, gfs_hour)
@@ -90,6 +91,25 @@ def calculate_station_accuracy(obs_station, wrf_model, wrf_version, wrf_run, gfs
                     if fcst_df is not None:
                         print('calculate_station_accuracy|obs_df : ', obs_df)
                         print('calculate_station_accuracy|fcst_df : ', fcst_df)
+                        merged_df = obs_df.merge(fcst_df, how='left', on='time')
+                        merged_df['cumulative_observed'] = merged_df['observed'].cumsum()
+                        merged_df['cumulative_forecast'] = merged_df['forecast'].cumsum()
+                        print(merged_df)
+                        merged_df['cum_diff'] = merged_df["cumulative_observed"] - merged_df["cumulative_forecast"]
+                        row_count = len(merged_df.index)
+                        print('row_count : ', row_count)
+                        if method == 'MAD':
+                            print('MAD')
+                            merged_df['abs_cum_diff'] = merged_df['cum_diff'].abs()
+                            sum_abs_diff = merged_df['abs_diff'].sum()
+                            print('sum_abs_diff : ', sum_abs_diff)
+                            mean_absolute_deviation = sum_abs_diff / row_count
+                            print('mean_absolute_deviation : ', mean_absolute_deviation)
+                            return mean_absolute_deviation
+                        elif method == 'RMSE':
+                            print('RMSE')
+                        else:
+                            print('Invalid method.')
 
 
 def format_obs_station_list(obs_stations, station_accuracy):
