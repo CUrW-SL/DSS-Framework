@@ -223,6 +223,7 @@ def get_fcst_tms(wrf_station_hash_id, exec_datetime, tms_start, tms_end, fcst_ad
 
 def format_df_to_time_indexing(tms_df):
     tms_df['time'] = pd.to_datetime(tms_df['time'], format=COMMON_DATE_TIME_FORMAT)
+    print('format_df_to_time_indexing|tms_df : ', tms_df)
     tms_df.set_index('time', inplace=True)
     return tms_df
 
