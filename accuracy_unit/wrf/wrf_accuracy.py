@@ -1,7 +1,9 @@
+import math
 from datetime import datetime, timedelta
 import sys
 from airflow.models import Variable
 import pandas as pd
+import numpy as np
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 # sys.path.insert(0, '/home/hasitha/PycharmProjects/DSS-Framework/db_util')
@@ -108,8 +110,13 @@ def calculate_station_accuracy(obs_station, wrf_model, wrf_version, wrf_run, gfs
                             return mean_absolute_deviation
                         elif method == 'RMSE':
                             print('RMSE')
+                            merged_df['diff_square'] = np.power((merged_df['cum_diff']), 2)
+                            root_mean_square_error = math.sqrt(merged_df['diff_square'].sum() / row_count)
+                            print('root_mean_square_error : ', root_mean_square_error)
+                            return root_mean_square_error
                         else:
                             print('Invalid method.')
+    return None
 
 
 def format_obs_station_list(obs_stations, station_accuracy):
