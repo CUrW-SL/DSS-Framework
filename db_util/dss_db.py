@@ -418,7 +418,7 @@ class RuleEngineAdapter:
             return None
 
     def get_accuracy_rule_info_by_id(self, rule_id):
-        query = 'select id,model_type, model, observed_stations, station_accuracy, rule_accuracy from dss.accuracy_rules where id=1;'
+        query = 'select id,model_type, model, observed_stations, allowed_error, rule_accuracy from dss.accuracy_rules where id=1;'
         print('get_accuracy_rule_info_by_id|query: ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
@@ -426,7 +426,7 @@ class RuleEngineAdapter:
         if result is not None:
             accuracy_rule = {'id': result[0], 'model_type': result[1], 'model': result[2],
                                 'observed_stations': result[3],
-                                'station_accuracy': result[4], 'rule_accuracy': result[4]}
+                             'allowed_error': result[4], 'rule_accuracy': result[4]}
         return accuracy_rule
 
 
