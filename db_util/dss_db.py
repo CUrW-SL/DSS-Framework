@@ -181,6 +181,12 @@ class RuleEngineAdapter:
             print('get_wrf_rule_status_by_id|wrf_rule : ', wrf_rule)
         return wrf_rule
 
+    def update_wrf_rule_accuracy_level(self, accuracy_level, rule_id, ):
+        query = 'update `dss`.`wrf_rules` set `current_accuracy`=\'{}\' ' \
+                'WHERE `id`=\'{}\';'.format(accuracy_level, rule_id)
+        print('update_wrf_rule_accuracy_level|query : ', query)
+        self.update_query(query)
+
     def get_hechms_rule_info(self, status=1):
         hechms_rules = []
         query = 'select id, name, target_model,forecast_days, observed_days, ' \
