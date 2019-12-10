@@ -500,7 +500,7 @@ class CurwFcstAdapter:
         print('get_wrf_station_tms|sql_query : ', sql_query)
         results = self.get_multiple_result(sql_query)
         if results is not None:
-            df = pd.DataFrame(data=results, columns=['time', 'value']).set_index(keys='time')
+            df = pd.DataFrame(data=results, columns=['time', 'value'])
             return df
         return None
 
@@ -607,7 +607,7 @@ class CurwObsAdapter:
                 print('len(results) : {}'.format(len(results)))
                 data_error = ((time_step_count - len(results)) / time_step_count) * 100
                 if data_error < 0:
-                    df = pd.DataFrame(data=results, columns=['time', 'value']).set_index(keys='time')
+                    df = pd.DataFrame(data=results, columns=['time', 'value'])
                     return df
                 elif data_error < 30:
                     print('data_error : {}'.format(data_error))
@@ -626,7 +626,7 @@ class CurwObsAdapter:
                         else:
                             formatted_ts.append((tms_step, Decimal(0)))
                         i += 1
-                    df = pd.DataFrame(data=formatted_ts, columns=['time', 'value']).set_index(keys='time')
+                    df = pd.DataFrame(data=formatted_ts, columns=['time', 'value'])
                     print('get_station_timeseries|df: ', df)
                     return df
                 else:
@@ -645,7 +645,7 @@ class CurwObsAdapter:
             start_time, end_time, hash_id)
         results = self.get_multiple_result(data_sql)
         if results is not None:
-            df = pd.DataFrame(data=results, columns=['time', 'value']).set_index(keys='time')
+            df = pd.DataFrame(data=results, columns=['time', 'value'])
 
     def get_ts_df(self, lat, lon, start_time, end_time):
         print('get_ts_df|[lat, lon, start_time, end_time] : ', lat, lon, start_time, end_time)
