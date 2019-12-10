@@ -8,8 +8,8 @@ import sys
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
-sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/dss_workflow/plugins/operators')
-from workflow_completion_sensor import WorkflowSensorOperator
+sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/accuracy_unit/flo2d')
+from wrf_accuracy import calculate_flo2d_rule_accuracy
 
 prod_dag_name = 'flo2d_250m_dag'
 dag_pool = 'flo2d_pool'
@@ -27,6 +27,18 @@ create_inflow_cmd = 'echo "create_inflow_cmd" ;sleep $[($RANDOM % 10) + 1]s'
 create_outflow_cmd = 'echo "create_outflow_cmd" ;sleep $[($RANDOM % 10) + 1]s'
 run_flo2d_250m_cmd = 'echo "run_flo2d_250m_cmd" ;sleep 900s'
 extract_water_level_cmd = 'echo "extract_water_level_cmd" ;sleep $[($RANDOM % 10) + 1]s'
+
+
+def check_accuracy(**context):
+    print('check_accuracy|context : ', context)
+    rule_info = context['task_instance'].xcom_pull(task_ids='init_flo2d_250m')['rule_info']
+    print('check_accuracy|rule_info : ', rule_info)
+    flo2d_rule = {'model': '250m', 'rule_info': rule_info}
+    print('check_accuracy|flo2d_rule : ', flo2d_rule)
+    exec_date = context["execution_date"].to_datetime_string()
+    print('check_accuracy|exec_date : ', flo2d_rule)
+    # TODO: condition tobe added
+    calculate_flo2d_rule_accuracy(flo2d_rule, exec_date)
 
 
 def update_workflow_status(status, rule_id):
@@ -121,6 +133,13 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
+    check_accuracy_flo2d250m = PythonOperator(
+        task_id='check_accuracy_flo2d250m',
+        provide_context=True,
+        python_callable=check_accuracy,
+        pool=dag_pool
+    )
+
     complete_state_flo2d_250m = PythonOperator(
         task_id='complete_state_flo2d_250m',
         provide_context=True,
@@ -130,5 +149,4 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
 
     init_flo2d_250m >> running_state_flo2d_250m >> create_raincell_flo2d_250m >> \
     create_inflow_flo2d_250m >> create_outflow_flo2d_250m >> run_flo2d_250m_flo2d_250m >> \
-    extract_water_level_flo2d_250m >> complete_state_flo2d_250m
-
+    extract_water_level_flo2d_250m >> check_accuracy_flo2d250m >> complete_state_flo2d_250m
