@@ -63,10 +63,26 @@ def calculate_wrf_rule_accuracy(wrf_rule, exec_datetime):
     dss_adapter = get_curw_dss_adapter()
     accuracy_rule = dss_adapter.get_accuracy_rule_info_by_id(accuracy_rule_id)
     print('calculate_wrf_rule_accuracy|accuracy_rule : ', accuracy_rule)
-    obs_station_list = format_obs_station_list(accuracy_rule['observed_stations'], accuracy_rule['station_accuracy'])
+    obs_station_list = format_obs_station_list(accuracy_rule['observed_stations'], accuracy_rule['allowed_error'])
+    station_result = {}
+    success_count = 0
     if len(obs_station_list) > 0:
-        for [obs_station, accuracy_level] in obs_station_list:
-            calculate_station_accuracy(obs_station, wrf_model, wrf_version, wrf_run, gfs_hour, exec_datetime, sim_tag)
+        for [obs_station, allowed_error] in obs_station_list:
+            station_error = calculate_station_accuracy(obs_station, wrf_model, wrf_version, wrf_run, gfs_hour,
+                                                       exec_datetime, sim_tag)
+            if station_error is not None:
+                if station_error <= allowed_error:
+                    station_result[obs_station] = True
+                    success_count + 1
+                else:
+                    station_result[obs_station] = False
+            else:
+                station_result[obs_station] = False
+        total_stations = len(station_result.keys())
+        print('calculate_wrf_rule_accuracy|total_stations : ', total_stations)
+        print('calculate_wrf_rule_accuracy|success_count : ', success_count)
+        accuracy_percentage = (success_count / total_stations) * 100
+        print('calculate_wrf_rule_accuracy|accuracy_percentage : ', total_stations)
 
 
 def calculate_station_accuracy(obs_station, wrf_model, wrf_version, wrf_run, gfs_hour,
@@ -119,7 +135,7 @@ def calculate_station_accuracy(obs_station, wrf_model, wrf_version, wrf_run, gfs
     return None
 
 
-def format_obs_station_list(obs_stations, station_accuracy):
+def format_obs_station_list(obs_stations, allowed_error):
     station_list = obs_stations.split(",")
     print(station_list)
     formatted_list = []
@@ -128,7 +144,7 @@ def format_obs_station_list(obs_stations, station_accuracy):
         if len(station_val) == 2:
             formatted_list.append([station_val[0], station_val[1]])
         else:
-            formatted_list.append([station_val[0], station_accuracy])
+            formatted_list.append([station_val[0], allowed_error])
     print(formatted_list)
     return formatted_list
 
