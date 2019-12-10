@@ -171,7 +171,7 @@ class CurwSimAdapter:
                         print('len(results) : {}'.format(len(results)))
                         data_error = ((time_step_count - len(results)) / time_step_count) * 100
                         if data_error < 1:
-                            df = pd.DataFrame(data=results, columns=['time', 'value']).set_index(keys='time')
+                            df = pd.DataFrame(data=results, columns=['time', 'value'])
                             return df
                         elif data_error <= acceppted_error:
                             print('data_error : {}'.format(data_error))
@@ -189,7 +189,7 @@ class CurwSimAdapter:
                                 else:
                                     formatted_ts.append((tms_step, Decimal(0)))
                                 i += 1
-                            df = pd.DataFrame(data=formatted_ts, columns=['time', 'value']).set_index(keys='time')
+                            df = pd.DataFrame(data=formatted_ts, columns=['time', 'value'])
                             print('get_station_timeseries|df: ', df)
                             return df
                         else:
@@ -228,7 +228,7 @@ class CurwSimAdapter:
                 print('len(results) : {}'.format(len(results)))
                 data_error = ((time_step_count - len(results)) / time_step_count) * 100
                 if data_error < 0:
-                    df = pd.DataFrame(data=results, columns=['time', 'value']).set_index(keys='time')
+                    df = pd.DataFrame(data=results, columns=['time', 'value'])
                     return df
                 elif data_error < 30:
                     print('data_error : {}'.format(data_error))
@@ -247,7 +247,7 @@ class CurwSimAdapter:
                         else:
                             formatted_ts.append((tms_step, Decimal(0)))
                         i += 1
-                    df = pd.DataFrame(data=formatted_ts, columns=['time', 'value']).set_index(keys='time')
+                    df = pd.DataFrame(data=formatted_ts, columns=['time', 'value'])
                     print('get_station_timeseries|df: ', df)
                     return df
                 else:
