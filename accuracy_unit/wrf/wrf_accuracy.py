@@ -56,6 +56,7 @@ def calculate_wrf_rule_accuracy(wrf_rule, exec_datetime):
     print('calculate_wrf_rule_accuracy|wrf_model : ', wrf_model)
     wrf_version = wrf_rule['version']
     wrf_run = wrf_rule['rule_info']['run']
+    wrf_rule_id = wrf_rule['rule_info']['id']
     gfs_hour = wrf_rule['rule_info']['hour']
     accuracy_rule_id = wrf_rule['rule_info']['accuracy_rule']
     sim_tag = 'gfs_d{}_{}'.format(wrf_run, gfs_hour)
@@ -83,6 +84,8 @@ def calculate_wrf_rule_accuracy(wrf_rule, exec_datetime):
         print('calculate_wrf_rule_accuracy|success_count : ', success_count)
         accuracy_percentage = (success_count / total_stations) * 100
         print('calculate_wrf_rule_accuracy|accuracy_percentage : ', total_stations)
+        dss_adapter.update_wrf_rule_accuracy_level(accuracy_percentage, wrf_rule_id)
+        print('wrf rule current accuracy successfully updated.')
 
 
 def calculate_station_accuracy(obs_station, wrf_model, wrf_version, wrf_run, gfs_hour,
