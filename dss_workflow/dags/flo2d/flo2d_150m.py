@@ -9,7 +9,7 @@ sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/accuracy_unit/flo2d')
-from wrf_accuracy import calculate_flo2d_rule_accuracy
+from flo2d_accuracy import calculate_flo2d_rule_accuracy
 
 prod_dag_name = 'flo2d_150m_dag'
 dag_pool = 'flo2d_pool'
