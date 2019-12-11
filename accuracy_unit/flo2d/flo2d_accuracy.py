@@ -51,7 +51,7 @@ def get_curw_sim_adapter(db_config=None):
 def calculate_flo2d_rule_accuracy(flo2d_rule, exec_datetime):
     print('calculate_flo2d_rule_accuracy|flo2d_rule : ', flo2d_rule)
     print('calculate_flo2d_rule_accuracy|execution_date : ', exec_datetime)
-    flo2d_model = 'WRF_{}'.format(flo2d_rule['model'])
+    flo2d_model = flo2d_rule['model']
     print('calculate_flo2d_rule_accuracy|flo2d_model : ', flo2d_model)
     flo2d_version = flo2d_rule['version']
     flo2d_run = flo2d_rule['rule_info']['run']
