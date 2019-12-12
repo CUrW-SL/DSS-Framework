@@ -88,12 +88,13 @@ def calculate_flo2d_rule_accuracy(flo2d_rule, exec_datetime):
 
 
 def calculate_station_accuracy(obs_station, flo2d_model, flo2d_version,
-                               exec_datetime, observed_days, sim_tag):
+                               exec_datetime, observed_days, sim_tag, method='MAD'):
     obs_adapter = get_curw_obs_adapter()
-    obs_station_id = get_obs_station_id(obs_station, obs_adapter)
+    obs_station_id = get_obs_station_id(obs_station, obs_adapter, STATION_TYPE)
     [tms_start, tms_end] = get_flo2d_ts_start_end(exec_datetime, observed_days)
     tms_start = tms_start.strftime('%Y-%m-%d %H:%M:%S')
-    tms_end = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    tms_end = tms_end.strftime('%Y-%m-%d %H:%M:%S')
+    print('calculate_station_accuracy|[tms_start, tms_end] : ', [tms_start, tms_end])
     if obs_station_id is not None:
         obs_hash_id = get_obs_station_hash_id(obs_station_id, obs_adapter)
         obs_df = get_obs_tms(obs_hash_id, exec_datetime, tms_start, tms_end, obs_adapter)
@@ -152,10 +153,10 @@ def format_obs_station_list(obs_stations, allowed_error):
     return formatted_list
 
 
-def get_obs_station_id(obs_station, obs_adapter=None):
+def get_obs_station_id(obs_station, obs_adapter=None, station_type=STATION_TYPE):
     if obs_adapter is None:
         obs_adapter = get_curw_obs_adapter()
-    station_id = obs_adapter.get_station_id_by_name(STATION_TYPE, obs_station)
+    station_id = obs_adapter.get_station_id_by_name(station_type, obs_station)
     if station_id is not None:
         print('get_obs_station_id|station_id : ', station_id)
         return station_id
