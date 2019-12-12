@@ -33,7 +33,7 @@ def check_accuracy(**context):
     print('check_accuracy|context : ', context)
     rule_info = context['task_instance'].xcom_pull(task_ids='init_flo2d_150m')['rule_info']
     print('check_accuracy|rule_info : ', rule_info)
-    flo2d_rule = {'model': '150m', 'rule_info': rule_info}
+    flo2d_rule = {'model': 'FLO2D', 'version': '150', 'rule_info': rule_info}
     print('check_accuracy|flo2d_rule : ', flo2d_rule)
     exec_date = context["execution_date"].to_datetime_string()
     print('check_accuracy|exec_date : ', flo2d_rule)
