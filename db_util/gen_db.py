@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from shapely.geometry import Point
 import geopandas as gpd
+import json
 
 LOG_FORMAT = '[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s'
 
@@ -503,6 +504,17 @@ class CurwFcstAdapter:
             df = pd.DataFrame(data=results, columns=['time', 'value'])
             return df
         return None
+
+    def get_flo2d_cell_map(self, model, version):
+        sql_query = 'select parameters from curw_fcst.source where model=\'{}\' and version=\'{}\';'.format(model,
+                                                                                                            version)
+        print('get_source_id|sql_query : ', sql_query)
+        result = self.get_single_result(sql_query)
+        if result is not None:
+            cell_map = json.loads(result[0])
+            return cell_map
+        else:
+            return None
 
 
 class CurwObsAdapter:
