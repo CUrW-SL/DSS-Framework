@@ -54,11 +54,11 @@ def calculate_flo2d_rule_accuracy(flo2d_rule, exec_datetime):
     flo2d_model = flo2d_rule['model']
     flo2d_version = flo2d_rule['version']
     print('calculate_flo2d_rule_accuracy|flo2d_model : ', flo2d_model)
-    flo2d_run = flo2d_rule['rule_info']['run']
     flo2d_rule_id = flo2d_rule['rule_info']['id']
-    gfs_hour = flo2d_rule['rule_info']['hour']
     accuracy_rule_id = flo2d_rule['rule_info']['accuracy_rule']
-    sim_tag = 'gfs_d{}_{}'.format(flo2d_run, gfs_hour)
+    observed_days = flo2d_rule['rule_info']['observed_days']
+    print('calculate_flo2d_rule_accuracy|observed_days : ', observed_days)
+    sim_tag = 'hourly_run'
     print('calculate_flo2d_rule_accuracy|sim_tag : ', sim_tag)
     dss_adapter = get_curw_dss_adapter()
     accuracy_rule = dss_adapter.get_accuracy_rule_info_by_id(accuracy_rule_id)
@@ -68,8 +68,8 @@ def calculate_flo2d_rule_accuracy(flo2d_rule, exec_datetime):
     success_count = 0
     if len(obs_station_list) > 0:
         for [obs_station, allowed_error] in obs_station_list:
-            station_error = calculate_station_accuracy(obs_station, flo2d_model, flo2d_version, flo2d_run,
-                                                       gfs_hour, exec_datetime, sim_tag)
+            station_error = calculate_station_accuracy(obs_station, flo2d_model, flo2d_version,
+                                                       exec_datetime, observed_days, sim_tag)
             if station_error is not None:
                 if station_error <= allowed_error:
                     station_result[obs_station] = True
@@ -87,11 +87,11 @@ def calculate_flo2d_rule_accuracy(flo2d_rule, exec_datetime):
         print('flo2d rule current accuracy successfully updated.')
 
 
-def calculate_station_accuracy(obs_station, flo2d_model, flo2d_version, flo2d_run, gfs_hour,
-                               exec_datetime, sim_tag, method='MAD'):
+def calculate_station_accuracy(obs_station, flo2d_model, flo2d_version,
+                               exec_datetime, observed_days, sim_tag):
     obs_adapter = get_curw_obs_adapter()
     obs_station_id = get_obs_station_id(obs_station, obs_adapter)
-    [tms_start, tms_end] = get_flo2d_ts_start_end(exec_datetime, flo2d_run, gfs_hour)
+    [tms_start, tms_end] = get_flo2d_ts_start_end(exec_datetime, observed_days)
     tms_start = tms_start.strftime('%Y-%m-%d %H:%M:%S')
     tms_end = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     if obs_station_id is not None:
@@ -196,22 +196,20 @@ def get_flo2d_station_hash_id(flo2d_model, flo2d_version, flo2d_station_id, exec
             return hash_id
 
 
-def get_flo2d_ts_start_end(exec_datetime, flo2d_run, gfs_hour):
-    flo2d_run = int(flo2d_run)
+def get_flo2d_ts_start_end(exec_datetime, observed_days):
+    observed_days = int(observed_days)
     exec_datetime = datetime.strptime(exec_datetime, '%Y-%m-%d %H:%M:%S')
     print(exec_datetime)
     exec_date_str = exec_datetime.strftime('%Y-%m-%d')
     exec_date = datetime.strptime(exec_date_str, '%Y-%m-%d')
     print(exec_date)
-    ts_start_date = exec_date - timedelta(days=flo2d_run)
+    ts_start_date = exec_date - timedelta(days=observed_days)
     ts_start_date_str = ts_start_date.strftime('%Y-%m-%d')
     print(ts_start_date_str)
-    gfs_ts_start_utc_str = '{} {}:00:00'.format(ts_start_date_str, gfs_hour)
+    gfs_ts_start_utc_str = '{} 00:00:00'.format(ts_start_date_str)
     print(gfs_ts_start_utc_str)
     gfs_ts_start_utc = datetime.strptime(gfs_ts_start_utc_str, '%Y-%m-%d %H:%M:%S')
-    gfs_ts_start_local = gfs_ts_start_utc + timedelta(hours=5, minutes=30)
-    gfs_ts_end_local = gfs_ts_start_local + timedelta(days=GFS_DAYS)
-    return [gfs_ts_start_local, gfs_ts_end_local]
+    return [gfs_ts_start_utc, exec_datetime]
 
 
 def get_fcst_tms(flo2d_station_hash_id, exec_datetime, tms_start, tms_end, fcst_adapter=None):
