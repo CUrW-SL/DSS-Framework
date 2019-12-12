@@ -52,8 +52,8 @@ def calculate_flo2d_rule_accuracy(flo2d_rule, exec_datetime):
     print('calculate_flo2d_rule_accuracy|flo2d_rule : ', flo2d_rule)
     print('calculate_flo2d_rule_accuracy|execution_date : ', exec_datetime)
     flo2d_model = flo2d_rule['model']
-    print('calculate_flo2d_rule_accuracy|flo2d_model : ', flo2d_model)
     flo2d_version = flo2d_rule['version']
+    print('calculate_flo2d_rule_accuracy|flo2d_model : ', flo2d_model)
     flo2d_run = flo2d_rule['rule_info']['run']
     flo2d_rule_id = flo2d_rule['rule_info']['id']
     gfs_hour = flo2d_rule['rule_info']['hour']
@@ -68,8 +68,8 @@ def calculate_flo2d_rule_accuracy(flo2d_rule, exec_datetime):
     success_count = 0
     if len(obs_station_list) > 0:
         for [obs_station, allowed_error] in obs_station_list:
-            station_error = calculate_station_accuracy(obs_station, flo2d_model, flo2d_version, flo2d_run, gfs_hour,
-                                                       exec_datetime, sim_tag)
+            station_error = calculate_station_accuracy(obs_station, flo2d_model, flo2d_version, flo2d_run,
+                                                       gfs_hour, exec_datetime, sim_tag)
             if station_error is not None:
                 if station_error <= allowed_error:
                     station_result[obs_station] = True
