@@ -99,43 +99,45 @@ def calculate_station_accuracy(obs_station, flo2d_model, flo2d_version,
         obs_hash_id = get_obs_station_hash_id(obs_station_id, obs_adapter)
         obs_df = get_obs_tms(obs_hash_id, exec_datetime, tms_start, tms_end, obs_adapter)
         if obs_df is not None:
-            sim_adapter = get_curw_sim_adapter()
-            flo2d_station_id = get_matching_flo2d_station(obs_station, obs_station_id, sim_adapter)
-            print('calculate_station_accuracy|flo2d_station_id : ', flo2d_station_id)
-            if flo2d_station_id is not None:
-                fcst_adapter = get_curw_fcst_adapter()
-                flo2d_hash_id = get_flo2d_station_hash_id(flo2d_model, flo2d_version, flo2d_station_id, exec_datetime,
-                                                          sim_tag,
-                                                          fcst_adapter)
-                print('calculate_station_accuracy|flo2d_hash_id : ', flo2d_hash_id)
-                if flo2d_hash_id is not None:
-                    fcst_df = get_fcst_tms(flo2d_hash_id, exec_datetime, tms_start, tms_end, fcst_adapter)
-                    if fcst_df is not None:
-                        print('calculate_station_accuracy|obs_df : ', obs_df)
-                        print('calculate_station_accuracy|fcst_df : ', fcst_df)
-                        merged_df = obs_df.merge(fcst_df, how='left', on='time')
-                        merged_df['cumulative_observed'] = merged_df['observed'].cumsum()
-                        merged_df['cumulative_forecast'] = merged_df['forecast'].cumsum()
-                        print(merged_df)
-                        merged_df['cum_diff'] = merged_df["cumulative_observed"] - merged_df["cumulative_forecast"]
-                        row_count = len(merged_df.index)
-                        print('row_count : ', row_count)
-                        if method == 'MAD':
-                            print('MAD')
-                            merged_df['abs_cum_diff'] = merged_df['cum_diff'].abs()
-                            sum_abs_diff = merged_df['abs_diff'].sum()
-                            print('sum_abs_diff : ', sum_abs_diff)
-                            mean_absolute_deviation = sum_abs_diff / row_count
-                            print('mean_absolute_deviation : ', mean_absolute_deviation)
-                            return mean_absolute_deviation
-                        elif method == 'RMSE':
-                            print('RMSE')
-                            merged_df['diff_square'] = np.power((merged_df['cum_diff']), 2)
-                            root_mean_square_error = math.sqrt(merged_df['diff_square'].sum() / row_count)
-                            print('root_mean_square_error : ', root_mean_square_error)
-                            return root_mean_square_error
-                        else:
-                            print('Invalid method.')
+            fcst_adapter = get_curw_fcst_adapter()
+            cell_id = get_cell_id(obs_station, flo2d_model, flo2d_version)
+            if cell_id is not None:
+                flo2d_station_id = get_matching_flo2d_station(obs_station, cell_id, fcst_adapter)
+                print('calculate_station_accuracy|flo2d_station_id : ', flo2d_station_id)
+                if flo2d_station_id is not None:
+                    fcst_adapter = get_curw_fcst_adapter()
+                    flo2d_hash_id = get_flo2d_station_hash_id(flo2d_model, flo2d_version, flo2d_station_id,
+                                                              exec_datetime,
+                                                              sim_tag, fcst_adapter)
+                    print('calculate_station_accuracy|flo2d_hash_id : ', flo2d_hash_id)
+                    if flo2d_hash_id is not None:
+                        fcst_df = get_fcst_tms(flo2d_hash_id, exec_datetime, tms_start, tms_end, fcst_adapter)
+                        if fcst_df is not None:
+                            print('calculate_station_accuracy|obs_df : ', obs_df)
+                            print('calculate_station_accuracy|fcst_df : ', fcst_df)
+                            merged_df = obs_df.merge(fcst_df, how='left', on='time')
+                            merged_df['cumulative_observed'] = merged_df['observed'].cumsum()
+                            merged_df['cumulative_forecast'] = merged_df['forecast'].cumsum()
+                            print(merged_df)
+                            merged_df['cum_diff'] = merged_df["cumulative_observed"] - merged_df["cumulative_forecast"]
+                            row_count = len(merged_df.index)
+                            print('row_count : ', row_count)
+                            if method == 'MAD':
+                                print('MAD')
+                                merged_df['abs_cum_diff'] = merged_df['cum_diff'].abs()
+                                sum_abs_diff = merged_df['abs_diff'].sum()
+                                print('sum_abs_diff : ', sum_abs_diff)
+                                mean_absolute_deviation = sum_abs_diff / row_count
+                                print('mean_absolute_deviation : ', mean_absolute_deviation)
+                                return mean_absolute_deviation
+                            elif method == 'RMSE':
+                                print('RMSE')
+                                merged_df['diff_square'] = np.power((merged_df['cum_diff']), 2)
+                                root_mean_square_error = math.sqrt(merged_df['diff_square'].sum() / row_count)
+                                print('root_mean_square_error : ', root_mean_square_error)
+                                return root_mean_square_error
+                            else:
+                                print('Invalid method.')
     return None
 
 
@@ -144,7 +146,14 @@ def get_cell_id(station_name, model, version, fcst_adapter=None):
         fcst_adapter = get_curw_fcst_adapter()
     cell_map = fcst_adapter.get_flo2d_cell_map(model, version)
     if cell_map is not None:
-        print('')
+        channel_cell_map = cell_map['CHANNEL_CELL_MAP']
+        flood_plain_cell_map = cell_map['FLOOD_PLAIN_CELL_MAP']
+        if station_name in channel_cell_map:
+            cell_id = channel_cell_map[station_name]
+        elif station_name in flood_plain_cell_map:
+            cell_id = channel_cell_map[station_name]
+        return cell_id
+    return None
 
 
 def format_obs_station_list(obs_stations, allowed_error):
@@ -179,17 +188,14 @@ def get_obs_station_hash_id(obs_station_id, obs_adapter=None):
         return hash_id
 
 
-def get_matching_flo2d_station(obs_station, obs_station_id, sim_adapter=None):
-    if obs_station_id is not None:
-        grid_id = '{}_{}_{}_{}'.format(VARIABLE_TYPE, obs_station_id, obs_station, MME_TAG)
-        print('get_matching_flo2d_station|grid_id : ', grid_id)
-        if sim_adapter is None:
-            sim_adapter = get_curw_sim_adapter()
-        flo2d_station_id = sim_adapter.get_matching_flo2d_station_by_grid_id(grid_id)
-        if flo2d_station_id is not None:
-            print('get_matching_flo2d_station|flo2d_station_id : ', flo2d_station_id)
-            return flo2d_station_id
-    return None
+def get_matching_flo2d_station(obs_station, cell_id, fcst_adapter=None):
+    fcst_station_name = '{}_{}'.format(cell_id, obs_station)
+    if fcst_adapter is None:
+        fcst_adapter = get_curw_fcst_adapter()
+    flo2d_station_id = fcst_adapter.get_flo2d_station_id_by_name(fcst_station_name)
+    if flo2d_station_id is not None:
+        print('get_matching_flo2d_station|flo2d_station_id : ', flo2d_station_id)
+        return flo2d_station_id
 
 
 def get_flo2d_station_hash_id(flo2d_model, flo2d_version, flo2d_station_id, exec_date, sim_tag, fcst_adapter=None):
@@ -198,8 +204,8 @@ def get_flo2d_station_hash_id(flo2d_model, flo2d_version, flo2d_station_id, exec
     source_id = fcst_adapter.get_source_id(flo2d_model, flo2d_version)
     if source_id is not None:
         print('get_flo2d_station_hash_id|source_id : ', source_id)
-        hash_id = fcst_adapter.get_hash_id_of_flo2d_station(VARIABLE, UNIT, source_id, flo2d_station_id, sim_tag,
-                                                            exec_date)
+        hash_id = fcst_adapter.get_hash_id_of_station(VARIABLE, UNIT, source_id, flo2d_station_id, sim_tag,
+                                                      exec_date)
         if hash_id is not None:
             print('get_flo2d_station_hash_id|hash_id : ', hash_id)
             return hash_id
@@ -224,7 +230,7 @@ def get_flo2d_ts_start_end(exec_datetime, observed_days):
 def get_fcst_tms(flo2d_station_hash_id, exec_datetime, tms_start, tms_end, fcst_adapter=None):
     if fcst_adapter is None:
         fcst_adapter = get_curw_fcst_adapter()
-    tms_df = fcst_adapter.get_flo2d_station_tms(flo2d_station_hash_id, exec_datetime, tms_start, tms_end)
+    tms_df = fcst_adapter.get_wrf_station_tms(flo2d_station_hash_id, exec_datetime, tms_start, tms_end)
     if tms_df is not None:
         return format_df_to_time_indexing(tms_df)
 
