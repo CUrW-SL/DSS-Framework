@@ -145,15 +145,16 @@ def get_cell_id(station_name, model, version, fcst_adapter=None):
     if fcst_adapter is None:
         fcst_adapter = get_curw_fcst_adapter()
     cell_map = fcst_adapter.get_flo2d_cell_map(model, version)
+    cell_id = None
     if cell_map is not None:
+        print('get_cell_id|cell_map : ', cell_map)
         channel_cell_map = cell_map['CHANNEL_CELL_MAP']
         flood_plain_cell_map = cell_map['FLOOD_PLAIN_CELL_MAP']
         if station_name in channel_cell_map:
             cell_id = channel_cell_map[station_name]
         elif station_name in flood_plain_cell_map:
             cell_id = channel_cell_map[station_name]
-        return cell_id
-    return None
+    return cell_id
 
 
 def format_obs_station_list(obs_stations, allowed_error):
