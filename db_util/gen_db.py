@@ -494,11 +494,11 @@ class CurwFcstAdapter:
         else:
             return None
 
-    def get_wrf_station_tms(self, hash_id, exec_date, tms_start, tms_end):
+    def get_station_tms(self, hash_id, exec_date, tms_start, tms_end):
         sql_query = 'select time,value from curw_fcst.data where id=\'{}\' and ' \
                     'time >= \'{}\' and time <= \'{}\' and ' \
                     'fgt >= \'{}\';'.format(hash_id, tms_start, tms_end, exec_date)
-        print('get_wrf_station_tms|sql_query : ', sql_query)
+        print('get_station_tms|sql_query : ', sql_query)
         results = self.get_multiple_result(sql_query)
         if results is not None:
             df = pd.DataFrame(data=results, columns=['time', 'value'])
