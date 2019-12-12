@@ -482,12 +482,12 @@ class CurwFcstAdapter:
         else:
             return None
 
-    def get_hash_id_of_wrf_station(self, variable, unit, source, station_id, sim_tag, exec_date):
+    def get_hash_id_of_station(self, variable, unit, source, station_id, sim_tag, exec_date):
         sql_query = 'select id from curw_fcst.run where variable={} and unit={} and source={} ' \
                     'and station=\'{}\' and sim_tag=\'{}\' and end_date >= \'{}\';'.format(variable, unit, source,
                                                                                            station_id,
                                                                                            sim_tag, exec_date)
-        print('get_hash_id_of_wrf_station|sql_query : ', sql_query)
+        print('get_hash_id_of_station|sql_query : ', sql_query)
         result = self.get_single_result(sql_query)
         if result is not None:
             return result[0]
@@ -513,6 +513,16 @@ class CurwFcstAdapter:
         if result is not None:
             cell_map = json.loads(result[0])
             return cell_map
+        else:
+            return None
+
+    def get_flo2d_station_id_by_name(self, name):
+        sql_query = 'select id from curw_fcst.station where name=\'{}\';'.format(name)
+        print('get_source_id|sql_query : ', sql_query)
+        result = self.get_single_result(sql_query)
+        if result is not None:
+            station_id = result[0]
+            return station_id
         else:
             return None
 

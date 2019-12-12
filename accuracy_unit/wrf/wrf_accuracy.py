@@ -183,7 +183,7 @@ def get_wrf_station_hash_id(wrf_model, wrf_version, wrf_station_id, exec_date, s
     source_id = fcst_adapter.get_source_id(wrf_model, wrf_version)
     if source_id is not None:
         print('get_wrf_station_hash_id|source_id : ', source_id)
-        hash_id = fcst_adapter.get_hash_id_of_wrf_station(VARIABLE, UNIT, source_id, wrf_station_id, sim_tag, exec_date)
+        hash_id = fcst_adapter.get_hash_id_of_station(VARIABLE, UNIT, source_id, wrf_station_id, sim_tag, exec_date)
         if hash_id is not None:
             print('get_wrf_station_hash_id|hash_id : ', hash_id)
             return hash_id
