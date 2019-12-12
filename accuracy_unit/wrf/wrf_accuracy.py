@@ -210,7 +210,7 @@ def get_wrf_ts_start_end(exec_datetime, wrf_run, gfs_hour):
 def get_fcst_tms(wrf_station_hash_id, exec_datetime, tms_start, tms_end, fcst_adapter=None):
     if fcst_adapter is None:
         fcst_adapter = get_curw_fcst_adapter()
-    tms_df = fcst_adapter.get_wrf_station_tms(wrf_station_hash_id, exec_datetime, tms_start, tms_end)
+    tms_df = fcst_adapter.get_station_tms(wrf_station_hash_id, exec_datetime, tms_start, tms_end)
     if tms_df is not None:
         return format_df_to_time_indexing(tms_df)
 
