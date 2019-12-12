@@ -139,6 +139,14 @@ def calculate_station_accuracy(obs_station, flo2d_model, flo2d_version,
     return None
 
 
+def get_cell_id(station_name, model, version, fcst_adapter=None):
+    if fcst_adapter is None:
+        fcst_adapter = get_curw_fcst_adapter()
+    cell_map = fcst_adapter.get_flo2d_cell_map(model, version)
+    if cell_map is not None:
+        print('')
+
+
 def format_obs_station_list(obs_stations, allowed_error):
     station_list = obs_stations.split(",")
     print(station_list)
@@ -249,10 +257,10 @@ if __name__ == "__main__":
     # print(len(obs_db_config.keys()))
     # sim_db_config = {'mysql_user': 'admin', 'mysql_password': 'floody', 'mysql_host': '35.227.163.211',
     #                  'mysql_db': 'curw_sim', 'log_path': '/home/hasitha/PycharmProjects/DSS-Framework/log'}
-    # fcst_db_config = {'mysql_user': 'admin', 'mysql_password': 'floody', 'mysql_host': '35.227.163.211',
-    #                   'mysql_db': 'curw_fcst', 'log_path': '/home/hasitha/PycharmProjects/DSS-Framework/log'}
+    fcst_db_config = {'mysql_user': 'admin', 'mysql_password': 'floody', 'mysql_host': '35.227.163.211',
+                      'mysql_db': 'curw_fcst', 'log_path': '/home/hasitha/PycharmProjects/DSS-Framework/log'}
     # obs_adapter = get_curw_obs_adapter(obs_db_config)
     # sim_adapter = get_curw_sim_adapter(sim_db_config)
-    # fcst_adapter = get_curw_fcst_adapter(fcst_db_config)
+    fcst_adapter = get_curw_fcst_adapter(fcst_db_config)
     # print(get_matching_flo2d_station('Arangala', obs_adapter, sim_adapter))
-    print(get_flo2d_ts_start_end('2019-12-07 07:21:32', '2', '12'))
+    print(fcst_adapter.get_flo2d_cell_map('FLO2D', 250))
