@@ -306,6 +306,12 @@ class RuleEngineAdapter:
             flo2d_rule = {'id': result[0], 'status': result[1]}
         return flo2d_rule
 
+    def update_flo2d_rule_accuracy_level(self, accuracy_level, rule_id):
+        query = 'update `dss`.`flo2d_rules` set `current_accuracy`=\'{}\' ' \
+                'WHERE `id`=\'{}\';'.format(accuracy_level, rule_id)
+        print('update_flo2d_rule_accuracy_level|query : ', query)
+        self.update_query(query)
+
     def get_workflow_routines(self, status):
         workflow_routines = []
         query = 'select id,dss1,dss2,dss3,cascade_on from dss.workflow_routines where status={}'.format(status)
