@@ -548,7 +548,7 @@ if __name__ == '__main__':
         print('wrf_conf : ', wrf_conf)
         wps_dir = get_wps_dir(wrf_conf['wrf_home'])
         print('wps_dir : ', wps_dir)
-        shutil.rmtree(wrf_conf['gfs_dir'])
+        # shutil.rmtree(wrf_conf['gfs_dir'])
         delete_files_with_prefix(wps_dir, 'FILE:*')
         delete_files_with_prefix(wps_dir, 'PFILE:*')
         delete_files_with_prefix(wps_dir, 'geo_em.*')
