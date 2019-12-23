@@ -158,6 +158,11 @@ RUN apt-get install -y curl \
 WORKDIR /home/Build_WRF/code
 
 COPY code /home/Build_WRF/code
+
+# copy geogrid.exe output
+COPY geo_em.zip /home/Build_WRF/WPS
+RUN unzip /home/Build_WRF/WPS/geo_em.zip
+
 #install required libs for python script
 RUN pip3 install -r requirements.yml
 
