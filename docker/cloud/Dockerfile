@@ -155,13 +155,15 @@ RUN apt-get install -y curl \
     && apt-get update \
     && apt-get install -y gcsfuse
 
-WORKDIR /home/Build_WRF/code
-
 COPY code /home/Build_WRF/code
+
+WORKDIR /home/Build_WRF/WPS
 
 # copy geogrid.exe output
 COPY geo_em.zip /home/Build_WRF/WPS
-RUN unzip /home/Build_WRF/WPS/geo_em.zip
+RUN unzip geo_em.zip
+
+WORKDIR /home/Build_WRF/code
 
 #install required libs for python script
 RUN pip3 install -r requirements.yml
