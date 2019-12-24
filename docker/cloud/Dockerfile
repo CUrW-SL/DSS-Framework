@@ -25,6 +25,7 @@ RUN apt-get update \
         file \
         m4 \
         nco \
+        libhdf5-dev \
         ncl-ncarg \
         python3.6 \
         python3-pip
@@ -57,7 +58,8 @@ RUN wget http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/
     && wget http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/mpich-3.0.4.tar.gz \
     && wget http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/zlib-1.2.7.tar.gz  \
     && wget http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/libpng-1.2.50.tar.gz \
-    && wget http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/jasper-1.900.1.tar.gz
+    && wget http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/jasper-1.900.1.tar.gz \
+    && wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.4/src/hdf5-1.10.4.tar.gz
 
 ENV DIR /home/Build_WRF/LIBRARIES
 ENV CC gcc
@@ -115,6 +117,13 @@ RUN tar xzvf jasper-1.900.1.tar.gz \
     && make install \
     && cd ..
 
+RUN tar xzvf hdf5-1.10.4.tar.gz \
+    && cd hdf5-1.10.4 \
+    && ./configure --prefix=$DIR/hdf5 \
+    && make \
+    && make install \
+    && cd ..
+
 # Permanent Export
 ENV PATH "$DIR/netcdf/bin:$PATH"
 ENV NETCDF "$DIR/netcdf"
@@ -130,7 +139,7 @@ RUN wget https://github.com/wrf-model/WRF/archive/v4.1.2.tar.gz \
     && wget https://github.com/wrf-model/WPS/archive/v4.1.tar.gz
 
 # Installing & building WRF. WRF-4.1.2.tar.gz
-RUN tar -xvzf v4.1.2.tar.gz \
+RUN tar -xvzf  v4.1.2.tar.gz \
     && mv WRF-4.1.2 WRF \
     && cd ./WRF \
     && echo $WRF_CONFIGURE_OPTION | ./configure  \
@@ -155,30 +164,23 @@ RUN apt-get install -y curl \
     && apt-get update \
     && apt-get install -y gcsfuse
 
-COPY code /home/Build_WRF/code
-
+#creating vtable symlinks
 WORKDIR /home/Build_WRF/WPS
+RUN ln -sfn /home/Build_WRF/WPS/ungrib/Variable_Tables/Vtable.GFS Vtable
+RUN ln -sfn /home/Build_WRF/WPS/ungrib/Variable_Tables/Vtable.GFS Vtable.GFS
 
 # copy geogrid.exe output
 COPY geo_em.zip /home/Build_WRF/WPS
 RUN unzip geo_em.zip
 
-# remove existing
-RUN rm -rf /home/Build_WRF/WPS/ungrib
-COPY ungrib.zip /home/Build_WRF/WPS
-RUN unzip ungrib.zip
-
-#creating symbolic links for vtables
-RUN ln -sfn /home/Build_WRF/WPS/ungrib/Variable_Tables/Vtable.GFS Vtable
-RUN ln -sfn /home/Build_WRF/WPS/ungrib/Variable_Tables/Vtable.GFS Vtable.GFS
-
 WORKDIR /home/Build_WRF/code
+
+COPY code /home/Build_WRF/code
+COPY code/namelist.wps /home/Build_WRF
+COPY code/namelist.input /home/Build_WRF
 
 #install required libs for python script
 RUN pip3 install -r requirements.yml
-
-COPY code/namelist.wps /home/Build_WRF
-COPY code/namelist.input /home/Build_WRF
 COPY uwcc-admin.json /home/Build_WRF/code/gcs.json
 
 RUN chmod +x wrfv4_run.sh
