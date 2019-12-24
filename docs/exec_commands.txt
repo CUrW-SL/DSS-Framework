@@ -1,16 +1,19 @@
 # building docker image
 docker build -t curw-wrfv4:ubuntu1604 .
-docker build -t curw-wrfv4:wrf_4.0_A .
-docker build -t curw-wrfv4:wrf_4.0_C .
-docker build -t curw-wrfv4:wrf_4.0_E .
-docker build -t curw-wrfv4:wrf_4.0_SE .
+docker build -t curw-wrfv4:wrf_4.1.2_A .
+docker build -t curw-wrfv4:wrf_4.1.2_C .
+docker build -t curw-wrfv4:wrf_4.1.2_E .
+docker build -t curw-wrfv4:wrf_4.1.2_SE .
 
 # build docker image without using cache
 docker build --no-cache -t curw-wrfv4:ubuntu1604 .
-docker build --no-cache -t curw-wrfv4:wrf_4.0_A .
+docker build --no-cache -t curw-wrfv4:wrf_4.1.2_A .
 
 # Run already built docker image and connect to its shell
-docker run -it curw-wrfv4:ubuntu1604 /bin/bash
+docker run -it curw-wrfv4:wrf_4.1.2_A /bin/bash
+docker run -it curw-wrfv4:wrf_4.1.2_C /bin/bash
+docker run -it curw-wrfv4:wrf_4.1.2_E /bin/bash
+docker run -it curw-wrfv4:wrf_4.1.2_SE /bin/bash
 
 # view <none><none> docker images
 docker images -f dangling=true -q
@@ -41,12 +44,6 @@ grep ^cpu\\scores /proc/cpuinfo | uniq |  awk '{print $4}'
 nohup ./runner.sh -r 0 -m E -v 4.0 -h 18 &
 
 nohup ./rfielder.sh -r 0 -m E -v 4.0 -h 18 &
-
-
-docker build -t curw-wrfv4:wrf_4.0_A .
-docker build -t curw-wrfv4:wrf_4.0_C .
-docker build -t curw-wrfv4:wrf_4.0_E .
-docker build -t curw-wrfv4:wrf_4.0_SE .
 
 [email]
 email_backend = airflow.utils.email.send_email_smtp
