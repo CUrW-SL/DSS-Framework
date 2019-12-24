@@ -136,7 +136,7 @@ ENV JASPERINC "$DIR/grib2/include"
 WORKDIR /home/Build_WRF
 
 RUN wget https://github.com/wrf-model/WRF/archive/v4.1.2.tar.gz \
-    && wget https://github.com/wrf-model/WPS/archive/master.zip
+    && wget https://github.com/wrf-model/WPS/archive/v4.1.tar.gz
 
 # Installing & building WRF. WRF-4.1.2.tar.gz
 RUN tar -xvzf  v4.1.2.tar.gz \
@@ -147,8 +147,8 @@ RUN tar -xvzf  v4.1.2.tar.gz \
     && cd ..
 
 # Installing & building WPS
-RUN unzip  master.zip \
-    && mv WPS-master WPS \
+RUN tar -xvzf v4.1.tar.gz \
+    && mv WPS-4.1 WPS \
     && cd ./WPS \
     && export JASPERLIB=$DIR/grib2/lib \
     && export JASPERINC=$DIR/grib2/include \
