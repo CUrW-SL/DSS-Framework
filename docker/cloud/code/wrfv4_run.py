@@ -426,12 +426,12 @@ def run_wps(wrf_config):
         finally:
             move_files_with_prefix(wps_dir, 'ungrib.log', logs_dir)
         # Starting geogrid.exe'
-        if not check_geogrid_output(wps_dir):
-            logging.info('Geogrid output not available')
-            try:
-                run_subprocess('./geogrid.exe', cwd=wps_dir)
-            finally:
-                move_files_with_prefix(wps_dir, 'geogrid.log', logs_dir)
+        # if not check_geogrid_output(wps_dir):
+        #    logging.info('Geogrid output not available')
+        #    try:
+        #        run_subprocess('./geogrid.exe', cwd=wps_dir)
+        #    finally:
+        #        move_files_with_prefix(wps_dir, 'geogrid.log', logs_dir)
         # Starting metgrid.exe'
         try:
             run_subprocess('./metgrid.exe', cwd=wps_dir)
