@@ -164,6 +164,11 @@ RUN apt-get install -y curl \
     && apt-get update \
     && apt-get install -y gcsfuse
 
+#creating vtable symlinks
+WORKDIR /home/Build_WRF/WPS
+RUN ln -sfn /home/Build_WRF/WPS/ungrib/Variable_Tables/Vtable.GFS Vtable
+RUN ln -sfn /home/Build_WRF/WPS/ungrib/Variable_Tables/Vtable.GFS Vtable.GFS
+
 WORKDIR /home/Build_WRF/code
 
 COPY code /home/Build_WRF/code
