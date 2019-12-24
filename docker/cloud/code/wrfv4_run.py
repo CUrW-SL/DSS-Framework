@@ -620,7 +620,6 @@ def run_wrf_model(run_mode, wrf_conf):
                     shutil.rmtree(wrf_conf['gfs_dir'])
                     delete_files_with_prefix(wps_dir, 'FILE:*')
                     delete_files_with_prefix(wps_dir, 'PFILE:*')
-                    delete_files_with_prefix(wps_dir, 'geo_em.*')
                     replace_namelist_input(wrf_conf)
                     run_em_real(wrf_conf)
                 else:
