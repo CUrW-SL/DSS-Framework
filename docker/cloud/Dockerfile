@@ -163,6 +163,15 @@ WORKDIR /home/Build_WRF/WPS
 COPY geo_em.zip /home/Build_WRF/WPS
 RUN unzip geo_em.zip
 
+# remove existing
+RUN rm -rf /home/Build_WRF/WPS/ungrib
+COPY ungrib.zip /home/Build_WRF/WPS
+RUN unzip ungrib.zip
+
+#creating symbolic links for vtables
+RUN ln -sfn /home/Build_WRF/WPS/ungrib/Variable_Tables/Vtable.GFS Vtable
+RUN ln -sfn /home/Build_WRF/WPS/ungrib/Variable_Tables/Vtable.GFS Vtable.GFS
+
 WORKDIR /home/Build_WRF/code
 
 #install required libs for python script
