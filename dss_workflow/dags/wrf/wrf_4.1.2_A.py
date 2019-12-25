@@ -89,8 +89,8 @@ def get_rule_id(context):
 
 def set_running_status(**context):
     rule_id = get_rule_id(context)
-    print('set_running_status :', "{{ dag_run }}")
-    print('set_running_status :', "{{ dag_run.conf }}")
+    print('set_running_status :', """{{ dag_run }}""")
+    print('set_running_status :', """{{ dag_run.conf }}""")
     if rule_id is not None:
         update_workflow_status(2, rule_id)
     else:
