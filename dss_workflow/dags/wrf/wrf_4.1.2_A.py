@@ -34,6 +34,7 @@ run_wrf4_A_cmd_template = "ssh -i /home/uwcc-admin/.ssh/uwcc-admin -o \"StrictHo
                           "\'bash -c \"{}/{}\"'"
 rfield_gen_cmd = 'echo "rfield_gen_cmd" ;sleep $[($RANDOM % 100) + 1]s'
 data_push_cmd = 'echo "data_push_cmd" ;sleep $[($RANDOM % 10) + 1]s'
+run_wrf4_A_cmd = 'echo "run_wrf4_A_cmd" ;sleep $[($RANDOM % 10) + 1]s'
 
 
 def update_workflow_status(status, rule_id):
@@ -83,6 +84,8 @@ def run_this_func(dag_run, **kwargs):
 
 def check_accuracy(**context):
     print('check_accuracy|context : ', context)
+    task_info = context['task_instance'].xcom_pull(task_ids='init_wrfv4A')
+    print('check_accuracy|task_info : ', task_info)
     rule_info = context['task_instance'].xcom_pull(task_ids='init_wrfv4A')['rule_info']
     print('check_accuracy|rule_info : ', rule_info)
     wrf_rule = {'model': 'A', 'version': '4.1.2', 'rule_info': rule_info}
