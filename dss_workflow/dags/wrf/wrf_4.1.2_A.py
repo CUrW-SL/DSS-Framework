@@ -31,10 +31,34 @@ run_script_name = 'runner.sh'
 # ./rfielder.sh -r 0 -m E -v 4.0 -h 18
 
 run_wrf4_A_cmd_template = "ssh -i /home/uwcc-admin/.ssh/uwcc-admin -o \"StrictHostKeyChecking no\" uwcc-admin@{} " \
-                          "\'bash -c \"{}/{}\"'"
+                          "\'bash -c \"{}\"'"
+# "ssh -i /home/uwcc-admin/.ssh/uwcc-admin -o \"StrictHostKeyChecking no\" uwcc-admin@10.138.0.9 " \
+# "\'bash -c \"/home/uwcc-admin/jaxa/create_jaxa_rfield.sh\"'"
 rfield_gen_cmd = 'echo "rfield_gen_cmd" ;sleep $[($RANDOM % 100) + 1]s'
 data_push_cmd = 'echo "data_push_cmd" ;sleep $[($RANDOM % 10) + 1]s'
-run_wrf4_A_cmd = 'echo "run_wrf4_A_cmd" ;sleep $[($RANDOM % 10) + 1]s'
+
+
+# {'model': 'A', 'version': '4.1.2',
+# 'rule_info': {'id': 1, 'run': '0', 'hour': '00', 'ignore_previous_run': 1,
+# 'check_gfs_data_availability': 1, 'accuracy_rule': 1,
+# 'rule_details': '{"node_ip":"10.138.0.10"}'}}
+def get_wrf_run_command(**context):
+    wrf_rule = context['task_instance'].xcom_pull(task_ids='init_wrfv4A')
+    print('get_wrf_run_command|wrf_rule : ', wrf_rule)
+    wrf_model = wrf_rule['model']
+    wrf_version = wrf_rule['version']
+    wrf_run = wrf_rule['rule_info']['run']
+    gfs_hour = wrf_rule['rule_info']['hour']
+    node_ip = wrf_rule['rule_info']['rule_details']['node_ip']
+    script = wrf_rule['rule_info']['rule_details']['run_script']
+    exec_date = context["execution_date"].to_datetime_string()
+    run_script = '{}  -r {} -m {} -v {} -h {} -d {}'.format(script, wrf_run, wrf_model,
+                                                            wrf_version, gfs_hour, exec_date)
+    print('get_wrf_run_command|run_script : ', run_script)
+    run_wrf4_A_cmd = run_wrf4_A_cmd_template.format(node_ip, run_script)
+    print('get_wrf_run_command|run_wrf4_A_cmd : ', run_wrf4_A_cmd)
+    run_wrf4_A_cmd = 'echo "run_wrf4_A_cmd" ;sleep $[($RANDOM % 10) + 1]s'
+    return run_wrf4_A_cmd
 
 
 def update_workflow_status(status, rule_id):
@@ -123,7 +147,8 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
 
     run_wrf4_A = BashOperator(
         task_id='run_wrf4_A',
-        bash_command=run_wrf4_A_cmd,
+        bash_command=get_wrf_run_command,
+        provide_context=True,
         pool=dag_pool
     )
 
