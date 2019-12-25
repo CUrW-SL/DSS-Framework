@@ -42,6 +42,7 @@ data_push_cmd = 'echo "data_push_cmd" ;sleep $[($RANDOM % 10) + 1]s'
 # 'rule_info': {'id': 1, 'run': '0', 'hour': '00', 'ignore_previous_run': 1,
 # 'check_gfs_data_availability': 1, 'accuracy_rule': 1,
 # 'rule_details': '{"node_ip":"10.138.0.10"}'}}
+
 def get_wrf_run_command(**context):
     wrf_rule = context['task_instance'].xcom_pull(task_ids='init_wrfv4A')
     print('get_wrf_run_command|wrf_rule : ', wrf_rule)
@@ -59,6 +60,9 @@ def get_wrf_run_command(**context):
     print('get_wrf_run_command|run_wrf4_A_cmd : ', run_wrf4_A_cmd)
     run_wrf4_A_cmd = 'echo "run_wrf4_A_cmd" ;sleep $[($RANDOM % 10) + 1]s'
     return run_wrf4_A_cmd
+
+
+# wrf_run_command = get_wrf_run_command(**context)
 
 
 def update_workflow_status(status, rule_id):
@@ -85,6 +89,8 @@ def get_rule_id(context):
 
 def set_running_status(**context):
     rule_id = get_rule_id(context)
+    print('set_running_status :', "{{ dag_run }}")
+    print('set_running_status :', "{{ dag_run.conf }}")
     if rule_id is not None:
         update_workflow_status(2, rule_id)
     else:
