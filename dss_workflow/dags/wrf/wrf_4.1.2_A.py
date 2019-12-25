@@ -25,10 +25,13 @@ default_args = {
     'email_on_failure': True,
 }
 
+script_path = '/home/uwcc-admin/wrf_docker'
+run_script_name = 'runner.sh'
 # ./runner.sh -r 0 -m E -v 4.0 -h 18 -d 2019-10-24
 # ./rfielder.sh -r 0 -m E -v 4.0 -h 18
 
-run_wrf4_A_cmd = 'echo "run_wrf_A_cmd" ;sleep $[($RANDOM % 1000) + 1]s'
+run_wrf4_A_cmd_template = "ssh -i /home/uwcc-admin/.ssh/uwcc-admin -o \"StrictHostKeyChecking no\" uwcc-admin@{} " \
+                          "\'bash -c \"{}/{}\"'"
 rfield_gen_cmd = 'echo "rfield_gen_cmd" ;sleep $[($RANDOM % 100) + 1]s'
 data_push_cmd = 'echo "data_push_cmd" ;sleep $[($RANDOM % 10) + 1]s'
 
