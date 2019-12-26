@@ -51,7 +51,6 @@ def get_wrf_run_command(**context):
     print('get_wrf_run_command|run_script : ', run_script)
     run_wrf4_SE_cmd = run_wrf4_SE_cmd_template.format(node_ip, run_script)
     print('get_wrf_run_command|run_wrf4_SE_cmd : ', run_wrf4_SE_cmd)
-    run_wrf4_SE_cmd = 'echo "run_wrf4_SE_cmd" ;sleep $[($RANDOM % 10) + 1]s'
     subprocess.call(run_wrf4_SE_cmd, shell=True)
 
 
