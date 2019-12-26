@@ -3,6 +3,7 @@ import mysql.connector
 import os
 from datetime import datetime
 import croniter
+import json
 
 LOG_FORMAT = '[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s'
 
@@ -163,7 +164,7 @@ class RuleEngineAdapter:
                         'version': result[3], 'run': result[4],
                         'hour': result[5], 'ignore_previous_run': result[6],
                         'check_gfs_data_availability': result[7], 'accuracy_rule': result[8],
-                        'rule_details': result[9]}
+                        'rule_details': json.loads(result[9])}
         return wrf_rule
 
     def get_wrf_rule_status_by_id(self, rule_id):
