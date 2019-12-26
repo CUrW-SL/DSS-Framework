@@ -53,6 +53,7 @@ def get_wrf_run_command(**context):
     wrf_version = wrf_rule['version']
     wrf_run = wrf_rule['rule_info']['run']
     gfs_hour = wrf_rule['rule_info']['hour']
+    print('get_wrf_run_command|rule_details: ', wrf_rule['rule_info']['rule_details'])
     node_ip = wrf_rule['rule_info']['rule_details']['node_ip']
     script = wrf_rule['rule_info']['rule_details']['run_script']
     exec_date = context["execution_date"].to_datetime_string()
