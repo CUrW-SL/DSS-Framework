@@ -5,6 +5,9 @@ from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow.models import Variable
 import sys
+import subprocess
+
+from docutils.nodes import subscript
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/dss_workflow/plugins/operators')
 from gfs_sensor import GfsSensorOperator
@@ -59,12 +62,7 @@ def get_wrf_run_command(**context):
     run_wrf4_A_cmd = run_wrf4_A_cmd_template.format(node_ip, run_script)
     print('get_wrf_run_command|run_wrf4_A_cmd : ', run_wrf4_A_cmd)
     run_wrf4_A_cmd = 'echo "run_wrf4_A_cmd" ;sleep $[($RANDOM % 10) + 1]s'
-    return run_wrf4_A_cmd
-
-
-# wrf_run_command = get_wrf_run_command(**context)
-my_dag_run = """{{ dag_run }}"""
-my_dag_run_conf = """{{ dag_run.conf }}"""
+    subprocess.call(run_wrf4_A_cmd, shell=True)
 
 
 def update_workflow_status(status, rule_id):
@@ -92,8 +90,6 @@ def get_rule_id(context):
 def set_running_status(**context):
     rule_id = get_rule_id(context)
     print('set_running_status :', )
-    print('set_running_status|my_dag_run :', my_dag_run)
-    print('set_running_status|my_dag_run_conf :', my_dag_run_conf)
     if rule_id is not None:
         update_workflow_status(2, rule_id)
     else:
@@ -154,10 +150,10 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    run_wrf4_A = BashOperator(
+    run_wrf4_A = PythonOperator(
         task_id='run_wrf4_A',
-        bash_command=get_wrf_run_command,
         provide_context=True,
+        python_callable=get_wrf_run_command,
         pool=dag_pool
     )
 
