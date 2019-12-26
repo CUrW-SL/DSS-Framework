@@ -5,6 +5,7 @@ from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow.models import Variable
 import sys
+import subprocess
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/dss_workflow/plugins/operators')
 from gfs_sensor import GfsSensorOperator
@@ -28,9 +29,30 @@ default_args = {
 # ./runner.sh -r 0 -m SE -v 4.0 -h 18 -d 2019-10-24
 # ./rfielder.sh -r 0 -m SE -v 4.0 -h 18
 
-run_wrf4_SE_cmd = 'echo "run_wrf_SE_cmd" ;sleep $[($RANDOM % 1000) + 1]s'
+run_wrf4_SE_cmd_template = "ssh -i /home/uwcc-admin/.ssh/uwcc-admin -o \"StrictHostKeyChecking no\" uwcc-admin@{} " \
+                           "\'bash -c \"{}\"'"
 rfield_gen_cmd = 'echo "rfield_gen_cmd" ;sleep $[($RANDOM % 100) + 1]s'
 data_push_cmd = 'echo "data_push_cmd" ;sleep $[($RANDOM % 10) + 1]s'
+
+
+def get_wrf_run_command(**context):
+    wrf_rule = context['task_instance'].xcom_pull(task_ids='init_wrfv4SE')
+    print('get_wrf_run_command|wrf_rule : ', wrf_rule)
+    wrf_model = wrf_rule['model']
+    wrf_version = wrf_rule['version']
+    wrf_run = wrf_rule['rule_info']['run']
+    gfs_hour = wrf_rule['rule_info']['hour']
+    print('get_wrf_run_command|rule_details: ', wrf_rule['rule_info']['rule_details'])
+    node_ip = wrf_rule['rule_info']['rule_details']['node_ip']
+    script = wrf_rule['rule_info']['rule_details']['run_script']
+    exec_date = context["execution_date"].to_datetime_string()
+    run_script = '{}  -r {} -m {} -v {} -h {} -d {}'.format(script, wrf_run, wrf_model,
+                                                            wrf_version, gfs_hour, exec_date)
+    print('get_wrf_run_command|run_script : ', run_script)
+    run_wrf4_SE_cmd = run_wrf4_SE_cmd_template.format(node_ip, run_script)
+    print('get_wrf_run_command|run_wrf4_SE_cmd : ', run_wrf4_SE_cmd)
+    run_wrf4_SE_cmd = 'echo "run_wrf4_SE_cmd" ;sleep $[($RANDOM % 10) + 1]s'
+    subprocess.call(run_wrf4_SE_cmd, shell=True)
 
 
 def update_workflow_status(status, rule_id):
@@ -115,9 +137,10 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    run_wrf4_SE = BashOperator(
+    run_wrf4_SE = PythonOperator(
         task_id='run_wrf4_SE',
-        bash_command=run_wrf4_SE_cmd,
+        provide_context=True,
+        python_callable=get_wrf_run_command,
         pool=dag_pool
     )
 
