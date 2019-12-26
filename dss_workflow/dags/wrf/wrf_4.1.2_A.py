@@ -63,6 +63,8 @@ def get_wrf_run_command(**context):
 
 
 # wrf_run_command = get_wrf_run_command(**context)
+my_dag_run = """{{ dag_run }}"""
+my_dag_run_conf = """{{ dag_run.conf }}"""
 
 
 def update_workflow_status(status, rule_id):
@@ -89,8 +91,9 @@ def get_rule_id(context):
 
 def set_running_status(**context):
     rule_id = get_rule_id(context)
-    print('set_running_status :', """{{ dag_run }}""")
-    print('set_running_status :', """{{ dag_run.conf }}""")
+    print('set_running_status :', )
+    print('set_running_status|my_dag_run :', my_dag_run)
+    print('set_running_status|my_dag_run_conf :', my_dag_run_conf)
     if rule_id is not None:
         update_workflow_status(2, rule_id)
     else:
