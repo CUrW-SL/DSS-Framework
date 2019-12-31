@@ -43,13 +43,13 @@ def get_wrf_run_command(**context):
     wrf_run = wrf_rule['rule_info']['run']
     gfs_hour = wrf_rule['rule_info']['hour']
     print('get_wrf_run_command|rule_details: ', wrf_rule['rule_info']['rule_details'])
-    node_ip = wrf_rule['rule_info']['rule_details']['node_ip']
+    run_node = wrf_rule['rule_info']['rule_details']['run_node']
     script = wrf_rule['rule_info']['rule_details']['run_script']
     exec_date = context["execution_date"].to_datetime_string()
     run_script = '{}  -r {} -m {} -v {} -h {} -d {}'.format(script, wrf_run, wrf_model,
                                                             wrf_version, gfs_hour, exec_date)
     print('get_wrf_run_command|run_script : ', run_script)
-    run_wrf4_SE_cmd = run_wrf4_SE_cmd_template.format(node_ip, run_script)
+    run_wrf4_SE_cmd = run_wrf4_SE_cmd_template.format(run_node, run_script)
     print('get_wrf_run_command|run_wrf4_SE_cmd : ', run_wrf4_SE_cmd)
     subprocess.call(run_wrf4_SE_cmd, shell=True)
 
