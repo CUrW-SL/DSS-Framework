@@ -1,7 +1,5 @@
 from datetime import datetime
 from airflow import DAG
-from airflow.operators.bash_operator import BashOperator
-# from airflow.operators import GfsSensorOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow.models import Variable
 import sys
@@ -167,7 +165,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    wrf_data_push_wrfv4A = BashOperator(
+    wrf_data_push_wrfv4A = PythonOperator(
         task_id='wrf_data_push_wrfv4A',
         provide_context=True,
         python_callable=get_push_command,

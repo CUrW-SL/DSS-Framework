@@ -1,7 +1,5 @@
 from datetime import datetime
 from airflow import DAG
-from airflow.operators.bash_operator import BashOperator
-# from airflow.operators import GfsSensorOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow.models import Variable
 import sys
@@ -26,13 +24,28 @@ default_args = {
     'email_on_failure': True,
 }
 
-# ./runner.sh -r 0 -m E -v 4.0 -h 18 -d 2019-10-24
-# ./rfielder.sh -r 0 -m E -v 4.0 -h 18
+ssh_cmd_template = "ssh -i /home/uwcc-admin/.ssh/uwcc-admin -o \"StrictHostKeyChecking no\" uwcc-admin@{} " \
+                   "\'bash -c \"{}\"'"
 
-run_wrf4_E_cmd_template = "ssh -i /home/uwcc-admin/.ssh/uwcc-admin -o \"StrictHostKeyChecking no\" uwcc-admin@{} " \
-                          "\'bash -c \"{}\"'"
-rfield_gen_cmd = 'echo "rfield_gen_cmd" ;sleep $[($RANDOM % 100) + 1]s'
-data_push_cmd = 'echo "data_push_cmd" ;sleep $[($RANDOM % 10) + 1]s'
+
+def get_push_command(**context):
+    wrf_rule = context['task_instance'].xcom_pull(task_ids='init_wrfv4E')
+    print('get_wrf_run_command|wrf_rule : ', wrf_rule)
+    wrf_model = wrf_rule['model']
+    wrf_run = wrf_rule['rule_info']['run']
+    gfs_hour = wrf_rule['rule_info']['hour']
+    print('get_wrf_run_command|rule_details: ', wrf_rule['rule_info']['rule_details'])
+    push_node = wrf_rule['rule_info']['rule_details']['push_node']
+    push_script = wrf_rule['rule_info']['rule_details']['push_script']
+    push_config = wrf_rule['rule_info']['rule_details']['push_config']
+    wrf_bucket = wrf_rule['rule_info']['rule_details']['wrf_bucket']
+    exec_date = context["execution_date"].to_datetime_string()
+    push_script = '{} {} {} {} {} {}'.format(push_config, wrf_bucket, wrf_run,
+                                             gfs_hour, wrf_model, exec_date)
+    print('get_push_command|run_script : ', push_script)
+    push_wrf4_E_cmd = ssh_cmd_template.format(push_node, push_script)
+    print('get_push_command|push_wrf4_E_cmd : ', push_wrf4_E_cmd)
+    subprocess.call(push_wrf4_E_cmd, shell=True)
 
 
 def get_wrf_run_command(**context):
@@ -49,7 +62,7 @@ def get_wrf_run_command(**context):
     run_script = '{}  -r {} -m {} -v {} -h {} -d {}'.format(script, wrf_run, wrf_model,
                                                             wrf_version, gfs_hour, exec_date)
     print('get_wrf_run_command|run_script : ', run_script)
-    run_wrf4_E_cmd = run_wrf4_E_cmd_template.format(run_node, run_script)
+    run_wrf4_E_cmd = ssh_cmd_template.format(run_node, run_script)
     print('get_wrf_run_command|run_wrf4_E_cmd : ', run_wrf4_E_cmd)
     subprocess.call(run_wrf4_E_cmd, shell=True)
 
@@ -146,9 +159,10 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    wrf_data_push_wrfv4E = BashOperator(
+    wrf_data_push_wrfv4E = PythonOperator(
         task_id='wrf_data_push_wrfv4E',
-        bash_command=data_push_cmd,
+        provide_context=True,
+        python_callable=get_push_command,
         pool=dag_pool
     )
 
