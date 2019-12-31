@@ -146,12 +146,6 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    rfield_gen_wrfv4C = BashOperator(
-        task_id='rfield_gen_wrfv4C',
-        bash_command=rfield_gen_cmd,
-        pool=dag_pool
-    )
-
     wrf_data_push_wrfv4C = BashOperator(
         task_id='wrf_data_push_wrfv4C',
         bash_command=data_push_cmd,
@@ -173,5 +167,4 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     )
 
     init_wrfv4_C >> running_state_wrfv4C >> check_gfs_availability_wrfv4C >> \
-    run_wrf4_C >> rfield_gen_wrfv4C >> wrf_data_push_wrfv4C >> \
-    check_accuracy_wrfv4C >> complete_state_wrfv4C
+    run_wrf4_C >> wrf_data_push_wrfv4C >> check_accuracy_wrfv4C >> complete_state_wrfv4C
