@@ -33,8 +33,9 @@ run_script_name = 'runner.sh'
 # ./runner.sh -r 0 -m E -v 4.0 -h 18 -d 2019-10-24
 # ./rfielder.sh -r 0 -m E -v 4.0 -h 18
 
-run_wrf4_A_cmd_template = "ssh -i /home/uwcc-admin/.ssh/uwcc-admin -o \"StrictHostKeyChecking no\" uwcc-admin@{} " \
-                          "\'bash -c \"{}\"'"
+ssh_cmd_template = "ssh -i /home/uwcc-admin/.ssh/uwcc-admin -o \"StrictHostKeyChecking no\" uwcc-admin@{} " \
+                   "\'bash -c \"{}\"'"
+
 # "ssh -i /home/uwcc-admin/.ssh/uwcc-admin -o \"StrictHostKeyChecking no\" uwcc-admin@10.138.0.9 " \
 # "\'bash -c \"/home/uwcc-admin/jaxa/create_jaxa_rfield.sh\"'"
 rfield_gen_cmd = 'echo "rfield_gen_cmd" ;sleep $[($RANDOM % 100) + 1]s'
@@ -45,6 +46,7 @@ data_push_cmd = 'echo "data_push_cmd" ;sleep $[($RANDOM % 10) + 1]s'
 # 'rule_info': {'id': 1, 'run': '0', 'hour': '00', 'ignore_previous_run': 1,
 # 'check_gfs_data_availability': 1, 'accuracy_rule': 1,
 # 'rule_details': '{"run_node":"10.138.0.10"}'}}
+
 
 def get_wrf_run_command(**context):
     wrf_rule = context['task_instance'].xcom_pull(task_ids='init_wrfv4A')
@@ -60,7 +62,7 @@ def get_wrf_run_command(**context):
     run_script = '{}  -r {} -m {} -v {} -h {} -d {}'.format(script, wrf_run, wrf_model,
                                                             wrf_version, gfs_hour, exec_date)
     print('get_wrf_run_command|run_script : ', run_script)
-    run_wrf4_A_cmd = run_wrf4_A_cmd_template.format(run_node, run_script)
+    run_wrf4_A_cmd = ssh_cmd_template.format(run_node, run_script)
     print('get_wrf_run_command|run_wrf4_A_cmd : ', run_wrf4_A_cmd)
     subprocess.call(run_wrf4_A_cmd, shell=True)
 
