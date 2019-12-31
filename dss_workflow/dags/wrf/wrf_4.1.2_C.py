@@ -103,12 +103,15 @@ def check_accuracy(**context):
     print('check_accuracy|context : ', context)
     rule_info = context['task_instance'].xcom_pull(task_ids='init_wrfv4C')['rule_info']
     print('check_accuracy|rule_info : ', rule_info)
-    wrf_rule = {'model': 'C', 'version': '4.1.2', 'rule_info': rule_info}
-    print('check_accuracy|wrf_rule : ', wrf_rule)
-    exec_date = context["execution_date"].to_datetime_string()
-    print('check_accuracy|exec_date : ', wrf_rule)
-    # TODO: condition tobe added
-    calculate_wrf_rule_accuracy(wrf_rule, exec_date)
+    accuracy_rule_id = rule_info['accuracy_rule']
+    if accuracy_rule_id == 0 or accuracy_rule_id == '0':
+        return True
+    else:
+        wrf_rule = {'model': 'C', 'version': '4.1.2', 'rule_info': rule_info}
+        print('check_accuracy|wrf_rule : ', wrf_rule)
+        exec_date = context["execution_date"].to_datetime_string()
+        print('check_accuracy|exec_date : ', wrf_rule)
+        return calculate_wrf_rule_accuracy(wrf_rule, exec_date)
 
 
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
