@@ -80,6 +80,12 @@ def calculate_wrf_rule_accuracy(wrf_rule, exec_datetime):
         print('calculate_wrf_rule_accuracy|accuracy_percentage : ', total_stations)
         dss_adapter.update_wrf_rule_accuracy_level(accuracy_percentage, wrf_rule_id)
         print('wrf rule current accuracy successfully updated.')
+        accuracy_rule = dss_adapter.get_accuracy_rule_info_by_id(accuracy_rule_id)
+        expected_accuracy = float(accuracy_rule['rule_accuracy'])
+        if accuracy_percentage >= expected_accuracy:
+            return True
+        else:
+            return False
 
 
 def calculate_station_accuracy(obs_station, wrf_model, wrf_version, wrf_run, gfs_hour,

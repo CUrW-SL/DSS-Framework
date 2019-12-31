@@ -442,8 +442,8 @@ class RuleEngineAdapter:
         print('get_accuracy_rule_info_by_id|result : ', result)
         if result is not None:
             accuracy_rule = {'id': result[0], 'model_type': result[1], 'model': result[2],
-                                'observed_stations': result[3],
-                             'allowed_error': result[4], 'rule_accuracy': result[4]}
+                             'observed_stations': result[3], 'allowed_error': result[4],
+                             'rule_accuracy': result[4]}
         return accuracy_rule
 
 
