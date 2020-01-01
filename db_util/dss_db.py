@@ -235,7 +235,7 @@ class RuleEngineAdapter:
                            'init_run': result[5], 'no_forecast_continue': result[6],
                            'no_observed_continue': result[7], 'rainfall_data_from': result[8],
                            'ignore_previous_run': result[9], 'accuracy_rule': result[10],
-                           'rule_details': result[11]}
+                           'rule_details': json.loads(result[11])}
         return hechms_rule
 
     def get_hechms_rule_status_by_id(self, id):
@@ -297,7 +297,7 @@ class RuleEngineAdapter:
                           'no_forecast_continue': result[5], 'no_observed_continue': result[6],
                           'raincell_data_from': result[7], 'inflow_data_from': result[8],
                           'outflow_data_from': result[9], 'ignore_previous_run': result[10],
-                          'accuracy_rule': result[11], 'rule_details': result[12]}
+                          'accuracy_rule': result[11], 'rule_details': json.loads(result[12])}
         return flo2d_rule
 
     def get_flo2d_rule_status_by_id(self, id):
