@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
@@ -23,22 +23,17 @@ default_args = {
 }
 
 create_raincell_cmd_template = 'curl -X GET "http://{}:{}/create-sim-raincell?' \
-                               'run_date={{ (execution_date - macros.timedelta(days=1) + macros.timedelta(hours=5,minutes=30)).strftime(\"%Y-%m-%d\") }}' \
-                               '&run_time={{ (execution_date - macros.timedelta(days=1) + macros.timedelta(hours=5,minutes=30)).strftime(\"%H:00:00\") }}' \
+                               'run_date={}&run_time={}' \
                                '&forward={}&backward={}"'
 create_inflow_cmd_template = 'curl -X GET "http://{}:{}/create-inflow?' \
-                             'run_date={{ (execution_date - macros.timedelta(days=1) + macros.timedelta(hours=5,minutes=30)).strftime(\"%Y-%m-%d\") }}' \
-                             '&run_time={{ (execution_date - macros.timedelta(days=1) + macros.timedelta(hours=5,minutes=30)).strftime(\"%H:00:00\") }}"'
+                             'run_date={}&run_time={}"'
 create_outflow_cmd_template = 'curl -X GET "http://{}:{}/create-outflow?' \
-                              'run_date={{ (execution_date - macros.timedelta(days=1) + macros.timedelta(hours=5,minutes=30)).strftime(\"%Y-%m-%d\") }}' \
-                              '&run_time={{ (execution_date - macros.timedelta(days=1) + macros.timedelta(hours=5,minutes=30)).strftime(\"%H:00:00\") }}' \
+                              'run_date={}&run_time={}' \
                               '&forward={}&backward={}"'
 run_flo2d_150m_cmd_template = 'curl -X GET "http://{}:{}/run-flo2d?' \
-                              'run_date={{ (execution_date - macros.timedelta(days=1) + macros.timedelta(hours=5,minutes=30)).strftime(\"%Y-%m-%d\") }}' \
-                              '&run_time={{ (execution_date - macros.timedelta(days=1) + macros.timedelta(hours=5,minutes=30)).strftime(\"%H:00:00\") }}"'
+                              'run_date={}&run_time={}'
 extract_water_level_cmd_template = 'curl -X GET "http://{}:{}/extract-data?' \
-                                   'run_date={{ (execution_date - macros.timedelta(days=1) + macros.timedelta(hours=5,minutes=30)).strftime(\"%Y-%m-%d\") }}' \
-                                   '&run_time={{ (execution_date - macros.timedelta(days=1) + macros.timedelta(hours=5,minutes=30)).strftime(\"%H:00:00\") }}"'
+                                   'run_date={}&run_time={}'
 
 
 def get_rule_from_context(context):
@@ -47,19 +42,32 @@ def get_rule_from_context(context):
     return rule
 
 
+def get_local_exec_date_time_from_context(context):
+    exec_datetime_str = context["execution_date"].to_datetime_string()
+    exec_datetime = datetime.strptime(exec_datetime_str, '%Y-%m-%d %H:%M:%S') \
+                    - timedelta(days=1) + timedelta(hours=5, minutes=30)
+    exec_date = exec_datetime.strftime('%Y-%m-%d')
+    # exec_time = exec_datetime.strftime('%H:%M:%S')
+    exec_time = exec_datetime.strftime('%H:00:00')
+    return [exec_date, exec_time]
+
+
 def get_create_raincell_cmd(**context):
     rule = get_rule_from_context(context)
+    [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
     forward = rule['rule_info']['forecast_days']
     backward = rule['rule_info']['observed_days']
     run_node = rule['rule_info']['rule_details']['run_node']
     run_port = rule['rule_info']['rule_details']['run_port']
-    create_raincell_cmd = create_raincell_cmd_template.format(run_node, run_port, forward, backward)
+    create_raincell_cmd = create_raincell_cmd_template.format(run_node, run_port, exec_date, exec_time, forward,
+                                                              backward)
     print('get_create_raincell_cmd|create_raincell_cmd : ', create_raincell_cmd)
     subprocess.call(create_raincell_cmd, shell=True)
 
 
 def get_create_inflow_cmd(**context):
     rule = get_rule_from_context(context)
+    [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
     run_node = rule['rule_info']['rule_details']['run_node']
     run_port = rule['rule_info']['rule_details']['run_port']
     create_inflow_cmd = create_inflow_cmd_template.format(run_node, run_port)
@@ -69,6 +77,7 @@ def get_create_inflow_cmd(**context):
 
 def get_create_outflow_cmd(**context):
     rule = get_rule_from_context(context)
+    [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
     forward = rule['rule_info']['forecast_days']
     backward = rule['rule_info']['observed_days']
     run_node = rule['rule_info']['rule_details']['run_node']
@@ -89,6 +98,7 @@ def get_run_flo2d_250m_cmd(**context):
 
 def get_extract_water_level_cmd(**context):
     rule = get_rule_from_context(context)
+    [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
     run_node = rule['rule_info']['rule_details']['run_node']
     run_port = rule['rule_info']['rule_details']['run_port']
     extract_water_level_cmd = extract_water_level_cmd_template.format(run_node, run_port)

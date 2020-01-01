@@ -168,7 +168,6 @@ def run_this_func(dag_run, **kwargs):
 
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
          description='Run Flo2d 250m DAG', catchup=False) as dag:
-
     init_flo2d_250m = PythonOperator(
         task_id='init_flo2d_250m',
         provide_context=True,
