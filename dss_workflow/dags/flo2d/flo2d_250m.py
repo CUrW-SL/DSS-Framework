@@ -170,33 +170,38 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    create_raincell_flo2d_250m = BashOperator(
+    create_raincell_flo2d_250m = PythonOperator(
         task_id='create_raincell_flo2d_250m',
-        bash_command=create_raincell_cmd,
+        provide_context=True,
+        python_callable=get_create_raincell_cmd,
         pool=dag_pool
     )
 
-    create_inflow_flo2d_250m = BashOperator(
-        task_id='create_inflow_flo2d_250m',
-        bash_command=create_inflow_cmd,
+    create_inflow_flo2d_250m = PythonOperator(
+        task_id='create_raincell_flo2d_250m',
+        provide_context=True,
+        python_callable=get_create_inflow_cmd,
         pool=dag_pool
     )
 
-    create_outflow_flo2d_250m = BashOperator(
-        task_id='create_outflow_flo2d_250m',
-        bash_command=create_outflow_cmd,
+    create_outflow_flo2d_250m = PythonOperator(
+        task_id='create_raincell_flo2d_250m',
+        provide_context=True,
+        python_callable=get_create_outflow_cmd,
         pool=dag_pool
     )
 
-    run_flo2d_250m_flo2d_250m = BashOperator(
-        task_id='run_flo2d_250m_flo2d_250m',
-        bash_command=run_flo2d_250m_cmd,
+    run_flo2d_250m_flo2d_250m = PythonOperator(
+        task_id='create_raincell_flo2d_250m',
+        provide_context=True,
+        python_callable=get_run_flo2d_250m_cmd,
         pool=dag_pool
     )
 
-    extract_water_level_flo2d_250m = BashOperator(
-        task_id='extract_water_level_flo2d_250m',
-        bash_command=extract_water_level_cmd,
+    extract_water_level_flo2d_250m = PythonOperator(
+        task_id='create_raincell_flo2d_250m',
+        provide_context=True,
+        python_callable=get_extract_water_level_cmd,
         pool=dag_pool
     )
 
