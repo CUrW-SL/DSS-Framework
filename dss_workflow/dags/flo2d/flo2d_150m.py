@@ -4,6 +4,7 @@ from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow.models import Variable
 import sys
+import subprocess
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
@@ -21,11 +22,78 @@ default_args = {
     'email_on_failure': True,
 }
 
-create_raincell_cmd = 'echo "create_raincell_cmd" ;sleep $[($RANDOM % 10) + 1]s'
-create_inflow_cmd = 'echo "create_inflow_cmd" ;sleep $[($RANDOM % 10) + 1]s'
-create_outflow_cmd = 'echo "create_outflow_cmd" ;sleep $[($RANDOM % 10) + 1]s'
-run_flo2d_150m_cmd = 'echo "run_flo2d_150m_cmd" ;sleep $[($RANDOM % 10) + 1]s'
-extract_water_level_cmd = 'echo "extract_water_level_cmd" ;sleep $[($RANDOM % 10) + 1]s'
+create_raincell_cmd_template = 'curl -X GET "http://{}:{}/create-sim-raincell?' \
+                               'run_date={{ (execution_date - macros.timedelta(days=1) + macros.timedelta(hours=5,minutes=30)).strftime(\"%Y-%m-%d\") }}' \
+                               '&run_time={{ (execution_date - macros.timedelta(days=1) + macros.timedelta(hours=5,minutes=30)).strftime(\"%H:00:00\") }}' \
+                               '&forward={}&backward={}"'
+create_inflow_cmd_template = 'curl -X GET "http://{}:{}/create-inflow?' \
+                             'run_date={{ (execution_date - macros.timedelta(days=1) + macros.timedelta(hours=5,minutes=30)).strftime(\"%Y-%m-%d\") }}' \
+                             '&run_time={{ (execution_date - macros.timedelta(days=1) + macros.timedelta(hours=5,minutes=30)).strftime(\"%H:00:00\") }}"'
+create_outflow_cmd_template = 'curl -X GET "http://{}:{}/create-outflow?' \
+                              'run_date={{ (execution_date - macros.timedelta(days=1) + macros.timedelta(hours=5,minutes=30)).strftime(\"%Y-%m-%d\") }}' \
+                              '&run_time={{ (execution_date - macros.timedelta(days=1) + macros.timedelta(hours=5,minutes=30)).strftime(\"%H:00:00\") }}' \
+                              '&forward={}&backward={}"'
+run_flo2d_150m_cmd_template = 'curl -X GET "http://{}:{}/run-flo2d?' \
+                              'run_date={{ (execution_date - macros.timedelta(days=1) + macros.timedelta(hours=5,minutes=30)).strftime(\"%Y-%m-%d\") }}' \
+                              '&run_time={{ (execution_date - macros.timedelta(days=1) + macros.timedelta(hours=5,minutes=30)).strftime(\"%H:00:00\") }}"'
+extract_water_level_cmd_template = 'curl -X GET "http://{}:{}/extract-data?' \
+                                   'run_date={{ (execution_date - macros.timedelta(days=1) + macros.timedelta(hours=5,minutes=30)).strftime(\"%Y-%m-%d\") }}' \
+                                   '&run_time={{ (execution_date - macros.timedelta(days=1) + macros.timedelta(hours=5,minutes=30)).strftime(\"%H:00:00\") }}"'
+
+
+def get_rule_from_context(context):
+    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d_250m')
+    print('get_rule_from_context|rule : ', rule)
+    return rule
+
+
+def get_create_raincell_cmd(**context):
+    rule = get_rule_from_context(context)
+    forward = rule['rule_info']['forecast_days']
+    backward = rule['rule_info']['observed_days']
+    run_node = rule['rule_info']['rule_details']['run_node']
+    run_port = rule['rule_info']['rule_details']['run_port']
+    create_raincell_cmd = create_raincell_cmd_template.format(run_node, run_port, forward, backward)
+    print('get_create_raincell_cmd|create_raincell_cmd : ', create_raincell_cmd)
+    subprocess.call(create_raincell_cmd, shell=True)
+
+
+def get_create_inflow_cmd(**context):
+    rule = get_rule_from_context(context)
+    run_node = rule['rule_info']['rule_details']['run_node']
+    run_port = rule['rule_info']['rule_details']['run_port']
+    create_inflow_cmd = create_inflow_cmd_template.format(run_node, run_port)
+    print('get_create_inflow_cmd|create_inflow_cmd : ', create_inflow_cmd)
+    subprocess.call(create_inflow_cmd, shell=True)
+
+
+def get_create_outflow_cmd(**context):
+    rule = get_rule_from_context(context)
+    forward = rule['rule_info']['forecast_days']
+    backward = rule['rule_info']['observed_days']
+    run_node = rule['rule_info']['rule_details']['run_node']
+    run_port = rule['rule_info']['rule_details']['run_port']
+    create_outflow_cmd = create_outflow_cmd_template.format(run_node, run_port, forward, backward)
+    print('get_create_outflow_cmd|create_outflow_cmd : ', create_outflow_cmd)
+    subprocess.call(create_outflow_cmd, shell=True)
+
+
+def get_run_flo2d_250m_cmd(**context):
+    rule = get_rule_from_context(context)
+    run_node = rule['rule_info']['rule_details']['run_node']
+    run_port = rule['rule_info']['rule_details']['run_port']
+    run_flo2d_250m_cmd = run_flo2d_150m_cmd_template.format(run_node, run_port)
+    print('get_create_inflow_cmd|run_flo2d_250m_cmd : ', run_flo2d_250m_cmd)
+    subprocess.call(run_flo2d_250m_cmd, shell=True)
+
+
+def get_extract_water_level_cmd(**context):
+    rule = get_rule_from_context(context)
+    run_node = rule['rule_info']['rule_details']['run_node']
+    run_port = rule['rule_info']['rule_details']['run_port']
+    extract_water_level_cmd = extract_water_level_cmd_template.format(run_node, run_port)
+    print('get_create_inflow_cmd|extract_water_level_cmd : ', extract_water_level_cmd)
+    subprocess.call(extract_water_level_cmd, shell=True)
 
 
 def check_accuracy(**context):
@@ -104,33 +172,38 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    create_raincell_flo2d_150m = BashOperator(
+    create_raincell_flo2d_150m = PythonOperator(
         task_id='create_raincell_flo2d_150m',
-        bash_command=create_raincell_cmd,
+        provide_context=True,
+        python_callable=get_create_raincell_cmd,
         pool=dag_pool
     )
 
-    create_inflow_flo2d_150m = BashOperator(
+    create_inflow_flo2d_150m = PythonOperator(
         task_id='create_inflow_flo2d_150m',
-        bash_command=create_inflow_cmd,
+        provide_context=True,
+        python_callable=get_create_inflow_cmd,
         pool=dag_pool
     )
 
-    create_outflow_flo2d_150m = BashOperator(
+    create_outflow_flo2d_150m = PythonOperator(
         task_id='create_outflow_flo2d_150m',
-        bash_command=create_outflow_cmd,
+        provide_context=True,
+        python_callable=get_create_outflow_cmd,
         pool=dag_pool
     )
 
-    run_flo2d_150m_flo2d_150m = BashOperator(
+    run_flo2d_150m_flo2d_150m = PythonOperator(
         task_id='run_flo2d_150m_flo2d_150m',
-        bash_command=run_flo2d_150m_cmd,
+        provide_context=True,
+        python_callable=get_run_flo2d_250m_cmd,
         pool=dag_pool
     )
 
-    extract_water_level_flo2d_150m = BashOperator(
+    extract_water_level_flo2d_150m = PythonOperator(
         task_id='extract_water_level_flo2d_150m',
-        bash_command=extract_water_level_cmd,
+        provide_context=True,
+        python_callable=get_extract_water_level_cmd,
         pool=dag_pool
     )
 
