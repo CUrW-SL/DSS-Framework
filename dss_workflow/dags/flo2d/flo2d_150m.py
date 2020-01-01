@@ -14,7 +14,6 @@ from flo2d_accuracy import calculate_flo2d_rule_accuracy
 prod_dag_name = 'flo2d_150m_dag'
 dag_pool = 'flo2d_pool'
 
-
 default_args = {
     'owner': 'dss admin',
     'start_date': datetime.utcnow(),
@@ -37,8 +36,11 @@ def check_accuracy(**context):
     print('check_accuracy|flo2d_rule : ', flo2d_rule)
     exec_date = context["execution_date"].to_datetime_string()
     print('check_accuracy|exec_date : ', flo2d_rule)
-    # TODO: condition tobe added
-    calculate_flo2d_rule_accuracy(flo2d_rule, exec_date)
+    accuracy_rule_id = rule_info['accuracy_rule']
+    if accuracy_rule_id == 0 or accuracy_rule_id == '0':
+        return True
+    else:
+        calculate_flo2d_rule_accuracy(flo2d_rule, exec_date)
 
 
 def update_workflow_status(status, rule_id):
