@@ -1,19 +1,16 @@
 from datetime import datetime
 from airflow import DAG
-from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow.models import Variable
 import sys
+import subprocess
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
-sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/dss_workflow/plugins/operators')
-from workflow_completion_sensor import WorkflowSensorOperator
 
 prod_dag_name = 'hechms_distributed_dag'
 dag_pool = 'hechms_pool'
-
 
 default_args = {
     'owner': 'dss admin',
@@ -22,9 +19,69 @@ default_args = {
     'email_on_failure': True,
 }
 
-create_rainfall_cmd = 'echo "create_rainfall_cmd" ;sleep $[($RANDOM % 10) + 1]s'
-run_hechms_distributed_cmd = 'echo "run_hechms_distributed_cmd" ;sleep $[($RANDOM % 10) + 1]s'
-upload_discharge_cmd = 'echo "upload_discharge_cmd" ;sleep $[($RANDOM % 10) + 1]s'
+create_input_cmd_template = 'curl -X GET "http://{}:{}/HECHMS/distributed/init/{{ (execution_date + macros.timedelta(hours=5,minutes=30)).strftime(\"%Y-%m-%d_%H:00:00\") }}/{}/{}/{}"'
+run_hechms_preprocess_cmd_template = 'curl -X GET "http://{}:{}/HECHMS/distributed/pre-process/{{ (execution_date + macros.timedelta(hours=5,minutes=30)).strftime(\"%Y-%m-%d_%H:00:00\") }}/{}/{}"'
+run_hechms_cmd_template = 'curl -X GET "http://{}:{}/HECHMS/distributed/run"'
+run_hechms_postprocess_cmd_template = 'curl -X GET "http://{}:{}/HECHMS/distributed/post-process/{{ (execution_date + macros.timedelta(hours=5,minutes=30)).strftime(\"%Y-%m-%d_%H:00:00\") }}/{}/{}"'
+upload_discharge_cmd_template = 'curl -X GET "http://10.138.0.3:5000/HECHMS/distributed/upload-discharge/{{ (execution_date + macros.timedelta(hours=5,minutes=30)).strftime(\"%Y-%m-%d_%H:00:00\") }}"'
+
+
+def get_rule_from_context(context):
+    rule = context['task_instance'].xcom_pull(task_ids='init_hec_distributed')
+    print('get_rule_from_context|rule : ', rule)
+    return rule
+
+
+def get_create_input_cmd(**context):
+    rule = get_rule_from_context(context)
+    forward = rule['rule_info']['forecast_days']
+    backward = rule['rule_info']['observed_days']
+    init_run = rule['rule_info']['init_run']
+    run_node = rule['rule_info']['rule_details']['run_node']
+    run_port = rule['rule_info']['rule_details']['run_port']
+    create_input_cmd = create_input_cmd_template.format(run_node, run_port, backward, forward, init_run)
+    print('get_create_input_cmd|create_input_cmd : ', create_input_cmd)
+    subprocess.call(create_input_cmd, shell=True)
+
+
+def get_run_hechms_preprocess_cmd(**context):
+    rule = get_rule_from_context(context)
+    forward = rule['rule_info']['forecast_days']
+    backward = rule['rule_info']['observed_days']
+    run_node = rule['rule_info']['rule_details']['run_node']
+    run_port = rule['rule_info']['rule_details']['run_port']
+    run_hechms_preprocess_cmd = run_hechms_preprocess_cmd_template.format(run_node, run_port, backward, forward)
+    print('get_run_hechms_preprocess_cmd|run_hechms_preprocess_cmd : ', run_hechms_preprocess_cmd)
+    subprocess.call(run_hechms_preprocess_cmd, shell=True)
+
+
+def get_run_hechms_cmd(**context):
+    rule = get_rule_from_context(context)
+    run_node = rule['rule_info']['rule_details']['run_node']
+    run_port = rule['rule_info']['rule_details']['run_port']
+    run_hechms_cmd = run_hechms_cmd_template.format(run_node, run_port)
+    print('get_run_hechms_preprocess_cmd|run_hechms_cmd : ', run_hechms_cmd)
+    subprocess.call(run_hechms_cmd, shell=True)
+
+
+def get_run_hechms_postprocess_cmd(**context):
+    rule = get_rule_from_context(context)
+    forward = rule['rule_info']['forecast_days']
+    backward = rule['rule_info']['observed_days']
+    run_node = rule['rule_info']['rule_details']['run_node']
+    run_port = rule['rule_info']['rule_details']['run_port']
+    run_hechms_postprocess_cmd = run_hechms_postprocess_cmd_template.format(run_node, run_port, backward, forward)
+    print('get_run_hechms_postprocess_cmd|run_hechms_postprocess_cmd : ', run_hechms_postprocess_cmd)
+    subprocess.call(run_hechms_postprocess_cmd, shell=True)
+
+
+def get_upload_discharge_cmd(**context):
+    rule = get_rule_from_context(context)
+    run_node = rule['rule_info']['rule_details']['run_node']
+    run_port = rule['rule_info']['rule_details']['run_port']
+    upload_discharge_cmd = upload_discharge_cmd_template.format(run_node, run_port)
+    print('get_upload_discharge_cmd|upload_discharge_cmd : ', upload_discharge_cmd)
+    subprocess.call(upload_discharge_cmd, shell=True)
 
 
 def update_workflow_status(status, rule_id):
@@ -89,21 +146,38 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    create_rainfall_hec_dis = BashOperator(
-        task_id='create_rainfall_hec_dis',
-        bash_command=create_rainfall_cmd,
+    create_input_hec_dis = PythonOperator(
+        task_id='create_input_hec_dis',
+        provide_context=True,
+        python_callable=get_create_input_cmd,
         pool=dag_pool
     )
 
-    run_hechms_distributed = BashOperator(
-        task_id='run_hechms_distributed',
-        bash_command=run_hechms_distributed_cmd,
+    run_hechms_preprocess_hec_dis = PythonOperator(
+        task_id='run_hechms_preprocess_hec_dis',
+        provide_context=True,
+        python_callable=get_run_hechms_preprocess_cmd,
         pool=dag_pool
     )
 
-    upload_discharge_hec_dis = BashOperator(
+    run_hechms_hec_dis = PythonOperator(
+        task_id='run_hechms_hec_dis',
+        provide_context=True,
+        python_callable=get_run_hechms_cmd,
+        pool=dag_pool
+    )
+
+    run_hechms_postprocess_hec_dis = PythonOperator(
+        task_id='run_hechms_postprocess_hec_dis',
+        provide_context=True,
+        python_callable=get_run_hechms_postprocess_cmd,
+        pool=dag_pool
+    )
+
+    upload_discharge_hec_dis = PythonOperator(
         task_id='upload_discharge_hec_dis',
-        bash_command=upload_discharge_cmd,
+        provide_context=True,
+        python_callable=get_upload_discharge_cmd,
         pool=dag_pool
     )
 
@@ -115,7 +189,5 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    init_hec_distributed >> running_state_hec_dis \
-    >> create_rainfall_hec_dis >> run_hechms_distributed >> upload_discharge_hec_dis\
-    >> complete_state_hec_dis
-
+    init_hec_distributed >> running_state_hec_dis >> create_input_hec_dis >> run_hechms_preprocess_hec_dis >> \
+    run_hechms_hec_dis >> run_hechms_postprocess_hec_dis >> upload_discharge_hec_dis >> complete_state_hec_dis
