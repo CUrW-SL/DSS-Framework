@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.models import Variable
@@ -30,6 +30,16 @@ def get_rule_from_context(context):
     rule = context['task_instance'].xcom_pull(task_ids='init_hec_distributed')
     print('get_rule_from_context|rule : ', rule)
     return rule
+
+
+def get_local_exec_date_time_from_context(context):
+    exec_datetime_str = context["execution_date"].to_datetime_string()
+    exec_datetime = datetime.strptime(exec_datetime_str, '%Y-%m-%d %H:%M:%S') \
+                    - timedelta(days=1) + timedelta(hours=5, minutes=30)
+    exec_date = exec_datetime.strftime('%Y-%m-%d')
+    # exec_time = exec_datetime.strftime('%H:%M:%S')
+    exec_time = exec_datetime.strftime('%H:00:00')
+    return [exec_date, exec_time]
 
 
 def get_create_input_cmd(**context):
