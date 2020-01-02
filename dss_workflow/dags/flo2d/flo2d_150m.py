@@ -37,7 +37,7 @@ extract_water_level_cmd_template = 'curl -X GET "http://{}:{}/extract-data?' \
 
 
 def get_rule_from_context(context):
-    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d_250m')
+    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d_150m')
     print('get_rule_from_context|rule : ', rule)
     return rule
 
@@ -70,7 +70,7 @@ def get_create_inflow_cmd(**context):
     [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
     run_node = rule['rule_info']['rule_details']['run_node']
     run_port = rule['rule_info']['rule_details']['run_port']
-    create_inflow_cmd = create_inflow_cmd_template.format(run_node, run_port)
+    create_inflow_cmd = create_inflow_cmd_template.format(run_node, run_port, exec_date, exec_time)
     print('get_create_inflow_cmd|create_inflow_cmd : ', create_inflow_cmd)
     subprocess.call(create_inflow_cmd, shell=True)
 
@@ -82,18 +82,19 @@ def get_create_outflow_cmd(**context):
     backward = rule['rule_info']['observed_days']
     run_node = rule['rule_info']['rule_details']['run_node']
     run_port = rule['rule_info']['rule_details']['run_port']
-    create_outflow_cmd = create_outflow_cmd_template.format(run_node, run_port, forward, backward)
+    create_outflow_cmd = create_outflow_cmd_template.format(run_node, run_port, exec_date, exec_time, forward, backward)
     print('get_create_outflow_cmd|create_outflow_cmd : ', create_outflow_cmd)
     subprocess.call(create_outflow_cmd, shell=True)
 
 
-def get_run_flo2d_250m_cmd(**context):
+def get_run_flo2d_150m_cmd(**context):
     rule = get_rule_from_context(context)
+    [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
     run_node = rule['rule_info']['rule_details']['run_node']
     run_port = rule['rule_info']['rule_details']['run_port']
-    run_flo2d_250m_cmd = run_flo2d_150m_cmd_template.format(run_node, run_port)
-    print('get_create_inflow_cmd|run_flo2d_250m_cmd : ', run_flo2d_250m_cmd)
-    subprocess.call(run_flo2d_250m_cmd, shell=True)
+    run_flo2d_150m_cmd = run_flo2d_150m_cmd_template.format(run_node, run_port, exec_date, exec_time)
+    print('get_create_inflow_cmd|run_flo2d_150m_cmd : ', run_flo2d_150m_cmd)
+    subprocess.call(run_flo2d_150m_cmd, shell=True)
 
 
 def get_extract_water_level_cmd(**context):
@@ -101,7 +102,7 @@ def get_extract_water_level_cmd(**context):
     [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
     run_node = rule['rule_info']['rule_details']['run_node']
     run_port = rule['rule_info']['rule_details']['run_port']
-    extract_water_level_cmd = extract_water_level_cmd_template.format(run_node, run_port)
+    extract_water_level_cmd = extract_water_level_cmd_template.format(run_node, run_port, exec_date, exec_time)
     print('get_create_inflow_cmd|extract_water_level_cmd : ', extract_water_level_cmd)
     subprocess.call(extract_water_level_cmd, shell=True)
 
@@ -206,7 +207,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     run_flo2d_150m_flo2d_150m = PythonOperator(
         task_id='run_flo2d_150m_flo2d_150m',
         provide_context=True,
-        python_callable=get_run_flo2d_250m_cmd,
+        python_callable=get_run_flo2d_150m_cmd,
         pool=dag_pool
     )
 
