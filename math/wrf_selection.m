@@ -73,8 +73,7 @@ Print[Length[data]];
 Print[data[[1]]];
 Do[
 (*list = StringCases[data[[i]],
- RegularExpression[
-"WRF_"<>selMod<>"_4.0_(.* )_(.* ).txt"] -> {"$1", "$2"}];
+ RegularExpression["WRF_"<>selMod<>"_4.0_(.* )_(.* ).txt"] -> {"$1", "$2"}];
 If[Length[list] != 0,
 datetime = list[[1]][[1]] <> " " <> list[[1]][[2]];
 n=DateObject[{datetime,{"Year","-","Month","-","Day"," ","Hour","-","Minute"}},TimeZone \[Rule] 5.5 ];
