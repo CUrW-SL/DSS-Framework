@@ -19,11 +19,15 @@ default_args = {
     'email_on_failure': True,
 }
 
-create_input_cmd_template = 'curl -X GET "http://{}:{}/HECHMS/distributed/init/{{ (execution_date + macros.timedelta(hours=5,minutes=30)).strftime(\"%Y-%m-%d_%H:00:00\") }}/{}/{}/{}"'
-run_hechms_preprocess_cmd_template = 'curl -X GET "http://{}:{}/HECHMS/distributed/pre-process/{{ (execution_date + macros.timedelta(hours=5,minutes=30)).strftime(\"%Y-%m-%d_%H:00:00\") }}/{}/{}"'
+create_input_cmd_template = 'curl -X GET "http://{}:{}/HECHMS/distributed/init/{}/{}/{}/{}"'
+
+run_hechms_preprocess_cmd_template = 'curl -X GET "http://{}:{}/HECHMS/distributed/pre-process/{}/{}/{}"'
+
 run_hechms_cmd_template = 'curl -X GET "http://{}:{}/HECHMS/distributed/run"'
-run_hechms_postprocess_cmd_template = 'curl -X GET "http://{}:{}/HECHMS/distributed/post-process/{{ (execution_date + macros.timedelta(hours=5,minutes=30)).strftime(\"%Y-%m-%d_%H:00:00\") }}/{}/{}"'
-upload_discharge_cmd_template = 'curl -X GET "http://10.138.0.3:5000/HECHMS/distributed/upload-discharge/{{ (execution_date + macros.timedelta(hours=5,minutes=30)).strftime(\"%Y-%m-%d_%H:00:00\") }}"'
+
+run_hechms_postprocess_cmd_template = 'curl -X GET "http://{}:{}/HECHMS/distributed/post-process/{}/{}/{}"'
+
+upload_discharge_cmd_template = 'curl -X GET "http://10.138.0.3:5000/HECHMS/distributed/upload-discharge/{}"'
 
 
 def get_rule_from_context(context):
@@ -32,18 +36,17 @@ def get_rule_from_context(context):
     return rule
 
 
-def get_local_exec_date_time_from_context(context):
+def get_local_exec_date_from_context(context):
     exec_datetime_str = context["execution_date"].to_datetime_string()
     exec_datetime = datetime.strptime(exec_datetime_str, '%Y-%m-%d %H:%M:%S') \
                     - timedelta(days=1) + timedelta(hours=5, minutes=30)
-    exec_date = exec_datetime.strftime('%Y-%m-%d')
-    # exec_time = exec_datetime.strftime('%H:%M:%S')
-    exec_time = exec_datetime.strftime('%H:00:00')
-    return [exec_date, exec_time]
+    exec_date = exec_datetime.strftime('%Y-%m-%d_%H:00:00')
+    return exec_date
 
 
 def get_create_input_cmd(**context):
     rule = get_rule_from_context(context)
+    exec_date = get_local_exec_date_from_context(context)
     forward = rule['rule_info']['forecast_days']
     backward = rule['rule_info']['observed_days']
     init_run = rule['rule_info']['init_run']
