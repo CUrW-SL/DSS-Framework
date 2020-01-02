@@ -204,7 +204,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    run_flo2d_150m_flo2d_150m = PythonOperator(
+    run_flo2d_150m = PythonOperator(
         task_id='run_flo2d_150m_flo2d_150m',
         provide_context=True,
         python_callable=get_run_flo2d_150m_cmd,
@@ -233,5 +233,5 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     )
 
     init_flo2d_150m >> running_state_flo2d_150m >> create_raincell_flo2d_150m >> \
-    create_inflow_flo2d_150m >> create_outflow_flo2d_150m >> run_flo2d_150m_flo2d_150m >> \
+    create_inflow_flo2d_150m >> create_outflow_flo2d_150m >> run_flo2d_150m >> \
     extract_water_level_flo2d_150m >> check_accuracy_flo2d150m >> complete_state_flo2d_150m
