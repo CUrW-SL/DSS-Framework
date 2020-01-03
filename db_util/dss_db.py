@@ -446,6 +446,37 @@ class RuleEngineAdapter:
                              'rule_accuracy': result[4]}
         return accuracy_rule
 
+    # ---------------------------Variable routine-----------------------------
+    def update_initial_variable_routing_status(self, status, routine_id):
+        query = 'update dss.variable_routines set status={},last_trigger_date=now()  ' \
+                'where id=\'{}\''.format(status, routine_id)
+        print('update_initial_variable_routing_status|query : ', query)
+        self.update_query(query)
+
+    def get_next_variable_routines(self, schedule_date=datetime.now()):
+        if type(schedule_date) is datetime:
+            schedule_date = schedule_date
+        else:
+            schedule_date = datetime.strptime(schedule_date, '%Y-%m-%d %H:%M:%S')
+        print('schedule_date : ', schedule_date)
+        query = 'select id,variable_name,dag_name,schedule from dss.variable_routines where status in (1,3);'
+        print('get_next_variable_routines|query : ', query)
+        results = self.get_multiple_result(query)
+        routines = []
+        if results is not None:
+            for result in results:
+                print('get_next_variable_routines|result : ', result)
+                routines.append({'id': result[0], 'variable_name': result[1],
+                                 'dag_name': result[2], 'schedule': result[4]})
+        print('get_next_variable_routines|routines : ', routines)
+        if len(routines) > 0:
+            routines = get_next_scheduled_routines(schedule_date, routines)
+            if len(routines) > 0:
+                for routine in routines:
+                    print('update_initial_workflow_routing_status.')
+                    self.update_initial_variable_routing_status(1, routine['id'])
+        return routines
+
 
 if __name__ == "__main__":
     db_config = {'mysql_user': 'admin', 'mysql_password': 'floody', 'mysql_host': '35.227.163.211', 'mysql_db': 'dss',
