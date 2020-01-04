@@ -447,6 +447,11 @@ class RuleEngineAdapter:
         return accuracy_rule
 
     # ---------------------------Variable routine-----------------------------
+    def update_variable_routing_status(self, status, routine_id):
+        query = 'update dss.variable_routines set status={} where id=\'{}\''.format(status, routine_id)
+        print('update_variable_routing_status|query : ', query)
+        self.update_query(query)
+
     def update_initial_variable_routing_status(self, status, routine_id):
         query = 'update dss.variable_routines set status={},last_trigger_date=now()  ' \
                 'where id=\'{}\''.format(status, routine_id)
