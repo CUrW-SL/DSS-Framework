@@ -68,7 +68,6 @@ with DAG(dag_id=prod_dag_name, default_args=default_args,
         task_id='scheduler_end',
         python_callable=end_routine,
         trigger_rule='none_failed',
-        provide_context=True,
         pool=dag_pool
     )
 
