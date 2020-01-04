@@ -130,3 +130,6 @@ def set_running_state(db_adapter, routine_id):
     db_adapter.update_workflow_routing_status(2, routine_id)
 
 
+def set_variable_routine_running_state(db_adapter, routine_id):
+    print('set_variable_routine_running_state|routine_id: ', routine_id)
+    db_adapter.update_variable_routing_status(2, routine_id)

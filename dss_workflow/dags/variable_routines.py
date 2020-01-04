@@ -15,8 +15,8 @@ from dss_db import RuleEngineAdapter
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/gen_util')
 from controller_util import get_triggering_dags, \
-    update_workflow_routine_status, \
-    set_running_state
+    update_variable_routine_status, \
+    set_variable_routine_running_state
 
 prod_dag_name = 'variable_controller_v1'
 dag_pool = 'variable_controller_pool'
@@ -31,8 +31,8 @@ def init_variable_routine(dag_run, **kwargs):
     if routine is not None:
         db_config = Variable.get('db_config', deserialize_json=True)
         adapter = RuleEngineAdapter.get_instance(db_config)
-        routine_id = routine['workflow_routine']['id']
-        set_running_state(adapter, routine_id)
+        routine_id = routine['variable_routine']['id']
+        set_variable_routine_running_state(adapter, routine_id)
         return routine
 
 
@@ -40,7 +40,7 @@ def end_variable_routine(**context):
     print('***************************end_variable_routine**********************************')
     db_config = Variable.get('db_config', deserialize_json=True)
     adapter = RuleEngineAdapter.get_instance(db_config)
-    update_workflow_routine_status(adapter)
+    update_variable_routine_status(adapter)
     print('******rounting completed**********')
 
 
