@@ -84,6 +84,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
 
     complete_state = PythonOperator(
         task_id='complete_state',
+        provide_context=True,
         python_callable=set_complete_status,
         dag=dag,
         pool=dag_pool
