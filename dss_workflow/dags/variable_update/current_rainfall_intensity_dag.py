@@ -34,7 +34,7 @@ def get_rule_id(context):
         return None
 
 
-def set_running_status(dag_run):
+def set_running_status(dag_run, **kwargs):
     print('set_running_status|dag_run : ', dag_run)
     print('set_running_status|dag_run.conf : ', dag_run.conf)
     # rule_id = get_rule_id(context)
@@ -65,6 +65,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     init_task = PythonOperator(
         task_id='init_task',
         python_callable=set_running_status,
+        provide_context=True,
         pool=dag_pool
     )
 
