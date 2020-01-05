@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 from airflow import DAG
-from airflow.operators.dagrun_operator import DagRunOrder
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.models import Variable
 import sys
@@ -8,7 +7,7 @@ import sys
 from airflow.operators.python_operator import PythonOperator
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/dss_workflow/plugins/operators')
-from dynamic_external_trigger import DynamicTriggerDagRunOperator
+from dynamic_external_trigger_operator import DynamicTriggerDagRunOperator
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
@@ -62,8 +61,8 @@ with DAG(dag_id=prod_dag_name, default_args=default_args,
         task_id='gen_target_dag_run',
         default_trigger='dss_variable_routine_v1',
         python_callable=generate_dag_run,
-        provide_context=True,
         pool=dag_pool
+
     )
 
     scheduler_end = PythonOperator(

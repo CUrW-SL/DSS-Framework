@@ -65,5 +65,5 @@ class DynamicTriggerDagRunOperator(BaseOperator):
 
 
 class MyFirstPlugin(AirflowPlugin):
-    name = "dynamic_dag_run_operator"
+    name = "dynamic_external_trigger_operator"
     operators = [DynamicTriggerDagRunOperator]
