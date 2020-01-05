@@ -8,7 +8,7 @@ import sys
 from airflow.operators.python_operator import PythonOperator
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/dss_workflow/plugins/operators')
-from multi_dag_trigger_operator import TriggerMultiDagRunOperator
+from dynamic_external_trigger import DynamicTriggerDagRunOperator
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
@@ -58,7 +58,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args,
         pool=dag_pool
     )
 
-    gen_target_dag_run = TriggerMultiDagRunOperator(
+    gen_target_dag_run = DynamicTriggerDagRunOperator(
         task_id='gen_target_dag_run',
         default_trigger='dss_variable_routine_v1',
         python_callable=generate_dag_run,
