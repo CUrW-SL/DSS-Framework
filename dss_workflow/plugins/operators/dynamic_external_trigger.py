@@ -3,12 +3,18 @@ from datetime import datetime, timezone
 
 import six
 from airflow.bin.cli import trigger_dag
-from airflow.operators.dagrun_operator import TriggerDagRunOperator, DagRunOrder
+from airflow.models import BaseOperator
 from airflow.plugins_manager import AirflowPlugin
 from airflow.utils.decorators import apply_defaults
 
 
-class DynamicTriggerDagRunOperator(TriggerDagRunOperator):
+class DagRunOrder(object):
+    def __init__(self, run_id=None, payload=None):
+        self.run_id = run_id
+        self.payload = payload
+
+
+class DynamicTriggerDagRunOperator(BaseOperator):
     @apply_defaults
     def __init__(
             self,
