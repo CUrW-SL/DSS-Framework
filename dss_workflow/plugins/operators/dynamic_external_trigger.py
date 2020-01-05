@@ -1,6 +1,5 @@
 import json
 from datetime import datetime, timezone
-
 import six
 from airflow.bin.cli import trigger_dag
 from airflow.models import BaseOperator
@@ -25,7 +24,7 @@ class DynamicTriggerDagRunOperator(BaseOperator):
         super(DynamicTriggerDagRunOperator, self).__init__(*args, **kwargs)
         self.python_callable = python_callable
 
-        if isinstance(execution_date, datetime.datetime):
+        if isinstance(execution_date, datetime):
             self.execution_date = execution_date.isoformat()
         elif isinstance(execution_date, six.string_types):
             self.execution_date = execution_date
