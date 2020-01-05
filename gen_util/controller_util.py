@@ -129,8 +129,6 @@ def get_triggering_variable_dags(variable_routines):
     dag_info = []
     if len(variable_routines) > 0:
         for variable_routine in variable_routines:
-            target_model = target_model.strip()
-            print('target_model : ', target_model)
             dag_name = variable_routine['dag_name']
             payload = variable_routine
             dag_info.append({'dag_name': dag_name, 'payload': payload})
