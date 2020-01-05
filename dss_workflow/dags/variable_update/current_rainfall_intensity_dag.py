@@ -17,7 +17,7 @@ def update_workflow_status(status, rule_id):
         db_config = Variable.get('db_config', deserialize_json=True)
         try:
             adapter = RuleEngineAdapter.get_instance(db_config)
-            adapter.update_rule_status_by_id('hechms', rule_id, status)
+            adapter.update_variable_routing_status(status, rule_id)
         except Exception as ex:
             print('update_workflow_status|db_adapter|Exception: ', str(ex))
     except Exception as e:
@@ -35,22 +35,20 @@ def get_rule_id(context):
 
 
 def set_running_status(dag_run, **kwargs):
-    print('set_running_status|dag_run : ', dag_run)
     print('set_running_status|dag_run.conf : ', dag_run.conf)
-    # rule_id = get_rule_id(context)
-    # if rule_id is not None:
-    #     update_workflow_status(2, rule_id)
-    # else:
-    #     print('set_running_status|rule_id not found')
+    variable_routine = dag_run.conf
+    variable_routine_id = variable_routine['id']
+    if variable_routine_id is not None:
+        update_workflow_status(2, variable_routine_id)
+    else:
+        print('set_running_status|variable_routine_id not found')
 
 
-def set_complete_status(**context):
+def set_complete_status(dag_run, **kwargs):
     print('set_complete_status')
-    # rule_id = get_rule_id(context)
-    # if rule_id is not None:
-    #     update_workflow_status(3, rule_id)
-    # else:
-    #     print('set_complete_status|rule_id not found')
+    variable_routine = dag_run.conf
+    variable_routine_id = variable_routine['id']
+    update_workflow_status(3, variable_routine_id)
 
 
 default_args = {
