@@ -1,42 +1,61 @@
-from datetime import datetime
-from airflow import settings
-from airflow.models import DagBag
+import json
+from datetime import datetime, timezone
+
+import six
+from airflow.bin.cli import trigger_dag
 from airflow.operators.dagrun_operator import TriggerDagRunOperator, DagRunOrder
 from airflow.plugins_manager import AirflowPlugin
 from airflow.utils.decorators import apply_defaults
-from airflow.utils.state import State
 
 
 class DynamicTriggerDagRunOperator(TriggerDagRunOperator):
     @apply_defaults
-    def __init__(self, op_args=None, op_kwargs=None, *args, **kwargs):
+    def __init__(
+            self,
+            python_callable=None,
+            execution_date=None,
+            *args, **kwargs):
         super(DynamicTriggerDagRunOperator, self).__init__(*args, **kwargs)
-        self.op_args = op_args or []
-        self.op_kwargs = op_kwargs or {}
+        self.python_callable = python_callable
+
+        if isinstance(execution_date, datetime.datetime):
+            self.execution_date = execution_date.isoformat()
+        elif isinstance(execution_date, six.string_types):
+            self.execution_date = execution_date
+        elif execution_date is None:
+            self.execution_date = execution_date
+        else:
+            raise TypeError(
+                'Expected str or datetime.datetime type '
+                'for execution_date. Got {}'.format(
+                    type(execution_date)))
 
     def execute(self, context):
-        session = settings.Session()
-        created = False
-        dro = self.python_callable(context, *self.op_args, **self.op_kwargs)
-        if dro or isinstance(dro, DagRunOrder):
-            if dro.run_id is None:
-                dro.run_id = 'trig__' + datetime.utcnow().isoformat()
-            print('DynamicTriggerDagRunOperator|dro : ', dro)
-            dbag = DagBag(settings.DAGS_FOLDER)
-            trigger_dag = dbag.get_dag(self.trigger_dag_id)
-            dr = trigger_dag.create_dagrun(
-                run_id=dro.run_id,
-                state=State.RUNNING,
-                conf=dro.payload,
-                external_trigger=True
-            )
-            created = True
-            self.log.info("Creating DagRun %s", dr)
-        if created is True:
-            session.commit()
+        if self.python_callable is not None:
+            results = self.python_callable(context)
+            print('DynamicTriggerDagRunOperator|execute|results : ', results)
+            count = 1
+            for result in results:
+                print('result : ', result)
+                if self.execution_date is not None:
+                    run_id = 'trig_{}_{}'.format(count, self.execution_date)
+                    self.execution_date = timezone.parse(self.execution_date)
+                else:
+                    run_id = 'trig_{}_{}'.format(count, timezone.utcnow().isoformat())
+                dro = DagRunOrder(run_id=run_id)
+                trigger_dag_id = result['dag_name']
+                print('trigger_dag_id : ', trigger_dag_id)
+                payload = result['payload']
+                print('payload : ', payload)
+                trigger_dag(dag_id=trigger_dag_id,
+                            run_id=dro.run_id,
+                            conf=json.dumps(payload),
+                            execution_date=self.execution_date,
+                            replace_microseconds=False)
+                count += 1
         else:
-            self.log.info("No DagRun created")
-        session.close()
+            print('DynamicTriggerDagRunOperator|python_callable is None.')
+            self.log.info("Criteria not met, moving on")
 
 
 class MyFirstPlugin(AirflowPlugin):
