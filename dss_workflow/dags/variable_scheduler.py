@@ -13,6 +13,9 @@ from multi_dag_trigger_operator import TriggerMultiDagRunOperator
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
+sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/gen_util')
+from controller_util import get_triggering_variable_dags
+
 prod_dag_name = 'variable_scheduler_v1'
 schedule_interval = '*/5 * * * *'
 dag_pool = 'variable_scheduler_pool'
@@ -28,8 +31,7 @@ def generate_dag_run(context):
     print('init_variable_routine|routines : ', routines)
     next_variable_routines = []
     if routines is not None:
-        for variable_routine in routines:
-            next_variable_routines.append(DagRunOrder(payload={'variable_routine': variable_routine}))
+        next_variable_routines = get_triggering_variable_dags(routines)
     else:
         print('No variable routine to schedule.')
     return next_variable_routines
@@ -58,7 +60,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args,
 
     gen_target_dag_run = TriggerMultiDagRunOperator(
         task_id='gen_target_dag_run',
-        trigger_dag_id='dss_variable_routine_v1',
+        default_trigger='dss_variable_routine_v1',
         python_callable=generate_dag_run,
         provide_context=True,
         pool=dag_pool
