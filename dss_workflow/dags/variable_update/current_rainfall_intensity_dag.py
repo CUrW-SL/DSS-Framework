@@ -64,8 +64,8 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
          description='Run current_rainfall_intensity_dag DAG', catchup=False) as dag:
     init_task = PythonOperator(
         task_id='init_task',
-        python_callable=set_running_status,
         provide_context=True,
+        python_callable=set_running_status,
         pool=dag_pool
     )
 
