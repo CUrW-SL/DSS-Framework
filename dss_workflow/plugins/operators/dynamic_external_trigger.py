@@ -6,6 +6,7 @@ from airflow.bin.cli import trigger_dag
 from airflow.models import BaseOperator
 from airflow.plugins_manager import AirflowPlugin
 from airflow.utils.decorators import apply_defaults
+from airflow.api.common.experimental.trigger_dag import trigger_dag
 
 
 class DagRunOrder(object):
