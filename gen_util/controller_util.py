@@ -125,6 +125,20 @@ def update_workflow_routine_status(db_adapter):
         print('No running workflows.')
 
 
+def get_triggering_variable_dags(variable_routines):
+    dag_info = []
+    if len(variable_routines) > 0:
+        for variable_routine in variable_routines:
+            target_model = target_model.strip()
+            print('target_model : ', target_model)
+            dag_name = variable_routine['dag_name']
+            payload = variable_routine
+            dag_info.append({'dag_name': dag_name, 'payload': payload})
+    else:
+        print('No triggering_variable_dags found.')
+    return dag_info
+
+
 def set_running_state(db_adapter, routine_id):
     print('set_running_state|routine_id: ', routine_id)
     db_adapter.update_workflow_routing_status(2, routine_id)
