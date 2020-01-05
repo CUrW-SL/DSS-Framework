@@ -472,7 +472,7 @@ class RuleEngineAdapter:
             for result in results:
                 print('get_next_variable_routines|result : ', result)
                 routines.append({'id': result[0], 'variable_name': result[1],
-                                 'dag_name': result[2], 'schedule': result[4]})
+                                 'dag_name': result[2], 'schedule': result[3]})
         print('get_next_variable_routines|routines : ', routines)
         if len(routines) > 0:
             routines = get_next_scheduled_routines(schedule_date, routines)
