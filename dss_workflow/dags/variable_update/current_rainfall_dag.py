@@ -52,6 +52,7 @@ def update_variable_value(dag_run, **kwargs):
     try:
         dss_adapter = RuleEngineAdapter.get_instance(db_config)
         obs_adapter = CurwObsAdapter.get_instance(obs_db_config)
+        print('update_variable_value|variable_routine : ', variable_routine)
         update_current_rainfall_values(dss_adapter, obs_adapter, variable_routine)
     except Exception as ex:
         print('update_variable_value|db_adapter|Exception: ', str(ex))
