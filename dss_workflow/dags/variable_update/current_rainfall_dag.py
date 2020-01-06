@@ -5,7 +5,8 @@ from airflow.models import Variable
 from airflow.operators.python_operator import PythonOperator
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
-from gen_db import CurwObsAdapter, RuleEngineAdapter
+from gen_db import CurwObsAdapter
+from dss_db import RuleEngineAdapter
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/variable_util')
 from current_rainfall import update_current_rainfall_values
