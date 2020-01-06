@@ -704,10 +704,12 @@ class CurwObsAdapter:
         for location in locations:
             sql_query = 'select id from curw_obs.station where name=\'{}\' and station_type=\'{}\';'.format(location,
                                                                                                             variable_type)
+            print('get_station_ids_for_location|sql_query : ', sql_query)
             result = self.get_single_result(sql_query)
             if result is not None:
                 location_id = result[0]
                 location_ids.append({'location': location, 'id': location_id})
+        print('get_station_ids_for_location|location_ids : ', location_ids)
         return location_ids
 
     def get_location_hash_ids(self, location_ids):
@@ -715,10 +717,12 @@ class CurwObsAdapter:
         for location_id in location_ids:
             if location_id['id']:
                 sql_query = 'select id from curw_obs.run where station={} and variable=10;'.format(location_id['id'])
+                print('get_location_hash_ids|sql_query : ', sql_query)
                 result = self.get_single_result(sql_query)
                 if result is not None:
                     location_id['hash_id'] = result[0]
                     location_hash_ids.append(location_id)
+        print('get_location_hash_ids|location_ids : ', location_ids)
         return location_hash_ids
 
     def get_values_for_hash_ids(self, location_hash_ids):
@@ -727,11 +731,13 @@ class CurwObsAdapter:
             if location_hash_id['hash_id']:
                 sql_query = 'select time,value from curw_obs.data where id=\'{}\' order by time desc limit 1;'.format(
                     location_hash_id['hash_id'])
+                print('get_values_for_hash_ids|sql_query : ', sql_query)
                 result = self.get_single_result(sql_query)
                 if result is not None:
                     location_hash_id['time'] = result[0]
                     location_hash_id['value'] = result[1]
                     variable_values.append(location_hash_id)
+        print('get_values_for_hash_ids|variable_values : ', variable_values)
         return variable_values
 
     def get_current_rainfall_for_given_location_set(self, locations, variable_type):
