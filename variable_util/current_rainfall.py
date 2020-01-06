@@ -1,6 +1,8 @@
 import sys
 from datetime import datetime, timedelta
 
+DEFAULT_VARIABLE_VALUE = -9999
+
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/variable_util')
 from common_util import get_iteration_gap_of_cron_exp, search_in_dictionary_list
 
@@ -20,7 +22,7 @@ def update_current_rainfall_values(dss_adapter, obs_adapter, variable_routine):
                     variable_value = variable_value_rec['value']
                     print('update_current_rainfall_values|variable_value : ', variable_value)
             else:
-                variable_value = -9999
+                variable_value = DEFAULT_VARIABLE_VALUE
             dss_adapter.update_variable_value(variable_value, variable_routine['variable_type'], location)
 
 

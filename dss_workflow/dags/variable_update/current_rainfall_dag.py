@@ -14,9 +14,6 @@ prod_dag_name = 'current_rainfall_dag'
 dag_pool = 'rain_intensity_pool'
 
 
-# {'id': 1, 'variable_name': 'current_rainfall', 'variable_type': 'Precipitation', 'dag_name': 'current_rainfall_dag', 'schedule': '0,30 * * * *'}
-
-
 def update_workflow_status(status, rule_id):
     try:
         db_config = Variable.get('db_config', deserialize_json=True)
@@ -56,7 +53,7 @@ def update_variable_value(dag_run, **kwargs):
         obs_adapter = CurwObsAdapter.get_instance(obs_db_config)
         update_current_rainfall_values(dss_adapter, obs_adapter, variable_routine)
     except Exception as ex:
-        print('update_workflow_status|db_adapter|Exception: ', str(ex))
+        print('update_variable_value|db_adapter|Exception: ', str(ex))
 
 
 default_args = {
