@@ -5,7 +5,8 @@ sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/variable_util')
 from common_util import get_iteration_gap_of_cron_exp, search_in_dictionary_list
 
 
-def update_current_rainfall_values(dss_adapter, obs_adapter, variable_routine, locations):
+def update_current_rainfall_values(dss_adapter, obs_adapter, variable_routine):
+    locations = obs_adapter.get_current_rainfall_for_given_location_set(variable_routine['variable_type'])
     variable_values = obs_adapter.get_current_rainfall_for_given_location_set(locations,
                                                                               variable_routine['variable_type'])
     print('update_current_rainfall_values|variable_values : ', variable_values)
