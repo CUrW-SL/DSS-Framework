@@ -494,6 +494,14 @@ class RuleEngineAdapter:
         print('locations : ', locations)
         return locations
 
+    def update_variable_value(self, variable_value, variable_type, location_name):
+        sql_query = 'update `dss`.`rule_variables` set `current_rainfall`=\'{}\' ' \
+                    'where `variable_type`=\'{}\' and`location_name`=\'{}\';'.format(variable_value,
+                                                                                     variable_type,
+                                                                                     location_name)
+        print('update_variable_value|query : ', sql_query)
+        self.update_query(sql_query)
+
 
 if __name__ == "__main__":
     db_config = {'mysql_user': 'admin', 'mysql_password': 'floody', 'mysql_host': '35.227.163.211', 'mysql_db': 'dss',

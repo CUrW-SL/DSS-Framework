@@ -743,3 +743,4 @@ class CurwObsAdapter:
                 if len(variable_values):
                     return variable_values
         return None
+
