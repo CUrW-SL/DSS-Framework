@@ -702,8 +702,12 @@ class CurwObsAdapter:
     def get_station_ids_for_location(self, locations, variable_type):
         location_ids = []
         for location in locations:
-            sql_query = 'select id from curw_obs.station where name=\'{}\' and station_type=\'{}\';'.format(location,
-                                                                                                            variable_type)
+            if variable_type == 'Precipitation':
+                sql_query = 'select id from curw_obs.station where name=\'{}\' and station_type=\'CUrW_WeatherStation\';'.format(
+                    location)
+            elif variable_type == 'WaterLevel':
+                sql_query = 'select id from curw_obs.station where name=\'{}\' and station_type=\'CUrW_WaterLevelGauge\';'.format(
+                    location)
             print('get_station_ids_for_location|sql_query : ', sql_query)
             result = self.get_single_result(sql_query)
             if result is not None:
