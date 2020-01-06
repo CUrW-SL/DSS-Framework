@@ -76,7 +76,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     update_variable_value = PythonOperator(
         task_id='update_variable_value',
         provide_context=True,
-        python_callable=set_complete_status,
+        python_callable=update_variable_value,
         pool=dag_pool
     )
 
@@ -88,3 +88,4 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     )
 
     init_task >> update_variable_value >> complete_state
+
