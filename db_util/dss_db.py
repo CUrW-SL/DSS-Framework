@@ -464,15 +464,15 @@ class RuleEngineAdapter:
         else:
             schedule_date = datetime.strptime(schedule_date, '%Y-%m-%d %H:%M:%S')
         print('schedule_date : ', schedule_date)
-        query = 'select id,variable_name,dag_name,schedule from dss.variable_routines where status in (1,3);'
+        query = 'select id,variable_name,variable_type,dag_name,schedule from dss.variable_routines where status in (1,3);'
         print('get_next_variable_routines|query : ', query)
         results = self.get_multiple_result(query)
         routines = []
         if results is not None:
             for result in results:
                 print('get_next_variable_routines|result : ', result)
-                routines.append({'id': result[0], 'variable_name': result[1],
-                                 'dag_name': result[2], 'schedule': result[3]})
+                routines.append({'id': result[0], 'variable_name': result[1], 'variable_type': result[2],
+                                 'dag_name': result[3], 'schedule': result[4]})
         print('get_next_variable_routines|routines : ', routines)
         if len(routines) > 0:
             routines = get_next_scheduled_routines(schedule_date, routines)
