@@ -698,3 +698,38 @@ class CurwObsAdapter:
             hash_id = result[0]
             return hash_id
         return None
+
+    def get_station_ids_for_location(self, locations, variable_type):
+        location_ids = []
+        for location in locations:
+            sql_query = 'select id from curw_obs.station where name=\'{}\' and station_type=\'{}\';'.format(location,
+                                                                                                            variable_type)
+            result = self.get_single_result(sql_query)
+            if result is not None:
+                location_id = result[0]
+                location_ids.append({'location': location, 'id': location_id})
+        return location_ids
+
+    def get_location_hash_ids(self, location_ids):
+        location_hash_ids = []
+        for location_id in location_ids:
+            if location_id['id']:
+                sql_query = 'select id from curw_obs.run where station={} and variable=10;'.format(location_id['id'])
+                result = self.get_single_result(sql_query)
+                if result is not None:
+                    location_id['hash_id'] = result[0]
+                    location_hash_ids.append(location_id)
+        return location_hash_ids
+
+    def get_values_for_hash_ids(self, location_hash_ids):
+        variable_values = []
+        for location_hash_id in location_hash_ids:
+            if location_hash_id['hash_id']:
+                sql_query = 'select time,value from curw_obs.data where id=\'{}\' order by time desc limit 1;'.format(
+                    location_hash_id['hash_id'])
+                result = self.get_single_result(sql_query)
+                if result is not None:
+                    location_hash_id['time'] = result[0]
+                    location_hash_id['value'] = result[1]
+                    variable_values.append(location_hash_id)
+        return variable_values
