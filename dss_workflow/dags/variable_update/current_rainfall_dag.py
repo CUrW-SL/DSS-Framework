@@ -8,7 +8,7 @@ from airflow.operators.python_operator import PythonOperator
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
-prod_dag_name = 'current_rainfall_intensity_dag'
+prod_dag_name = 'current_rainfall_dag'
 dag_pool = 'rain_intensity_pool'
 
 
