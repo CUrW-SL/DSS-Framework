@@ -733,3 +733,13 @@ class CurwObsAdapter:
                     location_hash_id['value'] = result[1]
                     variable_values.append(location_hash_id)
         return variable_values
+
+    def get_current_rainfall_for_given_location_set(self, locations, variable_type):
+        location_ids = self.get_station_ids_for_location(locations, variable_type)
+        if len(location_ids) > 0:
+            location_hash_ids = self.get_location_hash_ids(location_ids)
+            if len(location_hash_ids) > 0:
+                variable_values = self.get_values_for_hash_ids(location_hash_ids)
+                if len(variable_values):
+                    return variable_values
+        return None
