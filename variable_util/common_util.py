@@ -13,3 +13,4 @@ def get_iteration_gap_of_cron_exp(cron_exp):
     s = m[1]  # seconds
     print([d[0], h[0], m[0], s])
     return {'days': d[0], 'hours': h[0], 'minutes': m[0], 'seconds': s}
+

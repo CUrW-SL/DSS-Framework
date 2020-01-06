@@ -12,6 +12,9 @@ prod_dag_name = 'current_rainfall_dag'
 dag_pool = 'rain_intensity_pool'
 
 
+# {'id': 1, 'variable_name': 'current_rainfall', 'variable_type': 'Precipitation', 'dag_name': 'current_rainfall_dag', 'schedule': '0,30 * * * *'}
+
+
 def update_workflow_status(status, rule_id):
     try:
         db_config = Variable.get('db_config', deserialize_json=True)
@@ -90,3 +93,4 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     )
 
     init_task >> task2 >> task3 >> task4 >> complete_state
+

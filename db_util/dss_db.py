@@ -482,16 +482,22 @@ class RuleEngineAdapter:
                     self.update_initial_variable_routing_status(1, routine['id'])
         return routines
 
+    def get_location_names_from_rule_variables(self, variable_type):
+        print('get_location_names_from_rule_variables|variable_type : ', variable_type)
+        query = 'select location_name from dss.rule_variables where variable_type=\'{}\';'.format(variable_type)
+        print('get_next_variable_routines|query : ', query)
+        results = self.get_multiple_result(query)
+        locations = []
+        if results is not None:
+            for result in results:
+                locations.append(result[0])
+        print('locations : ', locations)
+        return locations
+
 
 if __name__ == "__main__":
     db_config = {'mysql_user': 'admin', 'mysql_password': 'floody', 'mysql_host': '35.227.163.211', 'mysql_db': 'dss',
                  'log_path': '/home/hasitha/PycharmProjects/DSS-Framework/log'}
     adapter = RuleEngineAdapter.get_instance(db_config)
     print(adapter)
-    adapter = RuleEngineAdapter.get_instance(db_config)
-    print(adapter)
-    # result = adapter.get_next_workflow_routines()
-    result = adapter.get_workflow_routine_info(2)
-    print(result)
-    print(result['cascade_on'])
-    print(type(result['cascade_on']))
+    adapter.get_location_names_from_rule_variables('Precipitation')
