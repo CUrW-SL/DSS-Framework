@@ -15,7 +15,7 @@ def update_current_rainfall_values(dss_adapter, obs_adapter, variable_routine):
     print('update_current_rainfall_values|variable_values : ', variable_values)
     if variable_values is not None:
         for location in locations:
-            variable_value_rec = search_in_dictionary_list(variable_values, location)
+            variable_value_rec = search_in_dictionary_list(variable_values, 'location', location)
             if variable_value_rec is not None:
                 variable_time = datetime.strptime('', '%Y-%m-%d %H:%M:%S')
                 current_time = datetime.now()
