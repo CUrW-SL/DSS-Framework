@@ -16,8 +16,8 @@ def get_iteration_gap_of_cron_exp(cron_exp):
 
 
 # search in list of dictionaries
-def search_in_dictionary_list(input_list, key):
-    for item in input_list:
-        if item[key]:
-            return item
+def search_in_dictionary_list(input_list, key, value):
+    for row in input_list:
+        if row[key] == value:
+            return row
     return None
