@@ -247,7 +247,6 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         task_id='outflow_branch',
         provide_context=True,
         python_callable=outflow_branch_func,
-        trigger_rule='none_failed',
         pool=dag_pool
     )
 
@@ -269,6 +268,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         task_id='run_flo2d_250m_flo2d_250m',
         provide_context=True,
         python_callable=get_run_flo2d_250m_cmd,
+        trigger_rule='none_failed',
         pool=dag_pool
     )
 
