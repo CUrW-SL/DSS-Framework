@@ -716,11 +716,16 @@ class CurwObsAdapter:
         print('get_station_ids_for_location|location_ids : ', location_ids)
         return location_ids
 
-    def get_location_hash_ids(self, location_ids):
+    def get_location_hash_ids(self, location_ids, variable_type):
         location_hash_ids = []
         for location_id in location_ids:
             if location_id['id']:
-                sql_query = 'select id from curw_obs.run where station={} and variable=10;'.format(location_id['id'])
+                if variable_type == 'Precipitation':
+                    sql_query = 'select id from curw_obs.run where station={} and variable=10;'.format(
+                        location_id['id'])
+                elif variable_type == 'WaterLevel':
+                    sql_query = 'select id from curw_obs.run where station={} and variable=17;'.format(
+                        location_id['id'])
                 print('get_location_hash_ids|sql_query : ', sql_query)
                 result = self.get_single_result(sql_query)
                 if result is not None:
@@ -747,7 +752,7 @@ class CurwObsAdapter:
     def get_current_rainfall_for_given_location_set(self, locations, variable_type):
         location_ids = self.get_station_ids_for_location(locations, variable_type)
         if len(location_ids) > 0:
-            location_hash_ids = self.get_location_hash_ids(location_ids)
+            location_hash_ids = self.get_location_hash_ids(location_ids, variable_type)
             if len(location_hash_ids) > 0:
                 variable_values = self.get_values_for_hash_ids(location_hash_ids)
                 if len(variable_values):
@@ -757,7 +762,7 @@ class CurwObsAdapter:
     def get_current_water_level_for_given_location_set(self, locations, variable_type):
         location_ids = self.get_station_ids_for_location(locations, variable_type)
         if len(location_ids) > 0:
-            location_hash_ids = self.get_location_hash_ids(location_ids)
+            location_hash_ids = self.get_location_hash_ids(location_ids, variable_type)
             if len(location_hash_ids) > 0:
                 variable_values = self.get_values_for_hash_ids(location_hash_ids)
                 if len(variable_values):
