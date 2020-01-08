@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from airflow import DAG
-from airflow.operators.python_operator import PythonOperator
+from airflow.operators.python_operator import PythonOperator, BranchPythonOperator
 from airflow.models import Variable
 import sys
 import subprocess
@@ -31,6 +31,10 @@ create_inflow_cmd_template = 'curl -X GET "http://{}:{}/create-inflow?' \
 create_outflow_cmd_template = 'curl -X GET "http://{}:{}/create-outflow?' \
                               'run_date={}&run_time={}' \
                               '&forward={}&backward={}"'
+
+create_outflow_old_cmd_template = 'curl -X GET "http://{}:{}/create-outflow-old?' \
+                                  'run_date={}&run_time={}' \
+                                  '&forward={}&backward={}"'
 
 run_flo2d_250m_cmd_template = 'curl -X GET "http://{}:{}/run-flo2d?' \
                               'run_date={}&run_time={}"'
@@ -89,6 +93,19 @@ def get_create_outflow_cmd(**context):
     run_node = rule['rule_info']['rule_details']['run_node']
     run_port = rule['rule_info']['rule_details']['run_port']
     create_outflow_cmd = create_outflow_cmd_template.format(run_node, run_port, exec_date, exec_time, forward, backward)
+    print('get_create_outflow_cmd|create_outflow_cmd : ', create_outflow_cmd)
+    subprocess.call(create_outflow_cmd, shell=True)
+
+
+def get_create_old_outflow_cmd(**context):
+    rule = get_rule_from_context(context)
+    [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
+    forward = rule['rule_info']['forecast_days']
+    backward = rule['rule_info']['observed_days']
+    run_node = rule['rule_info']['rule_details']['run_node']
+    run_port = rule['rule_info']['rule_details']['run_port']
+    create_outflow_cmd = create_outflow_old_cmd_template.format(run_node, run_port, exec_date, exec_time, forward,
+                                                                backward)
     print('get_create_outflow_cmd|create_outflow_cmd : ', create_outflow_cmd)
     subprocess.call(create_outflow_cmd, shell=True)
 
@@ -184,6 +201,18 @@ def run_this_func(dag_run, **kwargs):
     return flo2d_rule
 
 
+def outflow_branch_func(**context):
+    rule = get_rule_from_context(context)
+    outflow_gen_method = rule['rule_info']['rule_details']['outflow_gen_method']
+    if outflow_gen_method is not None:
+        if outflow_gen_method == 'code':
+            return 'create_old_outflow_flo2d_250m'
+        else:
+            return 'create_outflow_flo2d_250m'
+    else:
+        return 'create_outflow_flo2d_250m'
+
+
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
          description='Run Flo2d 250m DAG', catchup=False) as dag:
     init_flo2d_250m = PythonOperator(
@@ -214,10 +243,25 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
+    outflow_branch = BranchPythonOperator(
+        task_id='outflow_branch',
+        provide_context=True,
+        python_callable=outflow_branch_func,
+        trigger_rule='none_failed',
+        pool=dag_pool
+    )
+
     create_outflow_flo2d_250m = PythonOperator(
         task_id='create_outflow_flo2d_250m',
         provide_context=True,
         python_callable=get_create_outflow_cmd,
+        pool=dag_pool
+    )
+
+    create_old_outflow_flo2d_250m = PythonOperator(
+        task_id='create_old_outflow_flo2d_250m',
+        provide_context=True,
+        python_callable=get_create_old_outflow_cmd,
         pool=dag_pool
     )
 
@@ -257,6 +301,6 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     )
 
     init_flo2d_250m >> running_state_flo2d_250m >> create_raincell_flo2d_250m >> \
-    create_inflow_flo2d_250m >> create_outflow_flo2d_250m >> run_flo2d_250m_flo2d_250m >> \
-    extract_water_level_flo2d_250m >> extract_water_level_curw_flo2d_250m >> \
+    create_inflow_flo2d_250m >> outflow_branch >> [create_outflow_flo2d_250m, create_old_outflow_flo2d_250m] >> \
+    run_flo2d_250m_flo2d_250m >> extract_water_level_flo2d_250m >> extract_water_level_curw_flo2d_250m >> \
     check_accuracy_flo2d250m >> complete_state_flo2d_250m
