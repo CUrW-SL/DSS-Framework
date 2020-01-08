@@ -102,11 +102,14 @@ def get_extract_water_level_cmd(**context):
     rule = get_rule_from_context(context)
     [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
     print('get_extract_water_level_cmd|[exec_date, exec_time] : ', [exec_date, exec_time])
+    forward = rule['rule_info']['forecast_days']
+    backward = rule['rule_info']['observed_days']
     run_node = rule['rule_info']['rule_details']['run_node']
     run_port = rule['rule_info']['rule_details']['run_port']
     print('get_extract_water_level_cmd|run_node : ', run_node)
     print('get_extract_water_level_cmd|run_port : ', run_port)
-    extract_water_level_cmd = extract_water_level_cmd_template.format(run_node, run_port, exec_date, exec_time)
+    extract_water_level_cmd = extract_water_level_cmd_template.format(run_node, run_port, exec_date, exec_time, forward,
+                                                                      backward)
     print('get_create_inflow_cmd|extract_water_level_cmd : ', extract_water_level_cmd)
     subprocess.call(extract_water_level_cmd, shell=True)
 
