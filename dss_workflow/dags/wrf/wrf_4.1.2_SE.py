@@ -36,12 +36,12 @@ def get_push_command(**context):
     gfs_hour = wrf_rule['rule_info']['hour']
     print('get_wrf_run_command|rule_details: ', wrf_rule['rule_info']['rule_details'])
     push_node = wrf_rule['rule_info']['rule_details']['push_node']
-    push_script = wrf_rule['rule_info']['rule_details']['push_script']
+    bash_script = wrf_rule['rule_info']['rule_details']['push_script']
     push_config = wrf_rule['rule_info']['rule_details']['push_config']
     wrf_bucket = wrf_rule['rule_info']['rule_details']['wrf_bucket']
     exec_date = context["execution_date"].to_datetime_string()
-    push_script = '{} {} {} {} {} {}'.format(push_config, wrf_bucket, wrf_run,
-                                             gfs_hour, wrf_model, exec_date)
+    push_script = '{} {} {} {} {} {} {}'.format(bash_script, push_config, wrf_bucket, wrf_run,
+                                                gfs_hour, wrf_model, exec_date)
     print('get_push_command|run_script : ', push_script)
     push_wrf4_SE_cmd = ssh_cmd_template.format(push_node, push_script)
     print('get_push_command|push_wrf4_SE_cmd : ', push_wrf4_SE_cmd)
