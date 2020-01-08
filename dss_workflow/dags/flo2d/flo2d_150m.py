@@ -26,6 +26,9 @@ create_raincell_cmd_template = 'curl -X GET "http://{}:{}/create-sim-raincell?' 
                                '&forward={}&backward={}"'
 create_inflow_cmd_template = 'curl -X GET "http://{}:{}/create-inflow?' \
                              'run_date={}&run_time={}"'
+create_chan_cmd_template = 'curl -X GET "http://{}:{}/create-chan?' \
+                           'run_date={}&run_time={}' \
+                           '&forward={}&backward={}"'
 create_outflow_cmd_template = 'curl -X GET "http://{}:{}/create-outflow?' \
                               'run_date={}&run_time={}' \
                               '&forward={}&backward={}"'
@@ -76,6 +79,18 @@ def get_create_inflow_cmd(**context):
     create_inflow_cmd = create_inflow_cmd_template.format(run_node, run_port, exec_date, exec_time)
     print('get_create_inflow_cmd|create_inflow_cmd : ', create_inflow_cmd)
     subprocess.call(create_inflow_cmd, shell=True)
+
+
+def get_create_chan_cmd(**context):
+    rule = get_rule_from_context(context)
+    [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
+    forward = rule['rule_info']['forecast_days']
+    backward = rule['rule_info']['observed_days']
+    run_node = rule['rule_info']['rule_details']['run_node']
+    run_port = rule['rule_info']['rule_details']['run_port']
+    create_chan_cmd = create_chan_cmd_template.format(run_node, run_port, exec_date, exec_time, forward, backward)
+    print('get_create_chan_cmd|create_chan_cmd : ', create_chan_cmd)
+    subprocess.call(create_chan_cmd, shell=True)
 
 
 def get_create_outflow_cmd(**context):
@@ -231,6 +246,13 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
+    create_chan_flo2d_150m = PythonOperator(
+        task_id='create_chan_flo2d_150m',
+        provide_context=True,
+        python_callable=get_create_chan_cmd,
+        pool=dag_pool
+    )
+
     outflow_branch = BranchPythonOperator(
         task_id='outflow_branch',
         provide_context=True,
@@ -282,6 +304,6 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    init_flo2d_150m >> running_state_flo2d_150m >> create_raincell_flo2d_150m >> \
+    init_flo2d_150m >> running_state_flo2d_150m >> create_raincell_flo2d_150m >> create_chan_flo2d_150m >> \
     create_inflow_flo2d_150m >> outflow_branch >> [create_outflow_flo2d_150m, create_old_outflow_flo2d_150m] >> \
     run_flo2d_150m >> extract_water_level_flo2d_150m >> check_accuracy_flo2d150m >> complete_state_flo2d_150m
