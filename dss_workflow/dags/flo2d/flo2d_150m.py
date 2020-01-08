@@ -32,8 +32,9 @@ create_outflow_cmd_template = 'curl -X GET "http://{}:{}/create-outflow?' \
                               '&forward={}&backward={}"'
 run_flo2d_150m_cmd_template = 'curl -X GET "http://{}:{}/run-flo2d?' \
                               'run_date={}&run_time={}"'
-extract_water_level_cmd_template = 'curl -X GET "http://{}:{}/extract-data?' \
-                                   'run_date={}&run_time={}"'
+extract_water_level_cmd_template = 'curl -X GET "http://{}:{}/extract-curw-fcst?' \
+                                   'run_date={}&run_time={}' \
+                                   '&forward={}&backward={}"'
 
 
 def get_rule_from_context(context):
