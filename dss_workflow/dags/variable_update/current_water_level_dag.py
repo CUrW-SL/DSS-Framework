@@ -2,11 +2,14 @@ import sys
 from datetime import datetime
 from airflow import DAG
 from airflow.models import Variable
-from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import PythonOperator
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
+from gen_db import CurwObsAdapter
 from dss_db import RuleEngineAdapter
+
+sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/variable_util')
+from current_water_level import update_current_water_level_values
 
 prod_dag_name = 'current_water_level_dag'
 dag_pool = 'water_level_pool'
@@ -22,16 +25,6 @@ def update_workflow_status(status, rule_id):
             print('update_workflow_status|db_adapter|Exception: ', str(ex))
     except Exception as e:
         print('update_workflow_status|db_config|Exception: ', str(e))
-
-
-def get_rule_id(context):
-    rule_info = context['task_instance'].xcom_pull(task_ids='init_hec_single')['rule_info']
-    if rule_info:
-        rule_id = rule_info['id']
-        print('get_rule_id|rule_id : ', rule_id)
-        return rule_id
-    else:
-        return None
 
 
 def set_running_status(dag_run, **kwargs):
@@ -51,6 +44,20 @@ def set_complete_status(dag_run, **kwargs):
     update_workflow_status(3, variable_routine_id)
 
 
+def update_variable_value(dag_run, **kwargs):
+    print('update_variable_value')
+    variable_routine = dag_run.conf
+    db_config = Variable.get('db_config', deserialize_json=True)
+    obs_db_config = Variable.get('obs_db_config', deserialize_json=True)
+    try:
+        dss_adapter = RuleEngineAdapter.get_instance(db_config)
+        obs_adapter = CurwObsAdapter.get_instance(obs_db_config)
+        print('update_variable_value|variable_routine : ', variable_routine)
+        update_current_water_level_values(dss_adapter, obs_adapter, variable_routine)
+    except Exception as ex:
+        print('update_variable_value|db_adapter|Exception: ', str(ex))
+
+
 default_args = {
     'owner': 'dss admin',
     'start_date': datetime.utcnow(),
@@ -67,18 +74,10 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    task2 = DummyOperator(
-        task_id='task2',
-        pool=dag_pool
-    )
-
-    task3 = DummyOperator(
-        task_id='task3',
-        pool=dag_pool
-    )
-
-    task4 = DummyOperator(
-        task_id='task4',
+    update_variable_value = PythonOperator(
+        task_id='update_variable_value',
+        provide_context=True,
+        python_callable=update_variable_value,
         pool=dag_pool
     )
 
@@ -89,4 +88,4 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    init_task >> task2 >> task3 >> task4 >> complete_state
+    init_task >> update_variable_value >> complete_state
