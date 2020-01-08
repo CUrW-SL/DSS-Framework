@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 DEFAULT_VARIABLE_VALUE = -9999
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/variable_util')
-from common_util import get_iteration_gap_of_cron_exp, search_in_dictionary_list
+from common_util import get_iteration_gap_of_cron_exp, search_in_dictionary_list, lower_time_limit
 
 
 def update_current_rainfall_values(dss_adapter, obs_adapter, variable_routine):
@@ -37,12 +37,3 @@ def validate_variable_value(variable_time, current_time, cron_exp):
     else:
         return False
 
-
-def lower_time_limit(current_time, cron_exp):
-    time_gap = get_iteration_gap_of_cron_exp(cron_exp)
-    lower_limit = current_time - timedelta(days=time_gap['days'],
-                                           hours=time_gap['hours'],
-                                           minutes=time_gap['minutes'],
-                                           seconds=time_gap['seconds'])
-    print('lower_time_limit|lower_limit : ', lower_limit)
-    return lower_limit
