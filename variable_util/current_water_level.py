@@ -1,0 +1,38 @@
+import sys
+from datetime import datetime, timedelta
+
+DEFAULT_VARIABLE_VALUE = -9999
+
+sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/variable_util')
+from common_util import get_iteration_gap_of_cron_exp, search_in_dictionary_list, lower_time_limit
+
+
+def update_current_water_level_values(dss_adapter, obs_adapter, variable_routine):
+    print('update_current_water_level_values|variable_routine : ', variable_routine)
+    locations = dss_adapter.get_location_names_from_rule_variables(variable_routine['variable_type'])
+    variable_values = obs_adapter.get_current_water_level_for_given_location_set(locations,
+                                                                                 variable_routine['variable_type'])
+    print('update_current_water_level_values|variable_values : ', variable_values)
+    if variable_values is not None:
+        for location in locations:
+            variable_value_rec = search_in_dictionary_list(variable_values, 'location', location)
+            if variable_value_rec is not None:
+                variable_time = variable_value_rec['time']
+                current_time = datetime.now()
+                if validate_variable_value(variable_time, current_time, variable_routine['schedule']):
+                    variable_value = variable_value_rec['value']
+                    print('update_current_water_level_values|variable_value : ', variable_value)
+            else:
+                variable_value = DEFAULT_VARIABLE_VALUE
+            print('update_current_water_level_values|variable_value : ', variable_value)
+            print('update_current_water_level_values|variable_type : ', variable_routine['variable_type'])
+            print('update_current_water_level_values|location : ', location)
+            dss_adapter.update_variable_value(variable_value, variable_routine['variable_type'], location)
+
+
+def validate_variable_value(variable_time, current_time, cron_exp):
+    lower_limit = lower_time_limit(current_time, cron_exp)
+    if variable_time > lower_limit:
+        return True
+    else:
+        return False
