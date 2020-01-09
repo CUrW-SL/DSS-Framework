@@ -12,7 +12,7 @@ sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/variable_util')
 from current_rainfall import update_current_rainfall_values
 
 prod_dag_name = 'current_rainfall_dag'
-dag_pool = 'rain_intensity_pool'
+dag_pool = 'current_rainfall_pool'
 
 
 def update_workflow_status(status, rule_id):
