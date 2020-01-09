@@ -788,7 +788,7 @@ class CurwObsAdapter:
         if len(location_ids) > 0:
             location_hash_ids = self.get_location_hash_ids(location_ids, variable_type)
             if len(location_hash_ids) > 0:
-                variable_values = self.get_values_for_hash_ids(location_hash_ids)
+                variable_values = self.get_multiple_values_for_hash_ids(location_hash_ids)
                 if len(variable_values):
                     return variable_values
         return None
