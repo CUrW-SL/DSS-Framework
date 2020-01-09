@@ -749,12 +749,36 @@ class CurwObsAdapter:
         print('get_values_for_hash_ids|variable_values : ', variable_values)
         return variable_values
 
+    def get_multiple_values_for_hash_ids(self, location_hash_ids):
+        variable_values = []
+        for location_hash_id in location_hash_ids:
+            if location_hash_id['hash_id']:
+                sql_query = 'select time,value from curw_obs.data where id=\'{}\' order by time desc limit 12;'.format(
+                    location_hash_id['hash_id'])
+                print('get_values_for_hash_ids|sql_query : ', sql_query)
+                results = self.get_multiple_result(sql_query)
+                if results is not None:
+                    location_hash_id['results'] = results
+                    variable_values.append(location_hash_id)
+        print('get_values_for_hash_ids|variable_values : ', variable_values)
+        return variable_values
+
     def get_current_rainfall_for_given_location_set(self, locations, variable_type):
         location_ids = self.get_station_ids_for_location(locations, variable_type)
         if len(location_ids) > 0:
             location_hash_ids = self.get_location_hash_ids(location_ids, variable_type)
             if len(location_hash_ids) > 0:
                 variable_values = self.get_values_for_hash_ids(location_hash_ids)
+                if len(variable_values):
+                    return variable_values
+        return None
+
+    def get_rainfall_for_given_location_set(self, locations, variable_type):
+        location_ids = self.get_station_ids_for_location(locations, variable_type)
+        if len(location_ids) > 0:
+            location_hash_ids = self.get_location_hash_ids(location_ids, variable_type)
+            if len(location_hash_ids) > 0:
+                variable_values = self.get_multiple_values_for_hash_ids(location_hash_ids)
                 if len(variable_values):
                     return variable_values
         return None
