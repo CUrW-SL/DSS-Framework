@@ -89,3 +89,4 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     )
 
     init_task >> update_variable_value >> complete_state
+
