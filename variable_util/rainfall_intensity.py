@@ -15,6 +15,7 @@ def update_rainfall_intensity_values(dss_adapter, obs_adapter, variable_routine)
                                                                       variable_routine['variable_type'])
     print('update_current_rainfall_values|variable_values : ', variable_values)
     current_time = datetime.now()
+    print('update_rainfall_intensity_values|current_time : ', current_time)
     for variable_value in variable_values:
         rainfall_values = pd.DataFrame(variable_value['results'], columns=['time', 'value'])
         print('update_current_rainfall_values|rainfall_values : ', rainfall_values)
