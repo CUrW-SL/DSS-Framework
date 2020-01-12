@@ -18,7 +18,7 @@ def update_rainfall_intensity_values(dss_adapter, obs_adapter, variable_routine)
     current_time = datetime.now()
     print('update_rainfall_intensity_values|current_time : ', current_time)
     for variable_value in variable_values:
-        rainfall_values = pd.DataFrame(data=variable_value['results'].reverse(), columns=['time', 'value'])
+        rainfall_values = pd.DataFrame(data=variable_value['results'], columns=['time', 'value'])
         print('update_current_rainfall_values|rainfall_values : ', rainfall_values)
         validate_rainfall_values(rainfall_values)
 
