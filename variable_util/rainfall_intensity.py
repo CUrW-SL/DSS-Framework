@@ -23,7 +23,6 @@ def update_rainfall_intensity_values(dss_adapter, obs_adapter, variable_routine)
         print('update_current_rainfall_values|rainfall_values : ', rainfall_values)
         if validate_rainfall_values(rainfall_values, current_time):
             rainfall_intensity = rainfall_values['value'].sum()
-            print('')
         else:
             rainfall_intensity = DEFAULT_VARIABLE_VALUE
             print('update_rainfall_intensity_values|Invalid time series.')
