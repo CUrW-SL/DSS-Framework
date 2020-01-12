@@ -27,7 +27,8 @@ def update_current_rainfall_values(dss_adapter, obs_adapter, variable_routine):
             print('update_current_rainfall_values|variable_value : ', variable_value)
             print('update_current_rainfall_values|variable_type : ', variable_routine['variable_type'])
             print('update_current_rainfall_values|location : ', location)
-            dss_adapter.update_variable_value(variable_value, variable_routine['variable_type'], location)
+            dss_adapter.update_variable_value(variable_routine['variable_name'], variable_value,
+                                              variable_routine['variable_type'], location)
 
 
 def validate_variable_value(variable_time, current_time, cron_exp):

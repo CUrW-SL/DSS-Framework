@@ -28,7 +28,8 @@ def update_rainfall_intensity_values(dss_adapter, obs_adapter, variable_routine)
             rainfall_intensity = DEFAULT_VARIABLE_VALUE
             print('update_rainfall_intensity_values|Invalid time series.')
         print('update_rainfall_intensity_values|rainfall_intensity : ', rainfall_intensity)
-        dss_adapter.update_variable_value(rainfall_intensity, variable_routine['variable_type'],
+        dss_adapter.update_variable_value(variable_routine['variable_name'], rainfall_intensity,
+                                          variable_routine['variable_type'],
                                           variable_value['location'])
 
 
