@@ -494,17 +494,15 @@ class RuleEngineAdapter:
         print('locations : ', locations)
         return locations
 
-    def update_variable_value(self, variable_value, variable_type, location_name):
+    def update_variable_value(self, variable_name, variable_value, variable_type, location_name):
         if variable_type == 'Precipitation':
-            sql_query = 'update `dss`.`rule_variables` set `current_rainfall`=\'{}\' ' \
-                        'where `variable_type`=\'{}\' and`location_name`=\'{}\';'.format(variable_value,
-                                                                                         variable_type,
-                                                                                         location_name)
+            sql_query = 'update `dss`.`rule_variables` set `{}`=\'{}\' ' \
+                        'where `variable_type`=\'{}\' and`location_name`=\'{}\';'.format(variable_name, variable_value,
+                                                                                         variable_type, location_name)
         elif variable_type == 'WaterLevel':
-            sql_query = 'update `dss`.`rule_variables` set `current_water_level`=\'{}\' ' \
-                        'where `variable_type`=\'{}\' and`location_name`=\'{}\';'.format(variable_value,
-                                                                                         variable_type,
-                                                                                         location_name)
+            sql_query = 'update `dss`.`rule_variables` set `{}`=\'{}\' ' \
+                        'where `variable_type`=\'{}\' and`location_name`=\'{}\';'.format(variable_name, variable_value,
+                                                                                         variable_type, location_name)
         else:
             print('Invalid_variable type|variable_type : ', variable_type)
         print('update_variable_value|query : ', sql_query)
