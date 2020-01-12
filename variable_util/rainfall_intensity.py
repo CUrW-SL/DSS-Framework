@@ -18,13 +18,13 @@ def update_rainfall_intensity_values(dss_adapter, obs_adapter, variable_routine)
     current_time = datetime.now()
     print('update_rainfall_intensity_values|current_time : ', current_time)
     for variable_value in variable_values:
-        rainfall_values = pd.DataFrame(data=variable_value['results'], columns=['time', 'value'])
+        rainfall_values = pd.DataFrame(data=variable_value['results'].reverse(), columns=['time', 'value'])
         print('update_current_rainfall_values|rainfall_values : ', rainfall_values)
         validate_rainfall_values(rainfall_values)
 
 
 def validate_rainfall_values(rainfall_values):
-    row_count = rainfall_values.shape()[0]
+    row_count = rainfall_values.shape[0]
     if row_count == TIME_STEPS_FOR_HOUR:
         start_time = rainfall_values['time'].iloc[0]
         print('validate_rainfall_values|start_time : ', start_time)
