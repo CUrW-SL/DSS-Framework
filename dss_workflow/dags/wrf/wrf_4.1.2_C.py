@@ -146,7 +146,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     check_gfs_availability_wrfv4C = GfsSensorOperator(
         task_id='check_gfs_availability_wrfv4C',
         poke_interval=60,
-        timeout=60 * 30,
+        execution_timeout=timedelta(minutes=45),
         params={'model': 'C', 'init_task_id': 'init_wrfv4C'},
         provide_context=True,
         pool=dag_pool
@@ -155,6 +155,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     run_wrf4_C = PythonOperator(
         task_id='run_wrf4_C',
         provide_context=True,
+        execution_timeout=timedelta(hours=7, minutes=30),
         python_callable=get_wrf_run_command,
         pool=dag_pool
     )
