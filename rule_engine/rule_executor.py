@@ -11,6 +11,10 @@ def get_next_pump_configurations(routines):
     return dag_info
 
 
+# ((location_name='Yakbedda') and (variable_type='WaterLevel') and ((current_water_level>=alert_water_level) or (current_water_level>=warning_water_level)))
+# or
+# ((location_name='Kohuwala') and (variable_type='Precipitation') and ((rainfall_intensity>=65.4) or ((last_1_day_rainfall>=150) and (last_3_day_rainfall>=420))))
+
 def evaluate_configuration_logics(routines):
     print('evaluate_configuration_logics|routines : ', routines)
     passed_routines = []
