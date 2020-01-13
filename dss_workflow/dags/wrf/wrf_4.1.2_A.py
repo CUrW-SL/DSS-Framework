@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.models import Variable
@@ -132,7 +132,7 @@ def check_accuracy(**context):
 
 
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
-         description='Run WRF v4 A DAG', catchup=False) as dag:
+         description='Run WRF v4 A DAG', dagrun_timeout=timedelta(hours=8), catchup=False) as dag:
     init_wrfv4_A = PythonOperator(
         task_id='init_wrfv4A',
         provide_context=True,
@@ -150,7 +150,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     check_gfs_availability_wrfv4A = GfsSensorOperator(
         task_id='check_gfs_availability_wrfv4A',
         poke_interval=60,
-        timeout=60 * 30,
+        execution_timeout=timedelta(minutes=45),
         params={'model': 'A', 'init_task_id': 'init_wrfv4A'},
         provide_context=True,
         pool=dag_pool
@@ -159,6 +159,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     run_wrf4_A = PythonOperator(
         task_id='run_wrf4_A',
         provide_context=True,
+        execution_timeout=timedelta(hours=7, minutes=30),
         python_callable=get_wrf_run_command,
         pool=dag_pool
     )

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.models import Variable
@@ -128,7 +128,7 @@ def check_accuracy(**context):
 
 
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
-         description='Run WRF v4 C DAG', catchup=False) as dag:
+         description='Run WRF v4 C DAG', dagrun_timeout=timedelta(hours=8), catchup=False) as dag:
     init_wrfv4_C = PythonOperator(
         task_id='init_wrfv4C',
         provide_context=True,
