@@ -13,4 +13,8 @@ def get_next_pump_configurations(routines):
 
 def evaluate_configuration_logics(routines):
     print('evaluate_configuration_logics|routines : ', routines)
+    passed_routines = []
+    for routine in routines:
+        rule_logic = routine['rule_logic']
+        print('evaluate_configuration_logics|rule_logic : ', rule_logic)
     return routines
