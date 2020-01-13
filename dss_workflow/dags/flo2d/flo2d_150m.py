@@ -216,8 +216,8 @@ def outflow_branch_func(**context):
         return 'create_outflow_flo2d_150m'
 
 
-with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
-         description='Run Flo2d 150m DAG', catchup=False) as dag:
+with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None, description='Run Flo2d 150m DAG',
+         dagrun_timeout=timedelta(hours=5, minutes=55), catchup=False) as dag:
     init_flo2d_150m = PythonOperator(
         task_id='init_flo2d_150m',
         provide_context=True,
@@ -235,6 +235,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     create_raincell_flo2d_150m = PythonOperator(
         task_id='create_raincell_flo2d_150m',
         provide_context=True,
+        execution_timeout=timedelta(hours=1),
         python_callable=get_create_raincell_cmd,
         pool=dag_pool
     )
@@ -242,6 +243,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     create_inflow_flo2d_150m = PythonOperator(
         task_id='create_inflow_flo2d_150m',
         provide_context=True,
+        execution_timeout=timedelta(minutes=10),
         python_callable=get_create_inflow_cmd,
         pool=dag_pool
     )
@@ -249,6 +251,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     create_chan_flo2d_150m = PythonOperator(
         task_id='create_chan_flo2d_150m',
         provide_context=True,
+        execution_timeout=timedelta(minutes=10),
         python_callable=get_create_chan_cmd,
         pool=dag_pool
     )
@@ -264,6 +267,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     create_outflow_flo2d_150m = PythonOperator(
         task_id='create_outflow_flo2d_150m',
         provide_context=True,
+        execution_timeout=timedelta(minutes=10),
         python_callable=get_create_outflow_cmd,
         pool=dag_pool
     )
@@ -271,6 +275,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     create_old_outflow_flo2d_150m = PythonOperator(
         task_id='create_old_outflow_flo2d_150m',
         provide_context=True,
+        execution_timeout=timedelta(minutes=10),
         python_callable=get_create_old_outflow_cmd,
         pool=dag_pool
     )
@@ -278,6 +283,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     run_flo2d_150m = PythonOperator(
         task_id='run_flo2d_150m_flo2d_150m',
         provide_context=True,
+        execution_timeout=timedelta(hours=4, minutes=30),
         python_callable=get_run_flo2d_150m_cmd,
         trigger_rule='none_failed',
         pool=dag_pool
