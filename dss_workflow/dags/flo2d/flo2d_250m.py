@@ -248,6 +248,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     create_raincell_flo2d_250m = PythonOperator(
         task_id='create_raincell_flo2d_250m',
         provide_context=True,
+        execution_timeout=timedelta(minutes=20),
         python_callable=get_create_raincell_cmd,
         pool=dag_pool
     )
@@ -255,6 +256,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     create_inflow_flo2d_250m = PythonOperator(
         task_id='create_inflow_flo2d_250m',
         provide_context=True,
+        execution_timeout=timedelta(minutes=5),
         python_callable=get_create_inflow_cmd,
         pool=dag_pool
     )
@@ -262,6 +264,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     create_chan_flo2d_250m = PythonOperator(
         task_id='create_chan_flo2d_250m',
         provide_context=True,
+        execution_timeout=timedelta(minutes=5),
         python_callable=get_create_chan_cmd,
         pool=dag_pool
     )
@@ -276,6 +279,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     create_outflow_flo2d_250m = PythonOperator(
         task_id='create_outflow_flo2d_250m',
         provide_context=True,
+        execution_timeout=timedelta(minutes=5),
         python_callable=get_create_outflow_cmd,
         pool=dag_pool
     )
@@ -283,6 +287,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     create_old_outflow_flo2d_250m = PythonOperator(
         task_id='create_old_outflow_flo2d_250m',
         provide_context=True,
+        execution_timeout=timedelta(minutes=5),
         python_callable=get_create_old_outflow_cmd,
         pool=dag_pool
     )
@@ -291,6 +296,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         task_id='run_flo2d_250m_flo2d_250m',
         provide_context=True,
         python_callable=get_run_flo2d_250m_cmd,
+        execution_timeout=timedelta(minutes=45),
         trigger_rule='none_failed',
         pool=dag_pool
     )
