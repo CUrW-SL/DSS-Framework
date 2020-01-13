@@ -482,6 +482,30 @@ class RuleEngineAdapter:
                     self.update_initial_variable_routing_status(1, routine['id'])
         return routines
 
+    def get_next_pump_routines(self, schedule_date=datetime.now()):
+        if type(schedule_date) is datetime:
+            schedule_date = schedule_date
+        else:
+            schedule_date = datetime.strptime(schedule_date, '%Y-%m-%d %H:%M:%S')
+        print('schedule_date : ', schedule_date)
+        query = 'select rule_id, rule_name, rule_logic, trigger_dag, status, schedule from dss.pump_rules where status in (1,3);'
+        print('get_next_pump_routines|query : ', query)
+        results = self.get_multiple_result(query)
+        routines = []
+        if results is not None:
+            for result in results:
+                print('get_next_pump_routines|result : ', result)
+                routines.append({'rule_id': result[0], 'rule_name': result[1], 'rule_logic': result[2],
+                                 'trigger_dag': result[3], 'status': result[4], 'schedule': result[5]})
+        print('get_next_pump_routines|routines : ', routines)
+        if len(routines) > 0:
+            routines = get_next_scheduled_routines(schedule_date, routines)
+            if len(routines) > 0:
+                for routine in routines:
+                    print('update_initial_workflow_routing_status.')
+                    self.update_initial_variable_routing_status(1, routine['id'])
+        return routines
+
     def get_location_names_from_rule_variables(self, variable_type):
         print('get_location_names_from_rule_variables|variable_type : ', variable_type)
         query = 'select location_name from dss.rule_variables where variable_type=\'{}\';'.format(variable_type)
