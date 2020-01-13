@@ -230,7 +230,7 @@ def outflow_branch_func(**context):
 
 
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
-         description='Run Flo2d 250m DAG', catchup=False) as dag:
+         description='Run Flo2d 250m DAG', dagrun_timeout=timedelta(minutes=55), catchup=False) as dag:
     init_flo2d_250m = PythonOperator(
         task_id='init_flo2d_250m',
         provide_context=True,
