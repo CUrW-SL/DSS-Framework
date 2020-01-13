@@ -145,3 +145,27 @@ def set_running_state(db_adapter, routine_id):
 def set_variable_routine_running_state(db_adapter, routine_id):
     print('set_variable_routine_running_state|routine_id: ', routine_id)
     db_adapter.update_variable_routing_status(2, routine_id)
+
+
+def is_matched(expression):
+    """
+    Finds out how balanced an expression is.
+    With a string containing only brackets.
+
+    >>> is_matched('[]()()(((([])))')
+    False
+    >>> is_matched('[](){{{[]}}}')
+    True
+    """
+    opening = tuple('({[')
+    closing = tuple(')}]')
+    mapping = dict(zip(opening, closing))
+    queue = []
+
+    for letter in expression:
+        if letter in opening:
+            queue.append(mapping[letter])
+        elif letter in closing:
+            if not queue or letter != queue.pop():
+                return False
+    return not queue
