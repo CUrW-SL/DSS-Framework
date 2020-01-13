@@ -496,7 +496,7 @@ class RuleEngineAdapter:
             for result in results:
                 print('get_next_pump_routines|result : ', result)
                 routines.append({'id': result[0], 'rule_name': result[1], 'rule_logic': result[2],
-                                 'trigger_dag': result[3], 'status': result[4], 'schedule': result[5]})
+                                 'dag_name': result[3], 'status': result[4], 'schedule': result[5]})
         print('get_next_pump_routines|routines : ', routines)
         if len(routines) > 0:
             routines = get_next_scheduled_routines(schedule_date, routines)
