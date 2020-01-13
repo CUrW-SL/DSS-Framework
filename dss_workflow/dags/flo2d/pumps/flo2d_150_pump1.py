@@ -11,8 +11,8 @@ from dss_db import RuleEngineAdapter
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/accuracy_unit/flo2d')
 from flo2d_accuracy import calculate_flo2d_rule_accuracy
 
-prod_dag_name = 'flo2d_150m_pump1_dag'
-dag_pool = 'flo2d_pool'
+prod_dag_name = 'flo2d_150_pump1_dag'
+dag_pool = 'flo2d_pump_pool'
 
 default_args = {
     'owner': 'dss admin',
