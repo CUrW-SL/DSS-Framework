@@ -30,7 +30,7 @@ def generate_dag_run(context):
     print('init_variable_routine|routines : ', routines)
     next_variable_routines = []
     if routines is not None:
-        next_variable_routines = get_next_pump_configurations(routines)
+        next_variable_routines = get_next_pump_configurations(adapter, routines)
     else:
         print('No variable routine to schedule.')
     return next_variable_routines

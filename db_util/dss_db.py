@@ -532,6 +532,18 @@ class RuleEngineAdapter:
         print('update_variable_value|query : ', sql_query)
         self.update_query(sql_query)
 
+    def evaluate_variable_rule_logic(self, rule_logic):
+        sql_query = 'select location_name from dss.rule_variables where {}'.format(rule_logic)
+        print('evaluate_variable_rule_logic|query : ', sql_query)
+        results = self.get_multiple_result(sql_query)
+        print('evaluate_variable_rule_logic|results : ', results)
+        location_names = []
+        if results is not None:
+            for result in results:
+                location_names.append(result[0])
+        print('evaluate_variable_rule_logic|location_names : ', location_names)
+        return location_names
+
 
 if __name__ == "__main__":
     db_config = {'mysql_user': 'admin', 'mysql_password': 'floody', 'mysql_host': '35.227.163.211', 'mysql_db': 'dss',
