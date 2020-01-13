@@ -488,7 +488,7 @@ class RuleEngineAdapter:
         else:
             schedule_date = datetime.strptime(schedule_date, '%Y-%m-%d %H:%M:%S')
         print('schedule_date : ', schedule_date)
-        query = 'select id, rule_name, rule_logic, trigger_dag, status, schedule from dss.pump_rules where status in (1,3);'
+        query = 'select id, rule_name, rule_logic, dag_name, status, schedule from dss.pump_rules where status in (1,3);'
         print('get_next_pump_routines|query : ', query)
         results = self.get_multiple_result(query)
         routines = []
