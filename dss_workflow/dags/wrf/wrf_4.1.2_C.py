@@ -138,7 +138,7 @@ def on_dag_failure(context):
 
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
          description='Run WRF v4 C DAG', dagrun_timeout=timedelta(hours=8), catchup=False,
-         on_failure_callback=on_dag_failure) as dag:
+         on_failure_callback=on_dag_failure, max_active_runs=2, concurrency=2) as dag:
     init_wrfv4_C = PythonOperator(
         task_id='init_wrfv4C',
         provide_context=True,
