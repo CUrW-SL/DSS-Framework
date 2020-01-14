@@ -70,8 +70,17 @@ def run_this_func(dag_run, **kwargs):
     return hechms_rule
 
 
+def on_dag_failure(context):
+    rule_id = get_rule_id(context)
+    if rule_id is not None:
+        update_workflow_status(4, rule_id)
+        print('on_dag_failure|set error status for rule|rule_id :', rule_id)
+    else:
+        print('on_dag_failure|rule_id not found')
+
+
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
-         description='Run HecHms DAG', catchup=False) as dag:
+         description='Run HecHms DAG', catchup=False, on_failure_callback=on_dag_failure) as dag:
     init_hec_single = PythonOperator(
         task_id='init_hec_single',
         provide_context=True,
