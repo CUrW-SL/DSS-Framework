@@ -58,6 +58,25 @@ def update_variable_value(dag_run, **kwargs):
         print('update_variable_value|db_adapter|Exception: ', str(ex))
 
 
+def get_rule_id(context):
+    rule_info = context['task_instance'].xcom_pull(task_ids='init_hec_single')['rule_info']
+    if rule_info:
+        rule_id = rule_info['id']
+        print('get_rule_id|rule_id : ', rule_id)
+        return rule_id
+    else:
+        return None
+
+
+def on_dag_failure(context):
+    rule_id = get_rule_id(context)
+    if rule_id is not None:
+        update_workflow_status(4, rule_id)
+        print('on_dag_failure|set error status for rule|rule_id :', rule_id)
+    else:
+        print('on_dag_failure|rule_id not found')
+
+
 default_args = {
     'owner': 'dss admin',
     'start_date': datetime.utcnow(),
@@ -66,7 +85,8 @@ default_args = {
 }
 
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
-         description='Run rainfall_intensity_dag DAG', catchup=False) as dag:
+         description='Run rainfall_intensity_dag DAG', catchup=False,
+         on_failure_callback=on_dag_failure) as dag:
     init_task = PythonOperator(
         task_id='init_task',
         provide_context=True,
