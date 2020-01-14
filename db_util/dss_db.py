@@ -155,7 +155,7 @@ class RuleEngineAdapter:
         wrf_rule = None
         query = 'select id, name, target_model, version, run, hour, ignore_previous_run, ' \
                 'check_gfs_data_availability,accuracy_rule, rule_details from dss.wrf_rules ' \
-                'where id = {} and status in (1,3)  '.format(rule_id)
+                'where id = {} and status in (1,3,4)  '.format(rule_id)
         print('get_wrf_rule_info_by_id|query : ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
@@ -225,7 +225,7 @@ class RuleEngineAdapter:
         query = 'select id, name, target_model,forecast_days, observed_days, ' \
                 'init_run, no_forecast_continue, no_observed_continue, rainfall_data_from, ' \
                 'ignore_previous_run, accuracy_rule, rule_details from dss.hechms_rules where ' \
-                'status in (1,3) and id = {}'.format(id)
+                'status in (1, 3, 4) and id = {}'.format(id)
         print('get_hechms_rule_info_by_id|query : ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
@@ -287,7 +287,7 @@ class RuleEngineAdapter:
                 'no_forecast_continue, no_observed_continue, raincell_data_from, ' \
                 'inflow_data_from, outflow_data_from, ignore_previous_run, accuracy_rule,' \
                 'rule_details ' \
-                'from dss.flo2d_rules where status in (1,3) and id={}'.format(id)
+                'from dss.flo2d_rules where status in (1, 3, 4) and id={}'.format(id)
         print('get_flo2d_rule_info_by_id|query : ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
