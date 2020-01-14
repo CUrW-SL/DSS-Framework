@@ -229,8 +229,18 @@ def outflow_branch_func(**context):
         return 'create_outflow_flo2d_250m'
 
 
+def on_dag_failure(context):
+    rule_id = get_rule_id(context)
+    if rule_id is not None:
+        update_workflow_status(4, rule_id)
+        print('on_dag_failure|set error status for rule|rule_id :', rule_id)
+    else:
+        print('on_dag_failure|rule_id not found')
+
+
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
-         description='Run Flo2d 250m DAG', dagrun_timeout=timedelta(minutes=55), catchup=False) as dag:
+         description='Run Flo2d 250m DAG', dagrun_timeout=timedelta(minutes=55), catchup=False,
+         on_failure_callback=on_dag_failure) as dag:
     init_flo2d_250m = PythonOperator(
         task_id='init_flo2d_250m',
         provide_context=True,
