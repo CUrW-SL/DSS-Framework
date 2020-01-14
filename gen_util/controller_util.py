@@ -83,6 +83,9 @@ def update_workflow_routine_status(db_adapter):
             wrf_completed = False
             hechms_completed = False
             flo2d_completed = False
+            wrf_error = False
+            hechms_error = False
+            flo2d_error = False
             print('update_workflow_routine_status|running_routine : ', running_routine)
             routine_id = running_routine['id']
             wrf_rule_id = running_routine['dss1']
@@ -95,8 +98,10 @@ def update_workflow_routine_status(db_adapter):
                 wrf_rule_info = db_adapter.get_wrf_rule_status_by_id(wrf_rule_id)
                 if wrf_rule_info is not None:
                     wrf_rule_status = wrf_rule_info['status']
-                    if wrf_rule_status == 3 or wrf_rule_status == '3':
+                    if (wrf_rule_status == 3) or (wrf_rule_status == '3'):
                         wrf_completed = True
+                    elif (wrf_rule_status == 4) or (wrf_rule_status == '4'):
+                        wrf_error = True
             print('update_workflow_routine_status|wrf_completed : ', wrf_completed)
             if hechms_rule_id == 0 or hechms_rule_id == '0':
                 hechms_completed = True
@@ -104,8 +109,10 @@ def update_workflow_routine_status(db_adapter):
                 hechms_rule_info = db_adapter.get_hechms_rule_status_by_id(hechms_rule_id)
                 if hechms_rule_info is not None:
                     hechms_rule_status = hechms_rule_info['status']
-                    if hechms_rule_status == 3 or hechms_rule_status == '3':
+                    if (hechms_rule_status == 3) or (hechms_rule_status == '3'):
                         hechms_completed = True
+                    elif (hechms_rule_status == 4) or (hechms_rule_status == '4'):
+                        hechms_error = True
             print('update_workflow_routine_status|hechms_completed : ', hechms_completed)
             if flo2d_rule_id == 0 or flo2d_rule_id == '0':
                 flo2d_completed = True
@@ -113,10 +120,24 @@ def update_workflow_routine_status(db_adapter):
                 flo2d_rule_info = db_adapter.get_flo2d_rule_status_by_id(flo2d_rule_id)
                 if flo2d_rule_info is not None:
                     flo2d_rule_status = flo2d_rule_info['status']
-                    if flo2d_rule_status == 3 or flo2d_rule_status == '3':
+                    if (flo2d_rule_status == 3) or (flo2d_rule_status == '3'):
                         flo2d_completed = True
+                    elif (flo2d_rule_status == 4) or (flo2d_rule_status == '4'):
+                        flo2d_error = True
             print('update_workflow_routine_status|flo2d_completed : ', flo2d_completed)
             if wrf_completed and hechms_completed and flo2d_completed:
+                db_adapter.update_workflow_routing_status(3, routine_id)
+                print('routine has completed.')
+            elif wrf_error and hechms_error and flo2d_error:
+                db_adapter.update_workflow_routing_status(3, routine_id)
+                print('routine has completed.')
+            elif wrf_error and hechms_completed and flo2d_completed:
+                db_adapter.update_workflow_routing_status(3, routine_id)
+                print('routine has completed.')
+            elif wrf_completed and hechms_error and flo2d_completed:
+                db_adapter.update_workflow_routing_status(3, routine_id)
+                print('routine has completed.')
+            elif wrf_completed and hechms_completed and flo2d_error:
                 db_adapter.update_workflow_routing_status(3, routine_id)
                 print('routine has completed.')
             else:
