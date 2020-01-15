@@ -1,0 +1,30 @@
+{
+  "rain_cell_file": "RAINCELL.DAT",
+  "kelani_basin_points_file": "/home/hasitha/PycharmProjects/Flo2d/configs/kelani_basin_points_250m.txt",
+  "kelani_lower_basin_shp_file": "/home/hasitha/PycharmProjects/Flo2d/configs/klb-wgs84/klb-wgs84.shp",
+  "db_config": {
+    "host": "35.230.102.148",
+    "user": "sim_user",
+    "password": "sim_pass",
+    "db": "curw_sim"
+  },
+  "flo2d_250_model_config": {
+    "cell_count": 9348,
+    "grid_prefix": "flo2d_250_{}_MDPA"
+  },
+  "flo2d_150_model_config": {
+    "cell_count": 9576,
+    "grid_prefix": ""
+  },
+  "flo2d_30_model_config": {
+    "cell_count": 9576,
+    "grid_prefix": ""
+  },
+  "INITIAL_PATH_PREFIX": "results/wrf0",
+  "KEY_FILE_PATH": "/home/hasitha/Shared/uwcc-admin.json",
+  "BUCKET_NAME": "curwsl_nfs_1",
+  "NET_CDF_FILE": "wrfout_d03-18:00:00_rf",
+  "FLO2D_MODEl": "150m",
+  "NET_CDF_PATH": "/mnt/disks/curwsl_nfs_1/results/wrf0_",
+  "WRF_DATA_DIR": "/home/hasitha/PycharmProjects/Workflow/output/"
+}

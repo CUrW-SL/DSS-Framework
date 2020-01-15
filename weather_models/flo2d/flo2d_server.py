@@ -3,7 +3,6 @@ from builtins import print
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 from urllib.parse import urlparse, parse_qs
-# from raincelldat.gen_raincell import create_hybrid_raincell
 from curw_sim.gen_raincell_curw_sim import create_sim_hybrid_raincell
 from inflowdat.get_inflow import create_inflow
 from outflowdat.gen_outflow_old import create_outflow_old
@@ -51,7 +50,7 @@ class StoreHandler(BaseHTTPRequestHandler):
                 [backward] = query_components["backward"]
                 print('[run_date, run_time] : ', [run_date, run_time])
                 dir_path = set_daily_dir(run_date, run_time)
-                create_hybrid_raincell(dir_path, run_date, run_time, forward, backward)
+                # create_hybrid_raincell(dir_path, run_date, run_time, forward, backward)
                 response = {'response': 'success'}
             except Exception as e:
                 print(str(e))
