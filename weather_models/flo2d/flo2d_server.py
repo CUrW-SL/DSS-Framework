@@ -1,4 +1,5 @@
 import os
+import sys
 from builtins import print
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
@@ -322,9 +323,16 @@ class StoreHandler(BaseHTTPRequestHandler):
 if __name__ == '__main__':
     try:
         print('starting server...')
-        server_address = (HOST_ADDRESS, HOST_PORT)
+        arguments = len(sys.argv) - 1
+        if arguments > 0:
+            host_address = sys.argv[1]
+            host_port = sys.argv[2]
+        else:
+            host_address = HOST_ADDRESS
+            host_port = HOST_PORT
+        server_address = (host_address, host_port)
         httpd = HTTPServer(server_address, StoreHandler)
-        print('running server...')
+        print('server running on host {} and port {} ...'.format(host_address, host_port))
         httpd.serve_forever()
     except Exception as e:
         print(str(e))
