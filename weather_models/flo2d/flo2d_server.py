@@ -51,8 +51,9 @@ class StoreHandler(BaseHTTPRequestHandler):
                 [backward] = query_components["backward"]
                 [model] = query_components["model"]
                 [data_type] = query_components["data_type"]  # 1-observed only, 2-forecast only,3-hybrid
-                print('[run_date, run_time, forward, backward, model, data_type] : ',
-                      [run_date, run_time, forward, backward, model, data_type])
+                [sim_tag] = query_components["sim_tag"]
+                print('[run_date, run_time, forward, backward, model, data_type, sim_tag] : ',
+                      [run_date, run_time, forward, backward, model, data_type, sim_tag])
                 dir_path = set_daily_dir(run_date, run_time)
                 try:
                     if data_type == 3:
@@ -60,7 +61,7 @@ class StoreHandler(BaseHTTPRequestHandler):
                                                    res_mins=5, flo2d_model='flo2d_250',
                                                    calc_method='MME')
                     else:
-                        create_raincell(dir_path, run_date, run_time, forward, backward, model, data_type)
+                        create_raincell(dir_path, run_date, run_time, forward, backward, model, data_type, sim_tag)
                     response = {'response': 'success'}
                 except Exception as e:
                     response = {'response': 'fail'}

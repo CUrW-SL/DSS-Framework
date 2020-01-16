@@ -161,7 +161,7 @@ def generate_raincell(raincell_file_path, time_limits, model, data_type, sim_tag
                   ['{} {} {} {}\n'.format(timestep, length, start_time.strftime(DATE_TIME_FORMAT),
                                           end_time.strftime(DATE_TIME_FORMAT))])
     get_cell_mapping(sim_connection, model)
-    select_distinct_observed_stations(obs_connection, model)
+    select_distinct_observed_stations(sim_connection, model)
 
     if data_type == 1:  # Observed only
         try:
