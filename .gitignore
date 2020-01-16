@@ -2,5 +2,6 @@ venv/
 venv_back/
 .idea/
 input/
+output/
 log/
 jupyter_notebooks/jaxa_data/
