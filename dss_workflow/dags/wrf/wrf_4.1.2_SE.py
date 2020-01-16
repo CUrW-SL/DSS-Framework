@@ -39,7 +39,8 @@ def get_push_command(**context):
     bash_script = wrf_rule['rule_info']['rule_details']['push_script']
     push_config = wrf_rule['rule_info']['rule_details']['push_config']
     wrf_bucket = wrf_rule['rule_info']['rule_details']['wrf_bucket']
-    exec_date = context["execution_date"].to_datetime_string()
+    exec_date = datetime.strptime(context["execution_date"].to_datetime_string(), '%Y-%m-%d %H:%M:%S')
+    exec_date = exec_date.strftime('%Y-%m-%d')
     push_script = '{} {} {} d{} {} {} {}'.format(bash_script, push_config, wrf_bucket, wrf_run,
                                                  gfs_hour, wrf_model, exec_date)
     print('get_push_command|run_script : ', push_script)
