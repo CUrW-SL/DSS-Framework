@@ -1,7 +1,7 @@
 import pymysql
 from datetime import datetime, timedelta
 import traceback
-from weather_models.flo2d.db_plugin import get_cell_mapping
+from weather_models.flo2d.db_plugin import get_cell_mapping, select_distinct_observed_stations
 import os
 
 DATE_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
@@ -138,16 +138,7 @@ def create_sim_hybrid_raincell(dir_path, run_date, run_time, forward, backward,
         print('Raincell file already in path : ', raincell_file_path)
 
 
-def generate_raincell(raincell_file_path, time_limits, model, data_type):
-    """
-    Create raincell for flo2d
-    :param raincell_file_path:
-    :param start_time: Raincell start time (e.g: "2019-06-05 00:00:00")
-    :param end_time: Raincell start time (e.g: "2019-06-05 23:30:00")
-    :param target_model: FLO2D model (e.g. flo2d_250, flo2d_150)
-    :param interpolation_method: value interpolation method (e.g. "MME")
-    :return:
-    """
+def generate_raincell(raincell_file_path, time_limits, model, data_type, sim_tag):
     sim_connection = pymysql.connect(host=HOST, user=USER, password=PASSWORD, db=SIM_DB,
                                      cursorclass=pymysql.cursors.DictCursor)
     fcst_connection = pymysql.connect(host=HOST, user=USER, password=PASSWORD, db=FCST_DB,
@@ -170,6 +161,7 @@ def generate_raincell(raincell_file_path, time_limits, model, data_type):
                   ['{} {} {} {}\n'.format(timestep, length, start_time.strftime(DATE_TIME_FORMAT),
                                           end_time.strftime(DATE_TIME_FORMAT))])
     get_cell_mapping(sim_connection, model)
+    select_distinct_observed_stations(obs_connection, model)
 
     if data_type == 1:  # Observed only
         try:
@@ -177,16 +169,18 @@ def generate_raincell(raincell_file_path, time_limits, model, data_type):
             raincell = []
             while timestamp < run_time:
                 timestamp = timestamp + timedelta(minutes=timestep)
-                with connection.cursor() as cursor1:
-                    cursor1.callproc('prepare_flo2d_raincell', (target_model, interpolation_method, timestamp))
-                    for result in cursor1:
+                with obs_connection.cursor() as cursor:
+                    cursor.callproc('prepare_flo2d_raincell', (target_model, interpolation_method, timestamp))
+                    for result in cursor:
                         raincell.append('{} {}\n'.format(result.get('cell_id'), '%.1f' % result.get('value')))
             while run_time < end_time:
                 print(timestamp)
         except Exception as ex:
             traceback.print_exc()
         finally:
-            connection.close()
+            sim_connection.close()
+            fcst_connection.close()
+            obs_connection.close()
             print("{} raincell generation process completed".format(datetime.now()))
     elif data_type == 2:  # Forecast only
         try:
@@ -231,10 +225,10 @@ def get_ts_start_end_for_data_type(run_date, run_time, forward=3, backward=2):
     return result
 
 
-def create_raincell(dir_path, run_date, run_time, forward, backward, model, data_type):
+def create_raincell(dir_path, run_date, run_time, forward, backward, model, data_type, sim_tag):
     time_limits = get_ts_start_end_for_data_type(run_date, run_time, forward, backward)
     raincell_file_path = os.path.join(dir_path, 'RAINCELL.DAT')
-    generate_raincell(raincell_file_path, time_limits, model, data_type)
+    generate_raincell(raincell_file_path, time_limits, model, data_type, sim_tag)
     # if not os.path.isfile(raincell_file_path):
     #     print('')
     # else:
@@ -244,6 +238,6 @@ def create_raincell(dir_path, run_date, run_time, forward, backward, model, data
 if __name__ == '__main__':
     try:
         create_raincell('/home/hasitha/PycharmProjects/DSS-Framework/output',
-                        '2020-01-16', '14:00:00', 3, 2, 'flo2d_250', 1)
+                        '2020-01-16', '14:00:00', 3, 2, 'flo2d_250', 1, 'mwrf_gfs_d0_00')
     except Exception as e:
         print(str(e))
