@@ -177,8 +177,8 @@ def generate_raincell(raincell_file_path, time_limits, model, data_type, sim_tag
                 raincell_entries = get_raincell_entries_for_timestamp(grid_maps, obs_station_precipitations)
                 append_to_file(raincell_file_path, raincell_entries)
             while run_time < end_time:
-
-                print(timestamp)
+                raincell_entries = get_empty_raincell_entries(model)
+                append_to_file(raincell_file_path, raincell_entries)
         except Exception as ex:
             traceback.print_exc()
         finally:
@@ -199,10 +199,16 @@ def generate_raincell(raincell_file_path, time_limits, model, data_type, sim_tag
 
 
 def get_empty_raincell_entries(model):
+    raincell_entries = []
     if model == "flo2d_250":
-        print('')
+        cell_id = 1
+        while cell_id <= 9348:
+            raincell_entry = '{} {}'.format(cell_id, '0.0')
+            raincell_entries.append(raincell_entry)
+            cell_id += 1
     elif model == "flo2d_150":
-        print('')
+        print('xxxxxxxxxxxx')
+    return raincell_entries.append('')
 
 
 def get_raincell_entries_for_timestamp(grid_maps, obs_station_precipitations):
