@@ -32,6 +32,16 @@ def select_distinct_observed_stations(obs_connection, flo2d_model):
     return id_list
 
 
+def select_obs_station_precipitation_for_timestamp(obs_connection, station_ids, time_step):
+    query = 'select station_tbl.station_id,time_tbl.step_value from ' \
+            '(select id as hash_id, station as station_id FROM curw_obs.run where unit=9 and variable=10 and station in ({})) station_tbl,' \
+            '(select id as hash_id, value as step_value from curw_obs.data where time=\'{}\') time_tbl ' \
+            'where station_tbl.hash_id = time_tbl.hash_id;'.format(station_ids, time_step)
+    print('select_obs_station_precipitation_for_timestamp|query : ', query)
+    rows = get_multiple_result(obs_connection, query)
+    print('select_obs_station_precipitation_for_timestamp|rows : ', rows)
+
+
 def get_single_result(sim_connection, query):
     cur = sim_connection.cursor()
     cur.execute(query)

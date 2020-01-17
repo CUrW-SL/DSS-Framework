@@ -1,7 +1,8 @@
 import pymysql
 from datetime import datetime, timedelta
 import traceback
-from weather_models.flo2d.db_plugin import get_cell_mapping, select_distinct_observed_stations
+from weather_models.flo2d.db_plugin import get_cell_mapping, select_distinct_observed_stations, \
+    select_obs_station_precipitation_for_timestamp
 import os
 
 DATE_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
@@ -161,18 +162,19 @@ def generate_raincell(raincell_file_path, time_limits, model, data_type, sim_tag
                   ['{} {} {} {}\n'.format(timestep, length, start_time.strftime(DATE_TIME_FORMAT),
                                           end_time.strftime(DATE_TIME_FORMAT))])
     get_cell_mapping(sim_connection, model)
-    select_distinct_observed_stations(sim_connection, model)
+    station_id_list = select_distinct_observed_stations(sim_connection, model)
+    station_ids = ','.join(str(e) for e in station_id_list)
+    print('station_ids : ', station_ids)
 
     if data_type == 1:  # Observed only
         try:
             timestamp = start_time
-            raincell = []
+            print('type(timestamp) : ', type(timestamp))
+            print('type(run_time) : ', type(run_time))
             while timestamp < run_time:
                 timestamp = timestamp + timedelta(minutes=timestep)
-                with obs_connection.cursor() as cursor:
-                    cursor.callproc('prepare_flo2d_raincell', (target_model, interpolation_method, timestamp))
-                    for result in cursor:
-                        raincell.append('{} {}\n'.format(result.get('cell_id'), '%.1f' % result.get('value')))
+                select_obs_station_precipitation_for_timestamp(obs_connection, station_ids,
+                                                               timestamp.strftime(DATE_TIME_FORMAT))
             while run_time < end_time:
                 print(timestamp)
         except Exception as ex:
@@ -185,16 +187,6 @@ def generate_raincell(raincell_file_path, time_limits, model, data_type, sim_tag
     elif data_type == 2:  # Forecast only
         try:
             timestamp = start_time
-            while timestamp < end_time:
-                raincell = []
-                timestamp = timestamp + timedelta(minutes=timestep)
-                with connection.cursor() as cursor1:
-                    cursor1.callproc('prepare_flo2d_raincell', (target_model, interpolation_method, timestamp))
-                    for result in cursor1:
-                        raincell.append('{} {}'.format(result.get('cell_id'), '%.1f' % result.get('value')))
-                    raincell.append('')
-                append_to_file(raincell_file_path, raincell)
-                print(timestamp)
         except Exception as ex:
             traceback.print_exc()
         finally:
