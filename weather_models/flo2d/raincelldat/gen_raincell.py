@@ -4,8 +4,10 @@ import traceback
 from weather_models.flo2d.db_plugin import get_cell_mapping, select_distinct_observed_stations, \
     select_obs_station_precipitation_for_timestamp
 import os
+from weather_models.flo2d.utils import search_in_dictionary_list
 
 DATE_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
+INVALID_VALUE = -9999
 
 # connection params
 # HOST = "10.138.0.13"
@@ -47,7 +49,7 @@ def prepare_raincell(raincell_file_path, start_time, end_time,
     :param interpolation_method: value interpolation method (e.g. "MME")
     :return:
     """
-    connection = pymysql.connect(host=HOST, user=USER, password=PASSWORD, db=DB,
+    connection = pymysql.connect(host=HOST, user=USER, password=PASSWORD, db=SIM_DB,
                                  cursorclass=pymysql.cursors.DictCursor)
     print("Connected to database")
 
@@ -57,7 +59,6 @@ def prepare_raincell(raincell_file_path, start_time, end_time,
     if end_time < start_time:
         print("start_time should be less than end_time")
         exit(1)
-
     # find max end time
     try:
         with connection.cursor() as cursor0:
@@ -147,12 +148,10 @@ def generate_raincell(raincell_file_path, time_limits, model, data_type, sim_tag
     obs_connection = pymysql.connect(host=HOST, user=USER, password=PASSWORD, db=OBS_DB,
                                      cursorclass=pymysql.cursors.DictCursor)
     print("Connected to database")
-
     if model == "flo2d_250":
         timestep = 5
     elif model == "flo2d_150":
         timestep = 15
-
     start_time = time_limits['obs_start']
     run_time = time_limits['run_time']
     end_time = time_limits['forecast_time']
@@ -161,11 +160,10 @@ def generate_raincell(raincell_file_path, time_limits, model, data_type, sim_tag
     write_to_file(raincell_file_path,
                   ['{} {} {} {}\n'.format(timestep, length, start_time.strftime(DATE_TIME_FORMAT),
                                           end_time.strftime(DATE_TIME_FORMAT))])
-    get_cell_mapping(sim_connection, model)
+    grid_maps = get_cell_mapping(sim_connection, model)
     station_id_list = select_distinct_observed_stations(sim_connection, model)
-    station_ids = ','.join(str(e) for e in station_id_list)
+    station_ids = ','.join(str(i) for i in station_id_list)
     print('station_ids : ', station_ids)
-
     if data_type == 1:  # Observed only
         try:
             timestamp = start_time
@@ -173,9 +171,13 @@ def generate_raincell(raincell_file_path, time_limits, model, data_type, sim_tag
             print('type(run_time) : ', type(run_time))
             while timestamp < run_time:
                 timestamp = timestamp + timedelta(minutes=timestep)
-                select_obs_station_precipitation_for_timestamp(obs_connection, station_ids,
-                                                               timestamp.strftime(DATE_TIME_FORMAT))
+                obs_station_precipitations = select_obs_station_precipitation_for_timestamp(obs_connection, station_ids,
+                                                                                            timestamp.strftime(
+                                                                                                DATE_TIME_FORMAT))
+                raincell_entries = get_raincell_entries_for_timestamp(grid_maps, obs_station_precipitations)
+                append_to_file(raincell_file_path, raincell_entries)
             while run_time < end_time:
+
                 print(timestamp)
         except Exception as ex:
             traceback.print_exc()
@@ -194,6 +196,32 @@ def generate_raincell(raincell_file_path, time_limits, model, data_type, sim_tag
             fcst_connection.close()
             obs_connection.close()
             print("{} raincell generation process completed".format(datetime.now()))
+
+
+def get_empty_raincell_entries(model):
+    if model == "flo2d_250":
+        print('')
+    elif model == "flo2d_150":
+        print('')
+
+
+def get_raincell_entries_for_timestamp(grid_maps, obs_station_precipitations):
+    raincell_entries = []
+    for grid_map in grid_maps:
+        grid_id = int(grid_map['grid_id'].split('_')[3])
+        obs1_id = grid_map['obs1']
+        precipitation = search_in_dictionary_list(obs_station_precipitations, 'station_id', obs1_id)
+        if precipitation == INVALID_VALUE:
+            obs2_id = grid_map['obs2']
+            precipitation = search_in_dictionary_list(obs_station_precipitations, 'station_id', obs2_id)
+            if precipitation == INVALID_VALUE:
+                obs3_id = grid_map['obs3']
+                precipitation = search_in_dictionary_list(obs_station_precipitations, 'station_id', obs3_id)
+                if precipitation == INVALID_VALUE:
+                    precipitation = 0
+        raincell_entry = '{} {}'.format(grid_id, '%.1f' % precipitation)
+        raincell_entries.append(raincell_entry)
+    return raincell_entries.append('')
 
 
 def get_ts_start_end_for_data_type(run_date, run_time, forward=3, backward=2):
