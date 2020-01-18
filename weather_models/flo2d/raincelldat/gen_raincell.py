@@ -234,7 +234,7 @@ def get_raincell_entries_for_timestamp(grid_maps, obs_station_precipitations):
                 if precipitation == INVALID_VALUE:
                     precipitation = 0
         raincell_entry = '{} {}'.format(grid_id, '%.1f' % precipitation)
-        print('raincell_entry : ', raincell_entry)
+        # print('raincell_entry : ', raincell_entry)
         raincell_entries.append(raincell_entry)
     raincell_entries.append('')
     return raincell_entries
@@ -264,7 +264,11 @@ def get_ts_start_end_for_data_type(run_date, run_time, forward=3, backward=2):
 def create_raincell(dir_path, run_date, run_time, forward, backward, model, data_type, sim_tag):
     time_limits = get_ts_start_end_for_data_type(run_date, run_time, forward, backward)
     raincell_file_path = os.path.join(dir_path, 'RAINCELL.DAT')
+    start_time = datetime.now()
     generate_raincell(raincell_file_path, time_limits, model, data_type, sim_tag)
+    end_time = datetime.now()
+    duration = (end_time - start_time).total_seconds() / 60
+    print('create_raincell|duration : ', duration)
     # if not os.path.isfile(raincell_file_path):
     #     print('')
     # else:
@@ -274,6 +278,6 @@ def create_raincell(dir_path, run_date, run_time, forward, backward, model, data
 if __name__ == '__main__':
     try:
         create_raincell('/home/hasitha/PycharmProjects/DSS-Framework/output',
-                        '2020-01-16', '14:00:00', 3, 2, 'flo2d_250', 1, 'mwrf_gfs_d0_00')
+                        '2020-01-17', '08:00:00', 3, 2, 'flo2d_250', 1, 'mwrf_gfs_d0_00')
     except Exception as e:
         print(str(e))
