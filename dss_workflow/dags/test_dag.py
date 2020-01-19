@@ -30,7 +30,7 @@ def create_dag(dag_id,
 for n in range(1, 3):
     dag_id = 'hello_world_{}'.format(str(n))
 
-    default_args = {'owner': 'dss_admin',
+    default_args = {'owner': 'dss admin',
                     'start_date': datetime(2020, 1, 18)
                     }
 
