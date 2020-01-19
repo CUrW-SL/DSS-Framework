@@ -1,40 +1,44 @@
 from datetime import datetime
+
 from airflow import DAG
-from airflow.operators.bash_operator import BashOperator
+
+from airflow.operators.python_operator import PythonOperator
 
 
-prod_dag_name = 'test_dag'
-schedule_interval = '*/5 * * * *'
+def create_dag(dag_id,
+               schedule,
+               dag_number,
+               default_args):
+    def hello_world_py(*args):
+        print('Hello World')
+        print('This is DAG: {}'.format(str(dag_number)))
 
-default_args = {
-    'owner': 'dss admin',
-    'start_date': datetime.strptime('2019-11-03 02:15:00', '%Y-%m-%d %H:%M:%S'),
-    'email': ['hasithadkr7@gmail.com'],
-    'email_on_failure': True,
-}
+    dag = DAG(dag_id, catchup=False,
+              schedule_interval=schedule,
+              default_args=default_args)
 
-test_task1_cmd = 'echo "download_gfs_cmd" ;sleep $[($RANDOM % 10) + 1]s'
-test_task2_cmd = '/home/uwcc-admin/git/DSS-Framework/docker/cloud/testing.sh '
-test_task3_cmd = 'echo "rfield_gen_cmd" ;sleep $[($RANDOM % 10) + 1]s'
+    with dag:
+        t1 = PythonOperator(
+            task_id='hello_world',
+            python_callable=hello_world_py,
+            dag_number=dag_number)
+
+    return dag
 
 
-with DAG(dag_id=prod_dag_name, default_args=default_args,
-         schedule_interval=schedule_interval, catchup=False,
-         description='Run TEST DAG') as dag:
-    test_task1 = BashOperator(
-        task_id='test_task1',
-        bash_command=test_task1_cmd,
-    )
+# build a dag for each number in range(3)
+for n in range(1, 3):
+    dag_id = 'hello_world_{}'.format(str(n))
 
-    test_task2 = BashOperator(
-        task_id='test_task2',
-        bash_command=test_task2_cmd,
-    )
+    default_args = {'owner': 'dss_admin',
+                    'start_date': datetime(2020, 1, 18)
+                    }
 
-    test_task3 = BashOperator(
-        task_id='test_task3',
-        bash_command=test_task3_cmd,
-    )
+    schedule = '*/10 * * * *'
 
-    test_task1 >> test_task2 >> test_task3
+    dag_number = n
 
+    globals()[dag_id] = create_dag(dag_id,
+                                   schedule,
+                                   dag_number,
+                                   default_args)
