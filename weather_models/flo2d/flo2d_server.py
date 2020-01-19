@@ -50,13 +50,15 @@ class StoreHandler(BaseHTTPRequestHandler):
                 [forward] = query_components["forward"]
                 [backward] = query_components["backward"]
                 [model] = query_components["model"]
-                [data_type] = query_components["data_type"]  # 1-observed only, 2-forecast only,3-hybrid
+                [data_type] = query_components[
+                    "data_type"]  # 1-observed only, 2-forecast only,3-hybrid, 4-Simiulated Rain
+                [any_wrf] = query_components["any_wrf"]
                 [sim_tag] = query_components["sim_tag"]
-                print('[run_date, run_time, forward, backward, model, data_type, sim_tag] : ',
-                      [run_date, run_time, forward, backward, model, data_type, sim_tag])
+                print('[run_date, run_time, forward, backward, model, data_type, any_wrf, sim_tag] : ',
+                      [run_date, run_time, forward, backward, model, data_type, any_wrf, sim_tag])
                 dir_path = set_daily_dir(run_date, run_time)
                 try:
-                    if data_type == 3:
+                    if data_type == 4:
                         create_sim_hybrid_raincell(dir_path, run_date, run_time, forward, backward,
                                                    res_mins=5, flo2d_model='flo2d_250',
                                                    calc_method='MME')

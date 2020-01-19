@@ -44,6 +44,10 @@ def select_obs_station_precipitation_for_timestamp(obs_connection, station_ids, 
     return rows
 
 
+def get_latest_fgt_of_the_day(given_datetime, sim_tag, ):
+    print('')
+
+
 def get_single_result(sim_connection, query):
     cur = sim_connection.cursor()
     cur.execute(query)

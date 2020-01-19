@@ -167,8 +167,6 @@ def generate_raincell(raincell_file_path, time_limits, model, data_type, sim_tag
     if data_type == 1:  # Observed only
         try:
             timestamp = start_time
-            print('type(timestamp) : ', type(timestamp))
-            print('type(run_time) : ', type(run_time))
             while timestamp < run_time:
                 timestamp = timestamp + timedelta(minutes=timestep)
                 obs_station_precipitations = select_obs_station_precipitation_for_timestamp(obs_connection, station_ids,
@@ -201,6 +199,18 @@ def generate_raincell(raincell_file_path, time_limits, model, data_type, sim_tag
             fcst_connection.close()
             obs_connection.close()
             print("{} raincell generation process completed".format(datetime.now()))
+    elif data_type == 3:  # Observed + Forecast
+        try:
+            timestamp = start_time
+        except Exception as ex:
+            traceback.print_exc()
+        finally:
+            sim_connection.close()
+            fcst_connection.close()
+            obs_connection.close()
+            print("{} raincell generation process completed".format(datetime.now()))
+    else:
+        print('data_type mismatched...')
 
 
 def get_empty_raincell_entries(model):
@@ -261,11 +271,11 @@ def get_ts_start_end_for_data_type(run_date, run_time, forward=3, backward=2):
     return result
 
 
-def create_raincell(dir_path, run_date, run_time, forward, backward, model, data_type, sim_tag):
+def create_raincell(dir_path, run_date, run_time, forward, backward, model, data_type, any_wrf, sim_tag):
     time_limits = get_ts_start_end_for_data_type(run_date, run_time, forward, backward)
     raincell_file_path = os.path.join(dir_path, 'RAINCELL.DAT')
     start_time = datetime.now()
-    generate_raincell(raincell_file_path, time_limits, model, data_type, sim_tag)
+    generate_raincell(raincell_file_path, time_limits, model, data_type, any_wrf, sim_tag)
     end_time = datetime.now()
     duration = (end_time - start_time).total_seconds() / 60
     print('create_raincell|duration : ', duration)
@@ -278,6 +288,6 @@ def create_raincell(dir_path, run_date, run_time, forward, backward, model, data
 if __name__ == '__main__':
     try:
         create_raincell('/home/hasitha/PycharmProjects/DSS-Framework/output',
-                        '2020-01-17', '08:00:00', 3, 2, 'flo2d_250', 1, 'mwrf_gfs_d0_00')
+                        '2020-01-17', '08:00:00', 3, 2, 'flo2d_250', 0, 1, 'mwrf_gfs_d0_00')
     except Exception as e:
         print(str(e))
