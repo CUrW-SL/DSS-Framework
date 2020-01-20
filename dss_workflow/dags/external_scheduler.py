@@ -12,7 +12,7 @@ from dynamic_external_trigger_operator import DynamicTriggerDagRunOperator
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
-sys.path.insert(0, '/home/hasitha/PycharmProjects/DSS-Framework/dss_workflow/dags/external_bash')
+sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/dss_workflow/dags/external_bash')
 from gen_dynamic_dags import generate_external_bash_dag
 
 prod_dag_name = 'external_scheduler_v1'
