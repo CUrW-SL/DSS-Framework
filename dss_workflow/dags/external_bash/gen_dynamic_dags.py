@@ -91,6 +91,8 @@ def create_dag(dag_id, schedule, timeout, dag_tasks, default_args):
 
 # example bash command : /home/uwcc-admin/calculate.sh -a 23 -date '2020-01-11' -c 1.4
 def get_bash_command(bash_script, input_params):
+    print('get_bash_command|bash_script : ', bash_script)
+    print('get_bash_command|input_params : ', input_params)
     inputs = []
     if input_params:
         for key in input_params.keys():
@@ -105,10 +107,12 @@ def get_bash_command(bash_script, input_params):
 
 
 def get_timeout(timeout):
+    print('get_timeout|timeout : ', timeout)
     return timedelta(hours=timeout['hours'], minutes=timeout['minutes'], seconds=timeout['seconds'])
 
 
 def generate_external_bash_dag(dss_adapter, dag_rule):
+    print('generate_external_bash_dag|dag_rule : ', dag_rule)
     dag_tasks = dss_adapter.get_dynamic_dag_tasks(dag_rule['id'])
     if len(dag_tasks) > 0:
         schedule = dag_rule['schedule']
