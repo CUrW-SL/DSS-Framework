@@ -517,6 +517,12 @@ class RuleEngineAdapter:
                     self.update_initial_pump_routing_status(1, routine['id'])
         return routines
 
+    def update_initial_external_bash_routing_status(self, status, routine_id):
+        query = 'update dss.dynamic_dags set status={},last_trigger_date=now()  ' \
+                'where id=\'{}\''.format(status, routine_id)
+        print('update_initial_external_bash_routing_status|query : ', query)
+        self.update_query(query)
+
     def get_external_bash_routines(self, schedule_date=datetime.now()):
         if type(schedule_date) is datetime:
             schedule_date = schedule_date
@@ -538,7 +544,7 @@ class RuleEngineAdapter:
             if len(routines) > 0:
                 for routine in routines:
                     print('update_initial_workflow_routing_status.')
-                    self.update_initial_variable_routing_status(1, routine['id'])
+                    self.update_initial_external_bash_routing_status(1, routine['id'])
         return routines
 
     def get_location_names_from_rule_variables(self, variable_type):
