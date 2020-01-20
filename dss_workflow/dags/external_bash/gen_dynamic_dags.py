@@ -92,11 +92,14 @@ def create_dag(dag_id, schedule, timeout, dag_tasks, default_args):
 # example bash command : /home/uwcc-admin/calculate.sh -a 23 -date '2020-01-11' -c 1.4
 def get_bash_command(bash_script, input_params):
     inputs = []
-    for key in input_params.keys():
-        inputs.append('-{} {}'.format(key, input_params[key]))
-    if len(inputs) > 0:
-        input_str = ' '.join(inputs)
-        return '{} {}'.format(bash_script, input_str)
+    if input_params:
+        for key in input_params.keys():
+            inputs.append('-{} {}'.format(key, input_params[key]))
+        if len(inputs) > 0:
+            input_str = ' '.join(inputs)
+            return '{} {}'.format(bash_script, input_str)
+        else:
+            return '{}'.format(bash_script)
     else:
         return '{}'.format(bash_script)
 
