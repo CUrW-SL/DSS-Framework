@@ -552,6 +552,19 @@ class RuleEngineAdapter:
                     self.update_initial_external_bash_routing_status(1, routine['id'])
         return routines
 
+    def get_all_external_bash_routines(self):
+        query = 'select id, dag_name, schedule, timeout from dss.dynamic_dags where status in (1,3);'
+        print('get_all_external_bash_routines|query : ', query)
+        results = self.get_multiple_result(query)
+        routines = []
+        if results is not None:
+            for result in results:
+                print('get_all_external_bash_routines|result : ', result)
+                routines.append({'id': result[0], 'dag_name': result[1], 'schedule': result[2],
+                                 'timeout': json.loads(result[3])})
+        print('get_all_external_bash_routines|routines : ', routines)
+        return routines
+
     def get_location_names_from_rule_variables(self, variable_type):
         print('get_location_names_from_rule_variables|variable_type : ', variable_type)
         query = 'select location_name from dss.rule_variables where variable_type=\'{}\';'.format(variable_type)
