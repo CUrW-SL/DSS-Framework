@@ -588,7 +588,7 @@ class RuleEngineAdapter:
     # Dynamic dag creation.
     def get_dynamic_dag_tasks(self, dag_id):
         sql_query = 'select id, task_name, bash_script, input_params, timeout ' \
-                    'from dss.dynamic_tasks where active=1 and dag_id={};'.format(dag_id)
+                    'from dss.dynamic_tasks where active=1 and dag_id={} order by task_order asc;'.format(dag_id)
         print('get_dynamic_dag_tasks|sql_query : ', sql_query)
         results = self.get_multiple_result(sql_query)
         print('get_dynamic_dag_tasks|results : ', results)

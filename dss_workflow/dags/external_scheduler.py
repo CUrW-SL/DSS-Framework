@@ -70,7 +70,7 @@ def update_workflow_status(status, rule_id):
         db_config = Variable.get('db_config', deserialize_json=True)
         try:
             adapter = RuleEngineAdapter.get_instance(db_config)
-            adapter.update_pump_routing_status(status, rule_id)
+            adapter.update_initial_external_bash_routing_status(status, rule_id)
         except Exception as ex:
             print('update_workflow_status|db_adapter|Exception: ', str(ex))
     except Exception as e:
