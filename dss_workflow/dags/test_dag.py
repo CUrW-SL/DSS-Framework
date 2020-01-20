@@ -1,14 +1,9 @@
 from datetime import datetime
-
 from airflow import DAG
-
 from airflow.operators.python_operator import PythonOperator
 
 
-def create_dag(dag_id,
-               schedule,
-               dag_number,
-               default_args):
+def create_dag(dag_id, schedule, dag_number, default_args):
     def hello_world_py(*args):
         print('Hello World')
         print('This is DAG: {}'.format(str(dag_number)))
@@ -42,3 +37,4 @@ for n in range(1, 3):
                                    schedule,
                                    dag_number,
                                    default_args)
+

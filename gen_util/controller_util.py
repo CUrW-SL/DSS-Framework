@@ -158,6 +158,19 @@ def get_triggering_variable_dags(variable_routines):
     return dag_info
 
 
+def get_triggering_external_bash_dags(external_routines):
+    dag_info = []
+    if len(external_routines) > 0:
+        print('get_triggering_external_bash_dags|external_routines : ', external_routines)
+        # for variable_routine in variable_routines:
+        #     dag_name = variable_routine['dag_name']
+        #     payload = variable_routine
+        #     dag_info.append({'dag_name': dag_name, 'payload': payload})
+    else:
+        print('No triggering_variable_dags found.')
+    return dag_info
+
+
 def set_running_state(db_adapter, routine_id):
     print('set_running_state|routine_id: ', routine_id)
     db_adapter.update_workflow_routing_status(2, routine_id)
