@@ -595,8 +595,12 @@ class RuleEngineAdapter:
         dag_tasks = []
         if results is not None:
             for result in results:
-                dag_tasks.append({'id': result[0], 'task_name': result[1], 'bash_script': result[2],
-                                  'input_params': json.loads(result[3]), 'timeout': json.loads(result[4])})
+                if result[3]:
+                    dag_tasks.append({'id': result[0], 'task_name': result[1], 'bash_script': result[2],
+                                      'input_params': json.loads(result[3]), 'timeout': json.loads(result[4])})
+                else:
+                    dag_tasks.append({'id': result[0], 'task_name': result[1], 'bash_script': result[2],
+                                      'input_params': result[3], 'timeout': json.loads(result[4])})
         print('get_dynamic_dag_tasks|dag_tasks : ', dag_tasks)
         return dag_tasks
 
