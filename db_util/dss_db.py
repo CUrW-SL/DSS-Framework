@@ -537,7 +537,7 @@ class RuleEngineAdapter:
             for result in results:
                 print('get_external_bash_routines|result : ', result)
                 routines.append({'id': result[0], 'dag_name': result[1], 'schedule': result[2],
-                                 'timeout': result[3]})
+                                 'timeout': json.loads(result[3])})
         print('get_external_bash_routines|routines : ', routines)
         if len(routines) > 0:
             routines = get_next_scheduled_routines(schedule_date, routines)
@@ -584,6 +584,21 @@ class RuleEngineAdapter:
                 location_names.append(result[0])
         print('evaluate_variable_rule_logic|location_names : ', location_names)
         return location_names
+
+    # Dynamic dag creation.
+    def get_dynamic_dag_tasks(self, dag_id):
+        sql_query = 'select id, task_name, bash_script, input_params, timeout ' \
+                    'from dss.dynamic_tasks where active=1 and dag_id={};'.format(dag_id)
+        print('get_dynamic_dag_tasks|sql_query : ', sql_query)
+        results = self.get_multiple_result(sql_query)
+        print('get_dynamic_dag_tasks|results : ', results)
+        dag_tasks = []
+        if results is not None:
+            for result in results:
+                dag_tasks.append({'id': result[0], 'task_name': result[1], 'bash_script': result[2],
+                                  'input_params': json.loads(result[3]), 'timeout': json.loads(result[4])})
+        print('get_dynamic_dag_tasks|dag_tasks : ', dag_tasks)
+        return dag_tasks
 
 
 if __name__ == "__main__":
