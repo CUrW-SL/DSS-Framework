@@ -40,6 +40,37 @@ def end_routine():
     print('******rounting has completed**********')
 
 
+def get_rule_id(context):
+    rule_info = context['task_instance'].xcom_pull(task_ids='init_flo2d_150m')['rule_info']
+    if rule_info:
+        rule_id = rule_info['id']
+        print('get_rule_id|rule_id : ', rule_id)
+        return rule_id
+    else:
+        return None
+
+
+def update_workflow_status(status, rule_id):
+    try:
+        db_config = Variable.get('db_config', deserialize_json=True)
+        try:
+            adapter = RuleEngineAdapter.get_instance(db_config)
+            adapter.update_pump_routing_status(status, rule_id)
+        except Exception as ex:
+            print('update_workflow_status|db_adapter|Exception: ', str(ex))
+    except Exception as e:
+        print('update_workflow_status|db_config|Exception: ', str(e))
+
+
+def on_dag_failure(context):
+    rule_id = get_rule_id(context)
+    if rule_id is not None:
+        update_workflow_status(4, rule_id)
+        print('on_dag_failure|set error status for rule|rule_id :', rule_id)
+    else:
+        print('on_dag_failure|rule_id not found')
+
+
 default_args = {
     'owner': 'dss admin',
     'start_date': datetime.strptime('2020-01-20 04:00:00', '%Y-%m-%d %H:%M:%S'),
