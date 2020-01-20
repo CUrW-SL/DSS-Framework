@@ -26,7 +26,7 @@ def update_workflow_status(status, rule_id):
         db_config = Variable.get('db_config', deserialize_json=True)
         try:
             adapter = RuleEngineAdapter.get_instance(db_config)
-            adapter.update_rule_status_by_id('wrf', rule_id, status)
+            adapter.update_external_bash_routing_status(status, rule_id)
         except Exception as ex:
             print('update_workflow_status|db_adapter|Exception: ', str(ex))
     except Exception as e:
@@ -50,9 +50,8 @@ def set_complete_status(**context):
         print('set_complete_status|rule_id not found')
 
 
-def create_dag(dag_id, schedule, timeout, dag_tasks, default_args):
+def create_dag(dag_id, timeout, dag_tasks, default_args):
     dag = DAG(dag_id, catchup=False,
-              schedule_interval=schedule,
               dagrun_timeout=timeout,
               default_args=default_args)
 
@@ -115,14 +114,24 @@ def generate_external_bash_dag(dss_adapter, dag_rule):
     print('generate_external_bash_dag|dag_rule : ', dag_rule)
     dag_tasks = dss_adapter.get_dynamic_dag_tasks(dag_rule['id'])
     if len(dag_tasks) > 0:
-        schedule = dag_rule['schedule']
         timeout = get_timeout(dag_rule['timeout'])
         default_args = {'owner': 'dss admin',
                         'start_date': datetime(2020, 1, 20)
                         }
         dag_id = dag_rule['dag_name']
         globals()[dag_id] = create_dag(dag_id,
-                                       schedule,
                                        timeout,
                                        dag_tasks,
                                        default_args)
+
+
+def start_creating():
+    db_config = Variable.get('db_config', deserialize_json=True)
+    adapter = RuleEngineAdapter.get_instance(db_config)
+    run_date = datetime.now()
+    routines = adapter.get_external_bash_routines(run_date)
+    for routine in routines:
+        generate_external_bash_dag(adapter, routine)
+
+
+start_creating()
