@@ -12,12 +12,27 @@ from dynamic_external_trigger_operator import DynamicTriggerDagRunOperator
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
-sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/gen_util')
-from controller_util import get_triggering_external_bash_dags
+sys.path.insert(0, '/home/hasitha/PycharmProjects/DSS-Framework/dss_workflow/dags/external_bash')
+from gen_dynamic_dags import generate_external_bash_dag
 
 prod_dag_name = 'external_scheduler_v1'
 schedule_interval = '*/5 * * * *'
 dag_pool = 'external_scheduler_pool'
+
+
+# [{'id': 1, 'dag_name': 'dynamic_dag1', 'schedule': '*/10 * * * *', 'timeout': '"{"hours":0,"minutes":5,"seconds":0}"'}]
+def get_triggering_external_bash_dags(dss_adapter, external_routines):
+    dag_info = []
+    if len(external_routines) > 0:
+        print('get_triggering_external_bash_dags|external_routines : ', external_routines)
+        for external_routine in external_routines:
+            generate_external_bash_dag(dss_adapter, external_routine)
+            dag_name = external_routine['dag_name']
+            payload = external_routine
+            dag_info.append({'dag_name': dag_name, 'payload': payload})
+    else:
+        print('No triggering_variable_dags found.')
+    return dag_info
 
 
 def generate_dag_run(context):
@@ -30,7 +45,7 @@ def generate_dag_run(context):
     print('init_variable_routine|routines : ', routines)
     next_variable_routines = []
     if routines is not None:
-        next_variable_routines = get_triggering_external_bash_dags(routines)
+        next_variable_routines = get_triggering_external_bash_dags(adapter, routines)
     else:
         print('No variable routine to schedule.')
     return next_variable_routines
