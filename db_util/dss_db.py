@@ -482,6 +482,17 @@ class RuleEngineAdapter:
                     self.update_initial_variable_routing_status(1, routine['id'])
         return routines
 
+    def update_pump_routing_status(self, status, routine_id):
+        query = 'update dss.pump_rules set status={} where id=\'{}\''.format(status, routine_id)
+        print('update_pump_routing_status|query : ', query)
+        self.update_query(query)
+
+    def update_initial_pump_routing_status(self, status, routine_id):
+        query = 'update dss.pump_rules set status={},last_trigger_date=now()  ' \
+                'where id=\'{}\''.format(status, routine_id)
+        print('update_initial_pump_routing_status|query : ', query)
+        self.update_query(query)
+
     def get_next_pump_routines(self, schedule_date=datetime.now()):
         if type(schedule_date) is datetime:
             schedule_date = schedule_date
@@ -503,7 +514,7 @@ class RuleEngineAdapter:
             if len(routines) > 0:
                 for routine in routines:
                     print('update_initial_workflow_routing_status.')
-                    self.update_initial_variable_routing_status(1, routine['id'])
+                    self.update_initial_pump_routing_status(1, routine['id'])
         return routines
 
     def get_external_bash_routines(self, schedule_date=datetime.now()):
