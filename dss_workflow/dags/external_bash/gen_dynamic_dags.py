@@ -128,6 +128,7 @@ def generate_external_bash_dag(dss_adapter, dag_rule):
 def start_creating():
     print('start_creating dynamic dags')
     db_config = Variable.get('db_config', deserialize_json=True)
+    print('start_creating|db_config : ', db_config)
     adapter = RuleEngineAdapter.get_instance(db_config)
     run_date = datetime.now()
     routines = adapter.get_external_bash_routines(run_date)
