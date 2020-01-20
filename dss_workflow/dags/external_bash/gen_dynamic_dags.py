@@ -4,7 +4,6 @@ from airflow.models import Variable
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.bash_operator import BashOperator
 import sys
-import subprocess
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
@@ -65,13 +64,15 @@ def create_dag(dag_id, schedule, timeout, dag_tasks, default_args):
             pool=dag_pool
         )
 
+        task_list = [init_task]
         for dag_task in dag_tasks:
-            t2 = BashOperator(
-                task_id='hello_world',
+            task = BashOperator(
+                task_id=dag_task['task_name'],
                 bash_command=get_bash_command(dag_task['bash_script'], dag_task['input_params']),
                 execution_timeout=get_timeout(dag_task['timeout']),
                 pool=dag_pool
             )
+            task_list.append(task)
 
         end_task = PythonOperator(
             task_id='end_task',
@@ -79,6 +80,11 @@ def create_dag(dag_id, schedule, timeout, dag_tasks, default_args):
             python_callable=set_complete_status,
             pool=dag_pool
         )
+
+        task_list.append(end_task)
+
+        for i in range(len(task_list) - 1):
+            task_list[i].set_downstream(task_list[i + 1])
 
     return dag
 
