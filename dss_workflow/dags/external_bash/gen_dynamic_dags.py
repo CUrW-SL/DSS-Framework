@@ -130,8 +130,7 @@ def start_creating():
     db_config = Variable.get('db_config', deserialize_json=True)
     print('start_creating|db_config : ', db_config)
     adapter = RuleEngineAdapter.get_instance(db_config)
-    run_date = datetime.now()
-    routines = adapter.get_external_bash_routines(run_date)
+    routines = adapter.get_all_external_bash_routines()
     for routine in routines:
         generate_external_bash_dag(adapter, routine)
 
