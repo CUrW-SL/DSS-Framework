@@ -609,19 +609,6 @@ class RuleEngineAdapter:
                     self.update_initial_external_bash_routing_status(1, routine['id'])
         return routines
 
-    def get_all_external_bash_routines(self):
-        query = 'select id, dag_name, schedule, timeout from dss.dynamic_dags where status in (1,3);'
-        print('get_all_external_bash_routines|query : ', query)
-        results = self.get_multiple_result(query)
-        routines = []
-        if results is not None:
-            for result in results:
-                print('get_all_external_bash_routines|result : ', result)
-                routines.append({'id': result[0], 'dag_name': result[1], 'schedule': result[2],
-                                 'timeout': json.loads(result[3])})
-        print('get_all_external_bash_routines|routines : ', routines)
-        return routines
-
 
 if __name__ == "__main__":
     db_config = {'mysql_user': 'admin', 'mysql_password': 'floody', 'mysql_host': '35.227.163.211', 'mysql_db': 'dss',

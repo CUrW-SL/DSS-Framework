@@ -1,3 +1,5 @@
+import json
+
 
 def get_triggering_dags(db_adapter, dss_rule_id, model_type):
     """
@@ -170,6 +172,20 @@ def get_triggering_external_bash_dags(external_routines):
     else:
         print('No triggering_external_bash_dags found.')
     return dag_info
+
+
+def get_all_external_bash_routines(dss_adapter):
+    query = 'select id, dag_name, schedule, timeout from dss.dynamic_dags where status in (1,3);'
+    print('get_all_external_bash_routines|query : ', query)
+    results = dss_adapter.get_multiple_result(query)
+    routines = []
+    if results is not None:
+        for result in results:
+            print('get_all_external_bash_routines|result : ', result)
+            routines.append({'id': result[0], 'dag_name': result[1], 'schedule': result[2],
+                             'timeout': json.loads(result[3])})
+    print('get_all_external_bash_routines|routines : ', routines)
+    return routines
 
 
 def set_running_state(db_adapter, routine_id):

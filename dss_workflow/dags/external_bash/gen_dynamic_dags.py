@@ -5,6 +5,9 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.operators.bash_operator import BashOperator
 import sys
 
+sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/gen_util')
+from controller_util import get_all_external_bash_routines
+
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
@@ -130,8 +133,7 @@ def start_creating():
     db_config = Variable.get('db_config', deserialize_json=True)
     print('start_creating|db_config : ', db_config)
     adapter = RuleEngineAdapter.get_instance(db_config)
-    adapter.get_location_names_from_rule_variables('Precipitation')
-    routines = adapter.get_all_external_bash_routines()
+    routines = get_all_external_bash_routines(adapter)
     if len(routines) > 0:
         for routine in routines:
             generate_external_bash_dag(adapter, routine)
