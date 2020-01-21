@@ -38,6 +38,8 @@ def update_workflow_status(status, rule_id):
 
 def set_running_status(**context):
     print('set_running_status|context : ', context)
+    params = context['params']
+    print('set_running_status|params : ', params)
     routine_id = get_rule_id(context)
     print('set_running_status|routine_id :', routine_id)
     if routine_id is not None:
@@ -48,6 +50,8 @@ def set_running_status(**context):
 
 def set_complete_status(**context):
     print('set_complete_status|context : ', context)
+    params = context['params']
+    print('set_running_status|params : ', params)
     routine_id = get_rule_id(context)
     print('set_complete_status|routine_id :', routine_id)
     if routine_id is not None:
