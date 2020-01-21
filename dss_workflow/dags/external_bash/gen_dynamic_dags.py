@@ -36,7 +36,7 @@ def update_workflow_status(status, rule_id):
         print('update_workflow_status|db_config|Exception: ', str(e))
 
 
-def set_running_status(**context):
+def set_running_status(context):
     print('set_running_status|context : ', context)
     routine_id = get_rule_id(context)
     print('set_running_status|routine_id :', routine_id)
@@ -46,7 +46,7 @@ def set_running_status(**context):
         print('set_running_status|rule_id not found')
 
 
-def set_complete_status(**context):
+def set_complete_status(context):
     print('set_complete_status|context : ', context)
     routine_id = get_rule_id(context)
     print('set_complete_status|routine_id :', routine_id)
