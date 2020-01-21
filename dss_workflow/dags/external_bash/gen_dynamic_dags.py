@@ -144,6 +144,8 @@ def generate_external_bash_dag(dss_adapter, dag_rule):
             'start_date': datetime.utcnow(),
             'email': ['hasithadkr7@gmail.com'],
             'email_on_failure': True,
+            'retries': 1,
+            'retry_delay': timedelta(seconds=30)
         }
         params = dag_rule
         dag_id = dag_rule['dag_name']
