@@ -188,6 +188,25 @@ def get_all_external_bash_routines(dss_adapter):
     return routines
 
 
+def get_dynamic_dag_tasks(dss_adapter, dag_id):
+    sql_query = 'select id, task_name, bash_script, input_params, timeout ' \
+                'from dss.dynamic_tasks where active=1 and dag_id={} order by task_order asc;'.format(dag_id)
+    print('get_dynamic_dag_tasks|sql_query : ', sql_query)
+    results = dss_adapter.get_multiple_result(sql_query)
+    print('get_dynamic_dag_tasks|results : ', results)
+    dag_tasks = []
+    if results is not None:
+        for result in results:
+            if result[3]:
+                dag_tasks.append({'id': result[0], 'task_name': result[1], 'bash_script': result[2],
+                                  'input_params': json.loads(result[3]), 'timeout': json.loads(result[4])})
+            else:
+                dag_tasks.append({'id': result[0], 'task_name': result[1], 'bash_script': result[2],
+                                  'input_params': result[3], 'timeout': json.loads(result[4])})
+    print('get_dynamic_dag_tasks|dag_tasks : ', dag_tasks)
+    return dag_tasks
+
+
 def set_running_state(db_adapter, routine_id):
     print('set_running_state|routine_id: ', routine_id)
     db_adapter.update_workflow_routing_status(2, routine_id)

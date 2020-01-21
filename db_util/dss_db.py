@@ -555,7 +555,6 @@ class RuleEngineAdapter:
         print('evaluate_variable_rule_logic|location_names : ', location_names)
         return location_names
 
-    # Dynamic dag creation.
     def get_dynamic_dag_tasks(self, dag_id):
         sql_query = 'select id, task_name, bash_script, input_params, timeout ' \
                     'from dss.dynamic_tasks where active=1 and dag_id={} order by task_order asc;'.format(dag_id)

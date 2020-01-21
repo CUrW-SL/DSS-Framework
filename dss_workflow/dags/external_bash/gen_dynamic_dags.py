@@ -6,7 +6,7 @@ from airflow.operators.bash_operator import BashOperator
 import sys
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/gen_util')
-from controller_util import get_all_external_bash_routines
+from controller_util import get_all_external_bash_routines, get_dynamic_dag_tasks
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
@@ -115,7 +115,7 @@ def get_timeout(timeout):
 
 def generate_external_bash_dag(dss_adapter, dag_rule):
     print('generate_external_bash_dag|dag_rule : ', dag_rule)
-    dag_tasks = dss_adapter.get_dynamic_dag_tasks(dag_rule['id'])
+    dag_tasks = get_dynamic_dag_tasks(dss_adapter, dag_rule['id'])
     if len(dag_tasks) > 0:
         timeout = get_timeout(dag_rule['timeout'])
         default_args = {'owner': 'dss admin',
