@@ -60,11 +60,23 @@ def set_complete_status(**context):
         print('set_complete_status|rule_id not found')
 
 
+def on_dag_failure(**context):
+    params = context['params']
+    print('set_running_status|params : ', params)
+    rule_id = params['id']
+    if rule_id is not None:
+        update_workflow_status(4, rule_id)
+        print('on_dag_failure|set error status for rule|rule_id :', rule_id)
+    else:
+        print('on_dag_failure|rule_id not found')
+
+
 def create_dag(dag_id, params, timeout, dag_tasks, default_args):
     dag = DAG(dag_id, catchup=False,
               dagrun_timeout=timeout,
               schedule_interval=None,
               params=params,
+              on_failure_callback=on_dag_failure,
               default_args=default_args)
 
     with dag:
