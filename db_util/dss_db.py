@@ -628,4 +628,6 @@ if __name__ == "__main__":
                  'log_path': '/home/hasitha/PycharmProjects/DSS-Framework/log'}
     adapter = RuleEngineAdapter.get_instance(db_config)
     print(adapter)
-    adapter.get_location_names_from_rule_variables('Precipitation')
+    # adapter.get_location_names_from_rule_variables('Precipitation')
+    adapter.get_all_external_bash_routines()
+    adapter.get_external_bash_routines(datetime.now())
