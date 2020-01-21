@@ -125,9 +125,9 @@ def get_bash_command(bash_script, input_params):
             input_str = ' '.join(inputs)
             return '{} {}'.format(bash_script, input_str)
         else:
-            return '{}'.format(bash_script)
+            return bash_script
     else:
-        return '{}'.format(bash_script)
+        return bash_script
 
 
 def get_timeout(timeout):
