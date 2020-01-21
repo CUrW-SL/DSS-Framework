@@ -159,7 +159,6 @@ def get_triggering_variable_dags(variable_routines):
         print('No triggering_variable_dags found.')
     return dag_info
 
-
 # [{'id': 1, 'dag_name': 'dynamic_dag1', 'schedule': '*/10 * * * *', 'timeout': '"{"hours":0,"minutes":5,"seconds":0}"'}]
 def get_triggering_external_bash_dags(external_routines):
     dag_info = []

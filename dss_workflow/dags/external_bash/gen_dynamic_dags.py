@@ -40,7 +40,7 @@ def set_running_status(**context):
     print('set_running_status|context : ', context)
     params = context['params']
     print('set_running_status|params : ', params)
-    routine_id = ''
+    routine_id = params['id']
     print('set_running_status|routine_id :', routine_id)
     if routine_id is not None:
         update_workflow_status(2, routine_id)
@@ -52,7 +52,7 @@ def set_complete_status(**context):
     print('set_complete_status|context : ', context)
     params = context['params']
     print('set_running_status|params : ', params)
-    routine_id = ''
+    routine_id = params['id']
     print('set_complete_status|routine_id :', routine_id)
     if routine_id is not None:
         update_workflow_status(3, routine_id)
