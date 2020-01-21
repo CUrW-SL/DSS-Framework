@@ -130,6 +130,7 @@ def start_creating():
     db_config = Variable.get('db_config', deserialize_json=True)
     print('start_creating|db_config : ', db_config)
     adapter = RuleEngineAdapter.get_instance(db_config)
+    adapter.get_location_names_from_rule_variables('Precipitation')
     routines = adapter.get_all_external_bash_routines()
     if len(routines) > 0:
         for routine in routines:
