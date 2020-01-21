@@ -590,7 +590,7 @@ class RuleEngineAdapter:
         else:
             schedule_date = datetime.strptime(schedule_date, '%Y-%m-%d %H:%M:%S')
         print('schedule_date : ', schedule_date)
-        query = 'select id, dag_name, schedule, timeout from dss.dynamic_dags where status in (1,3);'
+        query = 'select id, dag_name, schedule, timeout from dss.dynamic_dags where status in (1,3,4);'
         print('get_external_bash_routines|query : ', query)
         results = self.get_multiple_result(query)
         routines = []
