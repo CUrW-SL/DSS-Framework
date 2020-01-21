@@ -65,7 +65,6 @@ def create_dag(dag_id, timeout, dag_tasks, default_args):
     with dag:
         init_task = PythonOperator(
             task_id='init_task',
-            provide_context=True,
             python_callable=set_running_status,
             pool=dag_pool
         )
@@ -82,7 +81,6 @@ def create_dag(dag_id, timeout, dag_tasks, default_args):
 
         end_task = PythonOperator(
             task_id='end_task',
-            provide_context=True,
             python_callable=set_complete_status,
             pool=dag_pool
         )
