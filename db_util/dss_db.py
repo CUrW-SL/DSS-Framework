@@ -517,54 +517,6 @@ class RuleEngineAdapter:
                     self.update_initial_pump_routing_status(1, routine['id'])
         return routines
 
-    def update_initial_external_bash_routing_status(self, status, routine_id):
-        query = 'update dss.dynamic_dags set status={},last_trigger_date=now()  ' \
-                'where id=\'{}\''.format(status, routine_id)
-        print('update_initial_external_bash_routing_status|query : ', query)
-        self.update_query(query)
-
-    def update_external_bash_routing_status(self, status, routine_id):
-        query = 'update dss.dynamic_dags set status={} where id=\'{}\''.format(status, routine_id)
-        print('update_external_bash_routing_status|query : ', query)
-        self.update_query(query)
-
-    def get_external_bash_routines(self, schedule_date=datetime.now()):
-        if type(schedule_date) is datetime:
-            schedule_date = schedule_date
-        else:
-            schedule_date = datetime.strptime(schedule_date, '%Y-%m-%d %H:%M:%S')
-        print('schedule_date : ', schedule_date)
-        query = 'select id, dag_name, schedule, timeout from dss.dynamic_dags where status in (1,3);'
-        print('get_external_bash_routines|query : ', query)
-        results = self.get_multiple_result(query)
-        routines = []
-        if results is not None:
-            for result in results:
-                print('get_external_bash_routines|result : ', result)
-                routines.append({'id': result[0], 'dag_name': result[1], 'schedule': result[2],
-                                 'timeout': json.loads(result[3])})
-        print('get_external_bash_routines|routines : ', routines)
-        if len(routines) > 0:
-            routines = get_next_scheduled_routines(schedule_date, routines)
-            if len(routines) > 0:
-                for routine in routines:
-                    print('update_initial_workflow_routing_status.')
-                    self.update_initial_external_bash_routing_status(1, routine['id'])
-        return routines
-
-    def get_all_external_bash_routines(self):
-        query = 'select id, dag_name, schedule, timeout from dss.dynamic_dags where status in (1,3);'
-        print('get_all_external_bash_routines|query : ', query)
-        results = self.get_multiple_result(query)
-        routines = []
-        if results is not None:
-            for result in results:
-                print('get_all_external_bash_routines|result : ', result)
-                routines.append({'id': result[0], 'dag_name': result[1], 'schedule': result[2],
-                                 'timeout': json.loads(result[3])})
-        print('get_all_external_bash_routines|routines : ', routines)
-        return routines
-
     def get_location_names_from_rule_variables(self, variable_type):
         print('get_location_names_from_rule_variables|variable_type : ', variable_type)
         query = 'select location_name from dss.rule_variables where variable_type=\'{}\';'.format(variable_type)
@@ -621,6 +573,54 @@ class RuleEngineAdapter:
                                       'input_params': result[3], 'timeout': json.loads(result[4])})
         print('get_dynamic_dag_tasks|dag_tasks : ', dag_tasks)
         return dag_tasks
+
+    def update_initial_external_bash_routing_status(self, status, routine_id):
+        query = 'update dss.dynamic_dags set status={},last_trigger_date=now()  ' \
+                'where id=\'{}\''.format(status, routine_id)
+        print('update_initial_external_bash_routing_status|query : ', query)
+        self.update_query(query)
+
+    def update_external_bash_routing_status(self, status, routine_id):
+        query = 'update dss.dynamic_dags set status={} where id=\'{}\''.format(status, routine_id)
+        print('update_external_bash_routing_status|query : ', query)
+        self.update_query(query)
+
+    def get_external_bash_routines(self, schedule_date=datetime.now()):
+        if type(schedule_date) is datetime:
+            schedule_date = schedule_date
+        else:
+            schedule_date = datetime.strptime(schedule_date, '%Y-%m-%d %H:%M:%S')
+        print('schedule_date : ', schedule_date)
+        query = 'select id, dag_name, schedule, timeout from dss.dynamic_dags where status in (1,3);'
+        print('get_external_bash_routines|query : ', query)
+        results = self.get_multiple_result(query)
+        routines = []
+        if results is not None:
+            for result in results:
+                print('get_external_bash_routines|result : ', result)
+                routines.append({'id': result[0], 'dag_name': result[1], 'schedule': result[2],
+                                 'timeout': json.loads(result[3])})
+        print('get_external_bash_routines|routines : ', routines)
+        if len(routines) > 0:
+            routines = get_next_scheduled_routines(schedule_date, routines)
+            if len(routines) > 0:
+                for routine in routines:
+                    print('update_initial_workflow_routing_status.')
+                    self.update_initial_external_bash_routing_status(1, routine['id'])
+        return routines
+
+    def get_all_external_bash_routines(self):
+        query = 'select id, dag_name, schedule, timeout from dss.dynamic_dags where status in (1,3);'
+        print('get_all_external_bash_routines|query : ', query)
+        results = self.get_multiple_result(query)
+        routines = []
+        if results is not None:
+            for result in results:
+                print('get_all_external_bash_routines|result : ', result)
+                routines.append({'id': result[0], 'dag_name': result[1], 'schedule': result[2],
+                                 'timeout': json.loads(result[3])})
+        print('get_all_external_bash_routines|routines : ', routines)
+        return routines
 
 
 if __name__ == "__main__":
