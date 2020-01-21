@@ -56,10 +56,11 @@ def set_complete_status(**context):
         print('set_complete_status|rule_id not found')
 
 
-def create_dag(dag_id, timeout, dag_tasks, default_args):
+def create_dag(dag_id, params, timeout, dag_tasks, default_args):
     dag = DAG(dag_id, catchup=False,
               dagrun_timeout=timeout,
               schedule_interval=None,
+              params=params,
               default_args=default_args)
 
     with dag:
@@ -128,8 +129,9 @@ def generate_external_bash_dag(dss_adapter, dag_rule):
             'email': ['hasithadkr7@gmail.com'],
             'email_on_failure': True,
         }
+        params = dag_rule
         dag_id = dag_rule['dag_name']
-        globals()[dag_id] = create_dag(dag_id,
+        globals()[dag_id] = create_dag(dag_id, params,
                                        timeout,
                                        dag_tasks,
                                        default_args)
