@@ -56,6 +56,7 @@ def set_complete_status(**context):
 def create_dag(dag_id, timeout, dag_tasks, default_args):
     dag = DAG(dag_id, catchup=False,
               dagrun_timeout=timeout,
+              schedule_interval=None,
               default_args=default_args)
 
     with dag:
@@ -119,7 +120,7 @@ def generate_external_bash_dag(dss_adapter, dag_rule):
     if len(dag_tasks) > 0:
         timeout = get_timeout(dag_rule['timeout'])
         default_args = {'owner': 'dss admin',
-                        'start_date': datetime(2020, 1, 20)
+                        'start_date': datetime.utcnow()
                         }
         dag_id = dag_rule['dag_name']
         globals()[dag_id] = create_dag(dag_id,
