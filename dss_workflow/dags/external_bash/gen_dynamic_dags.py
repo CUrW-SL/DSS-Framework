@@ -36,19 +36,24 @@ def update_workflow_status(status, rule_id):
         print('update_workflow_status|db_config|Exception: ', str(e))
 
 
-def set_running_status(**context):
-    rule_id = get_rule_id(context)
-    print('set_running_status :', )
-    if rule_id is not None:
-        update_workflow_status(2, rule_id)
+def set_running_status(dag_run, **kwargs):
+    print('set_running_status|dag_run.conf : ', dag_run.conf)
+    routine = dag_run.conf
+    routine_id = routine['id']
+    print('set_running_status|routine_id :', routine_id)
+    if routine_id is not None:
+        update_workflow_status(2, routine_id)
     else:
         print('set_running_status|rule_id not found')
 
 
-def set_complete_status(**context):
-    rule_id = get_rule_id(context)
-    if rule_id is not None:
-        update_workflow_status(3, rule_id)
+def set_complete_status(dag_run, **kwargs):
+    print('set_complete_status|dag_run.conf : ', dag_run.conf)
+    routine = dag_run.conf
+    routine_id = routine['id']
+    print('set_complete_status|routine_id :', routine_id)
+    if routine_id is not None:
+        update_workflow_status(3, routine_id)
     else:
         print('set_complete_status|rule_id not found')
 
