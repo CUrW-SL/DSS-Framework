@@ -41,7 +41,7 @@ def end_routine():
 
 
 def get_rule_id(context):
-    rule_info = context['task_instance'].xcom_pull(task_ids='init_flo2d_150m')['rule_info']
+    rule_info = context['task_instance'].xcom_pull(task_ids='gen_target_dag_run')['rule_info']
     if rule_info:
         rule_id = rule_info['id']
         print('get_rule_id|rule_id : ', rule_id)
