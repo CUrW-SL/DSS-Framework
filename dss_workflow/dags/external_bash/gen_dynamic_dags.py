@@ -124,9 +124,12 @@ def generate_external_bash_dag(dss_adapter, dag_rule):
     dag_tasks = get_dynamic_dag_tasks(dss_adapter, dag_rule['id'])
     if len(dag_tasks) > 0:
         timeout = get_timeout(dag_rule['timeout'])
-        default_args = {'owner': 'dss admin',
-                        'start_date': datetime.utcnow()
-                        }
+        default_args = {
+            'owner': 'dss admin',
+            'start_date': datetime.utcnow(),
+            'email': ['hasithadkr7@gmail.com'],
+            'email_on_failure': True,
+        }
         dag_id = dag_rule['dag_name']
         globals()[dag_id] = create_dag(dag_id,
                                        timeout,
