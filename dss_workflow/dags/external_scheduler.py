@@ -104,3 +104,4 @@ with DAG(dag_id=prod_dag_name, default_args=default_args,
     )
 
     scheduler_init >> gen_target_dag_run >> scheduler_end
+

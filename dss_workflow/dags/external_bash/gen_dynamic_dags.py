@@ -14,16 +14,6 @@ from dss_db import RuleEngineAdapter
 dag_pool = 'external_dag_pool'
 
 
-def get_rule_id(context):
-    rule_info = context['task_instance'].xcom_pull(task_ids='init_task')['rule_info']
-    if rule_info:
-        rule_id = rule_info['id']
-        print('get_rule_id|rule_id : ', rule_id)
-        return rule_id
-    else:
-        return None
-
-
 def update_workflow_status(status, rule_id):
     try:
         db_config = Variable.get('db_config', deserialize_json=True)
@@ -43,7 +33,7 @@ def set_running_status(**context):
     routine_id = params['id']
     print('set_running_status|routine_id :', routine_id)
     if routine_id is not None:
-        update_workflow_status(2, routine_id)
+        update_workflow_status(1, routine_id)
     else:
         print('set_running_status|rule_id not found')
 
