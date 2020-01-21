@@ -93,6 +93,7 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
                 task_id=dag_task['task_name'],
                 bash_command=get_bash_command(dag_task['bash_script'], dag_task['input_params']),
                 execution_timeout=get_timeout(dag_task['timeout']),
+                on_failure_callback=on_dag_failure,
                 pool=dag_pool
             )
             task_list.append(task)
