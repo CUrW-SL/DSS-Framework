@@ -1,0 +1,37 @@
+&share
+ wrf_core = '{WRF_CORE}',
+ max_dom = {MAX_DOM},
+ start_date = 'YYYY1-MM1-DD1_hh1:mm1:00','YYYY1-MM1-DD1_hh1:mm1:00','YYYY1-MM1-DD1_hh1:mm1:00',
+ end_date   = 'YYYY2-MM2-DD2_hh2:mm2:00','YYYY2-MM2-DD2_hh2:mm2:00','YYYY2-MM2-DD2_hh2:mm2:00',
+ interval_seconds = {INTERVAL_SECONDS},
+ io_form_geogrid = {IO_FORM_GEOGRID},
+/
+
+&geogrid
+ parent_id         =   {PARENT_ID},
+ parent_grid_ratio =   {PARENT_GRID_RATIO},
+ i_parent_start    =   {IPARENT_START},
+ j_parent_start    =   {JPARENT_START},
+ e_we              =  {E_WE},
+ e_sn              =  {E_SN},
+ geog_data_res     = {GEOG_DATA_RES},
+ dx = {DX},
+ dy = {DY},
+ map_proj = '{MAP_PROJ}',
+ ref_lat   =  {REF_LAT},
+ ref_lon   =  {REF_LON},
+ truelat1  =  {TRUELAT1},
+ truelat2  =  {TRUELAT2},
+ stand_lon =  {STAND_LON},
+ geog_data_path = '{GEOG_DATA_PATH}'
+/
+
+&ungrib
+ out_format = '{OUT_FORMAT}',
+ prefix = '{PREFIX}',
+/
+
+&metgrid
+ fg_name = '{FG_NAME}'
+ io_form_metgrid = {IO_FORM_METGRID},
+/
