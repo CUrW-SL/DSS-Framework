@@ -1,0 +1,107 @@
+&time_control
+ run_days                            = {RUN_DAYS},
+ run_hours                           = {RUN_HOURS},
+ run_minutes                         = {RUN_MINUTES},
+ run_seconds                         = {RUN_SECONDS},
+ start_year                          = YYYY1, YYYY1,  YYYY1,
+ start_month                         = MM1, MM1,  MM1,
+ start_day                           = DD1, DD1,  DD1,
+ start_hour                          = hh1,   hh1,   hh1,
+ start_minute                        = mm1,   mm1,   mm1,
+ start_second                        = 00,   00,   00,
+ end_year                            = YYYY2, YYYY2,  YYYY2,
+ end_month                           = MM2, MM2,  MM2,
+ end_day                             = DD2, DD2,  DD2,
+ end_hour                            = hh2,   hh2,   hh2,
+ end_minute                          = mm2,   mm2,   mm2,
+ end_second                          = 00,   00,   00,
+ interval_seconds                    = {INTERVAL_SECONDS}
+ input_from_file                     = {INPUT_FROM_FILE},
+ history_interval                    = {HISTORY_INTERVAL},
+ frames_per_outfile                  = {FRAMES_PER_OUTFILE},
+ restart                             = {RESTART},
+ restart_interval                    = {RESTART_INTERVAL},
+ io_form_history                     = {IO_FORM_HISTORY}
+ io_form_restart                     = {IO_FORM_RESTART}
+ io_form_input                       = {IO_FORM_INPUT}
+ io_form_boundary                    = {IO_FORM_BOUNDARY}
+ debug_level                         = {DEBUG_LEVEL}
+ /
+
+ &domains
+ time_step                           = {TIME_STEP},
+ time_step_fract_num                 = {TIME_STEP_FRAC_NUM},
+ time_step_fract_den                 = {TIME_STEP_FRAC_DEN},
+ max_dom                             = {MAX_DOM},
+ e_we                                = {E_WE},
+ e_sn                                = {E_SN},
+ e_vert                              = {E_VERT},
+ p_top_requested                     = {P_TOP_REQUESTED},
+ num_metgrid_levels                  = {NUM_METGRID_LEVELS},
+ num_metgrid_soil_levels             = {NUM_METGRID_SOIL_LEVELS},
+ dx                                  = {DX},
+ dy                                  = {DY},
+ grid_id                             = {GRID_ID},
+ parent_id                           = {PARENT_ID},
+ i_parent_start                      = {IPARENT_START},
+ j_parent_start                      = {JPARENT_START},
+ parent_grid_ratio                   = {PARENT_GRID_RATIO},
+ parent_time_step_ratio              = {PARENT_TIME_STEP_RATIO},
+ feedback                            = {FEEDBACK},
+ smooth_option                       = {SMOOTH_OPTION}
+/
+
+ &physics
+ mp_physics                          = {MP_PHYSICS},
+ ra_lw_physics                       = {RA_LW_PHYSICS},
+ ra_sw_physics                       = {RA_SW_PHYSICS},
+ radt                                = {RADT},
+ sf_sfclay_physics                   = {SF_SFCLAY_PHYSICS},
+ sf_surface_physics                  = {SF_SURFACE_PHYSICS},
+ bl_pbl_physics                      = {BL_PBL_PHYSICS},
+ bldt                                = {BLDT},
+ cu_physics                          = {CU_PHYSICS},
+ cudt                                = {CUDT},
+ isfflx                              = {ISFFLX},
+ ifsnow                              = {IFSNOW},
+ icloud                              = {ICLOUD},
+ surface_input_source                = {SURFACE_INPUT_SOURCE},
+ num_soil_layers                     = {NUM_SOIL_LAYERS},
+ sf_urban_physics                    = {SF_URBAN_PHYSICS},
+ /
+
+ &fdda
+ /
+
+ &dynamics
+ w_damping                           = {W_DAMPING},
+ diff_opt                            = {DIFF_OPT},
+ km_opt                              = {KM_OPT},
+ diff_6th_opt                        = {DIFF_6TH_OPT},
+ diff_6th_factor                     = {DIFF_6TH_FACTOR},
+ base_temp                           = {BASE_TEMP}.
+ damp_opt                            = {DAMP_OPT},
+ zdamp                               = {ZDAMP},
+ dampcoef                            = {DAMPCOEF}
+ khdif                               = {KHDIF},
+ kvdif                               = {KVDIF},
+ non_hydrostatic                     = {NON_HYDROSTATIC},
+ moist_adv_opt                       = {MOIST_ADV_OPT},
+ scalar_adv_opt                      = {SCALAR_ADV_OPT},
+ /
+
+ &bdy_control
+ spec_bdy_width                      = {SPEC_BDY_WIDTH},
+ spec_zone                           = {SPEC_ZONE},
+ relax_zone                          = {RELAX_ZONE},
+ specified                           = {SPECIFIED},
+ nested                              = {NESTED},
+ /
+
+ &grib2
+ /
+
+ &namelist_quilt
+ nio_tasks_per_group = {NIO_TASKS_PER_GROUP},
+ nio_groups = {NIO_GROUP},
+ /
