@@ -174,7 +174,8 @@ def get_triggering_external_bash_dags(external_routines):
 
 
 def get_all_external_bash_routines(dss_adapter):
-    query = 'select id, dag_name, schedule, timeout from dss.dynamic_dags where status in (1,3,4);'
+    query = 'select id, dag_name, schedule, timeout from dss.dynamic_dags;'
+    # query = 'select id, dag_name, schedule, timeout from dss.dynamic_dags where status in (1,3,4);'
     print('get_all_external_bash_routines|query : ', query)
     results = dss_adapter.get_multiple_result(query)
     routines = []
