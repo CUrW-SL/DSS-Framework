@@ -33,7 +33,7 @@ def set_running_status(**context):
     routine_id = params['id']
     print('set_running_status|routine_id :', routine_id)
     if routine_id is not None:
-        update_workflow_status(1, routine_id)
+        update_workflow_status(2, routine_id)
     else:
         print('set_running_status|rule_id not found')
 
