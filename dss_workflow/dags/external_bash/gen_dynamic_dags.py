@@ -50,7 +50,7 @@ def set_complete_status(**context):
         print('set_complete_status|rule_id not found')
 
 
-def on_dag_failure(**context):
+def on_dag_failure(context):
     params = context['params']
     print('set_running_status|params : ', params)
     rule_id = params['id']
