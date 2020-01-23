@@ -658,7 +658,7 @@ class RuleEngineAdapter:
                 'i_parent_start, j_parent_start, e_we, e_sn, geog_data_res, dx, ' \
                 'dy, map_proj, ref_lat, ref_lon, truelat1, truelat2, ' \
                 'stand_lon, geog_data_path, out_format, prefix, fg_name, io_form_metgrid ' \
-                'from dss.namelist_input_config where id={};'.format(config_id)
+                'from dss.namelist_wps_config where id={};'.format(config_id)
         print('get_namelist_input_configs|query: ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
@@ -684,6 +684,7 @@ if __name__ == "__main__":
     adapter = RuleEngineAdapter.get_instance(db_config)
     print(adapter)
     # adapter.get_location_names_from_rule_variables('Precipitation')
-    adapter.get_all_external_bash_routines()
-    adapter.get_external_bash_routines(datetime.now())
-
+    # adapter.get_all_external_bash_routines()
+    # adapter.get_external_bash_routines(datetime.now())
+    adapter.get_namelist_input_configs(1)
+    adapter.get_namelist_wps_configs(1)
