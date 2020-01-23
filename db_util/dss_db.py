@@ -627,28 +627,33 @@ class RuleEngineAdapter:
         result = self.cursor.fetchone()
         print('get_namelist_input_configs|result : ', result)
         if result is not None:
-            wps_config = {'id': result[0], 'run_days': result[1], 'run_minutes': result[2],
-                          'run_seconds': result[3], 'interval_seconds': result[4],
-                          'input_from_file': result[5], 'history_interval': result[6], 'frames_per_outfile': result[7],
-                          'restart': result[8], 'restart_interval': result[9], 'io_form_history': result[10],
-                          'io_form_restart': result[11], 'io_form_input': result[12], 'io_form_boundary': result[13],
-                          'debug_level': result[14], 'time_step': result[15], 'time_step_fract_num': result[16],
-                          'time_step_fract_den': result[17], 'max_dom': result[18], 'e_we': result[19],
-                          'e_sn': result[20], 'e_vert': result[21], 'p_top_requested': result[22],
-                          'num_metgrid_levels': result[23], 'num_metgrid_soil_levels': result[24], 'dx': result[25],
-                          'dy': result[26], 'grid_id': result[27], 'parent_id': result[28],
-                          'i_parent_start': result[29], 'j_parent_start': result[30], 'parent_grid_ratio': result[31],
-                          'parent_time_step_ratio': result[32], 'feedback': result[33], 'smooth_option': result[34],
-                          'mp_physics': result[35], 'ra_lw_physics': result[36], 'ra_sw_physics': result[37],
-                          'radt': result[38], 'sf_sfclay_physics': result[39], 'sf_surface_physics': result[40],
-                          'bl_pbl_physics': result[41], 'w_damping': result[42], 'diff_opt': result[43],
-                          'km_opt': result[44], 'diff_6th_opt': result[45], 'diff_6th_factor': result[46],
-                          'base_temp': result[47], 'damp_opt': result[48], 'zdamp': result[49],
-                          'dampcoef': result[50], 'khdif': result[51], 'kvdif': result[52],
-                          'non_hydrostatic': result[53], 'moist_adv_opt': result[54], 'scalar_adv_opt': result[55],
-                          'spec_bdy_width': result[56], 'spec_zone': result[57], 'relax_zone': result[58],
-                          'specified': result[59], 'nested': result[60], 'nio_tasks_per_group': result[61],
-                          'nio_groups': result[62]}
+            wps_config = {'id': result[0], 'run_days': result[1], 'run_hours': result[2], 'run_minutes': result[3],
+                          'run_seconds': result[4], 'interval_seconds': result[5],
+                          'input_from_file': result[6], 'history_interval': result[7], 'frames_per_outfile': result[8],
+                          'restart': result[9], 'restart_interval': result[10], 'io_form_history': result[11],
+                          'io_form_restart': result[12], 'io_form_input': result[13], 'io_form_boundary': result[14],
+                          'debug_level': result[15], 'time_step': result[16], 'time_step_fract_num': result[17],
+                          'time_step_fract_den': result[18], 'max_dom': result[19], 'e_we': result[20],
+                          'e_sn': result[21], 'e_vert': result[22], 'p_top_requested': result[23],
+                          'num_metgrid_levels': result[24], 'num_metgrid_soil_levels': result[25], 'dx': result[26],
+                          'dy': result[27], 'grid_id': result[28], 'parent_id': result[29],
+                          'i_parent_start': result[30], 'j_parent_start': result[31], 'parent_grid_ratio': result[32],
+                          'parent_time_step_ratio': result[33], 'feedback': result[34], 'smooth_option': result[35],
+                          'mp_physics': result[36], 'ra_lw_physics': result[37], 'ra_sw_physics': result[38],
+                          'radt': result[39], 'sf_sfclay_physics': result[40], 'sf_surface_physics': result[41],
+                          'bl_pbl_physics': result[42], 'bldt': result[43], 'cu_physics': result[44],
+                          'cudt': result[45],
+                          'isfflx': result[46], 'ifsnow': result[47], 'icloud': result[48],
+                          'surface_input_source': result[49], 'num_soil_layers': result[50],
+                          'sf_urban_physics': result[51],
+                          'w_damping': result[52], 'diff_opt': result[53],
+                          'km_opt': result[54], 'diff_6th_opt': result[55], 'diff_6th_factor': result[56],
+                          'base_temp': result[57], 'damp_opt': result[58], 'zdamp': result[59],
+                          'dampcoef': result[60], 'khdif': result[61], 'kvdif': result[62],
+                          'non_hydrostatic': result[63], 'moist_adv_opt': result[64], 'scalar_adv_opt': result[65],
+                          'spec_bdy_width': result[66], 'spec_zone': result[67], 'relax_zone': result[68],
+                          'specified': result[69], 'nested': result[70], 'nio_tasks_per_group': result[71],
+                          'nio_groups': result[72]}
             return wps_config
         else:
             return None
@@ -665,10 +670,10 @@ class RuleEngineAdapter:
                 'dy, map_proj, ref_lat, ref_lon, truelat1, truelat2, ' \
                 'stand_lon, geog_data_path, out_format, prefix, fg_name, io_form_metgrid ' \
                 'from dss.namelist_wps_config where id={};'.format(config_id)
-        print('get_namelist_input_configs|query: ', query)
+        print('get_namelist_wps_configs|query: ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
-        print('get_namelist_input_configs|result : ', result)
+        print('get_namelist_wps_configs|result : ', result)
         if result is not None:
             wps_config = {'id': result[0], 'wrf_core': result[1], 'max_dom': result[2],
                           'interval_seconds': result[3], 'io_form_geogrid': result[4],
