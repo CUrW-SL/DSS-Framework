@@ -444,7 +444,9 @@ class RuleEngineAdapter:
             accuracy_rule = {'id': result[0], 'model_type': result[1], 'model': result[2],
                              'observed_stations': result[3], 'allowed_error': result[4],
                              'rule_accuracy': result[4]}
-        return accuracy_rule
+            return accuracy_rule
+        else:
+            return None
 
     # ---------------------------Variable routine-----------------------------
     def update_variable_routing_status(self, status, routine_id):
@@ -607,6 +609,24 @@ class RuleEngineAdapter:
                     print('update_initial_workflow_routing_status.')
                     self.update_initial_external_bash_routing_status(1, routine['id'])
         return routines
+
+    def get_namelist_wps_configs(self, config_id):
+        query = 'select id,model_type, model, observed_stations, allowed_error, rule_accuracy ' \
+                'from dss.accuracy_rules where id={};'.format(rule_id)
+        print('get_namelist_wps_configs|query: ', query)
+        self.cursor.execute(query)
+        result = self.cursor.fetchone()
+        print('get_namelist_wps_configs|result : ', result)
+        if result is not None:
+            wps_config = {'id': result[0], 'model_type': result[1], 'model': result[2],
+                          'observed_stations': result[3], 'allowed_error': result[4],
+                          'rule_accuracy': result[4]}
+            return wps_config
+        else:
+            return None
+
+    def get_namelist_input_configs(self, config_id):
+        print('')
 
 
 if __name__ == "__main__":
