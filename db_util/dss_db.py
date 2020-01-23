@@ -654,7 +654,28 @@ class RuleEngineAdapter:
             return None
 
     def get_namelist_wps_configs(self, config_id):
-        print('')
+        query = 'select id,wrf_core, max_dom, interval_seconds, io_form_geogrid, parent_id, parent_grid_ratio, ' \
+                'i_parent_start, j_parent_start, e_we, e_sn, geog_data_res, dx, ' \
+                'dy, map_proj, ref_lat, ref_lon, truelat1, truelat2, ' \
+                'stand_lon, geog_data_path, out_format, prefix, fg_name, io_form_metgrid ' \
+                'from dss.namelist_input_config where id={};'.format(config_id)
+        print('get_namelist_input_configs|query: ', query)
+        self.cursor.execute(query)
+        result = self.cursor.fetchone()
+        print('get_namelist_input_configs|result : ', result)
+        if result is not None:
+            wps_config = {'id': result[0], 'wrf_core': result[1], 'max_dom': result[2],
+                          'interval_seconds': result[3], 'io_form_geogrid': result[4],
+                          'parent_id': result[5], 'parent_grid_ratio': result[6], 'i_parent_start': result[7],
+                          'j_parent_start': result[8], 'e_we': result[9], 'e_sn': result[10],
+                          'geog_data_res': result[11], 'dx': result[12], 'dy': result[13],
+                          'map_proj': result[14], 'ref_lat': result[15], 'ref_lon': result[16],
+                          'truelat1': result[17], 'truelat2': result[18], 'stand_lon': result[19],
+                          'geog_data_path': result[20], 'out_format': result[21], 'prefix': result[22],
+                          'fg_name': result[23], 'io_form_metgrid': result[24]}
+            return wps_config
+        else:
+            return None
 
 
 if __name__ == "__main__":
