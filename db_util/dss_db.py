@@ -610,22 +610,50 @@ class RuleEngineAdapter:
                     self.update_initial_external_bash_routing_status(1, routine['id'])
         return routines
 
-    def get_namelist_wps_configs(self, config_id):
-        query = 'select id,model_type, model, observed_stations, allowed_error, rule_accuracy ' \
-                'from dss.accuracy_rules where id={};'.format(rule_id)
-        print('get_namelist_wps_configs|query: ', query)
+    def get_namelist_input_configs(self, config_id):
+        query = 'select id,run_days, run_hours, run_minutes, run_seconds, interval_seconds, input_from_file, ' \
+                'history_interval, frames_per_outfile, restart, restart_interval, io_form_history, io_form_restart, ' \
+                'io_form_input, io_form_boundary, debug_level, time_step, time_step_fract_num, time_step_fract_den, ' \
+                'max_dom, e_we, e_sn, e_vert, p_top_requested, num_metgrid_levels, num_metgrid_soil_levels, dx, dy, ' \
+                'grid_id, parent_id, i_parent_start, j_parent_start, parent_grid_ratio, parent_time_step_ratio, feedback, ' \
+                'smooth_option , mp_physics, ra_lw_physics, ra_sw_physics, radt, sf_sfclay_physics, sf_surface_physics,' \
+                'bl_pbl_physics, bldt, cu_physics, cudt, isfflx, ifsnow, icloud, surface_input_source, num_soil_layers,' \
+                'sf_urban_physics, w_damping, diff_opt, km_opt, diff_6th_opt, diff_6th_factor, base_temp, damp_opt, ' \
+                'zdamp, dampcoef, khdif, kvdif, non_hydrostatic, moist_adv_opt, scalar_adv_opt, spec_bdy_width, ' \
+                'spec_zone, relax_zone, specified, nested, nio_tasks_per_group, nio_groups ' \
+                'from dss.namelist_input_config where id={};'.format(config_id)
+        print('get_namelist_input_configs|query: ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
-        print('get_namelist_wps_configs|result : ', result)
+        print('get_namelist_input_configs|result : ', result)
         if result is not None:
-            wps_config = {'id': result[0], 'model_type': result[1], 'model': result[2],
-                          'observed_stations': result[3], 'allowed_error': result[4],
-                          'rule_accuracy': result[4]}
+            wps_config = {'id': result[0], 'run_days': result[1], 'run_minutes': result[2],
+                          'run_seconds': result[3], 'interval_seconds': result[4],
+                          'input_from_file': result[4], 'history_interval': result[5], 'frames_per_outfile': result[6],
+                          'restart': result[7], 'restart_interval': result[8], 'io_form_history': result[9],
+                          'io_form_restart': result[10], 'io_form_input': result[11], 'io_form_boundary': result[12],
+                          'debug_level': result[13], 'time_step': result[14], 'time_step_fract_num': result[15],
+                          'time_step_fract_den': result[16], 'max_dom': result[17], 'e_we': result[18],
+                          'e_sn': result[19], 'e_vert': result[20], 'p_top_requested': result[21],
+                          'num_metgrid_levels': result[22], 'num_metgrid_soil_levels': result[23], 'dx': result[24],
+                          'dy': result[25], 'grid_id': result[26], 'parent_id': result[27],
+                          'i_parent_start': result[28], 'j_parent_start': result[29], 'parent_grid_ratio': result[30],
+                          'parent_time_step_ratio': result[31], 'feedback': result[32], 'smooth_option': result[33],
+                          'mp_physics': result[34], 'ra_lw_physics': result[35], 'ra_sw_physics': result[36],
+                          'radt': result[37], 'sf_sfclay_physics': result[38], 'sf_surface_physics': result[39],
+                          'bl_pbl_physics': result[40], 'w_damping': result[41], 'diff_opt': result[42],
+                          'km_opt': result[43], 'diff_6th_opt': result[44], 'diff_6th_factor': result[45],
+                          'base_temp': result[46], 'damp_opt': result[47], 'zdamp': result[48],
+                          'dampcoef': result[49], 'khdif': result[50], 'kvdif': result[51],
+                          'non_hydrostatic': result[52], 'moist_adv_opt': result[53], 'scalar_adv_opt': result[54],
+                          'spec_bdy_width': result[55], 'spec_zone': result[56], 'relax_zone': result[57],
+                          'specified': result[58], 'nested': result[59], 'nio_tasks_per_group': result[60],
+                          'nio_groups': result[61]}
             return wps_config
         else:
             return None
 
-    def get_namelist_input_configs(self, config_id):
+    def get_namelist_wps_configs(self, config_id):
         print('')
 
 
