@@ -653,6 +653,12 @@ class RuleEngineAdapter:
         else:
             return None
 
+    def set_access_date_namelist_input_configs(self, config_id):
+        query = 'update dss.namelist_input_config set last_access_date=now()  ' \
+                'where id=\'{}\''.format(config_id)
+        print('set_access_date_namelist_input_configs|query : ', query)
+        self.update_query(query)
+
     def get_namelist_wps_configs(self, config_id):
         query = 'select id,wrf_core, max_dom, interval_seconds, io_form_geogrid, parent_id, parent_grid_ratio, ' \
                 'i_parent_start, j_parent_start, e_we, e_sn, geog_data_res, dx, ' \
@@ -676,6 +682,12 @@ class RuleEngineAdapter:
             return wps_config
         else:
             return None
+
+    def set_access_date_namelist_wps_configs(self, config_id):
+        query = 'update dss.namelist_wps_config set last_access_date=now()  ' \
+                'where id=\'{}\''.format(config_id)
+        print('set_access_date_namelist_wps_configs|query : ', query)
+        self.update_query(query)
 
 
 if __name__ == "__main__":
