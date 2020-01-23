@@ -30,8 +30,8 @@
 
  &domains
  time_step                           = {TIME_STEP},
- time_step_fract_num                 = {TIME_STEP_FRAC_NUM},
- time_step_fract_den                 = {TIME_STEP_FRAC_DEN},
+ time_step_fract_num                 = {TIME_STEP_FRACT_NUM},
+ time_step_fract_den                 = {TIME_STEP_FRACT_DEN},
  max_dom                             = {MAX_DOM},
  e_we                                = {E_WE},
  e_sn                                = {E_SN},
@@ -43,8 +43,8 @@
  dy                                  = {DY},
  grid_id                             = {GRID_ID},
  parent_id                           = {PARENT_ID},
- i_parent_start                      = {IPARENT_START},
- j_parent_start                      = {JPARENT_START},
+ i_parent_start                      = {I_PARENT_START},
+ j_parent_start                      = {J_PARENT_START},
  parent_grid_ratio                   = {PARENT_GRID_RATIO},
  parent_time_step_ratio              = {PARENT_TIME_STEP_RATIO},
  feedback                            = {FEEDBACK},
@@ -103,5 +103,5 @@
 
  &namelist_quilt
  nio_tasks_per_group = {NIO_TASKS_PER_GROUP},
- nio_groups = {NIO_GROUP},
+ nio_groups = {NIO_GROUPS},
  /
