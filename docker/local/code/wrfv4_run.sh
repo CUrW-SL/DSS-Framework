@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-export GOOGLE_APPLICATION_CREDENTIALS=/home/Build_WRF/code/gcs.json
-
 echo "#### Reading running args..."
 while getopts ":d:i:m:g:k:v:" option; do
   case "${option}" in
@@ -9,12 +7,6 @@ while getopts ":d:i:m:g:k:v:" option; do
   d) START_DATE=$OPTARG ;;
   k) RUN_ID=$OPTARG ;;
   m) MODE=$OPTARG ;;
-  v)
-    bucket=$(echo "$OPTARG" | cut -d':' -f1)
-    path=$(echo "$OPTARG" | cut -d':' -f2)
-    echo "#### mounting $bucket to $path"
-    gcsfuse "$bucket" "$path"
-    ;;
   esac
 done
 
