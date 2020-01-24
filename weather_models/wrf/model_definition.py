@@ -44,6 +44,27 @@ def format_content(content, config_data):
 
 
 def create_namelist_wps_file(dss_adapter, config_id, template_path, file_location):
+    try:
+        new_content = get_namelist_wps_config(dss_adapter, config_id, template_path)
+        if new_content is not None:
+            with open(file_location, 'w') as file:
+                file.write(new_content)
+        return True
+    except Exception as e:
+        print('create_namelist_wps_file|Exception : ', str(e))
+        return False
+
+
+def create_namelist_input_file(dss_adapter, config_id, template_path, file_location):
+    try:
+        new_content = get_namelist_input_config(dss_adapter, config_id, template_path)
+        if new_content is not None:
+            with open(file_location, 'w') as file:
+                file.write(new_content)
+        return True
+    except Exception as e:
+        print('create_namelist_input_file|Exception : ', str(e))
+        return False
 
 
 if __name__ == "__main__":
@@ -51,5 +72,7 @@ if __name__ == "__main__":
                  'log_path': '/home/hasitha/PycharmProjects/DSS-Framework/log'}
     adapter = RuleEngineAdapter.get_instance(db_config)
     print(adapter)
-    get_namelist_wps_config(adapter, 1, namelist_wps_template)
-    get_namelist_input_config(adapter, 1, namelist_input_template)
+    # get_namelist_wps_config(adapter, 1, namelist_wps_template)
+    # get_namelist_input_config(adapter, 1, namelist_input_template)
+    namelist_input_file = '/home/hasitha/PycharmProjects/DSS-Framework/output/namelist.input'
+    create_namelist_input_file(adapter, 1, namelist_input_template, namelist_input_file)
