@@ -490,7 +490,7 @@ class RuleEngineAdapter:
         self.update_query(query)
 
     def update_initial_pump_routing_status(self, status, routine_id):
-        query = 'update dss.pump_rules set status={},last_trigger_date=now()  ' \
+        query = 'update dss.pump_rules set status={},last_trigger_time=now()  ' \
                 'where id=\'{}\''.format(status, routine_id)
         print('update_initial_pump_routing_status|query : ', query)
         self.update_query(query)
