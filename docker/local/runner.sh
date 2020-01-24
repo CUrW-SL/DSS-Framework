@@ -2,7 +2,7 @@
 
 echo "#### Running WRF procedures..."
 
-mkdir -p /mnt/disks/workspace1/wrf-data/gfs
+mkdir -p /mnt/disks/data/wrf-data/gfs
 
 while getopts ":r:m:v:d:h:" option; do
   case "${option}" in
@@ -53,12 +53,18 @@ echo "exec_date : ${exec_date}"
 echo "wrf_id : ${wrf_id}"
 echo "docker_tag : ${docker_tag}"
 
+docker run -i --rm --privileged
+    -v /mnt/disks/data/wrf-data/geog:/home/Build_WRF/geog \
+    -v /mnt/disks/data/wrf-data/nfs:/home/Build_WRF/nfs \
+    -v /mnt/disks/data/wrf-data/gfs:/home/Build_WRF/gfs \
+    -v /mnt/disks/data/wrf-data/archive:/home/Build_WRF/archive \
+    curw-wrfv4:${docker_tag} /home/Build_WRF/code/wrfv4_run.sh -d ${gfs_date} -k ${wrf_id}
 
-docker run -i --rm --privileged -v /mnt/disks/workspace1/wrf-data/geog:/home/Build_WRF/geog \
-    -v /home/uwcc-admin/uwcc-admin.json:/wrf/gcs.json curw-wrfv4:${docker_tag} \
-    /home/Build_WRF/code/wrfv4_run.sh -d ${gfs_date} -k ${wrf_id} \
-    -v wrf_nfs:/home/Build_WRF/nfs -v curwsl_archive_1:/home/Build_WRF/archive
+#docker run -i --rm --privileged -v /mnt/disks/workspace1/wrf-data/geog:/home/Build_WRF/geog \
+#    -v /home/uwcc-admin/uwcc-admin.json:/wrf/gcs.json curw-wrfv4:${docker_tag} \
+#    /home/Build_WRF/code/wrfv4_run.sh -d ${gfs_date} -k ${wrf_id} \
+#    -v wrf_nfs:/home/Build_WRF/nfs -v curwsl_archive_1:/home/Build_WRF/archive
 
 #d03_netcdf_path="/mnt/disks/worker-disk/wrf_nfs/dwrf/${VERSION}/d${WRF_RUN}/${GFS_HOUR}/${exec_date}/${MODEL}/d03_RAINNC.nc"
-d03_netcdf_path="/mnt/disks/worker-disk/wrf_nfs/wrf/${VERSION}/d${WRF_RUN}/${GFS_HOUR}/${exec_date}/output/dwrf/${MODEL}/d03_RAINNC.nc"
-echo "d03_netcdf_path : ${d03_netcdf_path}"
+#d03_netcdf_path="/mnt/disks/worker-disk/wrf_nfs/wrf/${VERSION}/d${WRF_RUN}/${GFS_HOUR}/${exec_date}/output/dwrf/${MODEL}/d03_RAINNC.nc"
+#echo "d03_netcdf_path : ${d03_netcdf_path}"
