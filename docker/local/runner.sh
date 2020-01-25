@@ -4,13 +4,15 @@ echo "#### Running WRF procedures..."
 
 mkdir -p /mnt/disks/data/wrf-data/gfs
 
-while getopts ":r:m:v:d:h:" option; do
+while getopts ":r:m:v:d:h:a:b:" option; do
   case "${option}" in
   d) RUN_DATE=$OPTARG ;; # 2019-10-23
   r) WRF_RUN=$OPTARG ;; # 1/0
   m) MODEL=$OPTARG ;; # 1/0
   v) VERSION=$OPTARG ;; # 1/0
   h) GFS_HOUR=$OPTARG ;; # 00/06/12/18
+  a) NAMELIST_WPS_ID=$OPTARG ;; # 1
+  b) NAMELIST_INPUT_ID=$OPTARG ;; # 2
   esac
 done
 
@@ -19,6 +21,8 @@ echo "WRF_RUN : $WRF_RUN"
 echo "GFS_HOUR : $GFS_HOUR"
 echo "MODEL : $MODEL"
 echo "VERSION : $VERSION"
+echo "NAMELIST_WPS_ID : $NAMELIST_WPS_ID"
+echo "NAMELIST_INPUT_ID : $NAMELIST_INPUT_ID"
 
 
 if [ ${WRF_RUN} == 0 ] || [ ${WRF_RUN} == "0" ]; then
@@ -30,7 +34,7 @@ if [ ${WRF_RUN} == 0 ] || [ ${WRF_RUN} == "0" ]; then
           exec_date=${RUN_DATE}
     fi
     gfs_date="${tmp_date}_${GFS_HOUR}:00"
-    wrf_id="dwrf_${VERSION}_${WRF_RUN}_${GFS_HOUR}_${exec_date}_${MODEL}"
+    wrf_id="dwrf_${VERSION}_${WRF_RUN}_${GFS_HOUR}_${exec_date}_${MODEL}_${NAMELIST_WPS_ID}_${NAMELIST_INPUT_ID}"
 fi
 
 if [ ${WRF_RUN} == 1 ] || [ ${WRF_RUN} == "1" ]; then
@@ -42,7 +46,7 @@ if [ ${WRF_RUN} == 1 ] || [ ${WRF_RUN} == "1" ]; then
           exec_date=${RUN_DATE}
     fi
     gfs_date="${tmp_date}_${GFS_HOUR}:00"
-    wrf_id="dwrf_${VERSION}_${WRF_RUN}_${GFS_HOUR}_${exec_date}_${MODEL}"
+    wrf_id="dwrf_${VERSION}_${WRF_RUN}_${GFS_HOUR}_${exec_date}_${MODEL}_${NAMELIST_WPS_ID}_${NAMELIST_INPUT_ID}"
 fi
 
 docker_tag="wrf_${VERSION}_${MODEL}"

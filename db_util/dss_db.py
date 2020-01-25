@@ -109,6 +109,7 @@ class RuleEngineAdapter:
             self.log.error('exception|query:'.format(sql_query))
             return None
 
+    # -------------------------WRF rule information-------------------------
     def get_wrf_rule_info(self, status=1):
         '''
         :param status:0-disable,1-enable,2-running,3-completed
@@ -189,6 +190,7 @@ class RuleEngineAdapter:
         print('update_wrf_rule_accuracy_level|query : ', query)
         self.update_query(query)
 
+    # -------------------------HecHms rule information-------------------------
     def get_hechms_rule_info(self, status=1):
         hechms_rules = []
         query = 'select id, name, target_model,forecast_days, observed_days, ' \
@@ -248,6 +250,7 @@ class RuleEngineAdapter:
             hechms_rule = {'id': result[0], 'status': result[1]}
         return hechms_rule
 
+    # -------------------------Flo2d rule information-------------------------
     def get_flo2d_rule_info(self, status=1):
         flo2d_rules = []
         query = 'select id, name, target_model, forecast_days, observed_days, ' \
