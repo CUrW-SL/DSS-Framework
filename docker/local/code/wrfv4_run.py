@@ -641,9 +641,19 @@ if __name__ == '__main__':
     start_date = args['start_date']
     logging.info('**** WRF RUN **** start_date: {}'.format(start_date))
     run_id = args['run_id']
+
     logging.info('**** WRF RUN **** run_id: {}'.format(run_id))
     run_mode = args['mode']
+
     logging.info('**** WRF RUN Mode**** run_mode: {}'.format(run_mode))
+    run_mode = args['mode']
+
+    logging.info('**** WPS content Mode**** run_mode: {}'.format(run_mode))
+    wps_content = args['wps_content']
+
+    logging.info('**** WRF input content Mode**** wps_content: {}'.format(wps_content))
+    wps_content = args['input_content']
+
     with open('wrfv4_config.json') as json_file:
         wrf_config = json.load(json_file)
         wrf_conf = wrf_config['wrf_config']
