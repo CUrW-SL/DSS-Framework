@@ -11,8 +11,8 @@ while getopts ":r:m:v:d:h:a:b:" option; do
   m) MODEL=$OPTARG ;; # 1/0
   v) VERSION=$OPTARG ;; # 1/0
   h) GFS_HOUR=$OPTARG ;; # 00/06/12/18
-  a) NAMELIST_WPS_ID=$OPTARG ;; # 1
-  b) NAMELIST_INPUT_ID=$OPTARG ;; # 2
+  a) NAMELIST_WPS_CONTENT=$OPTARG ;; # 1
+  b) NAMELIST_INPUT_CONTENT=$OPTARG ;; # 2
   esac
 done
 
@@ -21,8 +21,8 @@ echo "WRF_RUN : $WRF_RUN"
 echo "GFS_HOUR : $GFS_HOUR"
 echo "MODEL : $MODEL"
 echo "VERSION : $VERSION"
-echo "NAMELIST_WPS_ID : $NAMELIST_WPS_ID"
-echo "NAMELIST_INPUT_ID : $NAMELIST_INPUT_ID"
+echo "NAMELIST_WPS_CONTENT : $NAMELIST_WPS_CONTENT"
+echo "NAMELIST_INPUT_CONTENT : $NAMELIST_INPUT_CONTENT"
 
 
 if [ ${WRF_RUN} == 0 ] || [ ${WRF_RUN} == "0" ]; then
@@ -34,7 +34,7 @@ if [ ${WRF_RUN} == 0 ] || [ ${WRF_RUN} == "0" ]; then
           exec_date=${RUN_DATE}
     fi
     gfs_date="${tmp_date}_${GFS_HOUR}:00"
-    wrf_id="dwrf_${VERSION}_${WRF_RUN}_${GFS_HOUR}_${exec_date}_${MODEL}_${NAMELIST_WPS_ID}_${NAMELIST_INPUT_ID}"
+    wrf_id="dwrf_${VERSION}_${WRF_RUN}_${GFS_HOUR}_${exec_date}_${MODEL}"
 fi
 
 if [ ${WRF_RUN} == 1 ] || [ ${WRF_RUN} == "1" ]; then
@@ -46,7 +46,7 @@ if [ ${WRF_RUN} == 1 ] || [ ${WRF_RUN} == "1" ]; then
           exec_date=${RUN_DATE}
     fi
     gfs_date="${tmp_date}_${GFS_HOUR}:00"
-    wrf_id="dwrf_${VERSION}_${WRF_RUN}_${GFS_HOUR}_${exec_date}_${MODEL}_${NAMELIST_WPS_ID}_${NAMELIST_INPUT_ID}"
+    wrf_id="dwrf_${VERSION}_${WRF_RUN}_${GFS_HOUR}_${exec_date}_${MODEL}"
 fi
 
 docker_tag="wrf_${VERSION}_${MODEL}"
@@ -61,7 +61,8 @@ docker run -i --rm --privileged
     -v /mnt/disks/data/wrf-data/nfs:/home/Build_WRF/nfs \
     -v /mnt/disks/data/wrf-data/gfs:/home/Build_WRF/gfs \
     -v /mnt/disks/data/wrf-data/archive:/home/Build_WRF/archive \
-    curw-wrfv4:${docker_tag} /home/Build_WRF/code/wrfv4_run.sh -d ${gfs_date} -k ${wrf_id}
+    curw-wrfv4:${docker_tag} /home/Build_WRF/code/wrfv4_run.sh \
+    -d ${gfs_date} -k ${wrf_id} -a ${NAMELIST_WPS_CONTENT} -b ${NAMELIST_INPUT_CONTENT}
 
 #docker run -i --rm --privileged -v /mnt/disks/workspace1/wrf-data/geog:/home/Build_WRF/geog \
 #    -v /home/uwcc-admin/uwcc-admin.json:/wrf/gcs.json curw-wrfv4:${docker_tag} \
