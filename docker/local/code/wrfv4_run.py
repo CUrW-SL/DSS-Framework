@@ -644,6 +644,14 @@ def write_namelist_wps_to_file(wrf_conf, zipped_wps_content):
         file.write(wps_content)
 
 
+def write_namelist_input_to_file(wrf_conf, zipped_input_content):
+    input_content = zlib.decompress(zipped_input_content)
+    input_content = input_content.decode()
+    namelist_input_file_path = wrf_conf['namelist_input']
+    with open(namelist_input_file_path, 'w') as file:
+        file.write(input_content)
+
+
 if __name__ == '__main__':
     args = vars(parse_args())
     logging.info('Running arguments:\n%s' % json.dumps(args, sort_keys=True, indent=0))
@@ -669,4 +677,6 @@ if __name__ == '__main__':
         logging.info('**** WRF RUN **** wrf_conf: {}'.format(wrf_conf))
         wrf_conf['run_id'] = run_id
         wrf_conf['start_date'] = start_date
+        write_namelist_wps_to_file(wrf_conf, zipped_wps_content)
+        write_namelist_wps_to_file(wrf_conf, zipped_wps_content)
         run_wrf_model(run_mode, wrf_conf)
