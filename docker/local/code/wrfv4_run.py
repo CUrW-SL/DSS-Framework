@@ -16,6 +16,7 @@ import os
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
 from zipfile import ZipFile, ZIP_DEFLATED
+import zlib
 
 import pkg_resources
 from joblib import Parallel, delayed
@@ -633,6 +634,14 @@ def run_wrf_model(run_mode, wrf_conf):
     except Exception as e:
         traceback.print_exc()
         log.error('download_gfs_data exception')
+
+
+def write_namelist_wps_to_file(wrf_conf, zipped_wps_content):
+    wps_content = zlib.decompress(zipped_wps_content)
+    wps_content = wps_content.decode()
+    namelist_wsp_file_path = wrf_conf['namelist_wps']
+    with open(namelist_wsp_file_path, 'w') as file:
+        file.write(wps_content)
 
 
 if __name__ == '__main__':
