@@ -4,6 +4,7 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.models import Variable
 import sys
 import subprocess
+import zlib
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/dss_workflow/plugins/operators')
 from gfs_sensor import GfsSensorOperator
@@ -82,16 +83,21 @@ def get_wrf_run_command(**context):
     exec_date = context["execution_date"].to_datetime_string()
     dss_adapter = get_dss_db_adapter()
     if dss_adapter is not None:
-        zipped_wps_content = get_namelist_wps_config(dss_adapter, namelist_wps_id, namelist_wps_template)
-        zipped_input_content = get_namelist_wps_config(dss_adapter, namelist_input_id, namelist_input_template)
-        run_script = '{}  -r {} -m {} -v {} -h {} -d {} -a {} -b {}'.format(run_script, wrf_run,
-                                                                            wrf_model, wrf_version,
-                                                                            gfs_hour, exec_date,
-                                                                            namelist_wps_id, namelist_input_id)
-        print('get_wrf_run_command|run_script : ', run_script)
-        run_wrf4_A_cmd = ssh_cmd_template.format(run_node, run_script)
-        print('get_wrf_run_command|run_wrf4_A_cmd : ', run_wrf4_A_cmd)
-        subprocess.call(run_wrf4_A_cmd, shell=True)
+        wps_content = get_namelist_wps_config(dss_adapter, namelist_wps_id, namelist_wps_template)
+        if wps_content is not None:
+            zipped_wps_content = zlib.compress(wps_content.encode())
+            input_content = get_namelist_input_config(dss_adapter, namelist_input_id, namelist_input_template)
+            if input_content is not None:
+                zipped_input_content = zlib.compress(input_content.encode())
+                run_script = '{}  -r {} -m {} -v {} -h {} -d {} -a {} -b {}'.format(run_script, wrf_run,
+                                                                                    wrf_model, wrf_version,
+                                                                                    gfs_hour, exec_date,
+                                                                                    zipped_wps_content,
+                                                                                    zipped_input_content)
+                print('get_wrf_run_command|run_script : ', run_script)
+                run_wrf4_A_cmd = ssh_cmd_template.format(run_node, run_script)
+                print('get_wrf_run_command|run_wrf4_A_cmd : ', run_wrf4_A_cmd)
+                subprocess.call(run_wrf4_A_cmd, shell=True)
 
 
 def update_workflow_status(status, rule_id):
