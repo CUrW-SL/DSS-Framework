@@ -657,19 +657,18 @@ if __name__ == '__main__':
     logging.info('Running arguments:\n%s' % json.dumps(args, sort_keys=True, indent=0))
     start_date = args['start_date']
     logging.info('**** WRF RUN **** start_date: {}'.format(start_date))
+
     run_id = args['run_id']
-
     logging.info('**** WRF RUN **** run_id: {}'.format(run_id))
-    run_mode = args['mode']
 
+    run_mode = args['mode']
     logging.info('**** WRF RUN Mode**** run_mode: {}'.format(run_mode))
-    run_mode = args['mode']
 
-    logging.info('**** WPS content Mode**** run_mode: {}'.format(run_mode))
-    wps_content = args['wps_content']
+    zipped_wps_content = args['wps_content']
+    logging.info('**** WPS content Mode**** zipped_wps_content: {}'.format(zipped_wps_content))
 
-    logging.info('**** WRF input content Mode**** wps_content: {}'.format(wps_content))
-    wps_content = args['input_content']
+    zipped_input_content = args['input_content']
+    logging.info('**** WRF input content Mode**** zipped_input_content: {}'.format(zipped_input_content))
 
     with open('wrfv4_config.json') as json_file:
         wrf_config = json.load(json_file)
@@ -678,5 +677,5 @@ if __name__ == '__main__':
         wrf_conf['run_id'] = run_id
         wrf_conf['start_date'] = start_date
         write_namelist_wps_to_file(wrf_conf, zipped_wps_content)
-        write_namelist_wps_to_file(wrf_conf, zipped_wps_content)
+        write_namelist_input_to_file(wrf_conf, zipped_input_content)
         run_wrf_model(run_mode, wrf_conf)
