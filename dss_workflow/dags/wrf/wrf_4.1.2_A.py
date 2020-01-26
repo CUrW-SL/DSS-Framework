@@ -14,6 +14,9 @@ from dss_db import RuleEngineAdapter
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/accuracy_unit/wrf')
 from wrf_accuracy import calculate_wrf_rule_accuracy
 
+sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/weather_models/wrf')
+from model_definition import get_namelist_wps_config, get_namelist_input_config
+
 prod_dag_name = 'wrf_4.1.2_A_dag'
 dag_pool = 'wrf_pool'
 
@@ -24,9 +27,21 @@ default_args = {
     'email_on_failure': True,
 }
 
-
 ssh_cmd_template = "ssh -i /home/uwcc-admin/.ssh/uwcc-admin -o \"StrictHostKeyChecking no\" uwcc-admin@{} " \
                    "\'bash -c \"{}\"'"
+
+
+def get_dss_db_adapter():
+    adapter = None
+    try:
+        db_config = Variable.get('db_config', deserialize_json=True)
+        try:
+            adapter = RuleEngineAdapter.get_instance(db_config)
+        except Exception as ex:
+            print('get_dss_db_adapter|db_adapter|Exception: ', str(ex))
+    except Exception as e:
+        print('get_dss_db_adapter|db_config|Exception: ', str(e))
+    return adapter
 
 
 def get_push_command(**context):
@@ -63,6 +78,7 @@ def get_wrf_run_command(**context):
     run_node = wrf_rule['rule_info']['rule_details']['run_node']
     run_script = wrf_rule['rule_info']['rule_details']['run_script']
     exec_date = context["execution_date"].to_datetime_string()
+    zipped_content = get_namelist_wps_config(dss_adapter, config_id, template_path)
     run_script = '{}  -r {} -m {} -v {} -h {} -d {} -a {} -b {}'.format(run_script, wrf_run,
                                                                         wrf_model, wrf_version,
                                                                         gfs_hour, exec_date,
