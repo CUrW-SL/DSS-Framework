@@ -73,17 +73,31 @@ def get_wrf_run_command(**context):
     wrf_version = wrf_rule['version']
     wrf_run = wrf_rule['rule_info']['run']
     gfs_hour = wrf_rule['rule_info']['hour']
+    namelist_wps_id = wrf_rule['rule_info']['namelist_wps']
+    namelist_input_id = wrf_rule['rule_info']['namelist_input']
     print('get_wrf_run_command|rule_details: ', wrf_rule['rule_info']['rule_details'])
     run_node = wrf_rule['rule_info']['rule_details']['run_node']
     run_script = wrf_rule['rule_info']['rule_details']['run_script']
+    namelist_wps_template = wrf_rule['rule_info']['rule_details']['namelist_wps_template']
+    namelist_input_template = wrf_rule['rule_info']['rule_details']['namelist_input_template']
     exec_date = context["execution_date"].to_datetime_string()
-    run_script = '{}  -r {} -m {} -v {} -h {} -d {}'.format(run_script, wrf_run,
-                                                            wrf_model, wrf_version,
-                                                            gfs_hour, exec_date)
-    print('get_wrf_run_command|run_script : ', run_script)
-    run_wrf4_A_cmd = ssh_cmd_template.format(run_node, run_script)
-    print('get_wrf_run_command|run_wrf4_A_cmd : ', run_wrf4_A_cmd)
-    subprocess.call(run_wrf4_A_cmd, shell=True)
+    dss_adapter = get_dss_db_adapter()
+    if dss_adapter is not None:
+        wps_content = get_namelist_wps_config(dss_adapter, namelist_wps_id, namelist_wps_template)
+        if wps_content is not None:
+            zipped_wps_content = zlib.compress(wps_content.encode())
+            input_content = get_namelist_input_config(dss_adapter, namelist_input_id, namelist_input_template)
+            if input_content is not None:
+                zipped_input_content = zlib.compress(input_content.encode())
+                run_script = '{}  -r {} -m {} -v {} -h {} -d {} -a {} -b {}'.format(run_script, wrf_run,
+                                                                                    wrf_model, wrf_version,
+                                                                                    gfs_hour, exec_date,
+                                                                                    zipped_wps_content,
+                                                                                    zipped_input_content)
+                print('get_wrf_run_command|run_script : ', run_script)
+                run_wrf4_A_cmd = ssh_cmd_template.format(run_node, run_script)
+                print('get_wrf_run_command|run_wrf4_A_cmd : ', run_wrf4_A_cmd)
+                subprocess.call(run_wrf4_A_cmd, shell=True)
 
 
 def update_workflow_status(status, rule_id):
