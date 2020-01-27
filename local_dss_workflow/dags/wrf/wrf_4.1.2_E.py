@@ -5,7 +5,7 @@ from airflow.models import Variable
 import sys
 import subprocess
 
-sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/dss_workflow/plugins/operators')
+sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/local_dss_workflow/plugins/operators')
 from gfs_sensor import GfsSensorOperator
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')

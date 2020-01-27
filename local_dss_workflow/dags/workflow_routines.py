@@ -6,7 +6,7 @@ from airflow.operators.dummy_operator import DummyOperator
 from airflow.models import Variable
 import sys
 
-sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/dss_workflow/plugins/operators')
+sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/local_dss_workflow/plugins/operators')
 from condition_multi_dag_run_operator import ConditionMultiTriggerDagRunOperator
 from dss_unit_completion_sensor import DssUnitSensorOperator
 
