@@ -170,7 +170,7 @@ RUN ln -sfn /home/Build_WRF/WPS/ungrib/Variable_Tables/Vtable.GFS Vtable
 RUN ln -sfn /home/Build_WRF/WPS/ungrib/Variable_Tables/Vtable.GFS Vtable.GFS
 
 # copy geogrid.exe output
-COPY geo_em.zip /home/Build_WRF/WPS
+COPY geogrid_output/geo_em.zip /home/Build_WRF/WPS
 RUN unzip geo_em.zip
 
 WORKDIR /home/Build_WRF/code
