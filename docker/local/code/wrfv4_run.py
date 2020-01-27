@@ -677,5 +677,11 @@ if __name__ == '__main__':
         wrf_conf['run_id'] = run_id
         wrf_conf['start_date'] = start_date
         write_namelist_wps_to_file(wrf_conf, zipped_wps_content)
-        write_namelist_input_to_file(wrf_conf, zipped_input_content)
-        run_wrf_model(run_mode, wrf_conf)
+        try:
+            write_namelist_input_to_file(wrf_conf, zipped_input_content)
+            try:
+                run_wrf_model(run_mode, wrf_conf)
+            except Exception as ex:
+                print('run_wrf_model|Exception : ', str(ex))
+        except Exception as e:
+            print('write_namelist_input_to_file|Exception : ', str(e))
