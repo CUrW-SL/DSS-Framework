@@ -1,13 +1,15 @@
 import sys
 
-# sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
-sys.path.insert(0, '/home/hasitha/PycharmProjects/DSS-Framework/db_util')
+sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
+# sys.path.insert(0, '/home/hasitha/PycharmProjects/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
-# namelist_input_template = '/home/curw/git/DSS-Framework/docker/cloud/namelist/template/template_namelist.input'
-# namelist_wps_template = '/home/curw/git/DSS-Framework/docker/cloud/namelist/template/template_namelist.wps'
-namelist_input_template = '/home/hasitha/PycharmProjects/DSS-Framework/docker/cloud/namelist/template/template_namelist.input'
-namelist_wps_template = '/home/hasitha/PycharmProjects/DSS-Framework/docker/cloud/namelist/template/template_namelist.wps'
+namelist_input_template = '/home/curw/git/DSS-Framework/docker/cloud/namelist/template/template_namelist.input'
+namelist_wps_template = '/home/curw/git/DSS-Framework/docker/cloud/namelist/template/template_namelist.wps'
+
+
+# namelist_input_template = '/home/hasitha/PycharmProjects/DSS-Framework/docker/cloud/namelist/template/template_namelist.input'
+# namelist_wps_template = '/home/hasitha/PycharmProjects/DSS-Framework/docker/cloud/namelist/template/template_namelist.wps'
 
 
 def get_namelist_wps_config(dss_adapter, config_id, template_path):
