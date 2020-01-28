@@ -59,7 +59,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args,
 
     gen_target_dag_run = DynamicTriggerDagRunOperator(
         task_id='gen_target_dag_run',
-        default_trigger='dss_variable_routine_v1',
+        default_trigger='variable_scheduler_v1',
         python_callable=generate_dag_run,
         pool=dag_pool
 
