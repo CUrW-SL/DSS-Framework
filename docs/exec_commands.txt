@@ -69,3 +69,6 @@ smtp_mail_from = curwalerts@gmail.com
 # remove docker image
 docker rmi curw-wrfv4:wrf_4.1_A
 
+# killing all airflow related process
+pkill -f airflow
+
