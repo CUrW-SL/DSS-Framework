@@ -10,10 +10,8 @@ sys.path.insert(0, '/home/curw/git/DSS-Framework/local_dss_workflow/plugins/oper
 from condition_multi_dag_run_operator import ConditionMultiTriggerDagRunOperator
 from dss_unit_completion_sensor import DssUnitSensorOperator
 
-# sys.path.insert(0, '/home/curw/git/DSS-Framework/db_util')
-# from dss_db import RuleEngineAdapter
 sys.path.insert(0, '/home/curw/git/DSS-Framework/db_util')
-from db_util.dss_db import RuleEngineAdapter
+from dss_db import RuleEngineAdapter
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/gen_util')
 from controller_util import get_triggering_dags, \
