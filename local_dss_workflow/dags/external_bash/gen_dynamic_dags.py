@@ -5,8 +5,8 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.operators.bash_operator import BashOperator
 import sys
 
-# sys.path.insert(0, '/home/curw/git/DSS-Framework/gen_util')
-# from controller_util import get_all_external_bash_routines, get_dynamic_dag_tasks
+sys.path.insert(0, '/home/curw/git/DSS-Framework/gen_util')
+from controller_util import get_all_external_bash_routines, get_dynamic_dag_tasks
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
