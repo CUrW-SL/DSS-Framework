@@ -15,8 +15,6 @@ from dynamic_external_trigger_operator import DynamicTriggerDagRunOperator
 sys.path.insert(0, '/home/curw/git/DSS-Framework/rule_engine')
 from rule_executor import get_next_pump_configurations
 
-sys.path.insert(0, '/home/curw/git/DSS-Framework/gen_util')
-from controller_util import get_all_external_bash_routines, get_dynamic_dag_tasks
 
 prod_dag_name = 'pump_scheduler_v1'
 schedule_interval = '*/5 * * * *'
