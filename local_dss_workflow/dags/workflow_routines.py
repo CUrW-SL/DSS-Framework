@@ -12,7 +12,7 @@ from dss_unit_completion_sensor import DssUnitSensorOperator
 
 # sys.path.insert(0, '/home/curw/git/DSS-Framework/db_util')
 # from dss_db import RuleEngineAdapter
-
+sys.path.insert(0, '/home/curw/git/DSS-Framework/db_util')
 from db_util.dss_db import RuleEngineAdapter
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/gen_util')
