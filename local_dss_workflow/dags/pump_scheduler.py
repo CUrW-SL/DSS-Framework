@@ -6,13 +6,13 @@ import sys
 
 from airflow.operators.python_operator import PythonOperator
 
-sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/local_dss_workflow/plugins/operators')
+sys.path.insert(0, '/home/curw/git/DSS-Framework/local_dss_workflow/plugins/operators')
 from dynamic_external_trigger_operator import DynamicTriggerDagRunOperator
 
-sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
+sys.path.insert(0, '/home/curw/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
-sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/rule_engine')
+sys.path.insert(0, '/home/curw/git/DSS-Framework/rule_engine')
 from rule_executor import get_next_pump_configurations
 
 prod_dag_name = 'pump_scheduler_v1'

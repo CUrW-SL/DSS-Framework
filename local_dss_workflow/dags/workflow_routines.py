@@ -6,14 +6,14 @@ from airflow.operators.dummy_operator import DummyOperator
 from airflow.models import Variable
 import sys
 
-sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/local_dss_workflow/plugins/operators')
+sys.path.insert(0, '/home/curw/git/DSS-Framework/local_dss_workflow/plugins/operators')
 from condition_multi_dag_run_operator import ConditionMultiTriggerDagRunOperator
 from dss_unit_completion_sensor import DssUnitSensorOperator
 
-sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
+sys.path.insert(0, '/home/curw/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
-sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/gen_util')
+sys.path.insert(0, '/home/curw/git/DSS-Framework/gen_util')
 from controller_util import get_triggering_dags, \
     update_workflow_routine_status, \
     set_running_state

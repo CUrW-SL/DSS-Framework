@@ -4,11 +4,11 @@ from airflow import DAG
 from airflow.models import Variable
 from airflow.operators.python_operator import PythonOperator
 
-sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
+sys.path.insert(0, '/home/curw/git/DSS-Framework/db_util')
 from gen_db import CurwObsAdapter
 from dss_db import RuleEngineAdapter
 
-sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/variable_util')
+sys.path.insert(0, '/home/curw/git/DSS-Framework/variable_util')
 from rainfall_intensity import update_rainfall_intensity_values
 
 prod_dag_name = 'rainfall_intensity_dag'

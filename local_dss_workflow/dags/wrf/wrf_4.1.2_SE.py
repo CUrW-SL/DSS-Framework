@@ -5,13 +5,13 @@ from airflow.models import Variable
 import sys
 import subprocess
 
-sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/local_dss_workflow/plugins/operators')
+sys.path.insert(0, '/home/curw/git/DSS-Framework/local_dss_workflow/plugins/operators')
 from gfs_sensor import GfsSensorOperator
 
-sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
+sys.path.insert(0, '/home/curw/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
-sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/accuracy_unit/wrf')
+sys.path.insert(0, '/home/curw/git/DSS-Framework/accuracy_unit/wrf')
 from wrf_accuracy import calculate_wrf_rule_accuracy
 
 prod_dag_name = 'wrf_4.1.2_SE_dag'
@@ -24,7 +24,7 @@ default_args = {
     'email_on_failure': True,
 }
 
-ssh_cmd_template = "ssh -i /home/uwcc-admin/.ssh/uwcc-admin -o \"StrictHostKeyChecking no\" uwcc-admin@{} " \
+ssh_cmd_template = "ssh -i /home/curw/.ssh/uwcc-admin -o \"StrictHostKeyChecking no\" uwcc-admin@{} " \
                    "\'bash -c \"{}\"'"
 
 

@@ -5,7 +5,7 @@ from airflow.models import Variable
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import PythonOperator
 
-sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
+sys.path.insert(0, '/home/curw/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
 prod_dag_name = 'last_1_day_rain_dag'

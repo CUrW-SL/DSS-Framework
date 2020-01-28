@@ -5,10 +5,10 @@ from airflow.models import Variable
 import sys
 import subprocess
 
-sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
+sys.path.insert(0, '/home/curw/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
-sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/accuracy_unit/flo2d')
+sys.path.insert(0, '/home/curw/git/DSS-Framework/accuracy_unit/flo2d')
 from flo2d_accuracy import calculate_flo2d_rule_accuracy
 
 prod_dag_name = 'flo2d_150_pump1_dag'

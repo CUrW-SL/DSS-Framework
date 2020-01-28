@@ -4,11 +4,11 @@ from airflow import DAG
 from airflow.models import Variable
 from airflow.operators.python_operator import PythonOperator
 
-sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
+sys.path.insert(0, '/home/curw/git/DSS-Framework/db_util')
 from gen_db import CurwObsAdapter
 from dss_db import RuleEngineAdapter
 
-sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/variable_util')
+sys.path.insert(0, '/home/curw/git/DSS-Framework/variable_util')
 from current_water_level import update_current_water_level_values
 
 prod_dag_name = 'current_water_level_dag'

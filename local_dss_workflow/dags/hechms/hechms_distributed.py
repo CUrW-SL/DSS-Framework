@@ -5,7 +5,7 @@ from airflow.models import Variable
 import sys
 import subprocess
 
-sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
+sys.path.insert(0, '/home/curw/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
 prod_dag_name = 'hechms_distributed_dag'
