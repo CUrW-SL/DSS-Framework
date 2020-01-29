@@ -26,7 +26,8 @@ create_raincell_cmd_template = 'curl -X GET "http://{}:{}/create-sim-raincell?' 
                                '&forward={}&backward={}"'
 
 create_inflow_cmd_template = 'curl -X GET "http://{}:{}/create-inflow?' \
-                             'run_date={}&run_time={}"'
+                             'run_date={}&run_time={}' \
+                             '&forward={}&backward={}"'
 
 create_outflow_cmd_template = 'curl -X GET "http://{}:{}/create-outflow?' \
                               'run_date={}&run_time={}' \
@@ -82,9 +83,11 @@ def get_create_raincell_cmd(**context):
 def get_create_inflow_cmd(**context):
     rule = get_rule_from_context(context)
     [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
+    forward = rule['rule_info']['forecast_days']
+    backward = rule['rule_info']['observed_days']
     run_node = rule['rule_info']['rule_details']['run_node']
     run_port = rule['rule_info']['rule_details']['run_port']
-    create_inflow_cmd = create_inflow_cmd_template.format(run_node, run_port, exec_date, exec_time)
+    create_inflow_cmd = create_inflow_cmd_template.format(run_node, run_port, exec_date, exec_time, forward, backward)
     print('get_create_inflow_cmd|create_inflow_cmd : ', create_inflow_cmd)
     subprocess.call(create_inflow_cmd, shell=True)
 
