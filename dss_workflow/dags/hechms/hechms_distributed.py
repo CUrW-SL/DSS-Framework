@@ -27,7 +27,7 @@ run_hechms_cmd_template = 'curl -X GET "http://{}:{}/HECHMS/distributed/run"'
 
 run_hechms_postprocess_cmd_template = 'curl -X GET "http://{}:{}/HECHMS/distributed/post-process/{}/{}/{}"'
 
-upload_discharge_cmd_template = 'curl -X GET "http://10.138.0.3:5000/HECHMS/distributed/upload-discharge/{}"'
+upload_discharge_cmd_template = 'curl -X GET "http://{}:{}/HECHMS/distributed/upload-discharge/{}"'
 
 
 def get_rule_from_context(context):
