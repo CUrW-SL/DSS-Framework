@@ -49,7 +49,7 @@ if [ ${WRF_RUN} == 1 ] || [ ${WRF_RUN} == "1" ]; then
     wrf_id="dwrf_${VERSION}_${WRF_RUN}_${GFS_HOUR}_${exec_date}_${MODEL}"
 fi
 
-docker_tag="wrf_${VERSION}_${MODEL}"
+docker_tag="wrf_${VERSION}"
 
 echo "tmp_date : ${tmp_date}"
 echo "gfs_date : ${gfs_date}"
@@ -61,8 +61,15 @@ docker run -i --rm --privileged
     -v /mnt/disks/data/wrf-data/nfs:/home/Build_WRF/nfs \
     -v /mnt/disks/data/wrf-data/gfs:/home/Build_WRF/gfs \
     -v /mnt/disks/data/wrf-data/archive:/home/Build_WRF/archive \
-    curw-wrfv4:${docker_tag} /home/Build_WRF/code/wrfv4_run.sh \
+    curw-wrf-18_04:${docker_tag} /home/Build_WRF/code/wrfv4_run.sh \
     -d ${gfs_date} -k ${wrf_id} -a ${NAMELIST_WPS_CONTENT} -b ${NAMELIST_INPUT_CONTENT}
+
+#docker run -i --rm --privileged
+#    -v /mnt/disks/data/wrf-data/nfs:/home/Build_WRF/nfs \
+#    -v /mnt/disks/data/wrf-data/gfs:/home/Build_WRF/gfs \
+#    -v /mnt/disks/data/wrf-data/archive:/home/Build_WRF/archive \
+#    curw-wrfv4:${docker_tag} /home/Build_WRF/code/wrfv4_run.sh \
+#    -d ${gfs_date} -k ${wrf_id} -a ${NAMELIST_WPS_CONTENT} -b ${NAMELIST_INPUT_CONTENT}
 
 #docker run -i --rm --privileged -v /mnt/disks/workspace1/wrf-data/geog:/home/Build_WRF/geog \
 #    -v /home/uwcc-admin/uwcc-admin.json:/wrf/gcs.json curw-wrfv4:${docker_tag} \
