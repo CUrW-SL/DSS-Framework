@@ -140,7 +140,7 @@ def create_sim_hybrid_raincell(dir_path, run_date, run_time, forward, backward,
         print('Raincell file already in path : ', raincell_file_path)
 
 
-def generate_raincell(raincell_file_path, time_limits, model, data_type, sim_tag):
+def generate_raincell(raincell_file_path, time_limits, model, data_type, any_wrf=None, sim_tag=None):
     sim_connection = pymysql.connect(host=HOST, user=USER, password=PASSWORD, db=SIM_DB,
                                      cursorclass=pymysql.cursors.DictCursor)
     fcst_connection = pymysql.connect(host=HOST, user=USER, password=PASSWORD, db=FCST_DB,
@@ -192,6 +192,10 @@ def generate_raincell(raincell_file_path, time_limits, model, data_type, sim_tag
     elif data_type == 2:  # Forecast only
         try:
             timestamp = start_time
+            if sim_tag is not None:
+                print('')
+            else:
+                print('sim_tag is required for forecast raincell generation.')
         except Exception as ex:
             traceback.print_exc()
         finally:
@@ -276,6 +280,7 @@ def create_raincell(dir_path, run_date, run_time, forward, backward, model, data
     raincell_file_path = os.path.join(dir_path, 'RAINCELL.DAT')
     start_time = datetime.now()
     generate_raincell(raincell_file_path, time_limits, model, data_type, any_wrf, sim_tag)
+    # generate_raincell(raincell_file_path, time_limits, model, data_type, any_wrf, sim_tag)
     end_time = datetime.now()
     duration = (end_time - start_time).total_seconds() / 60
     print('create_raincell|duration : ', duration)
@@ -288,6 +293,6 @@ def create_raincell(dir_path, run_date, run_time, forward, backward, model, data
 if __name__ == '__main__':
     try:
         create_raincell('/home/hasitha/PycharmProjects/DSS-Framework/output',
-                        '2020-01-17', '08:00:00', 3, 2, 'flo2d_250', 0, 1, 'mwrf_gfs_d0_00')
+                        '2020-01-27', '08:00:00', 3, 2, 'flo2d_250', 0, 1, 'mwrf_gfs_d0_00')
     except Exception as e:
         print(str(e))
