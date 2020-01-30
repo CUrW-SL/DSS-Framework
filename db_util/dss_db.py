@@ -117,15 +117,14 @@ class RuleEngineAdapter:
         '''
         wrf_rules = []
         query = 'select id, name, target_model, version, run, hour, ignore_previous_run, ' \
-                'check_gfs_data_availability, namelist_wps, namelist_input from dss.wrf_rules ' \
+                'check_gfs_data_availability from dss.wrf_rules ' \
                 'where status = {} '.format(status)
         results = self.get_multiple_result(query)
         if results is not None:
             for row in results:
                 wrf_rules.append({'id': row[0], 'name': row[1], 'target_model': row[2],
                                   'version': row[3], 'run': row[4], 'hour': row[5],
-                                  'ignore_previous_run': row[6], 'check_gfs_data_availability': row[7],
-                                  'namelist_wps': row[8], 'namelist_input': row[9]})
+                                  'ignore_previous_run': row[6], 'check_gfs_data_availability': row[7]})
         return wrf_rules
 
     def get_wrf_rule_info_by_id(self, rule_id, status=1):
@@ -135,7 +134,7 @@ class RuleEngineAdapter:
         '''
         wrf_rule = None
         query = 'select id, name, target_model, version, run, hour, ignore_previous_run, ' \
-                'check_gfs_data_availability, namelist_wps, namelist_input from dss.wrf_rules ' \
+                'check_gfs_data_availability from dss.wrf_rules ' \
                 'where id = {} and status = {} '.format(rule_id, status)
         print('get_wrf_rule_info_by_id|query : ', query)
         self.cursor.execute(query)
@@ -143,8 +142,7 @@ class RuleEngineAdapter:
         if result is not None:
             wrf_rule = {'id': result[0], 'name': result[1], 'target_model': result[2],
                         'version': result[3], 'run': result[4], 'hour': result[5],
-                        'ignore_previous_run': result[6], 'check_gfs_data_availability': result[7],
-                        'namelist_wps': result[8], 'namelist_input': result[9]}
+                        'ignore_previous_run': result[6], 'check_gfs_data_availability': result[7]}
         return wrf_rule
 
     def get_eligible_wrf_rule_info_by_id(self, rule_id):
@@ -154,8 +152,7 @@ class RuleEngineAdapter:
         '''
         wrf_rule = None
         query = 'select id, name, target_model, version, run, hour, ignore_previous_run, ' \
-                'check_gfs_data_availability,accuracy_rule, rule_details, namelist_wps, ' \
-                'namelist_input from dss.wrf_rules ' \
+                'check_gfs_data_availability,accuracy_rule, rule_details from dss.wrf_rules ' \
                 'where id = {} and status in (1,3,4)  '.format(rule_id)
         print('get_wrf_rule_info_by_id|query : ', query)
         self.cursor.execute(query)
@@ -164,8 +161,7 @@ class RuleEngineAdapter:
             wrf_rule = {'id': result[0], 'name': result[1], 'target_model': result[2],
                         'version': result[3], 'run': result[4], 'hour': result[5],
                         'ignore_previous_run': result[6], 'check_gfs_data_availability': result[7],
-                        'accuracy_rule': result[8], 'rule_details': json.loads(result[9]),
-                        'namelist_wps': result[10], 'namelist_input': result[11]}
+                        'accuracy_rule': result[8], 'rule_details': json.loads(result[9])}
         return wrf_rule
 
     def get_wrf_rule_status_by_id(self, rule_id):
