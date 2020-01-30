@@ -28,8 +28,8 @@ default_args = {
     'email_on_failure': True,
 }
 
-ssh_cmd_template = "ssh -i /home/curw/.ssh/uwcc-admin -o \"StrictHostKeyChecking no\" uwcc-admin@{} " \
-                   "\'bash -c \"{}\"'"
+# ssh curw@192.168.1.43 /home/curw/task.sh -a 12 -b 2 -c 'hello'
+ssh_cmd_template = 'ssh curw@{} {}'
 
 
 def get_dss_db_adapter():
