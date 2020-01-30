@@ -61,9 +61,9 @@ def get_push_command(**context):
     push_script = '{} {} {} d{} {} {} {}'.format(bash_script, push_config, wrf_bucket, wrf_run,
                                                  gfs_hour, wrf_model, exec_date)
     print('get_push_command|run_script : ', push_script)
-    push_wrf4_A_cmd = ssh_cmd_template.format(push_node, push_script)
-    print('get_push_command|push_wrf4_A_cmd : ', push_wrf4_A_cmd)
-    subprocess.call(push_wrf4_A_cmd, shell=True)
+    push_wrf_cmd = ssh_cmd_template.format(push_node, push_script)
+    print('get_push_command|push_wrf_cmd : ', push_wrf_cmd)
+    subprocess.call(push_wrf_cmd, shell=True)
 
 
 def get_wrf_run_command(**context):
@@ -95,9 +95,9 @@ def get_wrf_run_command(**context):
                                                                                     zipped_wps_content,
                                                                                     zipped_input_content)
                 print('get_wrf_run_command|run_script : ', run_script)
-                run_wrf4_A_cmd = ssh_cmd_template.format(run_node, run_script)
-                print('get_wrf_run_command|run_wrf4_A_cmd : ', run_wrf4_A_cmd)
-                subprocess.call(run_wrf4_A_cmd, shell=True)
+                run_wrf_cmd = ssh_cmd_template.format(run_node, run_script)
+                print('get_wrf_run_command|run_wrf4_A_cmd : ', run_wrf_cmd)
+                subprocess.call(run_wrf_cmd, shell=True)
 
 
 def update_workflow_status(status, rule_id):
@@ -113,7 +113,7 @@ def update_workflow_status(status, rule_id):
 
 
 def get_rule_id(context):
-    rule_info = context['task_instance'].xcom_pull(task_ids='init_wrfv4A')['rule_info']
+    rule_info = context['task_instance'].xcom_pull(task_ids='init_wrf')['rule_info']
     if rule_info:
         rule_id = rule_info['id']
         print('get_rule_id|rule_id : ', rule_id)
@@ -148,9 +148,9 @@ def run_this_func(dag_run, **kwargs):
 
 def check_accuracy(**context):
     print('check_accuracy|context : ', context)
-    task_info = context['task_instance'].xcom_pull(task_ids='init_wrfv4A')
+    task_info = context['task_instance'].xcom_pull(task_ids='init_wrf')
     print('check_accuracy|task_info : ', task_info)
-    rule_info = context['task_instance'].xcom_pull(task_ids='init_wrfv4A')['rule_info']
+    rule_info = context['task_instance'].xcom_pull(task_ids='init_wrf')['rule_info']
     print('check_accuracy|rule_info : ', rule_info)
     accuracy_rule_id = rule_info['accuracy_rule']
     if accuracy_rule_id == 0 or accuracy_rule_id == '0':
@@ -173,59 +173,59 @@ def on_dag_failure(context):
 
 
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
-         description='Run WRF v4 A DAG', dagrun_timeout=timedelta(hours=9), catchup=False,
+         description='Run WRF DAG', dagrun_timeout=timedelta(hours=9), catchup=False,
          on_failure_callback=on_dag_failure, max_active_runs=2, concurrency=2) as dag:
-    init_wrfv4_A = PythonOperator(
-        task_id='init_wrfv4A',
+    init_wrf = PythonOperator(
+        task_id='init_wrf',
         provide_context=True,
         python_callable=run_this_func,
         pool=dag_pool
     )
 
-    running_state_wrfv4A = PythonOperator(
-        task_id='running_state_wrfv4A',
+    running_state_wrf = PythonOperator(
+        task_id='running_state_wrf',
         provide_context=True,
         python_callable=set_running_status,
         pool=dag_pool
     )
 
-    check_gfs_availability_wrfv4A = GfsSensorOperator(
-        task_id='check_gfs_availability_wrfv4A',
+    check_gfs_availability_wrf = GfsSensorOperator(
+        task_id='check_gfs_availability_wrf',
         poke_interval=60,
         execution_timeout=timedelta(minutes=45),
-        params={'model': 'A', 'init_task_id': 'init_wrfv4A'},
+        params={'model': 'A', 'init_task_id': 'init_wrf'},
         provide_context=True,
         pool=dag_pool
     )
 
-    run_wrf4_A = PythonOperator(
-        task_id='run_wrf4_A',
+    run_wrf = PythonOperator(
+        task_id='run_wrf',
         provide_context=True,
         execution_timeout=timedelta(hours=8, minutes=30),
         python_callable=get_wrf_run_command,
         pool=dag_pool
     )
 
-    wrf_data_push_wrfv4A = PythonOperator(
-        task_id='wrf_data_push_wrfv4A',
+    wrf_data_push_wrf = PythonOperator(
+        task_id='wrf_data_push_wrf',
         provide_context=True,
         python_callable=get_push_command,
         pool=dag_pool
     )
 
-    check_accuracy_wrfv4A = PythonOperator(
-        task_id='check_accuracy_wrfv4A',
+    check_accuracy_wrf = PythonOperator(
+        task_id='check_accuracy_wrf',
         provide_context=True,
         python_callable=check_accuracy,
         pool=dag_pool
     )
 
-    complete_state_wrfv4A = PythonOperator(
-        task_id='complete_state_wrfv4A',
+    complete_state_wrf = PythonOperator(
+        task_id='complete_state_wrf',
         provide_context=True,
         python_callable=set_complete_status,
         pool=dag_pool
     )
 
-    init_wrfv4_A >> running_state_wrfv4A >> check_gfs_availability_wrfv4A >> \
-    run_wrf4_A >> wrf_data_push_wrfv4A >> check_accuracy_wrfv4A >> complete_state_wrfv4A
+    init_wrf >> running_state_wrf >> check_gfs_availability_wrf >> \
+    run_wrf >> wrf_data_push_wrf >> check_accuracy_wrf >> complete_state_wrf
