@@ -1,6 +1,6 @@
 import sys
 
-sys.path.insert(0, '/home/curw/git/DSS-Framework/gen_util')
+sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/gen_util')
 from controller_util import is_matched
 
 
