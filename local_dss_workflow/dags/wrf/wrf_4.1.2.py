@@ -46,7 +46,7 @@ def get_dss_db_adapter():
 
 
 def get_push_command(**context):
-    wrf_rule = context['task_instance'].xcom_pull(task_ids='init_wrfv4A')
+    wrf_rule = context['task_instance'].xcom_pull(task_ids='init_wrf')
     print('get_wrf_run_command|wrf_rule : ', wrf_rule)
     wrf_model = wrf_rule['model']
     wrf_run = wrf_rule['rule_info']['run']
@@ -67,7 +67,7 @@ def get_push_command(**context):
 
 
 def get_wrf_run_command(**context):
-    wrf_rule = context['task_instance'].xcom_pull(task_ids='init_wrfv4A')
+    wrf_rule = context['task_instance'].xcom_pull(task_ids='init_wrf')
     print('get_wrf_run_command|wrf_rule : ', wrf_rule)
     wrf_model = wrf_rule['model']
     wrf_version = wrf_rule['version']
@@ -96,7 +96,7 @@ def get_wrf_run_command(**context):
                                                                                     zipped_input_content)
                 print('get_wrf_run_command|run_script : ', run_script)
                 run_wrf_cmd = ssh_cmd_template.format(run_node, run_script)
-                print('get_wrf_run_command|run_wrf4_A_cmd : ', run_wrf_cmd)
+                print('get_wrf_run_command|run_wrf_cmd : ', run_wrf_cmd)
                 subprocess.call(run_wrf_cmd, shell=True)
 
 
