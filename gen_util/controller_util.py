@@ -25,6 +25,8 @@ def get_triggering_dags(db_adapter, dss_rule_id, model_type):
                            'ignore_previous_run': wrf_rule_info['ignore_previous_run'],
                            'check_gfs_data_availability': wrf_rule_info['check_gfs_data_availability'],
                            'accuracy_rule': wrf_rule_info['accuracy_rule'],
+                           'namelist_wps': wrf_rule_info['namelist_wps'],
+                           'namelist_input': wrf_rule_info['namelist_input'],
                            'rule_details': wrf_rule_info['rule_details']}
                 dag_info.append({'dag_name': dag_name, 'payload': payload})
         else:
