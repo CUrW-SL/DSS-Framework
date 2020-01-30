@@ -20,7 +20,7 @@ def get_triggering_dags(db_adapter, dss_rule_id, model_type):
             for target_model in target_models:
                 target_model = target_model.strip()
                 print('target_model : ', target_model)
-                dag_name = 'wrf_{}_{}_dag'.format(wrf_rule_info['version'], target_model)
+                dag_name = 'wrf_{}_dag'.format(wrf_rule_info['version'])
                 payload = {'id': wrf_rule_info['id'], 'run': wrf_rule_info['run'], 'hour': wrf_rule_info['hour'],
                            'ignore_previous_run': wrf_rule_info['ignore_previous_run'],
                            'check_gfs_data_availability': wrf_rule_info['check_gfs_data_availability'],
