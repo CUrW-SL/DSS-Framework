@@ -667,7 +667,7 @@ if __name__ == '__main__':
     logging.info('**** WRF RUN Mode**** run_mode: {}'.format(run_mode))
 
     wps_config_id = args['wps_config_id']
-    logging.info('**** WPS wps_config_id: {}'.format(wps_config_id))    
+    logging.info('**** WPS wps_config_id: {}'.format(wps_config_id))
 
     input_config_id = args['input_content']
     logging.info('**** WRF input content input_config_id: {}'.format(input_config_id))
