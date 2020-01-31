@@ -68,7 +68,7 @@ docker run -i --rm --privileged \
     -v /mnt/disks/data/wrf-data/archive:/home/Build_WRF/archive \
     curw-wrf-18_04:${docker_tag} /home/Build_WRF/code/wrfv4_run.sh \
     -d ${gfs_date} -k ${wrf_id} -a ${NAMELIST_WPS_ID} \
-    -b ${NAMELIST_INPUT_ID} -c ${DB_CONFIG}
+    -b ${NAMELIST_INPUT_ID} -c \\\'${DB_CONFIG}\\\'
 
 #docker run -i --rm --privileged
 #    -v /mnt/disks/data/wrf-data/nfs:/home/Build_WRF/nfs \
