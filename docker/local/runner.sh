@@ -75,7 +75,7 @@ docker run -i --rm --privileged \
     curw-wrf-18_04:${docker_tag} /home/Build_WRF/code/wrfv4_run.sh \
     -d ${gfs_date} -k ${wrf_id} -a ${NAMELIST_WPS_ID} \
     -b ${NAMELIST_INPUT_ID} -p ${DB_USER} \
-    -q ${DB_PASSWORD} -r ${DB_NAME} -s ${DB_HOST}
+    -q ${DB_PASSWORD} -t ${DB_NAME} -s ${DB_HOST}
 
 #docker run -i --rm --privileged
 #    -v /mnt/disks/data/wrf-data/nfs:/home/Build_WRF/nfs \
