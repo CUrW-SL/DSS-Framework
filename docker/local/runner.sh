@@ -4,7 +4,7 @@ echo "#### Running WRF procedures..."
 
 #mkdir -p /mnt/disks/data/wrf-data/gfs
 
-while getopts "r:m:v:d:h:a:b:c:" option; do
+while getopts "r:m:v:d:h:a:b:p:q:r:s:" option; do
   case "${option}" in
   d) RUN_DATE=$OPTARG ;; # 2019-10-23
   r) WRF_RUN=$OPTARG ;; # 1/0
@@ -13,7 +13,10 @@ while getopts "r:m:v:d:h:a:b:c:" option; do
   h) GFS_HOUR=$OPTARG ;; # 00/06/12/18
   a) NAMELIST_WPS_ID=$OPTARG ;; # 1
   b) NAMELIST_INPUT_ID=$OPTARG ;; # 2
-  c) DB_CONFIG=$OPTARG ;; # 2
+  p) DB_USER=$OPTARG ;; # 2
+  q) DB_PASSWORD=$OPTARG ;; # 2
+  r) DB_NAME=$OPTARG ;; # 2
+  s) DB_HOST=$OPTARG ;; # 2
   *) echo "Invalid option: $OPTARG" ;;
   \?) echo "Invalid option: $OPTARG" ;;
   :) echo "Invalid option: $OPTARG requires an argument" ;;
@@ -27,7 +30,10 @@ echo "MODEL : $MODEL"
 echo "VERSION : $VERSION"
 echo "NAMELIST_WPS_ID : $NAMELIST_WPS_ID"
 echo "NAMELIST_INPUT_ID : $NAMELIST_INPUT_ID"
-echo "DB_CONFIG : $DB_CONFIG"
+echo "DB_USER : $DB_USER"
+echo "DB_PASSWORD : $DB_PASSWORD"
+echo "DB_NAME : $DB_NAME"
+echo "DB_HOST : $DB_HOST"
 
 
 if [[ ${WRF_RUN} == 0 ]] || [[ ${WRF_RUN} == "0" ]]; then
@@ -68,7 +74,8 @@ docker run -i --rm --privileged \
     -v /mnt/disks/data/wrf-data/archive:/home/Build_WRF/archive \
     curw-wrf-18_04:${docker_tag} /home/Build_WRF/code/wrfv4_run.sh \
     -d ${gfs_date} -k ${wrf_id} -a ${NAMELIST_WPS_ID} \
-    -b ${NAMELIST_INPUT_ID} -c \'${DB_CONFIG}\'
+    -b ${NAMELIST_INPUT_ID} -p ${DB_USER} \
+    -q ${DB_PASSWORD} -r ${DB_NAME} -s ${DB_HOST}
 
 #docker run -i --rm --privileged
 #    -v /mnt/disks/data/wrf-data/nfs:/home/Build_WRF/nfs \

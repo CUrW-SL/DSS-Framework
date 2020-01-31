@@ -70,10 +70,14 @@ def get_push_command(**context):
     print('get_push_command|push_wrf_cmd : ', push_wrf_cmd)
     subprocess.call(push_wrf_cmd, shell=True)
 
-
+# {mysql_user: curw, mysql_password: cfcwm07, mysql_host: 192.168.1.43, mysql_db: dss, log_path: /home/curw/dss/logs}
 def get_wrf_run_command(**context):
     wrf_rule = context['task_instance'].xcom_pull(task_ids='init_wrf')
     db_config = Variable.get('db_config', deserialize_json=True)
+    db_user = db_config['mysql_user']
+    db_password = db_config['mysql_password']
+    db_name = db_config['mysql_db']
+    db_host = db_config['mysql_host']
     vm_config = Variable.get('ubuntu1_config', deserialize_json=True)
     vm_user = vm_config['user']
     vm_password = vm_config['password']
@@ -89,12 +93,19 @@ def get_wrf_run_command(**context):
     run_script = wrf_rule['rule_info']['rule_details']['run_script']
     exec_date = context["execution_date"].to_datetime_string()
     if db_config is not None:
-        run_script = '{}  -r {} -m {} -v {} -h {} -a {} -b {} -c \\\'\'{}\'\\\' -d {}'.format(run_script, wrf_run,
-                                                                            wrf_model, wrf_version,
-                                                                            gfs_hour,
-                                                                            namelist_wps_id,
-                                                                            namelist_input_id,
-                                                                            db_config, exec_date)
+        # run_script = '{}  -r {} -m {} -v {} -h {} -a {} -b {} -c \\\'\'{}\'\\\' -d {}'.format(run_script, wrf_run,
+        #                                                                     wrf_model, wrf_version,
+        #                                                                     gfs_hour,
+        #                                                                     namelist_wps_id,
+        #                                                                     namelist_input_id,
+        #                                                                     db_config, exec_date)
+        run_script = '{}  -r {} -m {} -v {} -h {} -a {} -b {} -p {} -q {} -r {} -s {} -d {}'.format(run_script, wrf_run,
+                                                                                              wrf_model, wrf_version,
+                                                                                              gfs_hour, namelist_wps_id,
+                                                                                              namelist_input_id,
+                                                                                              db_user, db_password,
+                                                                                              db_name, db_host,
+                                                                                              exec_date)
         print('get_wrf_run_command|run_script : ', run_script)
         run_wrf_cmd = ssh_cmd_template.format(vm_password, vm_user, run_node, run_script)
         print('get_wrf_run_command|run_wrf_cmd : ', run_wrf_cmd)

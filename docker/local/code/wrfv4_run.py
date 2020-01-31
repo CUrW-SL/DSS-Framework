@@ -672,7 +672,9 @@ if __name__ == '__main__':
     input_config_id = args['input_content']
     logging.info('**** WRF input content input_config_id: {}'.format(input_config_id))
 
-    db_config = args['db_config']
+    db_config = {'mysql_user': args['db_config'], 'mysql_password': args['db_config'],
+                 'mysql_host': args['db_config'], 'mysql_db': args['db_config'],
+                 'log_path': ''}
     logging.info('**** WRF db_config: {}'.format(db_config))
 
     with open('wrfv4_config.json') as json_file:
