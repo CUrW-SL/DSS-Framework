@@ -62,11 +62,11 @@ fi
 
 docker_tag="wrf_${VERSION}"
 
-echo "tmp_date : ${tmp_date}"
-echo "gfs_date : ${gfs_date}"
-echo "exec_date : ${exec_date}"
-echo "wrf_id : ${wrf_id}"
-echo "docker_tag : ${docker_tag}"
+echo "runner tmp_date : ${tmp_date}"
+echo "runner gfs_date : ${gfs_date}"
+echo "runner exec_date : ${exec_date}"
+echo "runner wrf_id : ${wrf_id}"
+echo "runner docker_tag : ${docker_tag}"
 
 docker run -i --rm --privileged \
     -v /mnt/disks/data/wrf-data/nfs:/home/Build_WRF/nfs \
