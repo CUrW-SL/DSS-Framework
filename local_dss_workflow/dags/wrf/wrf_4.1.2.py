@@ -29,7 +29,12 @@ default_args = {
 }
 
 # ssh curw@192.168.1.43 /home/curw/task.sh -a 12 -b 2 -c 'hello'
-ssh_cmd_template = 'ssh curw@{} {}'
+# sshpass -p 'cfcwm07' ssh curw@124.43.13.195 -p 6022 /home/curw/task.sh -a 12 -b 2 -c 'hello'
+# sshpass -p 'cfcwm07' ssh curw@124.43.13.195 /home/curw/task.sh -a 12 -b 2 -c 'hello'
+# sshpass -p '{}' ssh {}@{} {}
+# ssh_cmd_template = 'ssh curw@{} {}'
+ssh_cmd_template = 'sshpass -p \'{}\' ssh {}@{} {}'
+
 
 
 def get_dss_db_adapter():
@@ -69,6 +74,9 @@ def get_push_command(**context):
 def get_wrf_run_command(**context):
     wrf_rule = context['task_instance'].xcom_pull(task_ids='init_wrf')
     db_config = Variable.get('db_config', deserialize_json=True)
+    vm_config = Variable.get('ubuntu1_config', deserialize_json=True)
+    vm_user = vm_config['user']
+    vm_password = vm_config['password']
     print('get_wrf_run_command|wrf_rule : ', wrf_rule)
     wrf_model = wrf_rule['model']
     wrf_version = wrf_rule['version']
@@ -90,7 +98,7 @@ def get_wrf_run_command(**context):
                                                                             namelist_input_id,
                                                                             db_config)
         print('get_wrf_run_command|run_script : ', run_script)
-        run_wrf_cmd = ssh_cmd_template.format(run_node, run_script)
+        run_wrf_cmd = ssh_cmd_template.format(vm_password, vm_user, run_node, run_script)
         print('get_wrf_run_command|run_wrf_cmd : ', run_wrf_cmd)
         subprocess.call(run_wrf_cmd, shell=True)
     # dss_adapter = get_dss_db_adapter()
