@@ -4,7 +4,7 @@ echo "#### Running WRF procedures..."
 
 #mkdir -p /mnt/disks/data/wrf-data/gfs
 
-while getopts "r:m:v:d:h:a:b:p:q:r:s:" option; do
+while getopts "r:m:v:d:h:a:b:p:q:t:s:" option; do
   case "${option}" in
   d) RUN_DATE=$OPTARG ;; # 2019-10-23
   r) WRF_RUN=$OPTARG ;; # 1/0
@@ -15,7 +15,7 @@ while getopts "r:m:v:d:h:a:b:p:q:r:s:" option; do
   b) NAMELIST_INPUT_ID=$OPTARG ;; # 2
   p) DB_USER=$OPTARG ;; # 2
   q) DB_PASSWORD=$OPTARG ;; # 2
-  r) DB_NAME=$OPTARG ;; # 2
+  t) DB_NAME=$OPTARG ;; # 2
   s) DB_HOST=$OPTARG ;; # 2
   *) echo "Invalid option: $OPTARG" ;;
   \?) echo "Invalid option: $OPTARG" ;;

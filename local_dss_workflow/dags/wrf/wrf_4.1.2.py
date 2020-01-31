@@ -99,7 +99,7 @@ def get_wrf_run_command(**context):
         #                                                                     namelist_wps_id,
         #                                                                     namelist_input_id,
         #                                                                     db_config, exec_date)
-        run_script = '{}  -r {} -m {} -v {} -h {} -a {} -b {} -p {} -q {} -r {} -s {} -d {}'.format(run_script, wrf_run,
+        run_script = '{}  -r {} -m {} -v {} -h {} -a {} -b {} -p {} -q {} -t {} -s {} -d {}'.format(run_script, wrf_run,
                                                                                               wrf_model, wrf_version,
                                                                                               gfs_hour, namelist_wps_id,
                                                                                               namelist_input_id,

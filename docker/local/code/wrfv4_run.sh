@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 echo "#### Reading running args..."
-while getopts "d:i:m:g:k:v:a:b:p:q:r:s:" option; do
+while getopts "d:i:m:g:k:v:a:b:p:q:t:s:" option; do
   case "${option}" in
   d) START_DATE=$OPTARG ;;
   k) RUN_ID=$OPTARG ;;
@@ -10,7 +10,7 @@ while getopts "d:i:m:g:k:v:a:b:p:q:r:s:" option; do
   b) NAMELIST_INPUT_ID=$OPTARG ;;
   p) DB_USER=$OPTARG ;; # 2
   q) DB_PASSWORD=$OPTARG ;; # 2
-  r) DB_NAME=$OPTARG ;; # 2
+  t) DB_NAME=$OPTARG ;; # 2
   s) DB_HOST=$OPTARG ;; # 2
   esac
 done
