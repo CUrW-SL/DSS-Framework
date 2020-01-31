@@ -39,8 +39,8 @@ python3 wrfv4_run.py \
                     $( check_empty "$RUN_ID" run_id ) \
                     $( check_empty "$NAMELIST_WPS_ID" wps_config_id ) \
                     $( check_empty "$NAMELIST_INPUT_ID" input_config_id ) \
-                    $( check_empty "$DB_USER" db_user )
-                    $( check_empty "$DB_PASSWORD" db_password )
-                    $( check_empty "$DB_NAME" db_name )
+                    $( check_empty "$DB_USER" db_user ) \
+                    $( check_empty "$DB_PASSWORD" db_password ) \
+                    $( check_empty "$DB_NAME" db_name ) \
                     $( check_empty "$DB_HOST" db_host )
 echo "####WRF procedures completed"
