@@ -6,6 +6,7 @@ echo "#### Running WRF procedures..."
 
 while getopts ":r:m:v:d:h:a:b:C:" option; do
   case "${option}" in
+  *) echo "Invalid option: $OPTARG" ;;
   d) RUN_DATE=$OPTARG ;; # 2019-10-23
   r) WRF_RUN=$OPTARG ;; # 1/0
   m) MODEL=$OPTARG ;; # 1/0
@@ -14,7 +15,6 @@ while getopts ":r:m:v:d:h:a:b:C:" option; do
   a) NAMELIST_WPS_ID=$OPTARG ;; # 1
   b) NAMELIST_INPUT_ID=$OPTARG ;; # 2
   c) DB_CONFIG=$OPTARG ;; # 2
-  *) echo "Invalid option: $OPTARG" ;;
   \?) echo "Invalid option: $OPTARG" ;;
   :) echo "Invalid option: $OPTARG requires an argument" ;;
   esac
