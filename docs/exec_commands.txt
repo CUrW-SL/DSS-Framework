@@ -74,3 +74,4 @@ pkill -f airflow
 
 # build docker containers for local deployments
 docker build -t curw-wrf-18_04:wrf_4.1.2 .
+docker build --no-cache -t curw-wrf-18_04:wrf_4.1.2 .

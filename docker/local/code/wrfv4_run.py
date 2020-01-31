@@ -600,6 +600,12 @@ def parse_args():
     parser.add_argument('-run_id')
     parser.add_argument('-start_date')
     parser.add_argument('-mode')
+    parser.add_argument('-wps_config_id')
+    parser.add_argument('-input_config_id')
+    parser.add_argument('-db_user')
+    parser.add_argument('-db_password')
+    parser.add_argument('-db_host')
+    parser.add_argument('-db_name')
     parser.add_argument('-wrf_config', default={})
     return parser.parse_args()
 
@@ -638,22 +644,6 @@ def run_wrf_model(run_mode, wrf_conf):
         log.error('download_gfs_data exception')
 
 
-# def write_namelist_wps_to_file(wrf_conf, zipped_wps_content):
-#     wps_content = zlib.decompress(zipped_wps_content)
-#     wps_content = wps_content.decode()
-#     namelist_wsp_file_path = wrf_conf['namelist_wps']
-#     with open(namelist_wsp_file_path, 'w') as file:
-#         file.write(wps_content)
-#
-#
-# def write_namelist_input_to_file(wrf_conf, zipped_input_content):
-#     input_content = zlib.decompress(zipped_input_content)
-#     input_content = input_content.decode()
-#     namelist_input_file_path = wrf_conf['namelist_input']
-#     with open(namelist_input_file_path, 'w') as file:
-#         file.write(input_content)
-
-
 if __name__ == '__main__':
     args = vars(parse_args())
     logging.info('Running arguments:\n%s' % json.dumps(args, sort_keys=True, indent=0))
@@ -669,11 +659,11 @@ if __name__ == '__main__':
     wps_config_id = args['wps_config_id']
     logging.info('**** WPS wps_config_id: {}'.format(wps_config_id))
 
-    input_config_id = args['input_content']
+    input_config_id = args['input_config_id']
     logging.info('**** WRF input content input_config_id: {}'.format(input_config_id))
 
-    db_config = {'mysql_user': args['db_config'], 'mysql_password': args['db_config'],
-                 'mysql_host': args['db_config'], 'mysql_db': args['db_config'],
+    db_config = {'mysql_user': args['db_user'], 'mysql_password': args['db_password'],
+                 'mysql_host': args['db_host'], 'mysql_db': args['db_name'],
                  'log_path': ''}
     logging.info('**** WRF db_config: {}'.format(db_config))
 
