@@ -92,7 +92,7 @@ class DSSAdapter:
                 'bl_pbl_physics, bldt, cu_physics, cudt, isfflx, ifsnow, icloud, surface_input_source, num_soil_layers,' \
                 'sf_urban_physics, w_damping, diff_opt, km_opt, diff_6th_opt, diff_6th_factor, base_temp, damp_opt, ' \
                 'zdamp, dampcoef, khdif, kvdif, non_hydrostatic, moist_adv_opt, scalar_adv_opt, spec_bdy_width, ' \
-                'spec_zone, relax_zone, specified, nested, nio_tasks_per_group, nio_groups ' \
+                'spec_zone, relax_zone, specified, nested, nio_tasks_per_group, nio_groups, template_path ' \
                 'from dss.namelist_input_config where id={};'.format(config_id)
         print('get_namelist_input_configs|query: ', query)
         self.cursor.execute(query)
@@ -125,7 +125,7 @@ class DSSAdapter:
                           'non_hydrostatic': result[63], 'moist_adv_opt': result[64], 'scalar_adv_opt': result[65],
                           'spec_bdy_width': result[66], 'spec_zone': result[67], 'relax_zone': result[68],
                           'specified': result[69], 'nested': result[70], 'nio_tasks_per_group': result[71],
-                          'nio_groups': result[72]}
+                          'nio_groups': result[72], 'template_path': result[73]}
             return wps_config
         else:
             return None
@@ -140,7 +140,7 @@ class DSSAdapter:
         query = 'select id,wrf_core, max_dom, interval_seconds, io_form_geogrid, parent_id, parent_grid_ratio, ' \
                 'i_parent_start, j_parent_start, e_we, e_sn, geog_data_res, dx, ' \
                 'dy, map_proj, ref_lat, ref_lon, truelat1, truelat2, ' \
-                'stand_lon, geog_data_path, out_format, prefix, fg_name, io_form_metgrid ' \
+                'stand_lon, geog_data_path, out_format, prefix, fg_name, io_form_metgrid, template_path ' \
                 'from dss.namelist_wps_config where id={};'.format(config_id)
         print('get_namelist_wps_configs|query: ', query)
         self.cursor.execute(query)
@@ -155,7 +155,7 @@ class DSSAdapter:
                           'map_proj': result[14], 'ref_lat': result[15], 'ref_lon': result[16],
                           'truelat1': result[17], 'truelat2': result[18], 'stand_lon': result[19],
                           'geog_data_path': result[20], 'out_format': result[21], 'prefix': result[22],
-                          'fg_name': result[23], 'io_form_metgrid': result[24]}
+                          'fg_name': result[23], 'io_form_metgrid': result[24], 'template_path': result[25]}
             return wps_config
         else:
             return None
