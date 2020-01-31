@@ -212,24 +212,40 @@ def format_content(content, config_data):
     return content
 
 
-def create_namelist_wps_file(dss_adapter, config_id, template_path, file_location):
+def create_namelist_wps_file(db_config, config_id, file_location):
     try:
-        new_content = get_namelist_wps_config(dss_adapter, config_id, template_path)
-        if new_content is not None:
-            with open(file_location, 'w') as file:
-                file.write(new_content)
+        dss_adapter = DSSAdapter.get_instance(db_config)
+        config_data = dss_adapter.get_namelist_wps_configs(config_id)
+        template_path = config_data['template_path']
+        print('get_namelist_wps_config|config_data : ', config_data)
+        if config_data is not None:
+            print('get_namelist_wps_configs|config_data : ', config_data)
+            with open(template_path, 'r') as file:
+                content = file.read()
+                new_content = format_content(content, config_data)
+                print('new_content : ', new_content)
+                with open(file_location, 'w') as file:
+                    file.write(new_content)
         return True
     except Exception as e:
         print('create_namelist_wps_file|Exception : ', str(e))
         return False
 
 
-def create_namelist_input_file(dss_adapter, config_id, template_path, file_location):
+def create_namelist_input_file(db_config, config_id, file_location):
     try:
-        new_content = get_namelist_input_config(dss_adapter, config_id, template_path)
-        if new_content is not None:
-            with open(file_location, 'w') as file:
-                file.write(new_content)
+        dss_adapter = DSSAdapter.get_instance(db_config)
+        config_data = dss_adapter.get_namelist_input_configs(config_id)
+        template_path = config_data['template_path']
+        print('get_namelist_input_config|config_data : ', config_data)
+        if config_data is not None:
+            print('get_namelist_input_config|config_data : ', config_data)
+            with open(template_path, 'r') as file:
+                content = file.read()
+                new_content = format_content(content, config_data)
+                print('new_content : ', new_content)
+                with open(file_location, 'w') as file:
+                    file.write(new_content)
         return True
     except Exception as e:
         print('create_namelist_input_file|Exception : ', str(e))
