@@ -4,7 +4,7 @@ echo "#### Running WRF procedures..."
 
 #mkdir -p /mnt/disks/data/wrf-data/gfs
 
-while getopts "r:m:v:d:h:a:b:C:" option; do
+while getopts "r:m:v:d:h:a:b:c:" option; do
   case "${option}" in
   d) RUN_DATE=$OPTARG ;; # 2019-10-23
   r) WRF_RUN=$OPTARG ;; # 1/0
