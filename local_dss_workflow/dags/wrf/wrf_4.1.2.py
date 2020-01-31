@@ -91,12 +91,12 @@ def get_wrf_run_command(**context):
     namelist_input_template = wrf_rule['rule_info']['rule_details']['namelist_input_template']
     exec_date = context["execution_date"].to_datetime_string()
     if db_config is not None:
-        run_script = '{}  -r {} -m {} -v {} -h {} -d {} -a {} -b {} -c {}'.format(run_script, wrf_run,
+        run_script = '{}  -r {} -m {} -v {} -h {} -a {} -b {} -c {} -d {}'.format(run_script, wrf_run,
                                                                             wrf_model, wrf_version,
-                                                                            gfs_hour, exec_date,
+                                                                            gfs_hour,
                                                                             namelist_wps_id,
                                                                             namelist_input_id,
-                                                                            db_config)
+                                                                            db_config, exec_date)
         print('get_wrf_run_command|run_script : ', run_script)
         run_wrf_cmd = ssh_cmd_template.format(vm_password, vm_user, run_node, run_script)
         print('get_wrf_run_command|run_wrf_cmd : ', run_wrf_cmd)
