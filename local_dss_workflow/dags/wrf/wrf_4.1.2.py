@@ -89,7 +89,7 @@ def get_wrf_run_command(**context):
     run_script = wrf_rule['rule_info']['rule_details']['run_script']
     exec_date = context["execution_date"].to_datetime_string()
     if db_config is not None:
-        run_script = '{}  -r {} -m {} -v {} -h {} -a {} -b {} -c "{}" -d {}'.format(run_script, wrf_run,
+        run_script = '{}  -r {} -m {} -v {} -h {} -a {} -b {} -c \'\'{}\'\' -d {}'.format(run_script, wrf_run,
                                                                             wrf_model, wrf_version,
                                                                             gfs_hour,
                                                                             namelist_wps_id,
