@@ -42,5 +42,5 @@ python3 wrfv4_run.py \
                     $( check_empty "$DB_USER" db_user ) \
                     $( check_empty "$DB_PASSWORD" db_password ) \
                     $( check_empty "$DB_NAME" db_name ) \
-                    $( check_empty \'"$DB_HOST"\' db_host )
+                    $( check_empty "$DB_HOST" db_host )
 echo "####WRF procedures completed"
