@@ -646,31 +646,31 @@ def run_wrf_model(run_mode, wrf_conf):
 
 if __name__ == '__main__':
     args = vars(parse_args())
-    logging.info('Running arguments:\n%s' % json.dumps(args, sort_keys=True, indent=0))
+    print('Running arguments:\n%s' % json.dumps(args, sort_keys=True, indent=0))
     start_date = args['start_date']
-    logging.info('**** WRF RUN **** start_date: {}'.format(start_date))
+    print('**** WRF RUN **** start_date: {}'.format(start_date))
 
     run_id = args['run_id']
-    logging.info('**** WRF RUN **** run_id: {}'.format(run_id))
+    print('**** WRF RUN **** run_id: {}'.format(run_id))
 
     run_mode = args['mode']
-    logging.info('**** WRF RUN Mode**** run_mode: {}'.format(run_mode))
+    print('**** WRF RUN Mode**** run_mode: {}'.format(run_mode))
 
     wps_config_id = args['wps_config_id']
-    logging.info('**** WPS wps_config_id: {}'.format(wps_config_id))
+    print('**** WPS wps_config_id: {}'.format(wps_config_id))
 
     input_config_id = args['input_config_id']
-    logging.info('**** WRF input content input_config_id: {}'.format(input_config_id))
+    print('**** WRF input content input_config_id: {}'.format(input_config_id))
 
     db_config = {'mysql_user': args['db_user'], 'mysql_password': args['db_password'],
                  'mysql_host': args['db_host'], 'mysql_db': args['db_name'],
                  'log_path': ''}
-    logging.info('**** WRF db_config: {}'.format(db_config))
+    print('**** WRF db_config: {}'.format(db_config))
 
     with open('wrfv4_config.json') as json_file:
         wrf_config = json.load(json_file)
         wrf_conf = wrf_config['wrf_config']
-        logging.info('**** WRF RUN **** wrf_conf: {}'.format(wrf_conf))
+        print('**** WRF RUN **** wrf_conf: {}'.format(wrf_conf))
         wrf_conf['run_id'] = run_id
         wrf_conf['start_date'] = start_date
         create_namelist_wps_file(db_config, wps_config_id, wrf_conf['namelist_wps'])
