@@ -68,7 +68,7 @@ echo "runner exec_date : ${exec_date}"
 echo "runner wrf_id : ${wrf_id}"
 echo "runner docker_tag : ${docker_tag}"
 
-docker run -i --rm --privileged \
+docker run -i --rm --privileged --network host \
     -v /mnt/disks/data/wrf-data/nfs:/home/Build_WRF/nfs \
     -v /mnt/disks/data/wrf-data/gfs:/home/Build_WRF/gfs \
     -v /mnt/disks/data/wrf-data/archive:/home/Build_WRF/archive \
