@@ -33,7 +33,6 @@ default_args = {
 ssh_cmd_template = 'sshpass -p \'{}\' ssh {}@{} {}'
 
 
-
 def get_dss_db_adapter():
     adapter = None
     try:
@@ -53,6 +52,9 @@ def get_push_command(**context):
     wrf_model = wrf_rule['model']
     wrf_run = wrf_rule['rule_info']['run']
     gfs_hour = wrf_rule['rule_info']['hour']
+    vm_config = Variable.get('ubuntu1_config', deserialize_json=True)
+    vm_user = vm_config['user']
+    vm_password = vm_config['password']
     print('get_wrf_run_command|rule_details: ', wrf_rule['rule_info']['rule_details'])
     push_node = wrf_rule['rule_info']['rule_details']['push_node']
     bash_script = wrf_rule['rule_info']['rule_details']['push_script']
@@ -63,7 +65,7 @@ def get_push_command(**context):
     push_script = '{} {} {} d{} {} {} {}'.format(bash_script, push_config, wrf_bucket, wrf_run,
                                                  gfs_hour, wrf_model, exec_date)
     print('get_push_command|run_script : ', push_script)
-    push_wrf_cmd = ssh_cmd_template.format(push_node, push_script)
+    push_wrf_cmd = ssh_cmd_template.format(vm_password, vm_user, push_node, push_script)
     print('get_push_command|push_wrf_cmd : ', push_wrf_cmd)
     subprocess.call(push_wrf_cmd, shell=True)
 
