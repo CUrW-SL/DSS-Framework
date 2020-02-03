@@ -8,7 +8,7 @@ from raincelldat.gen_raincell import create_sim_hybrid_raincell, create_raincell
 from inflowdat.get_inflow import create_inflow
 from outflowdat.gen_outflow_old import create_outflow_old
 from outflowdat.gen_outflow import create_outflow
-from run_model import execute_flo2d_250m, flo2d_model_completed
+from run_model import execute_flo2d, flo2d_model_completed
 from waterlevel.upload_waterlevel import upload_waterlevels_curw
 from extract.extract_water_level_hourly_run import upload_waterlevels
 from extract.extract_discharge_hourly_run import upload_discharges
@@ -19,6 +19,8 @@ from datetime import datetime, timedelta
 HOST_ADDRESS = '10.138.0.4'
 # HOST_ADDRESS = '0.0.0.0'
 HOST_PORT = 8088
+
+WIN_HOME_DIR_PATH = r"D:\flo2d_hourly"
 
 
 def set_daily_dir(run_date, run_time):
@@ -34,36 +36,71 @@ def set_daily_dir(run_date, run_time):
     return dir_path
 
 
+def get_input_file_creation_params(query_components):
+    print('get_input_file_creation_params|query_components : ', query_components)
+
+    if query_components["run_date"]:
+        [run_date] = query_components["run_date"]
+    else:
+        run_date = datetime.now().strftime('%Y-%m-%d')
+
+    if query_components["run_time"]:
+        [run_time] = query_components["run_time"]
+    else:
+        run_time = datetime.now().strftime('%H:00:00')
+
+    if query_components["model"]:  # "flo2d_250"/"flo2d_150"
+        [model] = query_components["model"]
+    else:
+        model = 'flo2d_250'
+
+    if query_components["forward"]:
+        [forward] = query_components["forward"]
+    else:
+        if model == 'flo2d_250':
+            forward = 3
+        else:
+            forward = 5
+
+    if query_components["backward"]:
+        [backward] = query_components["backward"]
+    else:
+        if model == 'flo2d_250':
+            backward = 2
+        else:
+            backward = 3
+    return {'run_date': run_date, 'run_time': run_time, 'forward': forward,
+            'backward': backward, 'model': model}
+
+
 class StoreHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.timeout = 2100
         print('Handle GET request...')
+
         if self.path.startswith('/create-raincell'):
-            os.chdir(r"D:\flo2d_hourly")
+            os.chdir(WIN_HOME_DIR_PATH)
             print('create-raincell')
             response = {}
             try:
                 query_components = parse_qs(urlparse(self.path).query)
                 print('query_components : ', query_components)
-                [run_date] = query_components["run_date"]
-                [run_time] = query_components["run_time"]
-                [forward] = query_components["forward"]
-                [backward] = query_components["backward"]
-                [model] = query_components["model"]
-                [data_type] = query_components[
-                    "data_type"]  # 1-observed only, 2-forecast only,3-hybrid, 4-Simiulated Rain
+
+                params = get_input_file_creation_params(query_components)
+
+                if query_components["data_type"]:  # 1-observed only, 2-forecast only,3-hybrid, 4-Simiulated Rain
+                    [data_type] = query_components["data_type"]
+                else:
+                    data_type = 4
+
                 [any_wrf] = query_components["any_wrf"]
                 [sim_tag] = query_components["sim_tag"]
-                print('[run_date, run_time, forward, backward, model, data_type, any_wrf, sim_tag] : ',
-                      [run_date, run_time, forward, backward, model, data_type, any_wrf, sim_tag])
-                dir_path = set_daily_dir(run_date, run_time)
+
+                dir_path = set_daily_dir(params['run_date'], params['run_time'])
                 try:
-                    if data_type == 4:
-                        create_sim_hybrid_raincell(dir_path, run_date, run_time, forward, backward,
-                                                   res_mins=5, flo2d_model='flo2d_250',
-                                                   calc_method='MME')
-                    else:
-                        create_raincell(dir_path, run_date, run_time, forward, backward, model, data_type, sim_tag)
+                    create_raincell(dir_path, params['run_date'], params['run_time'],
+                                    params['forward'], params['backward'], params['model'],
+                                    data_type, any_wrf, sim_tag)
                     response = {'response': 'success'}
                 except Exception as e:
                     response = {'response': 'fail'}
@@ -76,28 +113,18 @@ class StoreHandler(BaseHTTPRequestHandler):
             self.wfile.write(str.encode(reply))
 
         if self.path.startswith('/create-inflow'):
-            os.chdir(r"D:\flo2d_hourly")
+            os.chdir(WIN_HOME_DIR_PATH)
             print('create-inflow')
             response = {}
             try:
                 query_components = parse_qs(urlparse(self.path).query)
                 print('query_components : ', query_components)
-                [run_date] = query_components["run_date"]
-                [run_time] = query_components["run_time"]
-                print('[run_date, run_time] : ', [run_date, run_time])
-                dir_path = set_daily_dir(run_date, run_time)
-                backward = '2'
-                forward = '3'
-                duration_days = (int(backward), int(forward))
-                ts_start_date = datetime.strptime(run_date, '%Y-%m-%d') - timedelta(days=duration_days[0])
-                ts_end_date = datetime.strptime(run_date, '%Y-%m-%d') + timedelta(days=duration_days[1])
-                ts_end_date = ts_end_date.strftime('%Y-%m-%d')
-                ts_start_date = ts_start_date.strftime('%Y-%m-%d')
-                ts_start_time = '00:00:00'
-                ts_start = '{} {}'.format(ts_start_date, ts_start_time)
-                ts_end = '{} {}'.format(ts_end_date, ts_start_time)
-                print('create_inflow-[ts_start, ts_end]', [ts_start, ts_end])
-                create_inflow(dir_path, ts_start, ts_end)
+
+                params = get_input_file_creation_params(query_components)
+                dir_path = set_daily_dir(params['run_date'], params['run_time'])
+
+                create_inflow(dir_path, params['run_date'], params['run_time'],
+                              params['forward'], params['backward'], params['model'])
                 response = {'response': 'success'}
             except Exception as e:
                 print(str(e))
@@ -108,28 +135,17 @@ class StoreHandler(BaseHTTPRequestHandler):
             self.wfile.write(str.encode(reply))
 
         if self.path.startswith('/create-chan'):
-            os.chdir(r"D:\flo2d_hourly")
+            os.chdir(WIN_HOME_DIR_PATH)
             print('create-chan')
             response = {}
             try:
                 query_components = parse_qs(urlparse(self.path).query)
-                print('query_components : ', query_components)
-                [run_date] = query_components["run_date"]
-                [run_time] = query_components["run_time"]
-                [forward] = query_components["forward"]
-                [backward] = query_components["backward"]
-                print('[run_date, run_time] : ', [run_date, run_time])
-                dir_path = set_daily_dir(run_date, run_time)
-                duration_days = (int(backward), int(forward))
-                ts_start_date = datetime.strptime(run_date, '%Y-%m-%d') - timedelta(days=duration_days[0])
-                ts_end_date = datetime.strptime(run_date, '%Y-%m-%d') + timedelta(days=duration_days[1])
-                ts_end_date = ts_end_date.strftime('%Y-%m-%d')
-                ts_start_date = ts_start_date.strftime('%Y-%m-%d')
-                ts_start_time = '00:00:00'
-                ts_start = '{} {}'.format(ts_start_date, ts_start_time)
-                ts_end = '{} {}'.format(ts_end_date, ts_start_time)
-                print('create-chan-[ts_start, ts_end]', [ts_start, ts_end])
-                create_chan(dir_path, ts_start, 'flo2d_250')
+
+                params = get_input_file_creation_params(query_components)
+                dir_path = set_daily_dir(params['run_date'], params['run_time'])
+
+                create_chan(dir_path, params['run_date'], params['run_time'],
+                            params['forward'], params['backward'], params['model'])
                 response = {'response': 'success'}
             except Exception as e:
                 print(str(e))
@@ -140,28 +156,18 @@ class StoreHandler(BaseHTTPRequestHandler):
             self.wfile.write(str.encode(reply))
 
         if self.path.startswith('/create-outflow'):
-            os.chdir(r"D:\flo2d_hourly")
+            os.chdir(WIN_HOME_DIR_PATH)
             print('create-outflow')
             response = {}
             try:
                 query_components = parse_qs(urlparse(self.path).query)
                 print('query_components : ', query_components)
-                [run_date] = query_components["run_date"]
-                [run_time] = query_components["run_time"]
-                [forward] = query_components["forward"]
-                [backward] = query_components["backward"]
-                print('[run_date, run_time] : ', [run_date, run_time])
-                dir_path = set_daily_dir(run_date, run_time)
-                duration_days = (int(backward), int(forward))
-                ts_start_date = datetime.strptime(run_date, '%Y-%m-%d') - timedelta(days=duration_days[0])
-                ts_end_date = datetime.strptime(run_date, '%Y-%m-%d') + timedelta(days=duration_days[1])
-                ts_end_date = ts_end_date.strftime('%Y-%m-%d')
-                ts_start_date = ts_start_date.strftime('%Y-%m-%d')
-                ts_start_time = '00:00:00'
-                ts_start = '{} {}'.format(ts_start_date, ts_start_time)
-                ts_end = '{} {}'.format(ts_end_date, ts_start_time)
-                print('create_outflow-[ts_start, ts_end]', [ts_start, ts_end])
-                create_outflow(dir_path, ts_start, ts_end)
+
+                params = get_input_file_creation_params(query_components)
+                dir_path = set_daily_dir(params['run_date'], params['run_time'])
+
+                create_outflow(dir_path, params['run_date'], params['run_time'],
+                               params['forward'], params['backward'], params['model'])
                 response = {'response': 'success'}
             except Exception as e:
                 print(str(e))
@@ -172,28 +178,18 @@ class StoreHandler(BaseHTTPRequestHandler):
             self.wfile.write(str.encode(reply))
 
         if self.path.startswith('/create-outflow-old'):
-            os.chdir(r"D:\flo2d_hourly")
+            os.chdir(WIN_HOME_DIR_PATH)
             print('create-outflow')
             response = {}
             try:
                 query_components = parse_qs(urlparse(self.path).query)
                 print('query_components : ', query_components)
-                [run_date] = query_components["run_date"]
-                [run_time] = query_components["run_time"]
-                [forward] = query_components["forward"]
-                [backward] = query_components["backward"]
-                print('[run_date, run_time] : ', [run_date, run_time])
-                dir_path = set_daily_dir(run_date, run_time)
-                duration_days = (int(backward), int(forward))
-                ts_start_date = datetime.strptime(run_date, '%Y-%m-%d') - timedelta(days=duration_days[0])
-                ts_end_date = datetime.strptime(run_date, '%Y-%m-%d') + timedelta(days=duration_days[1] + 1)
-                ts_end_date = ts_end_date.strftime('%Y-%m-%d')
-                ts_start_date = ts_start_date.strftime('%Y-%m-%d')
-                ts_start_time = '00:00:00'
-                ts_start = '{} {}'.format(ts_start_date, ts_start_time)
-                ts_end = '{} {}'.format(ts_end_date, ts_start_time)
-                print('create_outflow-[ts_start, ts_end]', [ts_start, ts_end])
-                create_outflow_old(dir_path, ts_start, ts_end)
+
+                params = get_input_file_creation_params(query_components)
+                dir_path = set_daily_dir(params['run_date'], params['run_time'])
+
+                create_outflow_old(dir_path, params['run_date'], params['run_time'],
+                                   params['forward'], params['backward'], params['model'])
                 response = {'response': 'success'}
             except Exception as e:
                 print(str(e))
@@ -204,40 +200,18 @@ class StoreHandler(BaseHTTPRequestHandler):
             self.wfile.write(str.encode(reply))
 
         if self.path.startswith('/run-flo2d'):
-            os.chdir(r"D:\flo2d_hourly")
+            os.chdir(WIN_HOME_DIR_PATH)
             print('run-flo2d')
             response = {}
             try:
                 query_components = parse_qs(urlparse(self.path).query)
                 print('query_components : ', query_components)
-                [run_date] = query_components["run_date"]
-                [run_time] = query_components["run_time"]
-                print('[run_date, run_time] : ', [run_date, run_time])
-                dir_path = set_daily_dir(run_date, run_time)
-                execute_flo2d_250m(dir_path, run_date, run_time)
-                response = {'response': 'success'}
-            except Exception as e:
-                print(str(e))
-            reply = json.dumps(response)
-            self.send_response(200)
-            self.send_header('Content-type', 'text/json')
-            self.end_headers()
-            self.wfile.write(str.encode(reply))
 
-        if self.path.startswith('/flo2d-completed'):
-            os.chdir(r"D:\flo2d_hourly")
-            print('flo2d-completed')
-            response = {}
-            try:
-                query_components = parse_qs(urlparse(self.path).query)
-                print('query_components : ', query_components)
-                [run_date] = query_components["run_date"]
-                [run_time] = query_components["run_time"]
-                dir_path = set_daily_dir(run_date, run_time)
-                try:
-                    flo2d_model_completed(dir_path, run_date, run_time)
-                except Exception as ex:
-                    print('flo2d_model_completed|Exception : ', str(ex))
+                params = get_input_file_creation_params(query_components)
+                dir_path = set_daily_dir(params['run_date'], params['run_time'])
+
+                execute_flo2d(dir_path, params['run_date'], params['run_time'],
+                                   params['forward'], params['backward'], params['model'])
                 response = {'response': 'success'}
             except Exception as e:
                 print(str(e))
@@ -248,25 +222,22 @@ class StoreHandler(BaseHTTPRequestHandler):
             self.wfile.write(str.encode(reply))
 
         if self.path.startswith('/extract-data'):
-            os.chdir(r"D:\flo2d_hourly")
+            os.chdir(WIN_HOME_DIR_PATH)
             print('extract-data')
             response = {}
             try:
                 query_components = parse_qs(urlparse(self.path).query)
                 print('query_components : ', query_components)
-                [run_date] = query_components["run_date"]
-                [run_time] = query_components["run_time"]
-                dir_path = set_daily_dir(run_date, run_time)
-                backward = '2'
-                forward = '3'
-                duration_days = (int(backward), int(forward))
-                ts_start_date = datetime.strptime(run_date, '%Y-%m-%d') - timedelta(days=duration_days[0])
-                ts_start_date = ts_start_date.strftime('%Y-%m-%d')
-                ts_start_time = '00:00:00'
+
+                params = get_input_file_creation_params(query_components)
+                dir_path = set_daily_dir(params['run_date'], params['run_time'])
+
                 # upload_waterlevels_curw(dir_path, ts_start_date, ts_start_time)
-                upload_waterlevels(dir_path, ts_start_date, ts_start_time, run_date, run_time)
+                upload_waterlevels(dir_path, params['run_date'], params['run_time'],
+                                   params['forward'], params['backward'], params['model'])
                 # upload discharges to curw_fcst database
-                upload_discharges(dir_path, ts_start_date, ts_start_time, run_date, run_time)
+                upload_discharges(dir_path, params['run_date'], params['run_time'],
+                                  params['forward'], params['backward'], params['model'])
                 response = {'response': 'success'}
             except Exception as e:
                 print(str(e))
@@ -277,28 +248,18 @@ class StoreHandler(BaseHTTPRequestHandler):
             self.wfile.write(str.encode(reply))
 
         if self.path.startswith('/extract-curw'):
-            os.chdir(r"D:\flo2d_hourly")
+            os.chdir(WIN_HOME_DIR_PATH)
             print('extract-data')
             response = {}
             try:
                 query_components = parse_qs(urlparse(self.path).query)
                 print('query_components : ', query_components)
-                [run_date] = query_components["run_date"]
-                [run_time] = query_components["run_time"]
-                dir_path = set_daily_dir(run_date, run_time)
-                backward = '2'
-                forward = '3'
-                duration_days = (int(backward), int(forward))
-                ts_start_date = datetime.strptime(run_date, '%Y-%m-%d') - timedelta(days=duration_days[0])
-                ts_start_date = ts_start_date.strftime('%Y-%m-%d')
-                run_date = datetime.strptime(run_date, '%Y-%m-%d') + timedelta(days=1)
-                run_date = run_date.strftime('%Y-%m-%d')
-                ts_start_time = '00:00:00'
-                print('upload_waterlevels_curw|[ts_start_date, ts_start_time, run_date, run_time] : ', [ts_start_date,
-                                                                                                        ts_start_time,
-                                                                                                        run_date,
-                                                                                                        run_time])
-                upload_waterlevels_curw(dir_path, ts_start_date, ts_start_time, run_date, run_time)
+
+                params = get_input_file_creation_params(query_components)
+                dir_path = set_daily_dir(params['run_date'], params['run_time'])
+
+                upload_waterlevels_curw(dir_path, params['run_date'], params['run_time'],
+                                        params['forward'], params['backward'], params['model'])
                 response = {'response': 'success'}
             except Exception as e:
                 print(str(e))
