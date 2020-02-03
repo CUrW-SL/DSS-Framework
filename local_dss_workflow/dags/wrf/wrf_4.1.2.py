@@ -4,7 +4,6 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.models import Variable
 import sys
 import subprocess
-import zlib
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/local_dss_workflow/plugins/operators')
 from gfs_sensor import GfsSensorOperator
@@ -15,8 +14,6 @@ from dss_db import RuleEngineAdapter
 sys.path.insert(0, '/home/curw/git/DSS-Framework/accuracy_unit/wrf')
 from wrf_accuracy import calculate_wrf_rule_accuracy
 
-sys.path.insert(0, '/home/curw/git/DSS-Framework/weather_models/wrf')
-from model_definition import get_namelist_wps_config, get_namelist_input_config
 
 prod_dag_name = 'wrf_4.1.2_dag'
 dag_pool = 'wrf_pool'
@@ -70,6 +67,7 @@ def get_push_command(**context):
     print('get_push_command|push_wrf_cmd : ', push_wrf_cmd)
     subprocess.call(push_wrf_cmd, shell=True)
 
+
 # {mysql_user: curw, mysql_password: cfcwm07, mysql_host: 192.168.1.43, mysql_db: dss, log_path: /home/curw/dss/logs}
 def get_wrf_run_command(**context):
     wrf_rule = context['task_instance'].xcom_pull(task_ids='init_wrf')
@@ -93,12 +91,6 @@ def get_wrf_run_command(**context):
     run_script = wrf_rule['rule_info']['rule_details']['run_script']
     exec_date = context["execution_date"].to_datetime_string()
     if db_config is not None:
-        # run_script = '{}  -r {} -m {} -v {} -h {} -a {} -b {} -c \\\'\'{}\'\\\' -d {}'.format(run_script, wrf_run,
-        #                                                                     wrf_model, wrf_version,
-        #                                                                     gfs_hour,
-        #                                                                     namelist_wps_id,
-        #                                                                     namelist_input_id,
-        #                                                                     db_config, exec_date)
         run_script = '{}  -r {} -m {} -v {} -h {} -a {} -b {} -p {} -q {} -t {} -s {} -d {}'.format(run_script, wrf_run,
                                                                                               wrf_model, wrf_version,
                                                                                               gfs_hour, namelist_wps_id,
