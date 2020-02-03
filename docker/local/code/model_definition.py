@@ -214,6 +214,7 @@ def format_content(content, config_data):
 
 def create_namelist_wps_file(db_config, config_id, file_location):
     try:
+        print('create_namelist_wps_file|db_config : ', db_config)
         dss_adapter = DSSAdapter.get_instance(db_config)
         config_data = dss_adapter.get_namelist_wps_configs(config_id)
         template_path = config_data['template_path']
