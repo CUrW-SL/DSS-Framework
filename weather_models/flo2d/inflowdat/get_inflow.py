@@ -78,7 +78,7 @@ def prepare_inflow(inflow_file_path, start, end, discharge_id, wl_id):
 
         # Extract discharge series
         with connection.cursor() as cursor1:
-            obs_end = datetime.strptime(start, COMMON_DATE_TIME_FORMAT) + timedelta(hours=10)
+            obs_end = datetime.strptime(start, DATE_TIME_FORMAT) + timedelta(hours=10)
             cursor1.callproc('getWL', (wl_id, start, obs_end))
             result = cursor1.fetchone()
             obs_wl = result.get('value')
@@ -127,9 +127,30 @@ def create_dir_if_not_exists(path):
     return path
 
 
-def create_inflow(dir_path, ts_start_date, ts_end_date):
-    try:
+def get_ts_start_end_for_data_type(run_date, run_time, forward=3, backward=2):
+    result = {}
+    """
+    method for geting timeseries start and end using input params.
+    :param run_date:run_date: string yyyy-mm-ddd
+    :param run_time:run_time: string hh:mm:ss
+    :param forward:int
+    :param backward:int
+    :return: tuple (string, string)
+    """
+    run_datetime = datetime.strptime('%s %s' % (run_date, '00:00:00'), '%Y-%m-%d %H:%M:%S')
+    ts_start_datetime = run_datetime - timedelta(days=backward)
+    ts_end_datetime = run_datetime + timedelta(days=forward)
+    run_datetime = datetime.strptime('%s %s' % (run_date, run_time), '%Y-%m-%d %H:%M:%S')
+    result['obs_start'] = ts_start_datetime
+    result['run_time'] = run_datetime
+    result['forecast_time'] = ts_end_datetime
+    print(result)
+    return result
 
+
+def create_inflow(dir_path, run_date, run_time, forward=3, backward=2, model='flo2d_250'):
+    try:
+        time_limits = get_ts_start_end_for_data_type(run_date, run_time, forward, backward)
         # Load config details and db connection params
         config_path = os.path.join(os.getcwd(), 'inflowdat', 'config.json')
         config = json.loads(open(config_path).read())
@@ -140,8 +161,8 @@ def create_inflow(dir_path, ts_start_date, ts_end_date):
         discharge_id = read_attribute_from_config_file('discharge_id', config, True)
         wl_id = read_attribute_from_config_file('wl_id', config, True)
 
-        start_time = ts_start_date
-        end_time = ts_end_date
+        start_time = time_limits['obs_start']
+        end_time = time_limits['forecast_time']
 
         inflow_file_path = os.path.join(output_dir, file_name)
 
@@ -151,3 +172,4 @@ def create_inflow(dir_path, ts_start_date, ts_end_date):
 
     except Exception:
         traceback.print_exc()
+

@@ -141,9 +141,31 @@ def usage():
     print(usageText)
 
 
-def create_outflow(dir_path, ts_start_date, ts_end_date):
-    try:
+def get_ts_start_end_for_data_type(run_date, run_time, forward=3, backward=2):
+    result = {}
+    """
+    method for geting timeseries start and end using input params.
+    :param run_date:run_date: string yyyy-mm-ddd
+    :param run_time:run_time: string hh:mm:ss
+    :param forward:int
+    :param backward:int
+    :return: tuple (string, string)
+    """
+    run_datetime = datetime.strptime('%s %s' % (run_date, '00:00:00'), '%Y-%m-%d %H:%M:%S')
+    ts_start_datetime = run_datetime - timedelta(days=backward)
+    ts_end_datetime = run_datetime + timedelta(days=forward)
+    run_datetime = datetime.strptime('%s %s' % (run_date, run_time), '%Y-%m-%d %H:%M:%S')
+    result['obs_start'] = ts_start_datetime
+    result['run_time'] = run_datetime
+    result['forecast_time'] = ts_end_datetime
+    print(result)
+    return result
 
+
+# def create_outflow(dir_path, ts_start_date, ts_end_date):
+def create_outflow(dir_path, run_date, run_time, forward=3, backward=2, model='flo2d_250'):
+    try:
+        time_limits = get_ts_start_end_for_data_type(run_date, run_time, forward, backward)
         # Load config details and db connection params
         config_path = os.path.join(os.getcwd(), 'outflowdat', 'config.json')
         config = json.loads(open(config_path).read())
@@ -156,7 +178,7 @@ def create_outflow(dir_path, ts_start_date, ts_end_date):
         outflow_file_path = os.path.join(output_dir, file_name)
 
         print("{} start preparing outflow".format(datetime.now()))
-        prepare_outflow(outflow_file_path, start=ts_start_date, end=ts_end_date, tide_id=tide_id)
+        prepare_outflow(outflow_file_path, start=time_limits['obs_start'], end=time_limits['forecast_time'], tide_id=tide_id)
         print("{} completed preparing outflow".format(datetime.now()))
 
         # os.system(r"deactivate")

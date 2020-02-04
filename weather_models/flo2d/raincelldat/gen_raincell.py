@@ -279,15 +279,13 @@ def create_raincell(dir_path, run_date, run_time, forward, backward, model, data
     time_limits = get_ts_start_end_for_data_type(run_date, run_time, forward, backward)
     raincell_file_path = os.path.join(dir_path, 'RAINCELL.DAT')
     start_time = datetime.now()
-    generate_raincell(raincell_file_path, time_limits, model, data_type, any_wrf, sim_tag)
-    # generate_raincell(raincell_file_path, time_limits, model, data_type, any_wrf, sim_tag)
+    if not os.path.isfile(raincell_file_path):
+        generate_raincell(raincell_file_path, time_limits, model, data_type, any_wrf, sim_tag)
+    else:
+        print('Raincell file already in path : ', raincell_file_path)
     end_time = datetime.now()
     duration = (end_time - start_time).total_seconds() / 60
     print('create_raincell|duration : ', duration)
-    # if not os.path.isfile(raincell_file_path):
-    #     print('')
-    # else:
-    #     print('Raincell file already in path : ', raincell_file_path)
 
 
 if __name__ == '__main__':

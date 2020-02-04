@@ -175,15 +175,35 @@ def usage():
     print(usageText)
 
 
-def create_chan(dir_path, ts_start_date, flo2d_model):
+def get_ts_start_end_for_data_type(run_date, run_time, forward=3, backward=2):
+    result = {}
+    """
+    method for geting timeseries start and end using input params.
+    :param run_date:run_date: string yyyy-mm-ddd
+    :param run_time:run_time: string hh:mm:ss
+    :param forward:int
+    :param backward:int
+    :return: tuple (string, string)
+    """
+    run_datetime = datetime.strptime('%s %s' % (run_date, '00:00:00'), '%Y-%m-%d %H:%M:%S')
+    ts_start_datetime = run_datetime - timedelta(days=backward)
+    ts_end_datetime = run_datetime + timedelta(days=forward)
+    run_datetime = datetime.strptime('%s %s' % (run_date, run_time), '%Y-%m-%d %H:%M:%S')
+    result['obs_start'] = ts_start_datetime
+    result['run_time'] = run_datetime
+    result['forecast_time'] = ts_end_datetime
+    print(result)
+    return result
+
+
+def create_chan(dir_path, run_date, run_time, forward=3, backward=2, flo2d_model='flo2d_250'):
     set_db_config_file_path(os.path.join(ROOT_DIRECTORY, 'db_adapter_config.json'))
-
+    time_limits = get_ts_start_end_for_data_type(run_date, run_time, forward, backward)
     try:
-
         # Load config details and db connection params
         config = json.loads(open(os.path.join(os.getcwd(), 'chan', "config.json")).read())
 
-        start_time = ts_start_date
+        start_time = time_limits['obs_start']
 
         output_dir = dir_path
         file_name = read_attribute_from_config_file('output_file_name', config)
