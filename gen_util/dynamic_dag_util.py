@@ -1,6 +1,19 @@
 import json
 
 
+def get_triggering_dynamic_dags(routines):
+    dag_info = []
+    if len(routines) > 0:
+        print('get_triggering_dynamic_dags|routines : ', routines)
+        for routine in routines:
+            dag_name = routine['dag_name']
+            payload = routine
+            dag_info.append({'dag_name': dag_name, 'payload': payload})
+    else:
+        print('No triggering_dags found.')
+    return dag_info
+
+
 def get_all_dynamic_dag_routines(dss_adapter):
     query = 'select id, dag_name, schedule, timeout from dss.dynamic_routine;'
     print('get_all_dynamic_dag_routines|query : ', query)
