@@ -37,7 +37,7 @@ def get_dynamic_dag_tasks(dss_adapter, dag_id):
     dag_tasks = []
     if results is not None:
         for result in results:
-            if result[3]:
+            if result[4]:
                 dag_tasks.append({'id': result[0], 'task_name': result[1], 'task_type': result[2], 'task_content': result[3],
                                   'input_params': json.loads(result[4]), 'timeout': json.loads(result[5])})
             else:
