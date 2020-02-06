@@ -19,15 +19,24 @@ dag_pool = 'external_dag_pool'
 
 
 def update_workflow_status(status, rule_id):
+    adapter = get_dss_db_adapter()
+    if adapter is not None:
+        adapter.update_external_bash_routing_status(status, rule_id)
+    else:
+        print('update_workflow_status|db adapter not found.')
+
+
+def get_dss_db_adapter():
+    adapter = None
     try:
         db_config = Variable.get('db_config', deserialize_json=True)
         try:
             adapter = RuleEngineAdapter.get_instance(db_config)
-            adapter.update_external_bash_routing_status(status, rule_id)
         except Exception as ex:
-            print('update_workflow_status|db_adapter|Exception: ', str(ex))
+            print('get_dss_db_adapter|Exception: ', str(ex))
     except Exception as e:
-        print('update_workflow_status|db_config|Exception: ', str(e))
+        print('get_dss_db_adapter|db_config|Exception: ', str(e))
+    return adapter
 
 
 def set_running_status(**context):
@@ -65,6 +74,27 @@ def on_dag_failure(context):
         print('on_dag_failure|rule_id not found')
 
 
+def create_trigger_dag_run(dag_task):
+    payload = {}
+    model_type = dag_task['input_params']['model_type']
+    model_rule = dag_task['input_params']['rule_id']
+    adapter = get_dss_db_adapter()
+    if adapter is not None:
+        if model_type == 'wrf':
+            payload = adapter.get_eligible_wrf_rule_info_by_id(model_rule)
+        elif model_type == 'flo2d':
+            payload = adapter.get_eligible_hechms_rule_info_by_id(model_rule)
+        elif model_type == 'hechms':
+            payload = adapter.get_eligible_flo2d_rule_info_by_id(model_rule)
+        else:
+            print('create_dag_run|available for weather model dags only.')
+    else:
+        print('create_dag_run|db adapter not found.')
+    dag_info = {'dag_name': dag_task['task_content'], 'payload': payload}
+    print('create_dag_run|dag_info : ', dag_info)
+    return dag_info
+
+
 def create_dag(dag_id, params, timeout, dag_tasks, default_args):
     dag = DAG(dag_id, catchup=False,
               dagrun_timeout=timeout,
@@ -83,15 +113,24 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
 
         task_list = [init_task]
         for dag_task in dag_tasks:
-            task = BashOperator(
-                task_id=dag_task['task_name'],
-                bash_command=get_bash_command(dag_task['bash_script'], dag_task['input_params']),
-                execution_timeout=get_timeout(dag_task['timeout']),
-                on_failure_callback=on_dag_failure,
-                pool=dag_pool
-            )
-            task_list.append(task)
-
+            if dag_task['task_type'] == 1:
+                task = BashOperator(
+                    task_id=dag_task['task_name'],
+                    bash_command=get_bash_command(dag_task['bash_script'], dag_task['input_params']),
+                    execution_timeout=get_timeout(dag_task['timeout']),
+                    on_failure_callback=on_dag_failure,
+                    pool=dag_pool
+                )
+                task_list.append(task)
+            elif dag_task['task_type'] == 2:
+                task = DynamicTriggerDagRunOperator(
+                    task_id='gen_target_dag_run',
+                    python_callable=create_trigger_dag_run(dag_task),
+                    execution_timeout=get_timeout(dag_task['timeout']),
+                    on_failure_callback=on_dag_failure,
+                    pool=dag_pool
+                )
+                task_list.append(task)
         end_task = PythonOperator(
             task_id='end_task',
             provide_context=True,
