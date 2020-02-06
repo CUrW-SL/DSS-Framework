@@ -115,7 +115,6 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
             if dag_task['task_type'] == 1:
                 task = BashOperator(
                     task_id=dag_task['task_name'],
-                    provide_context=True,
                     bash_command=get_bash_command(dag_task['task_content'], dag_task['input_params']),
                     execution_timeout=get_timeout(dag_task['timeout']),
                     on_failure_callback=on_dag_failure,
@@ -146,11 +145,9 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
     return dag
 
 
+#{{ (execution_date).strftime(\"%Y-%m-%d %H:00:00\") }}
 # example bash command : /home/uwcc-admin/calculate.sh -a 23 -date '2020-01-11' -c 1.4
-def get_bash_command(bash_script, input_params, **context):
-    #exec_date = context["execution_date"].to_datetime_string()
-    #exec_date = context["execution_date"].to_datetime_string()
-    print('get_bash_command|context : ', context)
+def get_bash_command(bash_script, input_params):
     print('get_bash_command|bash_script : ', bash_script)
     print('get_bash_command|input_params : ', input_params)
     inputs = []
@@ -159,11 +156,11 @@ def get_bash_command(bash_script, input_params, **context):
             inputs.append('-{} {}'.format(key, input_params[key]))
         if len(inputs) > 0:
             input_str = ' '.join(inputs)
-            return '{} {}'.format(bash_script, input_str)
+            return '{} {} -d {{ (execution_date).strftime(\"%Y-%m-%d %H:00:00\") }}'.format(bash_script, input_str)
         else:
-            return '{} '.format(bash_script)
+            return '{} -d {{ (execution_date).strftime(\"%Y-%m-%d %H:00:00\") }}'.format(bash_script)
     else:
-        return '{} '.format(bash_script)
+        return '{} -d {{ (execution_date).strftime(\"%Y-%m-%d %H:00:00\") }}'.format(bash_script)
 
 
 def get_timeout(timeout):
