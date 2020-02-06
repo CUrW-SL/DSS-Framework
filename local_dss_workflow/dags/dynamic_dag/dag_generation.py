@@ -124,7 +124,7 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
                 task_list.append(task)
             elif dag_task['task_type'] == 2:
                 task = DynamicTriggerDagRunOperator(
-                    task_id='gen_target_dag_run',
+                    task_id=dag_task['task_name'],
                     python_callable=create_trigger_dag_run(dag_task),
                     execution_timeout=get_timeout(dag_task['timeout']),
                     on_failure_callback=on_dag_failure,
