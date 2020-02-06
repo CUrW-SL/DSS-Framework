@@ -3,7 +3,6 @@ from airflow import DAG
 from airflow.models import Variable
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.bash_operator import BashOperator
-from airflow.operators.dagrun_operator import TriggerDagRunOperator
 import sys
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/gen_util')
@@ -147,7 +146,9 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
 
 
 # example bash command : /home/uwcc-admin/calculate.sh -a 23 -date '2020-01-11' -c 1.4
-def get_bash_command(bash_script, input_params):
+def get_bash_command(context, bash_script, input_params):
+    exec_date = context["execution_date"].to_datetime_string()
+    print('get_bash_command|exec_date : ', exec_date)
     print('get_bash_command|bash_script : ', bash_script)
     print('get_bash_command|input_params : ', input_params)
     inputs = []
