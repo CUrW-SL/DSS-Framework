@@ -146,7 +146,7 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
 
 
 # example bash command : /home/uwcc-admin/calculate.sh -a 23 -date '2020-01-11' -c 1.4
-def get_bash_command(context, bash_script, input_params):
+def get_bash_command(bash_script, input_params, **context):
     exec_date = context["execution_date"].to_datetime_string()
     print('get_bash_command|exec_date : ', exec_date)
     print('get_bash_command|bash_script : ', bash_script)
