@@ -616,6 +616,42 @@ class RuleEngineAdapter:
                     self.update_initial_external_bash_routing_status(1, routine['id'])
         return routines
 
+    # Dynamic dag generation
+    def update_initial_dynamic_dag_routing_status(self, status, routine_id):
+        query = 'update dss.dynamic_routine set status={},last_trigger_date=now()  ' \
+                'where id=\'{}\''.format(status, routine_id)
+        print('update_initial_dynamic_dag_routing_status|query : ', query)
+        self.update_query(query)
+
+    def update_dynamic_dag_routing_status(self, status, routine_id):
+        query = 'update dss.dynamic_routine set status={} where id=\'{}\''.format(status, routine_id)
+        print('update_dynamic_dag_routing_status|query : ', query)
+        self.update_query(query)
+
+    def get_dynamic_dag_routines(self, schedule_date=datetime.now()):
+        if type(schedule_date) is datetime:
+            schedule_date = schedule_date
+        else:
+            schedule_date = datetime.strptime(schedule_date, '%Y-%m-%d %H:%M:%S')
+        print('schedule_date : ', schedule_date)
+        query = 'select id, dag_name, schedule, timeout from dss.dynamic_routine where status in (1,3,4);'
+        print('get_dynamic_dag_routines|query : ', query)
+        results = self.get_multiple_result(query)
+        routines = []
+        if results is not None:
+            for result in results:
+                print('get_dynamic_dag_routines|result : ', result)
+                routines.append({'id': result[0], 'dag_name': result[1], 'schedule': result[2],
+                                 'timeout': json.loads(result[3])})
+        print('get_dynamic_dag_routines|routines : ', routines)
+        if len(routines) > 0:
+            routines = get_next_scheduled_routines(schedule_date, routines)
+            if len(routines) > 0:
+                for routine in routines:
+                    print('update_initial_workflow_routing_status.')
+                    self.update_initial_dynamic_dag_routing_status(1, routine['id'])
+        return routines
+
     # -----------------------------WRF definition--------------------------------
 
     def get_namelist_input_configs(self, config_id):
