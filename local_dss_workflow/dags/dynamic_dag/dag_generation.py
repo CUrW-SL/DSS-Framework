@@ -115,7 +115,7 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
             if dag_task['task_type'] == 1:
                 task = BashOperator(
                     task_id=dag_task['task_name'],
-                    bash_command=get_bash_command(dag_task['task_content'], dag_task['input_params']),
+                    bash_command=get_bash_command(dag_task['task_content'], dag_task['input_params'], dag),
                     execution_timeout=get_timeout(dag_task['timeout']),
                     on_failure_callback=on_dag_failure,
                     pool=dag_pool
@@ -146,7 +146,10 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
 
 
 # example bash command : /home/uwcc-admin/calculate.sh -a 23 -date '2020-01-11' -c 1.4
-def get_bash_command(bash_script, input_params):
+def get_bash_command(bash_script, input_params, dag):
+    print('get_bash_command|dag : ', dag)
+    last_dag_run = dag.get_last_dagrun(include_externally_triggered=True)
+    print('get_bash_command|last_dag_run : ', last_dag_run)
     print('get_bash_command|bash_script : ', bash_script)
     print('get_bash_command|input_params : ', input_params)
     inputs = []
