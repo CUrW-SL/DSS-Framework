@@ -73,8 +73,11 @@ def on_dag_failure(context):
         print('on_dag_failure|rule_id not found')
 
 
-def create_trigger_dag_run(dag_task):
+def create_trigger_dag_run(dag_task, dag):
     payload = {}
+    print('get_bash_command|dag : ', dag)
+    last_dag_run = dag.get_last_dagrun(include_externally_triggered=True)
+    exec_date = last_dag_run.execution_date.strftime('%Y-%m-%d %H:%M:%S')
     model_type = dag_task['input_params']['model_type']
     model_rule = dag_task['input_params']['rule_id']
     adapter = get_dss_db_adapter()
@@ -89,6 +92,7 @@ def create_trigger_dag_run(dag_task):
             print('create_dag_run|available for weather model dags only.')
     else:
         print('create_dag_run|db adapter not found.')
+    payload['run_date'] = exec_date
     dag_info = {'dag_name': dag_task['task_content'], 'payload': payload}
     print('create_dag_run|dag_info : ', dag_info)
     return dag_info
@@ -124,7 +128,7 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
             elif dag_task['task_type'] == 2:
                 task = DynamicTriggerDagRunOperator(
                     task_id=dag_task['task_name'],
-                    python_callable=create_trigger_dag_run(dag_task),
+                    python_callable=create_trigger_dag_run(dag_task, dag),
                     execution_timeout=get_timeout(dag_task['timeout']),
                     on_failure_callback=on_dag_failure,
                     pool=dag_pool
@@ -152,6 +156,7 @@ def get_bash_command(bash_script, input_params, dag):
     exec_date = last_dag_run.execution_date.strftime('%Y-%m-%d %H:%M:%S')
     print('get_bash_command|exec_date : ', exec_date)
     print('get_bash_command|bash_script : ', bash_script)
+    input_params['d'] = exec_date
     print('get_bash_command|input_params : ', input_params)
     inputs = []
     if input_params:
