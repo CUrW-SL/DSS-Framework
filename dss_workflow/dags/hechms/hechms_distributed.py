@@ -53,7 +53,8 @@ def get_create_input_cmd(**context):
     run_port = rule['rule_info']['rule_details']['run_port']
     create_input_cmd = create_input_cmd_template.format(run_node, run_port, exec_date, backward, forward, init_run)
     print('get_create_input_cmd|create_input_cmd : ', create_input_cmd)
-    subprocess.call(create_input_cmd, shell=True)
+    response = subprocess.call(create_input_cmd, shell=True)
+    print('get_create_input_cmd|response : ', response)
 
 
 def get_run_hechms_preprocess_cmd(**context):
@@ -66,7 +67,8 @@ def get_run_hechms_preprocess_cmd(**context):
     run_hechms_preprocess_cmd = run_hechms_preprocess_cmd_template.format(run_node, run_port, exec_date, backward,
                                                                           forward)
     print('get_run_hechms_preprocess_cmd|run_hechms_preprocess_cmd : ', run_hechms_preprocess_cmd)
-    subprocess.call(run_hechms_preprocess_cmd, shell=True)
+    response = subprocess.call(run_hechms_preprocess_cmd, shell=True)
+    print('get_run_hechms_preprocess_cmd|response : ', response)
 
 
 def get_run_hechms_cmd(**context):
@@ -75,7 +77,8 @@ def get_run_hechms_cmd(**context):
     run_port = rule['rule_info']['rule_details']['run_port']
     run_hechms_cmd = run_hechms_cmd_template.format(run_node, run_port)
     print('get_run_hechms_preprocess_cmd|run_hechms_cmd : ', run_hechms_cmd)
-    subprocess.call(run_hechms_cmd, shell=True)
+    response = subprocess.call(run_hechms_cmd, shell=True)
+    print('get_run_hechms_cmd|response : ', response)
 
 
 def get_run_hechms_postprocess_cmd(**context):
@@ -88,7 +91,8 @@ def get_run_hechms_postprocess_cmd(**context):
     run_hechms_postprocess_cmd = run_hechms_postprocess_cmd_template.format(run_node, run_port, exec_date, backward,
                                                                             forward)
     print('get_run_hechms_postprocess_cmd|run_hechms_postprocess_cmd : ', run_hechms_postprocess_cmd)
-    subprocess.call(run_hechms_postprocess_cmd, shell=True)
+    response = subprocess.call(run_hechms_postprocess_cmd, shell=True)
+    print('get_run_hechms_postprocess_cmd|response : ', response)
 
 
 def get_upload_discharge_cmd(**context):
@@ -98,7 +102,8 @@ def get_upload_discharge_cmd(**context):
     run_port = rule['rule_info']['rule_details']['run_port']
     upload_discharge_cmd = upload_discharge_cmd_template.format(run_node, run_port, exec_date)
     print('get_upload_discharge_cmd|upload_discharge_cmd : ', upload_discharge_cmd)
-    subprocess.call(upload_discharge_cmd, shell=True)
+    response = subprocess.call(upload_discharge_cmd, shell=True)
+    print('get_upload_discharge_cmd|response : ', response)
 
 
 def update_workflow_status(status, rule_id):
