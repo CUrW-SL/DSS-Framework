@@ -156,6 +156,8 @@ def get_bash_command(bash_script, input_params, dag):
     exec_date = last_dag_run.execution_date.strftime('%Y-%m-%d %H:%M:%S')
     print('get_bash_command|exec_date : ', exec_date)
     print('get_bash_command|bash_script : ', bash_script)
+    if input_params is None:
+        input_params = {}
     input_params['d'] = exec_date
     print('get_bash_command|input_params : ', input_params)
     inputs = []
