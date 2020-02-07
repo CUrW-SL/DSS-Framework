@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
 from airflow import DAG
+from airflow.models.dag import get_last_dagrun
+from airflow.utils.db import provide_session
 from airflow.models import Variable
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.bash_operator import BashOperator
@@ -147,9 +149,10 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
 
 #{{ (execution_date).strftime(\"%Y-%m-%d %H:00:00\") }}
 # example bash command : /home/uwcc-admin/calculate.sh -a 23 -date '2020-01-11' -c 1.4
+@provide_session
 def get_bash_command(bash_script, input_params, dag):
     print('get_bash_command|dag : ', dag)
-    last_dag_run = dag.get_last_dagrun()
+    last_dag_run = get_last_dagrun(dag.dag_id)
     print('get_bash_command|last_dag_run : ', last_dag_run)
     exec_date = last_dag_run.execution_date.strftime('%Y-%m-%d %H:%M:%S')
 
