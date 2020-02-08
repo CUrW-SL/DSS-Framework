@@ -99,6 +99,38 @@ def create_trigger_dag_run(dag_task, dag):
     return dag_info
 
 
+# example bash command : /home/uwcc-admin/calculate.sh -a 23 -date '2020-01-11' -c 1.4
+def get_bash_command(bash_script, input_params, dag):
+    print('get_bash_command|dag : ', dag)
+    last_dag_run = dag.get_last_dagrun(include_externally_triggered=True)
+    exec_date = last_dag_run.execution_date.strftime('%Y-%m-%d %H:%M:%S')
+    print('get_bash_command|exec_date : ', exec_date)
+    print('get_bash_command|bash_script : ', bash_script)
+    if input_params is None:
+        input_params = {}
+    if 'd' not in input_params:
+        # if user hasn't pass 'd' execution date as a param, system will add
+        # it to the input params.
+        input_params['d'] = exec_date
+    print('get_bash_command|input_params : ', input_params)
+    inputs = []
+    if input_params:
+        for key in input_params.keys():
+            inputs.append('-{} {}'.format(key, input_params[key]))
+        if len(inputs) > 0:
+            input_str = ' '.join(inputs)
+            return '{} {} '.format(bash_script, input_str)
+        else:
+            return '{} '.format(bash_script)
+    else:
+        return '{} '.format(bash_script)
+
+
+def get_timeout(timeout):
+    print('get_timeout|timeout : ', timeout)
+    return timedelta(hours=timeout['hours'], minutes=timeout['minutes'], seconds=timeout['seconds'])
+
+
 def create_dag(dag_id, params, timeout, dag_tasks, default_args):
     dag = DAG(dag_id, catchup=False,
               dagrun_timeout=timeout,
@@ -150,40 +182,8 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
     return dag
 
 
-# example bash command : /home/uwcc-admin/calculate.sh -a 23 -date '2020-01-11' -c 1.4
-def get_bash_command(bash_script, input_params, dag):
-    print('get_bash_command|dag : ', dag)
-    last_dag_run = dag.get_last_dagrun(include_externally_triggered=True)
-    exec_date = last_dag_run.execution_date.strftime('%Y-%m-%d %H:%M:%S')
-    print('get_bash_command|exec_date : ', exec_date)
-    print('get_bash_command|bash_script : ', bash_script)
-    if input_params is None:
-        input_params = {}
-    if 'd' not in input_params:
-        # if user hasn't pass 'd' execution date as a param, system will add
-        # it to the input params.
-        input_params['d'] = exec_date
-    print('get_bash_command|input_params : ', input_params)
-    inputs = []
-    if input_params:
-        for key in input_params.keys():
-            inputs.append('-{} {}'.format(key, input_params[key]))
-        if len(inputs) > 0:
-            input_str = ' '.join(inputs)
-            return '{} {} '.format(bash_script, input_str)
-        else:
-            return '{} '.format(bash_script)
-    else:
-        return '{} '.format(bash_script)
-
-
-def get_timeout(timeout):
-    print('get_timeout|timeout : ', timeout)
-    return timedelta(hours=timeout['hours'], minutes=timeout['minutes'], seconds=timeout['seconds'])
-
-
-def generate_external_bash_dag(dss_adapter, dag_rule):
-    print('generate_external_bash_dag|dag_rule : ', dag_rule)
+def generate_dynamic_workflow_dag(dss_adapter, dag_rule):
+    print('generate_dynamic_workflow_dag|dag_rule : ', dag_rule)
     dag_tasks = get_dynamic_dag_tasks(dss_adapter, dag_rule['id'])
     if len(dag_tasks) > 0:
         timeout = get_timeout(dag_rule['timeout'])
@@ -211,7 +211,7 @@ def start_creating():
     routines = get_all_dynamic_dag_routines(adapter)
     if len(routines) > 0:
         for routine in routines:
-            generate_external_bash_dag(adapter, routine)
+            generate_dynamic_workflow_dag(adapter, routine)
 
 
 start_creating()
