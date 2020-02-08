@@ -85,9 +85,9 @@ def create_trigger_dag_run(dag_task, dag):
     if adapter is not None:
         if model_type == 'wrf':
             payload = adapter.get_eligible_wrf_rule_info_by_id(model_rule)
-        elif model_type == 'flo2d':
-            payload = adapter.get_eligible_hechms_rule_info_by_id(model_rule)
         elif model_type == 'hechms':
+            payload = adapter.get_eligible_hechms_rule_info_by_id(model_rule)
+        elif model_type == 'flo2d':
             payload = adapter.get_eligible_flo2d_rule_info_by_id(model_rule)
         else:
             print('create_dag_run|available for weather model dags only.')
