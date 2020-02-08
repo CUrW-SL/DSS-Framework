@@ -75,9 +75,10 @@ def on_dag_failure(context):
 
 def create_trigger_dag_run(dag_task, dag):
     payload = {}
-    print('get_bash_command|dag : ', dag)
+    print('create_trigger_dag_run|dag : ', dag)
     last_dag_run = dag.get_last_dagrun(include_externally_triggered=True)
     exec_date = last_dag_run.execution_date.strftime('%Y-%m-%d %H:%M:%S')
+    print('create_trigger_dag_run|dag : ', exec_date)
     model_type = dag_task['input_params']['model_type']
     model_rule = dag_task['input_params']['rule_id']
     adapter = get_dss_db_adapter()
@@ -158,7 +159,10 @@ def get_bash_command(bash_script, input_params, dag):
     print('get_bash_command|bash_script : ', bash_script)
     if input_params is None:
         input_params = {}
-    input_params['d'] = exec_date
+    if 'd' not in input_params:
+        # if user hasn't pass 'd' execution date as a param, system will add
+        # it to the input params.
+        input_params['d'] = exec_date
     print('get_bash_command|input_params : ', input_params)
     inputs = []
     if input_params:
