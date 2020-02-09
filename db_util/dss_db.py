@@ -94,6 +94,21 @@ class RuleEngineAdapter:
         finally:
             return value
 
+    def get_single_row(self, sql_query):
+        cursor = self.cursor
+        try:
+            cursor.execute(sql_query)
+            result = cursor.fetchone()
+            if result:
+                return result
+            else:
+                self.log.error('no result|query:'.format(sql_query))
+                return None
+        except Exception as ex:
+            print('get_single_result|Exception : ', str(ex))
+            self.log.error('exception|query:'.format(sql_query))
+            return None
+
     def get_multiple_result(self, sql_query):
         cursor = self.cursor
         try:
