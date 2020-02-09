@@ -106,6 +106,10 @@ def on_dag_failure(context):
 
 def create_trigger_dag_run(context):
     print('create_trigger_dag_run|context : ', context)
+    run_date = context["execution_date"].to_datetime_string()
+    task_name = context['task'].task_id
+    dag_rule_id = context['params']['id']
+    print('create_trigger_dag_run|[run_date, task_name, dag_rule_id] : ', [run_date, task_name, dag_rule_id])
 
 
 # example bash command : /home/uwcc-admin/calculate.sh -a 23 -date '2020-01-11' -c 1.4
