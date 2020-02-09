@@ -20,11 +20,12 @@ from extract.extract_discharge_hourly_run import upload_discharges
 from os.path import join as pjoin
 from datetime import datetime, timedelta
 
-HOST_ADDRESS = '10.138.0.4'
+HOST_ADDRESS = '192.168.1.41'
 # HOST_ADDRESS = '0.0.0.0'
 HOST_PORT = 8088
 
-WIN_HOME_DIR_PATH = r"D:\flo2d_hourly"
+#WIN_HOME_DIR_PATH = r"D:\flo2d_hourly"
+WIN_HOME_DIR_PATH = r"D:\DSS-Framework\weather_models\flo2d"
 
 
 def set_daily_dir(run_date, run_time):
@@ -181,28 +182,6 @@ class StoreHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(str.encode(reply))
 
-        if self.path.startswith('/create-outflow-old'):
-            os.chdir(WIN_HOME_DIR_PATH)
-            print('create-outflow')
-            response = {}
-            try:
-                query_components = parse_qs(urlparse(self.path).query)
-                print('query_components : ', query_components)
-
-                params = get_input_file_creation_params(query_components)
-                dir_path = set_daily_dir(params['run_date'], params['run_time'])
-
-                create_outflow_old(dir_path, params['run_date'], params['run_time'],
-                                   params['forward'], params['backward'], params['model'])
-                response = {'response': 'success'}
-            except Exception as e:
-                print(str(e))
-            reply = json.dumps(response)
-            self.send_response(200)
-            self.send_header('Content-type', 'text/json')
-            self.end_headers()
-            self.wfile.write(str.encode(reply))
-
         if self.path.startswith('/run-flo2d'):
             os.chdir(WIN_HOME_DIR_PATH)
             print('run-flo2d')
@@ -242,28 +221,6 @@ class StoreHandler(BaseHTTPRequestHandler):
                 # upload discharges to curw_fcst database
                 upload_discharges(dir_path, params['run_date'], params['run_time'],
                                   params['forward'], params['backward'], params['model'])
-                response = {'response': 'success'}
-            except Exception as e:
-                print(str(e))
-            reply = json.dumps(response)
-            self.send_response(200)
-            self.send_header('Content-type', 'text/json')
-            self.end_headers()
-            self.wfile.write(str.encode(reply))
-
-        if self.path.startswith('/extract-curw'):
-            os.chdir(WIN_HOME_DIR_PATH)
-            print('extract-data')
-            response = {}
-            try:
-                query_components = parse_qs(urlparse(self.path).query)
-                print('query_components : ', query_components)
-
-                params = get_input_file_creation_params(query_components)
-                dir_path = set_daily_dir(params['run_date'], params['run_time'])
-
-                upload_waterlevels_curw(dir_path, params['run_date'], params['run_time'],
-                                        params['forward'], params['backward'], params['model'])
                 response = {'response': 'success'}
             except Exception as e:
                 print(str(e))
