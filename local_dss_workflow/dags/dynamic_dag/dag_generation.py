@@ -77,31 +77,35 @@ def on_dag_failure(context):
         print('on_dag_failure|rule_id not found')
 
 
-def create_trigger_dag_run(dag_task, dag):
-    payload = {}
-    print('create_trigger_dag_run|dag : ', dag)
-    last_dag_run = dag.get_last_dagrun(include_externally_triggered=True)
-    exec_date = last_dag_run.execution_date.strftime('%Y-%m-%d %H:%M:%S')
-    print('create_trigger_dag_run|dag : ', exec_date)
-    model_type = dag_task['input_params']['model_type']
-    model_rule = dag_task['input_params']['rule_id']
-    adapter = get_dss_db_adapter()
-    if adapter is not None:
-        if model_type == 'wrf':
-            payload = adapter.get_eligible_wrf_rule_info_by_id(model_rule)
-        elif model_type == 'hechms':
-            payload = adapter.get_eligible_hechms_rule_info_by_id(model_rule)
-        elif model_type == 'flo2d':
-            payload = adapter.get_eligible_flo2d_rule_info_by_id(model_rule)
-        else:
-            print('create_dag_run|available for weather model dags only.')
-    else:
-        print('create_dag_run|db adapter not found.')
-    payload['run_date'] = exec_date
-    dag_info = []
-    dag_info = dag_info.append({'dag_name': dag_task['task_content'], 'payload': payload})
-    print('create_dag_run|dag_info : ', dag_info)
-    return dag_info
+# def create_trigger_dag_run(dag_task, dag):
+#     payload = {}
+#     print('create_trigger_dag_run|dag : ', dag)
+#     last_dag_run = dag.get_last_dagrun(include_externally_triggered=True)
+#     exec_date = last_dag_run.execution_date.strftime('%Y-%m-%d %H:%M:%S')
+#     print('create_trigger_dag_run|dag : ', exec_date)
+#     model_type = dag_task['input_params']['model_type']
+#     model_rule = dag_task['input_params']['rule_id']
+#     adapter = get_dss_db_adapter()
+#     if adapter is not None:
+#         if model_type == 'wrf':
+#             payload = adapter.get_eligible_wrf_rule_info_by_id(model_rule)
+#         elif model_type == 'hechms':
+#             payload = adapter.get_eligible_hechms_rule_info_by_id(model_rule)
+#         elif model_type == 'flo2d':
+#             payload = adapter.get_eligible_flo2d_rule_info_by_id(model_rule)
+#         else:
+#             print('create_dag_run|available for weather model dags only.')
+#     else:
+#         print('create_dag_run|db adapter not found.')
+#     payload['run_date'] = exec_date
+#     dag_info = []
+#     dag_info = dag_info.append({'dag_name': dag_task['task_content'], 'payload': payload})
+#     print('create_dag_run|dag_info : ', dag_info)
+#     return dag_info
+
+
+def create_trigger_dag_run(context):
+    print('create_trigger_dag_run|context : ', context)
 
 
 # example bash command : /home/uwcc-admin/calculate.sh -a 23 -date '2020-01-11' -c 1.4
@@ -166,7 +170,8 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
             elif dag_task['task_type'] == 2:
                 task = DynamicTriggerDagRunOperator(
                     task_id=dag_task['task_name'],
-                    python_callable=create_trigger_dag_run(dag_task, dag),
+                    #python_callable=create_trigger_dag_run(dag_task, dag),
+                    python_callable=create_trigger_dag_run,
                     execution_timeout=get_timeout(dag_task['timeout']),
                     on_failure_callback=on_dag_failure,
                     pool=dag_pool
