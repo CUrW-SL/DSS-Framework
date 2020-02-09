@@ -11,7 +11,7 @@ def create_dir_if_not_exists(path):
     return path
 
 
-def execute_flo2d_250m(dir_path, run_date, run_time):
+def execute_flo2d(dir_path, run_date, run_time):
     print("Flo2d run_date : ", run_date)
     print("Flo2d run_time : ", run_time)
     output_dir = dir_path
