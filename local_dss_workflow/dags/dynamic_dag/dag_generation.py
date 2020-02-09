@@ -129,7 +129,7 @@ def create_trigger_dag_run(context):
             print('create_trigger_dag_run|available for weather model dags only.')
         payload['run_date'] = run_date
         print('create_trigger_dag_run|payload : ', payload)
-        dag_info = dag_info.append({'dag_name': target_dag_info['task_content'], 'payload': payload})
+        dag_info.append({'dag_name': target_dag_info['task_content'], 'payload': payload})
         print('create_dag_run|dag_info : ', dag_info)
     return dag_info
 
