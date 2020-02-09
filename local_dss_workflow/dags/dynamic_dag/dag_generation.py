@@ -6,7 +6,7 @@ from airflow.operators.bash_operator import BashOperator
 import sys
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/gen_util')
-from dynamic_dag_util import get_all_dynamic_dag_routines, get_dynamic_dag_tasks
+from dynamic_dag_util import get_all_dynamic_dag_routines, get_dynamic_dag_tasks, get_trigger_target_dag
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
@@ -110,6 +110,26 @@ def create_trigger_dag_run(context):
     task_name = context['task'].task_id
     dag_rule_id = context['params']['id']
     print('create_trigger_dag_run|[run_date, task_name, dag_rule_id] : ', [run_date, task_name, dag_rule_id])
+    dss_adapter = get_dss_db_adapter()
+    payload = {}
+    dag_info = []
+    if dss_adapter is not None:
+        target_dag_info = get_trigger_target_dag(dag_rule_id, task_name)
+        print('create_trigger_dag_run|target_dag_info : ', target_dag_info)
+        model_type = target_dag_info['input_params']['model_type']
+        model_rule = target_dag_info['input_params']['rule_id']
+        if model_type == 'wrf':
+            payload = dss_adapter.get_eligible_wrf_rule_info_by_id(model_rule)
+        elif model_type == 'hechms':
+            payload = dss_adapter.get_eligible_hechms_rule_info_by_id(model_rule)
+        elif model_type == 'flo2d':
+            payload = dss_adapter.get_eligible_flo2d_rule_info_by_id(model_rule)
+        else:
+            print('create_trigger_dag_run|available for weather model dags only.')
+        payload['run_date'] = run_date
+        dag_info = dag_info.append({'dag_name': target_dag_info['task_content'], 'payload': payload})
+        print('create_dag_run|dag_info : ', dag_info)
+    return dag_info
 
 
 # example bash command : /home/uwcc-admin/calculate.sh -a 23 -date '2020-01-11' -c 1.4
