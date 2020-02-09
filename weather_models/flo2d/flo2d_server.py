@@ -23,7 +23,8 @@ HOST_ADDRESS = '192.168.1.41'
 HOST_PORT = 8088
 
 #WIN_HOME_DIR_PATH = r"D:\flo2d_hourly"
-WIN_HOME_DIR_PATH = r"D:\DSS-Framework\weather_models\flo2d"
+# WIN_HOME_DIR_PATH = r"D:\DSS-Framework\weather_models\flo2d"
+WIN_HOME_DIR_PATH = r"D:\flo2d_output"
 
 
 def set_daily_dir(run_date, run_time):
