@@ -118,6 +118,7 @@ def create_trigger_dag_run(context):
         print('create_trigger_dag_run|target_dag_info : ', target_dag_info)
         model_type = target_dag_info['input_params']['model_type']
         model_rule = target_dag_info['input_params']['rule_id']
+        print('create_trigger_dag_run|[model_type, model_rule] : ', [model_type, model_rule])
         if model_type == 'wrf':
             payload = dss_adapter.get_eligible_wrf_rule_info_by_id(model_rule)
         elif model_type == 'hechms':
