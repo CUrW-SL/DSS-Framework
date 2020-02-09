@@ -38,6 +38,10 @@ def get_dss_db_adapter():
     return adapter
 
 
+def get_local_cloud_config():
+    print('')
+
+
 def set_running_status(**context):
     print('set_running_status|context : ', context)
     params = context['params']
@@ -96,7 +100,7 @@ def create_trigger_dag_run(dag_task, dag):
     payload['run_date'] = exec_date
     dag_info = {'dag_name': dag_task['task_content'], 'payload': payload}
     print('create_dag_run|dag_info : ', dag_info)
-    return dag_info
+    return [dag_info]
 
 
 # example bash command : /home/uwcc-admin/calculate.sh -a 23 -date '2020-01-11' -c 1.4
