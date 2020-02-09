@@ -1,0 +1,19 @@
+{
+  "CURW_FCST_USERNAME": "curw",
+  "CURW_FCST_PASSWORD": "cfcwm07",
+  "CURW_FCST_HOST": "192.168.1.43",
+  "CURW_FCST_PORT": 3306,
+  "CURW_FCST_DATABASE": "curw_fcst",
+
+  "CURW_OBS_USERNAME": "curw",
+  "CURW_OBS_PASSWORD": "cfcwm07",
+  "CURW_OBS_HOST": "192.168.1.43",
+  "CURW_OBS_PORT": 3306,
+  "CURW_OBS_DATABASE": "curw_obs",
+
+  "CURW_SIM_USERNAME": "curw",
+  "CURW_SIM_PASSWORD": "cfcwm07",
+  "CURW_SIM_HOST": "192.168.1.43",
+  "CURW_SIM_PORT": 3306,
+  "CURW_SIM_DATABASE": "curw_sim"
+}
