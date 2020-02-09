@@ -114,7 +114,7 @@ def create_trigger_dag_run(context):
     payload = {}
     dag_info = []
     if dss_adapter is not None:
-        target_dag_info = get_trigger_target_dag(dag_rule_id, task_name)
+        target_dag_info = get_trigger_target_dag(dss_adapter, dag_rule_id, task_name)
         print('create_trigger_dag_run|target_dag_info : ', target_dag_info)
         model_type = target_dag_info['input_params']['model_type']
         model_rule = target_dag_info['input_params']['rule_id']
