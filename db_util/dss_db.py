@@ -306,7 +306,7 @@ class RuleEngineAdapter:
                 'inflow_data_from, outflow_data_from, ignore_previous_run, accuracy_rule,' \
                 'rule_details ' \
                 'from dss.flo2d_rules where status in (1, 3, 4) and id={}'.format(id)
-        print('get_flo2d_rule_info_by_id|query : ', query)
+        print('get_eligible_flo2d_rule_info_by_id|query : ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
         if result is not None:
@@ -321,7 +321,7 @@ class RuleEngineAdapter:
     def get_flo2d_rule_status_by_id(self, id):
         flo2d_rule = None
         query = 'select id, status from dss.flo2d_rules where id={}'.format(id)
-        print('get_flo2d_rule_info_by_id|query : ', query)
+        print('get_flo2d_rule_status_by_id|query : ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
         if result is not None:
