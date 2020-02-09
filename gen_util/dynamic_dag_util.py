@@ -49,7 +49,7 @@ def get_dynamic_dag_tasks(dss_adapter, dag_id):
 
 def get_trigger_target_dag(dss_adapter, dag_rule_id, task_name):
     sql_query = 'select id, task_name, task_type, task_content, input_params, timeout ' \
-                'from dss.dynamic_workflow where active=1 and owner_dag_id={} and task_name={} ;'.format(dag_rule_id,
+                'from dss.dynamic_workflow where active=1 and owner_dag_id={} and task_name=\'{}\' ;'.format(dag_rule_id,
                                                                                                          task_name)
     print('get_trigger_target_dag|sql_query : ', sql_query)
     result = dss_adapter.get_single_row(sql_query)
