@@ -1,10 +1,10 @@
 import pymysql
 from datetime import datetime, timedelta
 import traceback
-from weather_models.flo2d.db_plugin import get_cell_mapping, select_distinct_observed_stations, \
+from db_plugin import get_cell_mapping, select_distinct_observed_stations, \
     select_obs_station_precipitation_for_timestamp
 import os
-from weather_models.flo2d.utils import search_value_in_dictionary_list
+from utils import search_value_in_dictionary_list
 
 DATE_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 INVALID_VALUE = -9999
