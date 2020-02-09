@@ -98,9 +98,10 @@ def create_trigger_dag_run(dag_task, dag):
     else:
         print('create_dag_run|db adapter not found.')
     payload['run_date'] = exec_date
-    dag_info = {'dag_name': dag_task['task_content'], 'payload': payload}
+    dag_info = []
+    dag_info = dag_info.append({'dag_name': dag_task['task_content'], 'payload': payload})
     print('create_dag_run|dag_info : ', dag_info)
-    return [dag_info]
+    return dag_info
 
 
 # example bash command : /home/uwcc-admin/calculate.sh -a 23 -date '2020-01-11' -c 1.4
