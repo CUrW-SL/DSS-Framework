@@ -191,8 +191,9 @@ class StoreHandler(BaseHTTPRequestHandler):
 
                 dir_path = set_daily_dir(params['run_date'], params['run_time'])
 
-                execute_flo2d(dir_path, params['run_date'], params['run_time'],
-                              params['forward'], params['backward'], params['model'])
+                # execute_flo2d(dir_path, params['run_date'], params['run_time'],
+                #               params['forward'], params['backward'], params['model'])
+                execute_flo2d(dir_path, params['run_date'], params['run_time'])
                 response = {'response': 'success'}
             except Exception as e:
                 print(str(e))
