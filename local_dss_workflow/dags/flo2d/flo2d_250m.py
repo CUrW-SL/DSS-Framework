@@ -290,5 +290,6 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
 
     init_flo2d_250m >> running_state_flo2d_250m >> create_raincell_flo2d_250m >> create_chan_flo2d_250m >> \
     create_inflow_flo2d_250m >>  create_outflow_flo2d_250m >> run_flo2d_250m_flo2d_250m >> \
-    extract_water_level_flo2d_250m >> check_accuracy_flo2d250m >> complete_state_flo2d_250m
+    check_accuracy_flo2d250m >> complete_state_flo2d_250m
+    # extract_water_level_flo2d_250m >> check_accuracy_flo2d250m >> complete_state_flo2d_250m
 
