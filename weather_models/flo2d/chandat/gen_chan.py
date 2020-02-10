@@ -68,6 +68,7 @@ def read_attribute_from_config_file(attribute, config, compulsory=False):
 
 
 def check_time_format(time):
+    print('check_time_format|time : ', time)
     try:
         time = datetime.strptime(time, DATE_TIME_FORMAT)
 
