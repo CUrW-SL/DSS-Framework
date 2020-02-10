@@ -21,7 +21,7 @@ default_args = {
     'email_on_failure': True,
 }
 
-create_raincell_cmd_template = 'curl -X GET "http://{}:{}/create-sim-raincell?' \
+create_raincell_cmd_template = 'curl -X GET "http://{}:{}/create-raincell?' \
                                'run_date={}&run_time={}' \
                                '&forward={}&backward={}"'
 
