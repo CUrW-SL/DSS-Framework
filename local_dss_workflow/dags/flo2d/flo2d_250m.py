@@ -267,12 +267,12 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    extract_water_level_flo2d_250m = PythonOperator(
-        task_id='extract_water_level_flo2d_250m',
-        provide_context=True,
-        python_callable=get_extract_water_level_cmd,
-        pool=dag_pool
-    )
+    # extract_water_level_flo2d_250m = PythonOperator(
+    #     task_id='extract_water_level_flo2d_250m',
+    #     provide_context=True,
+    #     python_callable=get_extract_water_level_cmd,
+    #     pool=dag_pool
+    # )
 
     check_accuracy_flo2d250m = PythonOperator(
         task_id='check_accuracy_flo2d250m',
