@@ -168,7 +168,8 @@ def create_inflow(dir_path, run_date, run_time, forward=3, backward=2, model='fl
         inflow_file_path = os.path.join(output_dir, file_name)
 
         print("{} start preparing inflow".format(datetime.now()))
-        prepare_inflow(inflow_file_path, start=start_time, end=end_time, discharge_id=discharge_id, wl_id=wl_id)
+        prepare_inflow(inflow_file_path, start=start_time.strftime('%Y-%m-%d %H:%M:%S'), end=end_time.strftime(
+            '%Y-%m-%d %H:%M:%S'), discharge_id=discharge_id, wl_id=wl_id)
         print("{} completed preparing inflow".format(datetime.now()))
 
     except Exception:
