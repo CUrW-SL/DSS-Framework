@@ -23,7 +23,7 @@ default_args = {
 
 create_raincell_cmd_template = 'curl -X GET "http://{}:{}/create-raincell?' \
                                'run_date={}&run_time={}&model={}' \
-                               '&forward={}&backward={}"'
+                               '&forward={}&backward={}&backward={}"'
 
 create_inflow_cmd_template = 'curl -X GET "http://{}:{}/create-inflow?' \
                              'run_date={}&run_time={}&model={}' \

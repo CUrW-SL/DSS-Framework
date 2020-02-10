@@ -93,22 +93,10 @@ class StoreHandler(BaseHTTPRequestHandler):
                 params = get_input_file_creation_params(query_components)
                 print('StoreHandler|create-raincell|params : ', params)
 
-                if query_components["data_type"]:  # 1-observed only, 2-forecast only,3-hybrid, 4-Simiulated Rain
-                    [data_type] = query_components["data_type"]
-                else:
-                    data_type = 4
-
-                any_wrf = None
-                sim_tag = None
-                if data_type == 1:
-                    [any_wrf] = query_components["any_wrf"]
-                    [sim_tag] = query_components["sim_tag"]
-
                 dir_path = set_daily_dir(params['run_date'], params['run_time'])
                 try:
                     create_raincell(dir_path, params['run_date'], params['run_time'],
-                                    params['forward'], params['backward'], params['model'],
-                                    data_type, any_wrf, sim_tag)
+                                    params['forward'], params['backward'], params['model'])
                     response = {'response': 'success'}
                 except Exception as e:
                     response = {'response': 'fail'}
