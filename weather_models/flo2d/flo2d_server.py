@@ -5,7 +5,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 from urllib.parse import urlparse, parse_qs
 
-from raincelldat.gen_raincell import create_sim_hybrid_raincell, create_raincell
+from raincelldat.gen_raincell import create_raincell
 from inflowdat.get_inflow import create_inflow
 from outflowdat.gen_outflow import create_outflow
 from chandat.gen_chan import create_chan
@@ -16,14 +16,11 @@ from extract.extract_water_level_hourly_run import upload_waterlevels
 from extract.extract_discharge_hourly_run import upload_discharges
 
 from os.path import join as pjoin
-from datetime import datetime, timedelta
+from datetime import datetime
 
 HOST_ADDRESS = '192.168.1.41'
-# HOST_ADDRESS = '0.0.0.0'
 HOST_PORT = 8088
 
-#WIN_HOME_DIR_PATH = r"D:\flo2d_hourly"
-# WIN_HOME_DIR_PATH = r"D:\DSS-Framework\weather_models\flo2d"
 WIN_HOME_DIR_PATH = r"D:\flo2d_output"
 
 
@@ -97,8 +94,11 @@ class StoreHandler(BaseHTTPRequestHandler):
                 else:
                     data_type = 4
 
-                [any_wrf] = query_components["any_wrf"]
-                [sim_tag] = query_components["sim_tag"]
+                any_wrf = None
+                sim_tag = None
+                if data_type == 1:
+                    [any_wrf] = query_components["any_wrf"]
+                    [sim_tag] = query_components["sim_tag"]
 
                 dir_path = set_daily_dir(params['run_date'], params['run_time'])
                 try:
@@ -193,7 +193,7 @@ class StoreHandler(BaseHTTPRequestHandler):
                 dir_path = set_daily_dir(params['run_date'], params['run_time'])
 
                 execute_flo2d(dir_path, params['run_date'], params['run_time'],
-                                   params['forward'], params['backward'], params['model'])
+                              params['forward'], params['backward'], params['model'])
                 response = {'response': 'success'}
             except Exception as e:
                 print(str(e))

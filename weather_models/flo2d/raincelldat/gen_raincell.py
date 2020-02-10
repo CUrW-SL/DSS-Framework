@@ -10,10 +10,9 @@ DATE_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 INVALID_VALUE = -9999
 
 # connection params
-# HOST = "10.138.0.13"
-HOST = "35.227.163.211"
-USER = "routine_user"
-PASSWORD = "aquaroutine"
+HOST = "192.168.1.43"
+USER = "curw"
+PASSWORD = "cfcwm07"
 SIM_DB = "curw_sim"
 FCST_DB = "curw_fcst"
 OBS_DB = "curw_obs"
@@ -278,6 +277,7 @@ def get_ts_start_end_for_data_type(run_date, run_time, forward=3, backward=2):
 def create_raincell(dir_path, run_date, run_time, forward, backward, model, data_type, any_wrf, sim_tag):
     time_limits = get_ts_start_end_for_data_type(run_date, run_time, forward, backward)
     raincell_file_path = os.path.join(dir_path, 'RAINCELL.DAT')
+    print('create_raincell|raincell_file_path : ', raincell_file_path)
     start_time = datetime.now()
     if not os.path.isfile(raincell_file_path):
         generate_raincell(raincell_file_path, time_limits, model, data_type, any_wrf, sim_tag)
