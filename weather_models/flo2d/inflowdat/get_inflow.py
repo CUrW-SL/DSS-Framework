@@ -152,6 +152,7 @@ def create_inflow(dir_path, run_date, run_time, forward=3, backward=2, model='fl
     try:
         time_limits = get_ts_start_end_for_data_type(run_date, run_time, forward, backward)
         # Load config details and db connection params
+        print('create_inflow|cwd : ', os.getcwd())
         config_path = os.path.join(os.getcwd(), 'inflowdat', 'config.json')
         config = json.loads(open(config_path).read())
 
