@@ -201,7 +201,7 @@ def create_chan(dir_path, run_date, run_time, forward=3, backward=2, flo2d_model
     time_limits = get_ts_start_end_for_data_type(run_date, run_time, forward, backward)
     try:
         # Load config details and db connection params
-        config = json.loads(open(os.path.join(os.getcwd(), 'chan', "config.json")).read())
+        config = json.loads(open(os.path.join(WIN_HOME_DIR_PATH, 'chandat', "config.json")).read())
 
         start_time = time_limits['obs_start']
 
