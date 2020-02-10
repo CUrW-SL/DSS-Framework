@@ -50,10 +50,12 @@ def prepare_raincell(raincell_file_path, start_time, end_time,
     """
     connection = pymysql.connect(host=HOST, user=USER, password=PASSWORD, db=SIM_DB,
                                  cursorclass=pymysql.cursors.DictCursor)
-    print("Connected to database")
+    print("************Connected to database**************")
 
     end_time = datetime.strptime(end_time, DATE_TIME_FORMAT)
     start_time = datetime.strptime(start_time, DATE_TIME_FORMAT)
+
+    print('prepare_raincell|[start_time, end_time, target_model] : ', [start_time, end_time, target_model])
 
     if end_time < start_time:
         print("start_time should be less than end_time")
@@ -159,6 +161,8 @@ def generate_raincell(raincell_file_path, time_limits, model, data_type, any_wrf
     write_to_file(raincell_file_path,
                   ['{} {} {} {}\n'.format(timestep, length, start_time.strftime(DATE_TIME_FORMAT),
                                           end_time.strftime(DATE_TIME_FORMAT))])
+
+    print('generate_raincell|raincell_file_path : ', raincell_file_path)
     grid_maps = get_cell_mapping(sim_connection, model)
     station_id_list = select_distinct_observed_stations(sim_connection, model)
     station_ids = ','.join(str(i) for i in station_id_list)
