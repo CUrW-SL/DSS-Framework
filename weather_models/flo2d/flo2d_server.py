@@ -38,40 +38,43 @@ def set_daily_dir(run_date, run_time):
 
 
 def get_input_file_creation_params(query_components):
-    print('get_input_file_creation_params|query_components : ', query_components)
+    try:
+        print('get_input_file_creation_params|query_components : ', query_components)
 
-    if query_components["run_date"]:
-        [run_date] = query_components["run_date"]
-    else:
-        run_date = datetime.now().strftime('%Y-%m-%d')
-
-    if query_components["run_time"]:
-        [run_time] = query_components["run_time"]
-    else:
-        run_time = datetime.now().strftime('%H:00:00')
-
-    if query_components["model"]:  # "flo2d_250"/"flo2d_150"
-        [model] = query_components["model"]
-    else:
-        model = 'flo2d_250'
-
-    if query_components["forward"]:
-        [forward] = query_components["forward"]
-    else:
-        if model == 'flo2d_250':
-            forward = 3
+        if query_components["run_date"]:
+            [run_date] = query_components["run_date"]
         else:
-            forward = 5
+            run_date = datetime.now().strftime('%Y-%m-%d')
 
-    if query_components["backward"]:
-        [backward] = query_components["backward"]
-    else:
-        if model == 'flo2d_250':
-            backward = 2
+        if query_components["run_time"]:
+            [run_time] = query_components["run_time"]
         else:
-            backward = 3
-    return {'run_date': run_date, 'run_time': run_time, 'forward': forward,
-            'backward': backward, 'model': model}
+            run_time = datetime.now().strftime('%H:00:00')
+
+        if query_components["model"]:  # "flo2d_250"/"flo2d_150"
+            [model] = query_components["model"]
+        else:
+            model = 'flo2d_250'
+
+        if query_components["forward"]:
+            [forward] = query_components["forward"]
+        else:
+            if model == 'flo2d_250':
+                forward = 3
+            else:
+                forward = 5
+
+        if query_components["backward"]:
+            [backward] = query_components["backward"]
+        else:
+            if model == 'flo2d_250':
+                backward = 2
+            else:
+                backward = 3
+        return {'run_date': run_date, 'run_time': run_time, 'forward': forward,
+                'backward': backward, 'model': model}
+    except Exception as e:
+        print('get_input_file_creation_params|Exception : ', str(e))
 
 
 class StoreHandler(BaseHTTPRequestHandler):
@@ -88,6 +91,7 @@ class StoreHandler(BaseHTTPRequestHandler):
                 print('query_components : ', query_components)
 
                 params = get_input_file_creation_params(query_components)
+                print('StoreHandler|create-raincell|params : ', params)
 
                 if query_components["data_type"]:  # 1-observed only, 2-forecast only,3-hybrid, 4-Simiulated Rain
                     [data_type] = query_components["data_type"]
@@ -125,6 +129,7 @@ class StoreHandler(BaseHTTPRequestHandler):
                 print('query_components : ', query_components)
 
                 params = get_input_file_creation_params(query_components)
+                print('StoreHandler|create-inflow|params : ', params)
                 dir_path = set_daily_dir(params['run_date'], params['run_time'])
 
                 create_inflow(dir_path, params['run_date'], params['run_time'],
@@ -146,6 +151,7 @@ class StoreHandler(BaseHTTPRequestHandler):
                 query_components = parse_qs(urlparse(self.path).query)
 
                 params = get_input_file_creation_params(query_components)
+                print('StoreHandler|create-chan|params : ', params)
                 dir_path = set_daily_dir(params['run_date'], params['run_time'])
 
                 create_chan(dir_path, params['run_date'], params['run_time'],
@@ -168,6 +174,8 @@ class StoreHandler(BaseHTTPRequestHandler):
                 print('query_components : ', query_components)
 
                 params = get_input_file_creation_params(query_components)
+                print('StoreHandler|create-outflow|params : ', params)
+
                 dir_path = set_daily_dir(params['run_date'], params['run_time'])
 
                 create_outflow(dir_path, params['run_date'], params['run_time'],
@@ -190,6 +198,8 @@ class StoreHandler(BaseHTTPRequestHandler):
                 print('query_components : ', query_components)
 
                 params = get_input_file_creation_params(query_components)
+                print('StoreHandler|run-flo2d|params : ', params)
+
                 dir_path = set_daily_dir(params['run_date'], params['run_time'])
 
                 execute_flo2d(dir_path, params['run_date'], params['run_time'],
@@ -212,6 +222,7 @@ class StoreHandler(BaseHTTPRequestHandler):
                 print('query_components : ', query_components)
 
                 params = get_input_file_creation_params(query_components)
+                print('StoreHandler|extract-data|params : ', params)
                 dir_path = set_daily_dir(params['run_date'], params['run_time'])
 
                 # upload_waterlevels_curw(dir_path, ts_start_date, ts_start_time)
