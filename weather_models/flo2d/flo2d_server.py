@@ -71,8 +71,8 @@ def get_input_file_creation_params(query_components):
                 backward = 2
             else:
                 backward = 3
-        return {'run_date': run_date, 'run_time': run_time, 'forward': forward,
-                'backward': backward, 'model': model}
+        return {'run_date': run_date, 'run_time': run_time, 'forward': int(forward),
+                'backward': int(backward), 'model': model}
     except Exception as e:
         print('get_input_file_creation_params|Exception : ', str(e))
 
