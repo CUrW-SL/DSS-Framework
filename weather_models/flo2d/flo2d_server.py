@@ -21,13 +21,14 @@ from datetime import datetime
 HOST_ADDRESS = '192.168.1.41'
 HOST_PORT = 8088
 
-WIN_HOME_DIR_PATH = r"D:\flo2d_output"
+WIN_OUTPUT_DIR_PATH = r"D:\flo2d_output"
+WIN_HOME_DIR_PATH = r"D:\DSS-Framework\weather_models\flo2d"
 
 
 def set_daily_dir(run_date, run_time):
     start_datetime = datetime.strptime('%s %s' % (run_date, run_time), '%Y-%m-%d %H:%M:%S')
     run_time = start_datetime.strftime('%H-%M-%S')
-    dir_path = pjoin(os.getcwd(), 'output', run_date, run_time)
+    dir_path = pjoin(WIN_OUTPUT_DIR_PATH, 'output', run_date, run_time)
     if not os.path.exists(dir_path):
         try:
             os.makedirs(dir_path)

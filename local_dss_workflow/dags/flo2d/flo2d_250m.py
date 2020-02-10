@@ -200,18 +200,6 @@ def run_this_func(dag_run, **kwargs):
     return flo2d_rule
 
 
-def outflow_branch_func(**context):
-    rule = get_rule_from_context(context)
-    outflow_gen_method = rule['rule_info']['rule_details']['outflow_gen_method']
-    if outflow_gen_method is not None:
-        if outflow_gen_method == 'code':
-            return 'create_old_outflow_flo2d_250m'
-        else:
-            return 'create_outflow_flo2d_250m'
-    else:
-        return 'create_outflow_flo2d_250m'
-
-
 def on_dag_failure(context):
     rule_id = get_rule_id(context)
     if rule_id is not None:
@@ -262,13 +250,6 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    outflow_branch = BranchPythonOperator(
-        task_id='outflow_branch',
-        provide_context=True,
-        python_callable=outflow_branch_func,
-        pool=dag_pool
-    )
-
     create_outflow_flo2d_250m = PythonOperator(
         task_id='create_outflow_flo2d_250m',
         provide_context=True,
@@ -308,6 +289,6 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     )
 
     init_flo2d_250m >> running_state_flo2d_250m >> create_raincell_flo2d_250m >> create_chan_flo2d_250m >> \
-    create_inflow_flo2d_250m >> outflow_branch >> create_outflow_flo2d_250m >> run_flo2d_250m_flo2d_250m >> \
+    create_inflow_flo2d_250m >>  create_outflow_flo2d_250m >> run_flo2d_250m_flo2d_250m >> \
     extract_water_level_flo2d_250m >> check_accuracy_flo2d250m >> complete_state_flo2d_250m
 
