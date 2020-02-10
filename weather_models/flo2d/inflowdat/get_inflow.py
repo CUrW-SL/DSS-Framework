@@ -149,6 +149,7 @@ def get_ts_start_end_for_data_type(run_date, run_time, forward=3, backward=2):
 
 
 def create_inflow(dir_path, run_date, run_time, forward=3, backward=2, model='flo2d_250'):
+    print('create_inflow|[run_date, run_time, forward, backward] : ', [run_date, run_time, forward, backward])
     try:
         time_limits = get_ts_start_end_for_data_type(run_date, run_time, forward, backward)
         # Load config details and db connection params
