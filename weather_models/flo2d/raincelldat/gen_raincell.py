@@ -53,8 +53,8 @@ def prepare_raincell(raincell_file_path, start_time, end_time,
     print("************Connected to database**************")
 
     print('prepare_raincell|[start_time, end_time, target_model] : ', [start_time, end_time, target_model])
-    end_time = datetime.strptime(end_time, DATE_TIME_FORMAT)
-    start_time = datetime.strptime(start_time, DATE_TIME_FORMAT)
+    #end_time = datetime.strptime(end_time, DATE_TIME_FORMAT)
+    #start_time = datetime.strptime(start_time, DATE_TIME_FORMAT)
 
     if end_time < start_time:
         print("start_time should be less than end_time")
