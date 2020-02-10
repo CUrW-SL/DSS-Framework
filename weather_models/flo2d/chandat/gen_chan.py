@@ -70,8 +70,6 @@ def read_attribute_from_config_file(attribute, config, compulsory=False):
 def check_time_format(time):
     print('check_time_format|time : ', time)
     try:
-        print('xxxxxxxxxxxxxxxxxxxxxxxxx')
-        time = datetime.strptime(time, DATE_TIME_FORMAT)
         if time.strftime('%S') != '00':
             print("Seconds should be always 00")
             exit(1)
