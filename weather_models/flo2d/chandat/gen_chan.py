@@ -8,7 +8,7 @@ import sys
 import getopt
 
 DATE_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
-ROOT_DIRECTORY = 'D:\curw_flo2d_data_manager'
+WIN_HOME_DIR_PATH = r"D:\DSS-Framework\weather_models\flo2d"
 
 from db_adapter.base import get_Pool, destroy_Pool
 from db_adapter.constants import set_db_config_file_path
@@ -103,7 +103,7 @@ def prepare_chan(chan_file_path, start, flo2d_model):
         print(initial_conditions)
 
         # chan head
-        head_file = open(os.path.join(ROOT_DIRECTORY, "input", "chan", "chan_{}_head.dat".format(flo2d_version)), "r")
+        head_file = open(os.path.join(WIN_HOME_DIR_PATH, "chandat", "chan_{}_head.dat".format(flo2d_version)), "r")
         head = head_file.read()
         head_file.close()
         write_file_to_file(chan_file_path, file_content=head)
@@ -111,7 +111,7 @@ def prepare_chan(chan_file_path, start, flo2d_model):
         # chan body
         chan_processed_body = []
 
-        body_file_name = os.path.join(ROOT_DIRECTORY, "input", "chan", "chan_{}_body.dat".format(flo2d_version))
+        body_file_name = os.path.join(WIN_HOME_DIR_PATH, "chandat", "chan_{}_body.dat".format(flo2d_version))
         chan_body = [line.rstrip('\n') for line in open(body_file_name, "r")]
 
         i = 0
@@ -136,7 +136,7 @@ def prepare_chan(chan_file_path, start, flo2d_model):
         append_to_file(chan_file_path, data=chan_processed_body)
 
         # chan tail
-        tail_file = open(os.path.join(ROOT_DIRECTORY, "input", "chan", "chan_{}_tail.dat".format(flo2d_version)), "r")
+        tail_file = open(os.path.join(WIN_HOME_DIR_PATH, "chandat", "chan_{}_tail.dat".format(flo2d_version)), "r")
         tail = tail_file.read()
         tail_file.close()
         append_file_to_file(chan_file_path, file_content=tail)
@@ -197,7 +197,7 @@ def get_ts_start_end_for_data_type(run_date, run_time, forward=3, backward=2):
 
 
 def create_chan(dir_path, run_date, run_time, forward=3, backward=2, flo2d_model='flo2d_250'):
-    set_db_config_file_path(os.path.join(ROOT_DIRECTORY, 'db_adapter_config.json'))
+    set_db_config_file_path(os.path.join(WIN_HOME_DIR_PATH, 'db_adapter_config.json'))
     time_limits = get_ts_start_end_for_data_type(run_date, run_time, forward, backward)
     try:
         # Load config details and db connection params
