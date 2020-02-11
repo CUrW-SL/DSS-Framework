@@ -3,6 +3,7 @@ from airflow import DAG
 from airflow.models import Variable
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.bash_operator import BashOperator
+from airflow.operators.sensors import ExternalTaskSensor
 import sys
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/gen_util')
@@ -205,7 +206,13 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
                     on_failure_callback=on_dag_failure,
                     pool=dag_pool
                 )
+                sensor = ExternalTaskSensor(
+                    task_id='wait_for_{}_to_be_completed'.format(dag_task['task_name']),
+                    external_dag_id=dag_task['task_content'],
+                    external_task_id='complete_state',
+                    dag=dag)
                 task_list.append(task)
+                task_list.append(sensor)
         end_task = PythonOperator(
             task_id='end_task',
             provide_context=True,
