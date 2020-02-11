@@ -210,7 +210,7 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
                     task_id='wait_for_{}_to_be_completed'.format(dag_task['task_name']),
                     external_dag_id=dag_task['task_content'],
                     external_task_id='complete_state',
-                    # execution_delta=timedelta(minutes=-5),
+                    execution_delta=timedelta(minutes=2),
                     dag=dag)
                 task_list.append(task)
                 task_list.append(sensor)
