@@ -118,6 +118,9 @@ def create_trigger_dag_run(context):
         print('create_trigger_dag_run|target_dag_info : ', target_dag_info)
         model_type = target_dag_info['input_params']['model_type']
         model_rule = target_dag_info['input_params']['rule_id']
+        if 'run_date' in target_dag_info['input_params']:
+            run_date = target_dag_info['input_params']['run_date']
+            print('********create_trigger_dag_run|run on user defined date|run_date : ', run_date)
         print('create_trigger_dag_run|[model_type, model_rule] : ', [model_type, model_rule])
         if model_type == 'wrf':
             payload = dss_adapter.get_eligible_wrf_rule_info_by_id(model_rule)
@@ -143,10 +146,10 @@ def get_bash_command(bash_script, input_params, dag):
     print('get_bash_command|bash_script : ', bash_script)
     if input_params is None:
         input_params = {}
-    if 'd' not in input_params:
+    if 'run_date' not in input_params:
         # if user hasn't pass 'd' execution date as a param, system will add
         # it to the input params.
-        input_params['d'] = exec_date
+        input_params['run_date'] = exec_date
     print('get_bash_command|input_params : ', input_params)
     inputs = []
     if input_params:
