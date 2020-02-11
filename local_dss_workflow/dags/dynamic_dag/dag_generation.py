@@ -15,6 +15,9 @@ from dss_db import RuleEngineAdapter
 sys.path.insert(0, '/home/curw/git/DSS-Framework/local_dss_workflow/plugins/operators')
 from dynamic_external_trigger_operator import DynamicTriggerDagRunOperator
 
+sys.path.insert(0, '/home/curw/git/DSS-Framework/local_dss_workflow/plugins/operators')
+from external_dag_sensor import ExternalDagSensorOperator
+
 dag_pool = 'external_dag_pool'
 
 
@@ -200,18 +203,17 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
             elif dag_task['task_type'] == 2:
                 task = DynamicTriggerDagRunOperator(
                     task_id=dag_task['task_name'],
-                    #python_callable=create_trigger_dag_run(dag_task, dag),
                     python_callable=create_trigger_dag_run,
                     execution_timeout=get_timeout(dag_task['timeout']),
                     on_failure_callback=on_dag_failure,
                     pool=dag_pool
                 )
-                sensor = ExternalTaskSensor(
+                sensor = ExternalDagSensorOperator(
                     task_id='wait_for_{}_to_be_completed'.format(dag_task['task_name']),
-                    external_dag_id=dag_task['task_content'],
-                    external_task_id='complete_state',
-                    execution_delta=timedelta(minutes=2),
-                    dag=dag)
+                    model_type=dag_task['input_params']['model_type'],
+                    model_rule_id=dag_task['input_params']['rule_id'],
+                    provide_context=True,
+                    pool=dag_pool)
                 task_list.append(task)
                 task_list.append(sensor)
         end_task = PythonOperator(
