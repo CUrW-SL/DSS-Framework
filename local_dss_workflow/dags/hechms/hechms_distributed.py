@@ -36,9 +36,13 @@ def get_rule_from_context(context):
 
 
 def get_local_exec_date_from_context(context):
-    exec_datetime_str = context["execution_date"].to_datetime_string()
-    exec_datetime = datetime.strptime(exec_datetime_str, '%Y-%m-%d %H:%M:%S') + timedelta(hours=5, minutes=30)
-    exec_date = exec_datetime.strftime('%Y-%m-%d_%H:00:00')
+    rule = get_rule_from_context(context)
+    if 'run_date' in rule['rule_info']:
+        exec_date = rule['rule_info']['run_date']
+    else:
+        exec_datetime_str = context["execution_date"].to_datetime_string()
+        exec_datetime = datetime.strptime(exec_datetime_str, '%Y-%m-%d %H:%M:%S') + timedelta(hours=5, minutes=30)
+        exec_date = exec_datetime.strftime('%Y-%m-%d_%H:00:00')
     return exec_date
 
 
