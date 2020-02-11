@@ -207,7 +207,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     )
 
     complete_state_hec_dis = PythonOperator(
-        task_id='complete_state_hec_dis',
+        task_id='complete_state',
         provide_context=True,
         python_callable=set_complete_status,
         dag=dag,

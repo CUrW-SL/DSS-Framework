@@ -282,7 +282,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     )
 
     complete_state_flo2d_250m = PythonOperator(
-        task_id='complete_state_flo2d_250m',
+        task_id='complete_state',
         provide_context=True,
         python_callable=set_complete_status,
         pool=dag_pool
