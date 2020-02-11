@@ -173,6 +173,13 @@ def get_timeout(timeout):
     return timedelta(hours=timeout['hours'], minutes=timeout['minutes'], seconds=timeout['seconds'])
 
 
+def get_timeout_in_seconds(timeout):
+    print('get_timeout_in_seconds|timeout : ', timeout)
+    total_seconds = timeout['hours']*3600 + timeout['minutes']*60 + timeout['seconds']
+    print('get_timeout_in_seconds|total_seconds : ', timeout)
+    return total_seconds
+
+
 def create_dag(dag_id, params, timeout, dag_tasks, default_args):
     dag = DAG(dag_id, catchup=False,
               dagrun_timeout=timeout,
@@ -213,6 +220,7 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
                     model_type=dag_task['input_params']['model_type'],
                     model_rule_id=dag_task['input_params']['rule_id'],
                     provide_context=True,
+                    timeout=get_timeout_in_seconds(dag_task['timeout']),
                     pool=dag_pool)
                 task_list.append(task)
                 task_list.append(sensor)
