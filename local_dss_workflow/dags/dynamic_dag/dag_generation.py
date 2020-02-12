@@ -225,15 +225,15 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
                     on_failure_callback=on_dag_failure,
                     pool=dag_pool
                 )
-                sensor1 = ExternalDagSensorOperator(
-                    task_id='wait1_for_{}_to_be_completed'.format(dag_task['task_name']),
-                    model_type=dag_task['input_params']['model_type'],
-                    model_rule_id=dag_task['input_params']['rule_id'],
-                    provide_context=True,
-                    timeout=get_timeout_in_seconds(dag_task['timeout']),
-                    pool=dag_pool)
-                sensor2 = SqlSensor(
-                    task_id='wait2_for_{}_to_be_completed'.format(dag_task['task_name']),
+                # sensor1 = ExternalDagSensorOperator(
+                #     task_id='wait1_for_{}_to_be_completed'.format(dag_task['task_name']),
+                #     model_type=dag_task['input_params']['model_type'],
+                #     model_rule_id=dag_task['input_params']['rule_id'],
+                #     provide_context=True,
+                #     timeout=get_timeout_in_seconds(dag_task['timeout']),
+                #     pool=dag_pool)
+                sensor = SqlSensor(
+                    task_id='wait_for_{}_to_be_completed'.format(dag_task['task_name']),
                     conn_id='dss_conn',
                     sql=get_sensor_sql_query(dag_task['input_params']['model_type'],
                                              dag_task['input_params']['rule_id']),
@@ -241,8 +241,7 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
                     timeout=get_timeout_in_seconds(dag_task['timeout']),
                     dag=dag)
                 task_list.append(task)
-                task_list.append(sensor1)
-                task_list.append(sensor2)
+                task_list.append(sensor)
         end_task = PythonOperator(
             task_id='end_task',
             provide_context=True,
