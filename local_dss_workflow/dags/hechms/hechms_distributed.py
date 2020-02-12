@@ -77,7 +77,7 @@ def get_create_input_cmd(**context):
     create_input_cmd = create_input_cmd_template.format(run_node, run_port, exec_date, backward, forward, init_run)
     print('get_create_input_cmd|create_input_cmd : ', create_input_cmd)
     # subprocess.call(create_input_cmd, shell=True)
-    request_url = create_input_request.format(run_node, run_port, exec_date, backward, forward)
+    request_url = create_input_request.format(run_node, run_port, exec_date, backward, forward, init_run)
     print('get_create_input_cmd|request_url : ', request_url)
     if send_http_get_request(request_url):
         print('get_create_input_cmd|success')
@@ -98,7 +98,7 @@ def get_run_hechms_preprocess_cmd(**context):
                                                                           forward)
     print('get_run_hechms_preprocess_cmd|run_hechms_preprocess_cmd : ', run_hechms_preprocess_cmd)
     #subprocess.call(run_hechms_preprocess_cmd, shell=True)
-    request_url = run_hechms_preprocess_request.format(run_node, run_port, exec_date, backward,forward)
+    request_url = run_hechms_preprocess_request.format(run_node, run_port, exec_date, backward, forward)
     print('get_run_hechms_preprocess_cmd|request_url : ', request_url)
     if send_http_get_request(request_url):
         print('get_run_hechms_preprocess_cmd|success')

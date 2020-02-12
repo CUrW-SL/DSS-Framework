@@ -58,11 +58,12 @@ class ExternalDagSensorOperator(BaseSensorOperator):
         super(ExternalDagSensorOperator, self).__init__(*args, **kwargs)
 
     def poke(self, context, session=None):
+        condition = False
         try:
             print('-----------------------------------------------------------------------')
-            condition = False
             dss_adapter = get_dss_db_adapter()
             if dss_adapter is not None:
+                print('ExternalDagSensorOperator|[model_type, model_rule_id]:', [self.model_type, self.model_rule_id])
                 if self.model_type and self.model_rule_id:
                     if self.model_type == 'wrf':
                         rule_status = dss_adapter.get_wrf_rule_status_by_id(self.model_rule_id)
@@ -84,6 +85,9 @@ class ExternalDagSensorOperator(BaseSensorOperator):
         except AirflowSensorTimeout as to:
             self._do_skip_downstream_tasks(context)
             raise AirflowSensorTimeout('ExternalDagSensorOperator. Time is OUT.')
+        finally:
+            print('ExternalDagSensorOperator|condition : ', condition)
+            return condition
 
 
 class MyFirstPlugin(AirflowPlugin):
