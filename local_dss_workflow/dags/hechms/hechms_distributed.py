@@ -109,7 +109,7 @@ def get_run_hechms_postprocess_cmd(**context):
                                                                             forward)
     print('get_run_hechms_postprocess_cmd|run_hechms_postprocess_cmd : ', run_hechms_postprocess_cmd)
     subprocess.call(run_hechms_postprocess_cmd, shell=True)
-    request_url = run_hechms_postprocess_request.format(exec_date, backward,forward)
+    request_url = run_hechms_postprocess_request.format(run_node, run_port, exec_date, backward, forward)
     print('get_run_hechms_postprocess_cmd|request_url : ', request_url)
     send_http_get_request(request_url)
 
@@ -122,7 +122,7 @@ def get_upload_discharge_cmd(**context):
     upload_discharge_cmd = upload_discharge_cmd_template.format(run_node, run_port, exec_date)
     print('get_upload_discharge_cmd|upload_discharge_cmd : ', upload_discharge_cmd)
     subprocess.call(upload_discharge_cmd, shell=True)
-    request_url = upload_discharge_cmd_request.format(exec_date)
+    request_url = upload_discharge_cmd_request.format(run_node, run_port, exec_date)
     print('get_upload_discharge_cmd|request_url : ', request_url)
     send_http_get_request(request_url)
 
