@@ -239,6 +239,7 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
                     sql=get_sensor_sql_query(dag_task['input_params']['model_type'],
                                              dag_task['input_params']['rule_id']),
                     poke_interval=60,
+                    fail_on_empty=True,
                     timeout=get_timeout_in_seconds(dag_task['timeout']),
                     dag=dag)
                 task_list.append(task)
