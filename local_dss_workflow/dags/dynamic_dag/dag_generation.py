@@ -227,10 +227,14 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
                     on_failure_callback=on_dag_failure,
                     pool=dag_pool
                 )
+                task_list.append(task)
+
                 wait = TimeDeltaSensor(
                     task_id='wait_a_minute',
                     delta=timedelta(minutes=1),
                     dag=dag)
+                task_list.append(wait)
+
                 sensor = SqlSensor(
                     task_id='wait_for_{}_to_be_completed'.format(dag_task['task_name']),
                     conn_id='dss_conn',
@@ -240,9 +244,6 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
                     allow_null=False,
                     timeout=get_timeout_in_seconds(dag_task['timeout']),
                     dag=dag)
-
-                task_list.append(task)
-                task_list.append(wait)
                 task_list.append(sensor)
 
                 print('create_dag|timeout:', sensor.timeout)
