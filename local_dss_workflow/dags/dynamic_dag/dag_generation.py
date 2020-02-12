@@ -176,7 +176,7 @@ def get_timeout(timeout):
 def get_timeout_in_seconds(timeout):
     print('get_timeout_in_seconds|timeout : ', timeout)
     total_seconds = timeout['hours'] * 3600 + timeout['minutes'] * 60 + timeout['seconds']
-    print('get_timeout_in_seconds|total_seconds : ', timeout)
+    print('get_timeout_in_seconds|total_seconds : ', total_seconds)
     return total_seconds
 
 
@@ -208,6 +208,7 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
 
         task_list = [init_task]
         for dag_task in dag_tasks:
+            print('create_dag|dag_task : ', dag_task)
             if dag_task['task_type'] == 1:
                 task = BashOperator(
                     task_id=dag_task['task_name'],
