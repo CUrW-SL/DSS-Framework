@@ -25,13 +25,14 @@ HOST_PORT = 8088
 
 WIN_OUTPUT_DIR_PATH = r"D:\flo2d_output"
 WIN_HOME_DIR_PATH = r"D:\DSS-Framework\weather_models\flo2d"
+WIN_FLO2D_DATA_MANAGER_PATH = r"D:\curw_flo2d_data_manager"
 
-#D:\>.\curw_flo2d_data_manager\input\chan\gen_chan.py -m flo2d_250 -s "2020-01-06 00:00:00" -d "D:\flo2d_output\output"
-CREATE_RAINCELL_CMD = ''
-CREATE_CHAN_CMD = ''
-CREATE_INFLOW_CMD = ''
-CREATE_OUTFLOW_CMD = ''
-RUN_OUTFLOW_CMD = ''
+# D:\>.\curw_flo2d_data_manager\input\chan\gen_chan.py -m flo2d_250 -s "2020-01-06 00:00:00" -d "D:\flo2d_output\output"
+CREATE_CHAN_CMD = '.\input\chan\gen_raincell.py -m {} -s "{}" -d "{}"'
+CREATE_RAINCELL_CMD = '.\input\chan\gen_chan.py -m {} -s "{}" -e "{}" -d "{}" -M "{}"'
+CREATE_INFLOW_250_CMD = '.\input\chan\get_inflow_250.py -s "{}" -d "{}" -M "{}"'
+CREATE_INFLOW_150_CMD = '.\input\chan\get_inflow_150.py -s "{}" -d "{}" -M "{}"'
+CREATE_OUTFLOW_CMD = '.\input\chan\gen_outflow.py -m {} -s "{}" -d "{}" -M "{}"'
 EXTRACT_OUTPUT_CMD = ''
 
 
@@ -48,7 +49,18 @@ def set_daily_dir(run_date, run_time):
     return dir_path
 
 
-def get_input_file_creation_params(query_components):
+def run_input_file_generation_methods(cmd):
+    try:
+        print('run_input_file_generation_methods|cmd: ', cmd)
+        os.chdir(WIN_FLO2D_DATA_MANAGER_PATH)
+        subprocess.call('', shell=True)
+        return {'response': 'success'}
+    except Exception as ex:
+        print('run_input_file_generation_methods|Exception: ', str(ex))
+        return {'response': 'fail'}
+
+
+def get_input_file_creation_params(query_components, input_file_type):
     try:
         print('get_input_file_creation_params|query_components : ', query_components)
 
@@ -82,8 +94,13 @@ def get_input_file_creation_params(query_components):
                 backward = 2
             else:
                 backward = 3
-        return {'run_date': run_date, 'run_time': run_time, 'forward': int(forward),
-                'backward': int(backward), 'model': model}
+        if input_file_type == 'inflow' or input_file_type == 'outflow' or input_file_type == 'raincell':
+            [pop_method] = query_components["pop_method"]
+            return {'run_date': run_date, 'run_time': run_time, 'forward': int(forward),
+                    'backward': int(backward), 'model': model, 'pop_method': pop_method}
+        else:
+            return {'run_date': run_date, 'run_time': run_time, 'forward': int(forward),
+                    'backward': int(backward), 'model': model}
     except Exception as e:
         print('get_input_file_creation_params|Exception : ', str(e))
 
@@ -96,19 +113,19 @@ class StoreHandler(BaseHTTPRequestHandler):
         if self.path.startswith('/create-raincell'):
             os.chdir(WIN_HOME_DIR_PATH)
             print('create-raincell')
-            response = {}
             try:
                 query_components = parse_qs(urlparse(self.path).query)
                 print('query_components : ', query_components)
 
-                params = get_input_file_creation_params(query_components)
+                params = get_input_file_creation_params(query_components, 'raincell')
                 print('StoreHandler|create-raincell|params : ', params)
 
                 dir_path = set_daily_dir(params['run_date'], params['run_time'])
                 try:
                     create_raincell(dir_path, params['run_date'], params['run_time'],
                                     params['forward'], params['backward'], params['model'])
-                    response = {'response': 'success'}
+                    command = ''
+                    response = run_input_file_generation_methods(command)
                 except Exception as e:
                     response = {'response': 'fail'}
             except Exception as e:
@@ -123,41 +140,18 @@ class StoreHandler(BaseHTTPRequestHandler):
         if self.path.startswith('/create-inflow'):
             os.chdir(WIN_HOME_DIR_PATH)
             print('create-inflow')
-            response = {}
             try:
                 query_components = parse_qs(urlparse(self.path).query)
                 print('query_components : ', query_components)
 
-                params = get_input_file_creation_params(query_components)
+                params = get_input_file_creation_params(query_components, 'inflow')
                 print('StoreHandler|create-inflow|params : ', params)
                 dir_path = set_daily_dir(params['run_date'], params['run_time'])
 
                 create_inflow(dir_path, params['run_date'], params['run_time'],
                               params['forward'], params['backward'], params['model'])
-                response = {'response': 'success'}
-            except Exception as e:
-                print(str(e))
-                response = {'response': 'fail'}
-            reply = json.dumps(response)
-            self.send_response(200)
-            self.send_header('Content-type', 'text/json')
-            self.end_headers()
-            self.wfile.write(str.encode(reply))
-
-        if self.path.startswith('/create-chan'):
-            os.chdir(WIN_HOME_DIR_PATH)
-            print('create-chan')
-            response = {}
-            try:
-                query_components = parse_qs(urlparse(self.path).query)
-
-                params = get_input_file_creation_params(query_components)
-                print('StoreHandler|create-chan|params : ', params)
-                dir_path = set_daily_dir(params['run_date'], params['run_time'])
-
-                create_chan(dir_path, params['run_date'], params['run_time'],
-                            params['forward'], params['backward'], params['model'])
-                response = {'response': 'success'}
+                command = ''
+                response = run_input_file_generation_methods(command)
             except Exception as e:
                 print(str(e))
                 response = {'response': 'fail'}
@@ -170,19 +164,42 @@ class StoreHandler(BaseHTTPRequestHandler):
         if self.path.startswith('/create-outflow'):
             os.chdir(WIN_HOME_DIR_PATH)
             print('create-outflow')
-            response = {}
             try:
                 query_components = parse_qs(urlparse(self.path).query)
                 print('query_components : ', query_components)
 
-                params = get_input_file_creation_params(query_components)
+                params = get_input_file_creation_params(query_components, 'outflow')
                 print('StoreHandler|create-outflow|params : ', params)
 
                 dir_path = set_daily_dir(params['run_date'], params['run_time'])
 
                 create_outflow(dir_path, params['run_date'], params['run_time'],
                                params['forward'], params['backward'], params['model'])
-                response = {'response': 'success'}
+                command = ''
+                response = run_input_file_generation_methods(command)
+            except Exception as e:
+                print(str(e))
+                response = {'response': 'fail'}
+            reply = json.dumps(response)
+            self.send_response(200)
+            self.send_header('Content-type', 'text/json')
+            self.end_headers()
+            self.wfile.write(str.encode(reply))
+
+        if self.path.startswith('/create-chan'):
+            os.chdir(WIN_HOME_DIR_PATH)
+            print('create-chan')
+            try:
+                query_components = parse_qs(urlparse(self.path).query)
+
+                params = get_input_file_creation_params(query_components)
+                print('StoreHandler|create-chan|params : ', params)
+                dir_path = set_daily_dir(params['run_date'], params['run_time'])
+
+                create_chan(dir_path, params['run_date'], params['run_time'],
+                            params['forward'], params['backward'], params['model'])
+                command = ''
+                response = run_input_file_generation_methods(command)
             except Exception as e:
                 print(str(e))
                 response = {'response': 'fail'}

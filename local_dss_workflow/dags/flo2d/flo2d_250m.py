@@ -24,24 +24,24 @@ default_args = {
 
 create_raincell_cmd_template = 'curl -X GET "http://{}:{}/create-raincell?' \
                                'run_date={}&run_time={}&model={}' \
-                               '&forward={}&backward={}"'
+                               '&forward={}&backward={}&pop_method={}"'
 create_raincell_cmd_request = 'http://{}:{}/create-raincell?' \
                                'run_date={}&run_time={}&model={}' \
-                               '&forward={}&backward={}'
+                               '&forward={}&backward={}&pop_method={}'
 
 create_inflow_cmd_template = 'curl -X GET "http://{}:{}/create-inflow?' \
                              'run_date={}&run_time={}&model={}' \
-                             '&forward={}&backward={}"'
+                             '&forward={}&backward={}&pop_method={}"'
 create_inflow_cmd_request = 'http://{}:{}/create-inflow?' \
                              'run_date={}&run_time={}&model={}' \
-                             '&forward={}&backward={}'
+                             '&forward={}&backward={}&pop_method={}'
 
 create_outflow_cmd_template = 'curl -X GET "http://{}:{}/create-outflow?' \
                               'run_date={}&run_time={}&model={}' \
-                              '&forward={}&backward={}"'
+                              '&forward={}&backward={}&pop_method={}"'
 create_outflow_cmd_request = 'http://{}:{}/create-outflow?' \
                               'run_date={}&run_time={}&model={}' \
-                              '&forward={}&backward={}'
+                              '&forward={}&backward={}&pop_method={}'
 
 create_chan_cmd_template = 'curl -X GET "http://{}:{}/create-chan?' \
                            'run_date={}&run_time={}&model={}' \
@@ -105,14 +105,16 @@ def get_create_raincell_cmd(**context):
     [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
     forward = rule['rule_info']['forecast_days']
     backward = rule['rule_info']['observed_days']
+    target_model = rule['rule_info']['target_model']
+    pop_method = rule['rule_info']['raincell_data_from']
     run_node = rule['rule_info']['rule_details']['run_node']
     run_port = rule['rule_info']['rule_details']['run_port']
     create_raincell_cmd = create_raincell_cmd_template.format(run_node, run_port, exec_date, exec_time,
-                                                              'flo2d_250', forward, backward)
+                                                              target_model, forward, backward, pop_method)
     print('get_create_raincell_cmd|create_raincell_cmd : ', create_raincell_cmd)
     #subprocess.call(create_raincell_cmd, shell=True)
     request_url = create_raincell_cmd_request.format(run_node, run_port, exec_date, exec_time,
-                                                     'flo2d_250', forward, backward)
+                                                     target_model, forward, backward, pop_method)
     print('get_create_raincell_cmd|request_url : ', request_url)
     if send_http_get_request(request_url):
         print('get_create_raincell_cmd|success')
@@ -127,14 +129,16 @@ def get_create_inflow_cmd(**context):
     [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
     forward = rule['rule_info']['forecast_days']
     backward = rule['rule_info']['observed_days']
+    target_model = rule['rule_info']['target_model']
+    pop_method = rule['rule_info']['raincell_data_from']
     run_node = rule['rule_info']['rule_details']['run_node']
     run_port = rule['rule_info']['rule_details']['run_port']
     create_inflow_cmd = create_inflow_cmd_template.format(run_node, run_port, exec_date, exec_time,
-                                                          'flo2d_250', forward, backward)
+                                                          target_model, forward, backward, pop_method)
     print('get_create_inflow_cmd|create_inflow_cmd : ', create_inflow_cmd)
     # subprocess.call(create_inflow_cmd, shell=True)
     request_url = create_inflow_cmd_request.format(run_node, run_port, exec_date, exec_time,
-                                                   'flo2d_250', forward, backward)
+                                                   target_model, forward, backward, pop_method)
     print('get_create_inflow_cmd|request_url : ', request_url)
     if send_http_get_request(request_url):
         print('get_create_inflow_cmd|success')
@@ -149,14 +153,15 @@ def get_create_chan_cmd(**context):
     [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
     forward = rule['rule_info']['forecast_days']
     backward = rule['rule_info']['observed_days']
+    target_model = rule['rule_info']['target_model']
     run_node = rule['rule_info']['rule_details']['run_node']
     run_port = rule['rule_info']['rule_details']['run_port']
     create_chan_cmd = create_chan_cmd_template.format(run_node, run_port, exec_date, exec_time,
-                                                      'flo2d_250', forward, backward)
+                                                      target_model, forward, backward)
     print('get_create_chan_cmd|create_chan_cmd : ', create_chan_cmd)
     #subprocess.call(create_chan_cmd, shell=True)
     request_url = create_chan_cmd_request.format(run_node, run_port, exec_date, exec_time,
-                                                   'flo2d_250', forward, backward)
+                                                 target_model, forward, backward)
     print('get_create_chan_cmd|request_url : ', request_url)
     if send_http_get_request(request_url):
         print('get_create_chan_cmd|success')
