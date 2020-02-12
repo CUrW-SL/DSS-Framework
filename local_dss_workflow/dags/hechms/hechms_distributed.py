@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from airflow import DAG
+from airflow import DAG, AirflowException
 from airflow.operators.python_operator import PythonOperator
 from airflow.models import Variable
 import sys
@@ -42,6 +42,9 @@ def send_http_get_request(url, params=None):
         r = requests.get(url=url)
     response = r.json()
     print('send_http_get_request|response : ', response)
+    if response == {'Result': 'Success'}:
+        return True
+    return False
 
 
 def get_rule_from_context(context):
@@ -73,7 +76,15 @@ def get_create_input_cmd(**context):
     run_port = rule['rule_info']['rule_details']['run_port']
     create_input_cmd = create_input_cmd_template.format(run_node, run_port, exec_date, backward, forward, init_run)
     print('get_create_input_cmd|create_input_cmd : ', create_input_cmd)
-    subprocess.call(create_input_cmd, shell=True)
+    # subprocess.call(create_input_cmd, shell=True)
+    request_url = create_input_request.format(run_node, run_port, exec_date, backward, forward)
+    print('get_create_input_cmd|request_url : ', request_url)
+    if send_http_get_request(request_url):
+        print('get_create_input_cmd|success')
+    else:
+        raise AirflowException(
+            'get_create_input_cmd|failed'
+        )
 
 
 def get_run_hechms_preprocess_cmd(**context):
@@ -86,7 +97,15 @@ def get_run_hechms_preprocess_cmd(**context):
     run_hechms_preprocess_cmd = run_hechms_preprocess_cmd_template.format(run_node, run_port, exec_date, backward,
                                                                           forward)
     print('get_run_hechms_preprocess_cmd|run_hechms_preprocess_cmd : ', run_hechms_preprocess_cmd)
-    subprocess.call(run_hechms_preprocess_cmd, shell=True)
+    #subprocess.call(run_hechms_preprocess_cmd, shell=True)
+    request_url = run_hechms_preprocess_request.format(run_node, run_port, exec_date, backward,forward)
+    print('get_run_hechms_preprocess_cmd|request_url : ', request_url)
+    if send_http_get_request(request_url):
+        print('get_run_hechms_preprocess_cmd|success')
+    else:
+        raise AirflowException(
+            'get_run_hechms_preprocess_cmd|failed'
+        )
 
 
 def get_run_hechms_cmd(**context):
@@ -95,7 +114,15 @@ def get_run_hechms_cmd(**context):
     run_port = rule['rule_info']['rule_details']['run_port']
     run_hechms_cmd = run_hechms_cmd_template.format(run_node, run_port)
     print('get_run_hechms_preprocess_cmd|run_hechms_cmd : ', run_hechms_cmd)
-    subprocess.call(run_hechms_cmd, shell=True)
+    #subprocess.call(run_hechms_cmd, shell=True)
+    request_url = run_hechms_cmd_request.format(run_node, run_port)
+    print('get_run_hechms_cmd|request_url : ', request_url)
+    if send_http_get_request(request_url):
+        print('get_run_hechms_cmd|success')
+    else:
+        raise AirflowException(
+            'get_run_hechms_cmd|failed'
+        )
 
 
 def get_run_hechms_postprocess_cmd(**context):
@@ -108,10 +135,15 @@ def get_run_hechms_postprocess_cmd(**context):
     run_hechms_postprocess_cmd = run_hechms_postprocess_cmd_template.format(run_node, run_port, exec_date, backward,
                                                                             forward)
     print('get_run_hechms_postprocess_cmd|run_hechms_postprocess_cmd : ', run_hechms_postprocess_cmd)
-    subprocess.call(run_hechms_postprocess_cmd, shell=True)
+    #subprocess.call(run_hechms_postprocess_cmd, shell=True)
     request_url = run_hechms_postprocess_request.format(run_node, run_port, exec_date, backward, forward)
     print('get_run_hechms_postprocess_cmd|request_url : ', request_url)
-    send_http_get_request(request_url)
+    if send_http_get_request(request_url):
+        print('get_run_hechms_postprocess_cmd|success')
+    else:
+        raise AirflowException(
+            'get_run_hechms_postprocess_cmd|failed'
+        )
 
 
 def get_upload_discharge_cmd(**context):
@@ -121,10 +153,15 @@ def get_upload_discharge_cmd(**context):
     run_port = rule['rule_info']['rule_details']['run_port']
     upload_discharge_cmd = upload_discharge_cmd_template.format(run_node, run_port, exec_date)
     print('get_upload_discharge_cmd|upload_discharge_cmd : ', upload_discharge_cmd)
-    subprocess.call(upload_discharge_cmd, shell=True)
+    #subprocess.call(upload_discharge_cmd, shell=True)
     request_url = upload_discharge_cmd_request.format(run_node, run_port, exec_date)
     print('get_upload_discharge_cmd|request_url : ', request_url)
-    send_http_get_request(request_url)
+    if send_http_get_request(request_url):
+        print('get_upload_discharge_cmd|success')
+    else:
+        raise AirflowException(
+            'get_upload_discharge_cmd|failed'
+        )
 
 
 def update_workflow_status(status, rule_id):
