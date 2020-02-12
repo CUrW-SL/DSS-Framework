@@ -184,9 +184,9 @@ def get_sensor_sql_query(model_type, model_rule_id):
     print('get_sensor_sql_query|[model_type, model_rule_id] : ', [model_type, model_rule_id])
     sql_query = None
     if model_type == 'hechms':
-        sql_query = 'select id, status from dss.hechms_rules where id = 1 and status=3'
+        sql_query = 'select TRUE from dss.hechms_rules where id={} and status=3'.format(model_rule_id)
     elif model_type == 'flo2d':
-        sql_query = 'select id, status from dss.flo2d_rules where id=1 and status=3'
+        sql_query = 'select TRUE from dss.flo2d_rules where id={} and status=3'.format(model_rule_id)
     return sql_query
 
 
