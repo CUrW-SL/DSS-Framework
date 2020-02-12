@@ -232,9 +232,9 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
                 )
                 task_list.append(task)
 
-                wait = TimeDeltaSensor(
+                wait = BashOperator(
                     task_id='wait_a_minute_task_{}'.format(index),
-                    delta=timedelta(minutes=1),
+                    bash_command='sleep 60',
                     pool=dag_pool)
                 task_list.append(wait)
 
