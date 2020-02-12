@@ -24,26 +24,44 @@ default_args = {
 create_raincell_cmd_template = 'curl -X GET "http://{}:{}/create-raincell?' \
                                'run_date={}&run_time={}&model={}' \
                                '&forward={}&backward={}"'
+create_raincell_cmd_request = 'http://{}:{}/create-raincell?' \
+                               'run_date={}&run_time={}&model={}' \
+                               '&forward={}&backward={}'
 
 create_inflow_cmd_template = 'curl -X GET "http://{}:{}/create-inflow?' \
                              'run_date={}&run_time={}&model={}' \
                              '&forward={}&backward={}"'
+create_inflow_cmd_request = 'http://{}:{}/create-inflow?' \
+                             'run_date={}&run_time={}&model={}' \
+                             '&forward={}&backward={}'
 
 create_outflow_cmd_template = 'curl -X GET "http://{}:{}/create-outflow?' \
                               'run_date={}&run_time={}&model={}' \
                               '&forward={}&backward={}"'
+create_outflow_cmd_request = 'http://{}:{}/create-outflow?' \
+                              'run_date={}&run_time={}&model={}' \
+                              '&forward={}&backward={}'
 
 create_chan_cmd_template = 'curl -X GET "http://{}:{}/create-chan?' \
                            'run_date={}&run_time={}&model={}' \
                            '&forward={}&backward={}"'
+create_chan_cmd_request = 'http://{}:{}/create-chan?' \
+                           'run_date={}&run_time={}&model={}' \
+                           '&forward={}&backward={}'
 
 run_flo2d_250m_cmd_template = 'curl -X GET "http://{}:{}/run-flo2d?' \
                               'run_date={}&run_time={}&model={}' \
                               '&forward={}&backward={}"'
+run_flo2d_250m_cmd_request = 'http://{}:{}/run-flo2d?' \
+                              'run_date={}&run_time={}&model={}' \
+                              '&forward={}&backward={}'
 
 extract_water_level_cmd_template = 'curl -X GET "http://{}:{}/extract-data?' \
                                    'run_date={}&run_time={}&model={} ' \
                                    '&forward={}&backward={}"'
+extract_water_level_cmd_request = 'http://{}:{}/extract-data?' \
+                                   'run_date={}&run_time={}&model={} ' \
+                                   '&forward={}&backward={}'
 
 
 def get_rule_from_context(context):

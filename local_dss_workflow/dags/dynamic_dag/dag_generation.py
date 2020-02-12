@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.models import Variable
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.bash_operator import BashOperator
-from airflow.operators.sensors import ExternalTaskSensor
+from airflow.sensors.sql_sensor import SqlSensor
 import sys
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/gen_util')
@@ -175,9 +175,19 @@ def get_timeout(timeout):
 
 def get_timeout_in_seconds(timeout):
     print('get_timeout_in_seconds|timeout : ', timeout)
-    total_seconds = timeout['hours']*3600 + timeout['minutes']*60 + timeout['seconds']
+    total_seconds = timeout['hours'] * 3600 + timeout['minutes'] * 60 + timeout['seconds']
     print('get_timeout_in_seconds|total_seconds : ', timeout)
     return total_seconds
+
+
+def get_sensor_sql_query(model_type, model_rule_id):
+    print('get_sensor_sql_query|[model_type, model_rule_id] : ', [model_type, model_rule_id])
+    sql_query = None
+    if model_type == 'hechms':
+        sql_query = 'select id, status from dss.hechms_rules where id = 1 and status=3'
+    elif model_type == 'flo2d':
+        sql_query = 'select id, status from dss.flo2d_rules where id=1 and status=3'
+    return sql_query
 
 
 def create_dag(dag_id, params, timeout, dag_tasks, default_args):
@@ -215,15 +225,24 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
                     on_failure_callback=on_dag_failure,
                     pool=dag_pool
                 )
-                sensor = ExternalDagSensorOperator(
-                    task_id='wait_for_{}_to_be_completed'.format(dag_task['task_name']),
+                sensor1 = ExternalDagSensorOperator(
+                    task_id='wait1_for_{}_to_be_completed'.format(dag_task['task_name']),
                     model_type=dag_task['input_params']['model_type'],
                     model_rule_id=dag_task['input_params']['rule_id'],
                     provide_context=True,
                     timeout=get_timeout_in_seconds(dag_task['timeout']),
                     pool=dag_pool)
+                sensor2 = SqlSensor(
+                    task_id='wait2_for_{}_to_be_completed'.format(dag_task['task_name']),
+                    conn_id='dss_conn',
+                    sql=get_sensor_sql_query(dag_task['input_params']['model_type'],
+                                             dag_task['input_params']['rule_id']),
+                    poke_interval=60,
+                    timeout=get_timeout_in_seconds(dag_task['timeout']),
+                    dag=dag)
                 task_list.append(task)
-                task_list.append(sensor)
+                task_list.append(sensor1)
+                task_list.append(sensor2)
         end_task = PythonOperator(
             task_id='end_task',
             provide_context=True,
