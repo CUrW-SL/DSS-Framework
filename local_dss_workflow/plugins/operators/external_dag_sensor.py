@@ -5,7 +5,7 @@ from airflow.plugins_manager import AirflowPlugin
 from airflow.models import Variable
 import sys
 
-sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
+sys.path.insert(0, '/home/curw/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/gen_util')
@@ -72,6 +72,7 @@ class ExternalDagSensorOperator(BaseSensorOperator):
                         rule_status = dss_adapter.get_flo2d_rule_status_by_id(self.model_rule_id)
                     else:
                         print('ExternalDagSensorOperator|payload is must.')
+                    print('ExternalDagSensorOperator|rule_status : ', rule_status)
                     if rule_status is not None:
                         if rule_status['status'] == 3:
                             condition = True
