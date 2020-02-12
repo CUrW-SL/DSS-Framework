@@ -4,6 +4,7 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.models import Variable
 import sys
 import subprocess
+import requests
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
@@ -19,14 +20,28 @@ default_args = {
 }
 
 create_input_cmd_template = 'curl -X GET "http://{}:{}/HECHMS/distributed/init/{}/{}/{}/{}"'
+create_input_request = 'http://{}:{}/HECHMS/distributed/init/{}/{}/{}/{}'
 
 run_hechms_preprocess_cmd_template = 'curl -X GET "http://{}:{}/HECHMS/distributed/pre-process/{}/{}/{}"'
+run_hechms_preprocess_request = 'http://{}:{}/HECHMS/distributed/pre-process/{}/{}/{}'
 
 run_hechms_cmd_template = 'curl -X GET "http://{}:{}/HECHMS/distributed/run"'
+run_hechms_cmd_request = 'http://{}:{}/HECHMS/distributed/run'
 
 run_hechms_postprocess_cmd_template = 'curl -X GET "http://{}:{}/HECHMS/distributed/post-process/{}/{}/{}"'
+run_hechms_postprocess_request = 'http://{}:{}/HECHMS/distributed/post-process/{}/{}/{}'
 
-upload_discharge_cmd_template = 'curl -X GET "http://10.138.0.3:5000/HECHMS/distributed/upload-discharge/{}"'
+upload_discharge_cmd_template = 'curl -X GET "http://{}:{}/HECHMS/distributed/upload-discharge/{}"'
+upload_discharge_cmd_request = 'http://{}:{}/HECHMS/distributed/upload-discharge/{}'
+
+
+def send_http_get_request(url, params=None):
+    if params is not None:
+        r = requests.get(url=url, params=params)
+    else:
+        r = requests.get(url=url)
+    response = r.json()
+    print('send_http_get_request|response : ', response)
 
 
 def get_rule_from_context(context):
@@ -94,6 +109,9 @@ def get_run_hechms_postprocess_cmd(**context):
                                                                             forward)
     print('get_run_hechms_postprocess_cmd|run_hechms_postprocess_cmd : ', run_hechms_postprocess_cmd)
     subprocess.call(run_hechms_postprocess_cmd, shell=True)
+    request_url = run_hechms_postprocess_request.format(exec_date, backward,forward)
+    print('get_run_hechms_postprocess_cmd|request_url : ', request_url)
+    send_http_get_request(request_url)
 
 
 def get_upload_discharge_cmd(**context):
@@ -104,6 +122,9 @@ def get_upload_discharge_cmd(**context):
     upload_discharge_cmd = upload_discharge_cmd_template.format(run_node, run_port, exec_date)
     print('get_upload_discharge_cmd|upload_discharge_cmd : ', upload_discharge_cmd)
     subprocess.call(upload_discharge_cmd, shell=True)
+    request_url = upload_discharge_cmd_request.format(exec_date)
+    print('get_upload_discharge_cmd|request_url : ', request_url)
+    send_http_get_request(request_url)
 
 
 def update_workflow_status(status, rule_id):
