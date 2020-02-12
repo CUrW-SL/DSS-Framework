@@ -1,9 +1,10 @@
 from datetime import datetime, timedelta
-from airflow import DAG
+from airflow import DAG, AirflowException
 from airflow.operators.python_operator import PythonOperator, BranchPythonOperator
 from airflow.models import Variable
 import sys
 import subprocess
+import requests
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
@@ -64,6 +65,18 @@ extract_water_level_cmd_request = 'http://{}:{}/extract-data?' \
                                    '&forward={}&backward={}'
 
 
+def send_http_get_request(url, params=None):
+    if params is not None:
+        r = requests.get(url=url, params=params)
+    else:
+        r = requests.get(url=url)
+    response = r.json()
+    print('send_http_get_request|response : ', response)
+    if response == {'response': 'success'}:
+        return True
+    return False
+
+
 def get_rule_from_context(context):
     rule = context['task_instance'].xcom_pull(task_ids='init_flo2d_250m')
     print('get_rule_from_context|rule : ', rule)
@@ -97,7 +110,16 @@ def get_create_raincell_cmd(**context):
     create_raincell_cmd = create_raincell_cmd_template.format(run_node, run_port, exec_date, exec_time,
                                                               'flo2d_250', forward, backward)
     print('get_create_raincell_cmd|create_raincell_cmd : ', create_raincell_cmd)
-    subprocess.call(create_raincell_cmd, shell=True)
+    #subprocess.call(create_raincell_cmd, shell=True)
+    request_url = create_raincell_cmd_request.format(run_node, run_port, exec_date, exec_time,
+                                                     'flo2d_250', forward, backward)
+    print('get_create_raincell_cmd|request_url : ', request_url)
+    if send_http_get_request(request_url):
+        print('get_create_raincell_cmd|success')
+    else:
+        raise AirflowException(
+            'get_create_raincell_cmd|failed'
+        )
 
 
 def get_create_inflow_cmd(**context):
@@ -110,7 +132,16 @@ def get_create_inflow_cmd(**context):
     create_inflow_cmd = create_inflow_cmd_template.format(run_node, run_port, exec_date, exec_time,
                                                           'flo2d_250', forward, backward)
     print('get_create_inflow_cmd|create_inflow_cmd : ', create_inflow_cmd)
-    subprocess.call(create_inflow_cmd, shell=True)
+    # subprocess.call(create_inflow_cmd, shell=True)
+    request_url = create_inflow_cmd_request.format(run_node, run_port, exec_date, exec_time,
+                                                   'flo2d_250', forward, backward)
+    print('get_create_inflow_cmd|request_url : ', request_url)
+    if send_http_get_request(request_url):
+        print('get_create_inflow_cmd|success')
+    else:
+        raise AirflowException(
+            'get_create_inflow_cmd|failed'
+        )
 
 
 def get_create_chan_cmd(**context):
@@ -123,7 +154,16 @@ def get_create_chan_cmd(**context):
     create_chan_cmd = create_chan_cmd_template.format(run_node, run_port, exec_date, exec_time,
                                                       'flo2d_250', forward, backward)
     print('get_create_chan_cmd|create_chan_cmd : ', create_chan_cmd)
-    subprocess.call(create_chan_cmd, shell=True)
+    #subprocess.call(create_chan_cmd, shell=True)
+    request_url = create_chan_cmd_request.format(run_node, run_port, exec_date, exec_time,
+                                                   'flo2d_250', forward, backward)
+    print('get_create_chan_cmd|request_url : ', request_url)
+    if send_http_get_request(request_url):
+        print('get_create_chan_cmd|success')
+    else:
+        raise AirflowException(
+            'get_create_chan_cmd|failed'
+        )
 
 
 def get_create_outflow_cmd(**context):
@@ -136,7 +176,16 @@ def get_create_outflow_cmd(**context):
     create_outflow_cmd = create_outflow_cmd_template.format(run_node, run_port, exec_date, exec_time,
                                                             'flo2d_250', forward, backward)
     print('get_create_outflow_cmd|create_outflow_cmd : ', create_outflow_cmd)
-    subprocess.call(create_outflow_cmd, shell=True)
+    #subprocess.call(create_outflow_cmd, shell=True)
+    request_url = create_outflow_cmd_request.format(run_node, run_port, exec_date, exec_time,
+                                                 'flo2d_250', forward, backward)
+    print('get_create_outflow_cmd|request_url : ', request_url)
+    if send_http_get_request(request_url):
+        print('get_create_outflow_cmd|success')
+    else:
+        raise AirflowException(
+            'get_create_outflow_cmd|failed'
+        )
 
 
 def get_run_flo2d_250m_cmd(**context):
@@ -148,8 +197,17 @@ def get_run_flo2d_250m_cmd(**context):
     run_port = rule['rule_info']['rule_details']['run_port']
     run_flo2d_250m_cmd = run_flo2d_250m_cmd_template.format(run_node, run_port, exec_date, exec_time,
                                                             'flo2d_250', forward, backward)
-    print('get_create_inflow_cmd|run_flo2d_250m_cmd : ', run_flo2d_250m_cmd)
-    subprocess.call(run_flo2d_250m_cmd, shell=True)
+    print('get_run_flo2d_250m_cmd|run_flo2d_250m_cmd : ', run_flo2d_250m_cmd)
+    #subprocess.call(run_flo2d_250m_cmd, shell=True)
+    request_url = run_flo2d_250m_cmd_request.format(run_node, run_port, exec_date, exec_time,
+                                                    'flo2d_250', forward, backward)
+    print('get_run_flo2d_250m_cmd|request_url : ', request_url)
+    if send_http_get_request(request_url):
+        print('get_run_flo2d_250m_cmd|success')
+    else:
+        raise AirflowException(
+            'get_run_flo2d_250m_cmd|failed'
+        )
 
 
 def get_extract_water_level_cmd(**context):
@@ -161,23 +219,32 @@ def get_extract_water_level_cmd(**context):
     run_port = rule['rule_info']['rule_details']['run_port']
     extract_water_level_cmd = extract_water_level_cmd_template.format(run_node, run_port, exec_date, exec_time,
                                                                       'flo2d_250', forward, backward)
-    print('get_create_inflow_cmd|extract_water_level_cmd : ', extract_water_level_cmd)
+    print('get_extract_water_level_cmd|extract_water_level_cmd : ', extract_water_level_cmd)
     subprocess.call(extract_water_level_cmd, shell=True)
-
-
-def check_accuracy(**context):
-    print('check_accuracy|context : ', context)
-    rule_info = context['task_instance'].xcom_pull(task_ids='init_flo2d_250m')['rule_info']
-    print('check_accuracy|rule_info : ', rule_info)
-    flo2d_rule = {'model': 'FLO2D', 'version': '250', 'rule_info': rule_info}
-    print('check_accuracy|flo2d_rule : ', flo2d_rule)
-    exec_date = context["execution_date"].to_datetime_string()
-    print('check_accuracy|exec_date : ', flo2d_rule)
-    accuracy_rule_id = rule_info['accuracy_rule']
-    if accuracy_rule_id == 0 or accuracy_rule_id == '0':
-        return True
+    request_url = extract_water_level_cmd_request.format(run_node, run_port, exec_date, exec_time,
+                                                    'flo2d_250', forward, backward)
+    print('get_extract_water_level_cmd|request_url : ', request_url)
+    if send_http_get_request(request_url):
+        print('get_extract_water_level_cmd|success')
     else:
-        calculate_flo2d_rule_accuracy(flo2d_rule, exec_date)
+        raise AirflowException(
+            'get_extract_water_level_cmd|failed'
+        )
+
+
+# def check_accuracy(**context):
+#     print('check_accuracy|context : ', context)
+#     rule_info = context['task_instance'].xcom_pull(task_ids='init_flo2d_250m')['rule_info']
+#     print('check_accuracy|rule_info : ', rule_info)
+#     flo2d_rule = {'model': 'FLO2D', 'version': '250', 'rule_info': rule_info}
+#     print('check_accuracy|flo2d_rule : ', flo2d_rule)
+#     exec_date = context["execution_date"].to_datetime_string()
+#     print('check_accuracy|exec_date : ', flo2d_rule)
+#     accuracy_rule_id = rule_info['accuracy_rule']
+#     if accuracy_rule_id == 0 or accuracy_rule_id == '0':
+#         return True
+#     else:
+#         calculate_flo2d_rule_accuracy(flo2d_rule, exec_date)
 
 
 def update_workflow_status(status, rule_id):
@@ -292,12 +359,12 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    # extract_water_level_flo2d_250m = PythonOperator(
-    #     task_id='extract_water_level_flo2d_250m',
-    #     provide_context=True,
-    #     python_callable=get_extract_water_level_cmd,
-    #     pool=dag_pool
-    # )
+    extract_water_level_flo2d_250m = PythonOperator(
+        task_id='extract_water_level_flo2d_250m',
+        provide_context=True,
+        python_callable=get_extract_water_level_cmd,
+        pool=dag_pool
+    )
 
     # check_accuracy_flo2d250m = PythonOperator(
     #     task_id='check_accuracy_flo2d250m',
@@ -315,7 +382,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
 
     init_flo2d_250m >> running_state_flo2d_250m >> create_raincell_flo2d_250m >> create_chan_flo2d_250m >> \
     create_inflow_flo2d_250m >>  create_outflow_flo2d_250m >> run_flo2d_250m_flo2d_250m >> \
-    complete_state_flo2d_250m
+    extract_water_level_flo2d_250m >> complete_state_flo2d_250m
     # check_accuracy_flo2d250m >> complete_state_flo2d_250m
     # extract_water_level_flo2d_250m >> check_accuracy_flo2d250m >> complete_state_flo2d_250m
 

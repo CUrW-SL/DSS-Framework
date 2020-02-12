@@ -15,6 +15,8 @@ from run_model import execute_flo2d, flo2d_model_completed
 from extract.extract_water_level_hourly_run import upload_waterlevels
 from extract.extract_discharge_hourly_run import upload_discharges
 
+import subprocess
+
 from os.path import join as pjoin
 from datetime import datetime
 
@@ -23,6 +25,14 @@ HOST_PORT = 8088
 
 WIN_OUTPUT_DIR_PATH = r"D:\flo2d_output"
 WIN_HOME_DIR_PATH = r"D:\DSS-Framework\weather_models\flo2d"
+
+#D:\>.\curw_flo2d_data_manager\input\chan\gen_chan.py -m flo2d_250 -s "2020-01-06 00:00:00" -d "D:\flo2d_output\output"
+CREATE_RAINCELL_CMD = ''
+CREATE_CHAN_CMD = ''
+CREATE_INFLOW_CMD = ''
+CREATE_OUTFLOW_CMD = ''
+RUN_OUTFLOW_CMD = ''
+EXTRACT_OUTPUT_CMD = ''
 
 
 def set_daily_dir(run_date, run_time):
@@ -103,6 +113,7 @@ class StoreHandler(BaseHTTPRequestHandler):
                     response = {'response': 'fail'}
             except Exception as e:
                 print(str(e))
+                response = {'response': 'fail'}
             reply = json.dumps(response)
             self.send_response(200)
             self.send_header('Content-type', 'text/json')
@@ -126,6 +137,7 @@ class StoreHandler(BaseHTTPRequestHandler):
                 response = {'response': 'success'}
             except Exception as e:
                 print(str(e))
+                response = {'response': 'fail'}
             reply = json.dumps(response)
             self.send_response(200)
             self.send_header('Content-type', 'text/json')
@@ -148,6 +160,7 @@ class StoreHandler(BaseHTTPRequestHandler):
                 response = {'response': 'success'}
             except Exception as e:
                 print(str(e))
+                response = {'response': 'fail'}
             reply = json.dumps(response)
             self.send_response(200)
             self.send_header('Content-type', 'text/json')
@@ -172,6 +185,7 @@ class StoreHandler(BaseHTTPRequestHandler):
                 response = {'response': 'success'}
             except Exception as e:
                 print(str(e))
+                response = {'response': 'fail'}
             reply = json.dumps(response)
             self.send_response(200)
             self.send_header('Content-type', 'text/json')
@@ -197,6 +211,7 @@ class StoreHandler(BaseHTTPRequestHandler):
                 response = {'response': 'success'}
             except Exception as e:
                 print(str(e))
+                response = {'response': 'fail'}
             reply = json.dumps(response)
             self.send_response(200)
             self.send_header('Content-type', 'text/json')
@@ -224,6 +239,7 @@ class StoreHandler(BaseHTTPRequestHandler):
                 response = {'response': 'success'}
             except Exception as e:
                 print(str(e))
+                response = {'response': 'fail'}
             reply = json.dumps(response)
             self.send_response(200)
             self.send_header('Content-type', 'text/json')
