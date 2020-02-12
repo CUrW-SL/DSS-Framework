@@ -236,7 +236,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     create_raincell_flo2d_250m = PythonOperator(
         task_id='create_raincell_flo2d_250m',
         provide_context=True,
-        execution_timeout=timedelta(minutes=30),
+        execution_timeout=timedelta(minutes=45),
         python_callable=get_create_raincell_cmd,
         pool=dag_pool
     )
