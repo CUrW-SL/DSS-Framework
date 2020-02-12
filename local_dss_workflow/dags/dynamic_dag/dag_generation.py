@@ -3,9 +3,9 @@ from airflow import DAG
 from airflow.models import Variable
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.bash_operator import BashOperator
-from airflow.operators.sensors import TimeDeltaSensor
 from airflow.sensors.sql_sensor import SqlSensor
 import sys
+from airflow.sensors.time_delta_sensor import TimeDeltaSensor
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/gen_util')
 from dynamic_dag_util import get_all_dynamic_dag_routines, get_dynamic_dag_tasks, get_trigger_target_dag
