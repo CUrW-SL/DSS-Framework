@@ -208,6 +208,7 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
         )
 
         task_list = [init_task]
+        index = 0
         for dag_task in dag_tasks:
             print('create_dag|dag_task : ', dag_task)
             if dag_task['task_type'] == 1:
@@ -220,6 +221,7 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
                 )
                 task_list.append(task)
             elif dag_task['task_type'] == 2:
+                index += 1
                 task = DynamicTriggerDagRunOperator(
                     task_id=dag_task['task_name'],
                     python_callable=create_trigger_dag_run,
@@ -230,7 +232,7 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
                 task_list.append(task)
 
                 wait = TimeDeltaSensor(
-                    task_id='wait_a_minute',
+                    task_id='wait_a_minute_task_{}'.format(index),
                     delta=timedelta(minutes=1),
                     dag=dag)
                 task_list.append(wait)
