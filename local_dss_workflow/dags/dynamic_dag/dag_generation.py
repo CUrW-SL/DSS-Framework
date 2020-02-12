@@ -3,6 +3,7 @@ from airflow import DAG
 from airflow.models import Variable
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.bash_operator import BashOperator
+from airflow.operators.sensors import TimeDeltaSensor
 from airflow.sensors.sql_sensor import SqlSensor
 import sys
 
@@ -226,13 +227,10 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
                     on_failure_callback=on_dag_failure,
                     pool=dag_pool
                 )
-                # sensor1 = ExternalDagSensorOperator(
-                #     task_id='wait1_for_{}_to_be_completed'.format(dag_task['task_name']),
-                #     model_type=dag_task['input_params']['model_type'],
-                #     model_rule_id=dag_task['input_params']['rule_id'],
-                #     provide_context=True,
-                #     timeout=get_timeout_in_seconds(dag_task['timeout']),
-                #     pool=dag_pool)
+                wait = TimeDeltaSensor(
+                    task_id='wait_a_minute',
+                    delta=timedelta(minutes=1),
+                    dag=dag)
                 sensor = SqlSensor(
                     task_id='wait_for_{}_to_be_completed'.format(dag_task['task_name']),
                     conn_id='dss_conn',
@@ -242,8 +240,11 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
                     allow_null=False,
                     timeout=get_timeout_in_seconds(dag_task['timeout']),
                     dag=dag)
+
                 task_list.append(task)
+                task_list.append(wait)
                 task_list.append(sensor)
+
                 print('create_dag|timeout:', sensor.timeout)
                 print('create_dag|dag_id', sensor.dag_id)
         end_task = PythonOperator(
