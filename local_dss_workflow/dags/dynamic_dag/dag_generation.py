@@ -222,6 +222,7 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
                 task_list.append(task)
             elif dag_task['task_type'] == 2:
                 index += 1
+                print('create_dag|index : ', index)
                 task = DynamicTriggerDagRunOperator(
                     task_id=dag_task['task_name'],
                     python_callable=create_trigger_dag_run,
@@ -234,7 +235,7 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
                 wait = TimeDeltaSensor(
                     task_id='wait_a_minute_task_{}'.format(index),
                     delta=timedelta(minutes=1),
-                    dag=dag)
+                    pool=dag_pool)
                 task_list.append(wait)
 
                 sensor = SqlSensor(
@@ -245,7 +246,7 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
                     poke_interval=60,
                     allow_null=False,
                     timeout=get_timeout_in_seconds(dag_task['timeout']),
-                    dag=dag)
+                    pool=dag_pool)
                 task_list.append(sensor)
 
                 print('create_dag|timeout:', sensor.timeout)
