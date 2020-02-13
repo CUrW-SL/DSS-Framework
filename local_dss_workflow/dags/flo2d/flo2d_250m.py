@@ -176,14 +176,16 @@ def get_create_outflow_cmd(**context):
     [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
     forward = rule['rule_info']['forecast_days']
     backward = rule['rule_info']['observed_days']
+    target_model = rule['rule_info']['target_model']
+    pop_method = rule['rule_info']['raincell_data_from']
     run_node = rule['rule_info']['rule_details']['run_node']
     run_port = rule['rule_info']['rule_details']['run_port']
     create_outflow_cmd = create_outflow_cmd_template.format(run_node, run_port, exec_date, exec_time,
-                                                            'flo2d_250', forward, backward)
+                                                            target_model, forward, backward, pop_method)
     print('get_create_outflow_cmd|create_outflow_cmd : ', create_outflow_cmd)
     #subprocess.call(create_outflow_cmd, shell=True)
     request_url = create_outflow_cmd_request.format(run_node, run_port, exec_date, exec_time,
-                                                 'flo2d_250', forward, backward)
+                                                    target_model, forward, backward, pop_method)
     print('get_create_outflow_cmd|request_url : ', request_url)
     if send_http_get_request(request_url):
         print('get_create_outflow_cmd|success')
@@ -198,14 +200,15 @@ def get_run_flo2d_250m_cmd(**context):
     [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
     forward = rule['rule_info']['forecast_days']
     backward = rule['rule_info']['observed_days']
+    target_model = rule['rule_info']['target_model']
     run_node = rule['rule_info']['rule_details']['run_node']
     run_port = rule['rule_info']['rule_details']['run_port']
     run_flo2d_250m_cmd = run_flo2d_250m_cmd_template.format(run_node, run_port, exec_date, exec_time,
-                                                            'flo2d_250', forward, backward)
+                                                            target_model, forward, backward)
     print('get_run_flo2d_250m_cmd|run_flo2d_250m_cmd : ', run_flo2d_250m_cmd)
     #subprocess.call(run_flo2d_250m_cmd, shell=True)
     request_url = run_flo2d_250m_cmd_request.format(run_node, run_port, exec_date, exec_time,
-                                                    'flo2d_250', forward, backward)
+                                                    target_model, forward, backward)
     print('get_run_flo2d_250m_cmd|request_url : ', request_url)
     if send_http_get_request(request_url):
         print('get_run_flo2d_250m_cmd|success')
@@ -220,14 +223,15 @@ def get_extract_water_level_cmd(**context):
     [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
     forward = rule['rule_info']['forecast_days']
     backward = rule['rule_info']['observed_days']
+    target_model = rule['rule_info']['target_model']
     run_node = rule['rule_info']['rule_details']['run_node']
     run_port = rule['rule_info']['rule_details']['run_port']
     extract_water_level_cmd = extract_water_level_cmd_template.format(run_node, run_port, exec_date, exec_time,
-                                                                      'flo2d_250', forward, backward)
+                                                                      target_model, forward, backward)
     print('get_extract_water_level_cmd|extract_water_level_cmd : ', extract_water_level_cmd)
     subprocess.call(extract_water_level_cmd, shell=True)
     request_url = extract_water_level_cmd_request.format(run_node, run_port, exec_date, exec_time,
-                                                    'flo2d_250', forward, backward)
+                                                         target_model, forward, backward)
     print('get_extract_water_level_cmd|request_url : ', request_url)
     if send_http_get_request(request_url):
         print('get_extract_water_level_cmd|success')
