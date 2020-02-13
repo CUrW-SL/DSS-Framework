@@ -58,7 +58,7 @@ run_flo2d_250m_cmd_request = 'http://{}:{}/run-flo2d?' \
 extract_water_level_cmd_template = 'curl -X GET "http://{}:{}/extract-water-level?' \
                                    'run_date={}&run_time={}&model={}' \
                                    '&forward={}&backward={}&sim_tag={}"'
-extract_water_level_cmd_request = 'http://{}:{}/extract-data?' \
+extract_water_level_cmd_request = 'http://{}:{}/extract-water-level?' \
                                    'run_date={}&run_time={}&model={}' \
                                    '&forward={}&backward={}&sim_tag={}'
 
@@ -235,16 +235,16 @@ def get_extract_water_level_cmd(**context):
     extract_water_level_cmd = extract_water_level_cmd_template.format(run_node, run_port, exec_date, exec_time,
                                                                       target_model, forward, backward, sim_tag)
     print('get_extract_water_level_cmd|extract_water_level_cmd : ', extract_water_level_cmd)
-    subprocess.call(extract_water_level_cmd, shell=True)
-    # request_url = extract_water_level_cmd_request.format(run_node, run_port, exec_date, exec_time,
-    #                                                      target_model, forward, backward, sim_tag)
-    # print('get_extract_water_level_cmd|request_url : ', request_url)
-    # if send_http_get_request(request_url):
-    #     print('get_extract_water_level_cmd|success')
-    # else:
-    #     raise AirflowException(
-    #         'get_extract_water_level_cmd|failed'
-    #     )
+    #subprocess.call(extract_water_level_cmd, shell=True)
+    request_url = extract_water_level_cmd_request.format(run_node, run_port, exec_date, exec_time,
+                                                         target_model, forward, backward, sim_tag)
+    print('get_extract_water_level_cmd|request_url : ', request_url)
+    if send_http_get_request(request_url):
+        print('get_extract_water_level_cmd|success')
+    else:
+        raise AirflowException(
+            'get_extract_water_level_cmd|failed'
+        )
 
 
 def get_extract_water_discharge_cmd(**context):
@@ -259,16 +259,16 @@ def get_extract_water_discharge_cmd(**context):
     extract_water_discharge_cmd = extract_water_discharge_cmd_template.format(run_node, run_port, exec_date, exec_time,
                                                                       target_model, forward, backward, sim_tag)
     print('get_extract_water_discharge_cmd|extract_water_discharge_cmd : ', extract_water_discharge_cmd)
-    subprocess.call(extract_water_discharge_cmd, shell=True)
-    # request_url = extract_water_discharge_cmd_request.format(run_node, run_port, exec_date, exec_time,
-    #                                                      target_model, forward, backward, sim_tag)
-    # print('get_extract_water_discharge_cmd|request_url : ', request_url)
-    # if send_http_get_request(request_url):
-    #     print('get_extract_water_discharge_cmd|success')
-    # else:
-    #     raise AirflowException(
-    #         'get_extract_water_discharge_cmd|failed'
-    #     )
+    # subprocess.call(extract_water_discharge_cmd, shell=True)
+    request_url = extract_water_discharge_cmd_request.format(run_node, run_port, exec_date, exec_time,
+                                                         target_model, forward, backward, sim_tag)
+    print('get_extract_water_discharge_cmd|request_url : ', request_url)
+    if send_http_get_request(request_url):
+        print('get_extract_water_discharge_cmd|success')
+    else:
+        raise AirflowException(
+            'get_extract_water_discharge_cmd|failed'
+        )
 
 
 def update_workflow_status(status, rule_id):
@@ -386,6 +386,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     extract_water_level_flo2d_250m = PythonOperator(
         task_id='extract_water_level_flo2d_250m',
         provide_context=True,
+        execution_timeout=timedelta(minutes=5),
         python_callable=get_extract_water_level_cmd,
         pool=dag_pool
     )
@@ -393,6 +394,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     extract_water_discharge_flo2d_250m = PythonOperator(
         task_id='extract_water_discharge_flo2d_250m',
         provide_context=True,
+        execution_timeout=timedelta(minutes=5),
         python_callable=get_extract_water_discharge_cmd,
         pool=dag_pool
     )
