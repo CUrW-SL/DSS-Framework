@@ -28,11 +28,11 @@ WIN_HOME_DIR_PATH = r"D:\DSS-Framework\weather_models\flo2d"
 WIN_FLO2D_DATA_MANAGER_PATH = r"D:\curw_flo2d_data_manager"
 
 
-CREATE_CHAN_CMD = '.\input\chan\gen_chan.py -m "{}" -s "{}" -d "{}"'
-CREATE_RAINCELL_CMD = '.\input\/raincell\gen_raincell.py -m "{}" -s "{}" -e "{}" -d "{}" -M "{}"'
-CREATE_INFLOW_250_CMD = '.\input\inflow\get_inflow_250.py -s "{}" -e "{}" -d "{}" -M "{}"'
-CREATE_INFLOW_150_CMD = '.\input\inflow\get_inflow_150.py -s "{}" -e "{}" -d "{}" -M "{}"'
-CREATE_OUTFLOW_CMD = '.\input\outflow\gen_outflow.py -m "{}" -s "{}" -e "{}" -d "{}" -M "{}"'
+CREATE_CHAN_CMD = '.\gen_chan.py -m "{}" -s "{}" -d "{}"'
+CREATE_RAINCELL_CMD = '.\gen_raincell.py -m "{}" -s "{}" -e "{}" -d "{}" -M "{}"'
+CREATE_INFLOW_250_CMD = '.\get_inflow_250.py -s "{}" -e "{}" -d "{}" -M "{}"'
+CREATE_INFLOW_150_CMD = '.\get_inflow_150.py -s "{}" -e "{}" -d "{}" -M "{}"'
+CREATE_OUTFLOW_CMD = '.\gen_outflow.py -m "{}" -s "{}" -e "{}" -d "{}" -M "{}"'
 EXTRACT_OUTPUT_CMD = ''
 
 
@@ -49,12 +49,13 @@ def set_daily_dir(run_date, run_time):
     return dir_path
 
 
-def run_input_file_generation_methods(cmd):
+def run_input_file_generation_methods(dir_path, command):
     try:
-        print('run_input_file_generation_methods|cmd: ', cmd)
-        os.chdir(WIN_FLO2D_DATA_MANAGER_PATH)
+        print('run_input_file_generation_methods|dir_path: ', dir_path)
+        print('run_input_file_generation_methods|command: ', command)
+        os.chdir(dir_path)
         print('run_input_file_generation_methods|getcwd : ', os.getcwd())
-        subprocess.call(cmd, shell=True)
+        subprocess.call(command, shell=True)
         return {'response': 'success'}
     except Exception as ex:
         print('run_input_file_generation_methods|Exception: ', str(ex))
@@ -140,10 +141,12 @@ class StoreHandler(BaseHTTPRequestHandler):
                     # create_raincell(dir_path, params['run_date'], params['run_time'],
                     #                 params['forward'], params['backward'], params['model'])
                     #CREATE_RAINCELL_CMD = '.\input\raincell\gen_raincell.py -m {} -s "{}" -e "{}" -d "{}" -M "{}"'
+                    command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'input', 'raincell')
                     command = CREATE_RAINCELL_CMD.format(params['model'], params['ts_start'],
                                                          params['ts_end'], dir_path, params['pop_method'])
+                    print('create-raincell|command_dir_path : ', command_dir_path)
                     print('create-raincell|command : ', command)
-                    response = run_input_file_generation_methods(command)
+                    response = run_input_file_generation_methods(command_dir_path, command)
                 except Exception as e:
                     print(str(e))
                     response = {'response': 'fail'}
@@ -169,6 +172,7 @@ class StoreHandler(BaseHTTPRequestHandler):
 
                 # create_inflow(dir_path, params['run_date'], params['run_time'],
                 #               params['forward'], params['backward'], params['model'])
+                command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'input', 'inflow')
                 if params['model'] == 'flo2d_250':
                     #CREATE_INFLOW_250_CMD = '.\input\inflow\get_inflow_250.py -s "{}" -e "{}" -d "{}" -M "{}"'
                     command = CREATE_INFLOW_250_CMD.format(params['ts_start'], params['ts_end'], dir_path,
@@ -177,7 +181,8 @@ class StoreHandler(BaseHTTPRequestHandler):
                     command = CREATE_INFLOW_150_CMD.format(params['ts_start'], params['ts_end'], dir_path,
                                                            params['pop_method'])
                 print('create-inflow|command : ', command)
-                response = run_input_file_generation_methods(command)
+                print('create-inflow|command_dir_path : ', command_dir_path)
+                response = run_input_file_generation_methods(command_dir_path, command)
             except Exception as e:
                 print(str(e))
                 response = {'response': 'fail'}
@@ -202,10 +207,12 @@ class StoreHandler(BaseHTTPRequestHandler):
                 # create_outflow(dir_path, params['run_date'], params['run_time'],
                 #                params['forward'], params['backward'], params['model'])
                 #CREATE_OUTFLOW_CMD = '.\input\outflow\gen_outflow.py -m {} -s "{}" -d "{}" -M "{}"'
+                command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'input', 'outflow')
                 command = CREATE_OUTFLOW_CMD.format(params['model'], params['ts_start'],
                                                     params['ts_end'], dir_path, params['pop_method'])
                 print('create-outflow|command : ', command)
-                response = run_input_file_generation_methods(command)
+                print('create-outflow|command_dir_path : ', command_dir_path)
+                response = run_input_file_generation_methods(command_dir_path, command)
             except Exception as e:
                 print(str(e))
                 response = {'response': 'fail'}
@@ -228,9 +235,11 @@ class StoreHandler(BaseHTTPRequestHandler):
                 # create_chan(dir_path, params['run_date'], params['run_time'],
                 #             params['forward'], params['backward'], params['model'])
                 #CREATE_CHAN_CMD = '.\input\chan\gen_chan.py -m {} -s "{}" -d "{}"'
+                command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'input', 'chan')
                 command = CREATE_CHAN_CMD.format(params['model'], params['ts_start'], dir_path)
                 print('create-chan|command : ', command)
-                response = run_input_file_generation_methods(command)
+                print('create-chan|command_dir_path : ', command_dir_path)
+                response = run_input_file_generation_methods(command_dir_path, command)
             except Exception as e:
                 print(str(e))
                 response = {'response': 'fail'}
