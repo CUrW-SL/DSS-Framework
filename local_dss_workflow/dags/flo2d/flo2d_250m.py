@@ -5,6 +5,7 @@ from airflow.models import Variable
 import sys
 import subprocess
 import requests
+# from requests import session, Timeout
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
@@ -234,16 +235,16 @@ def get_extract_water_level_cmd(**context):
     extract_water_level_cmd = extract_water_level_cmd_template.format(run_node, run_port, exec_date, exec_time,
                                                                       target_model, forward, backward, sim_tag)
     print('get_extract_water_level_cmd|extract_water_level_cmd : ', extract_water_level_cmd)
-    # subprocess.call(extract_water_level_cmd, shell=True)
-    request_url = extract_water_level_cmd_request.format(run_node, run_port, exec_date, exec_time,
-                                                         target_model, forward, backward, sim_tag)
-    print('get_extract_water_level_cmd|request_url : ', request_url)
-    if send_http_get_request(request_url):
-        print('get_extract_water_level_cmd|success')
-    else:
-        raise AirflowException(
-            'get_extract_water_level_cmd|failed'
-        )
+    subprocess.call(extract_water_level_cmd, shell=True)
+    # request_url = extract_water_level_cmd_request.format(run_node, run_port, exec_date, exec_time,
+    #                                                      target_model, forward, backward, sim_tag)
+    # print('get_extract_water_level_cmd|request_url : ', request_url)
+    # if send_http_get_request(request_url):
+    #     print('get_extract_water_level_cmd|success')
+    # else:
+    #     raise AirflowException(
+    #         'get_extract_water_level_cmd|failed'
+    #     )
 
 
 def get_extract_water_discharge_cmd(**context):
@@ -258,16 +259,16 @@ def get_extract_water_discharge_cmd(**context):
     extract_water_discharge_cmd = extract_water_discharge_cmd_template.format(run_node, run_port, exec_date, exec_time,
                                                                       target_model, forward, backward, sim_tag)
     print('get_extract_water_discharge_cmd|extract_water_discharge_cmd : ', extract_water_discharge_cmd)
-    # subprocess.call(extract_water_discharge_cmd, shell=True)
-    request_url = extract_water_discharge_cmd_request.format(run_node, run_port, exec_date, exec_time,
-                                                         target_model, forward, backward, sim_tag)
-    print('get_extract_water_discharge_cmd|request_url : ', request_url)
-    if send_http_get_request(request_url):
-        print('get_extract_water_discharge_cmd|success')
-    else:
-        raise AirflowException(
-            'get_extract_water_discharge_cmd|failed'
-        )
+    subprocess.call(extract_water_discharge_cmd, shell=True)
+    # request_url = extract_water_discharge_cmd_request.format(run_node, run_port, exec_date, exec_time,
+    #                                                      target_model, forward, backward, sim_tag)
+    # print('get_extract_water_discharge_cmd|request_url : ', request_url)
+    # if send_http_get_request(request_url):
+    #     print('get_extract_water_discharge_cmd|success')
+    # else:
+    #     raise AirflowException(
+    #         'get_extract_water_discharge_cmd|failed'
+    #     )
 
 
 def update_workflow_status(status, rule_id):
