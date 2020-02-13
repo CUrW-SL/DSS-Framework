@@ -55,17 +55,17 @@ run_flo2d_250m_cmd_request = 'http://{}:{}/run-flo2d?' \
                               '&forward={}&backward={}'
 
 extract_water_level_cmd_template = 'curl -X GET "http://{}:{}/extract-water-level?' \
-                                   'run_date={}&run_time={}&model={} ' \
+                                   'run_date={}&run_time={}&model={}' \
                                    '&forward={}&backward={}&sim_tag={}"'
 extract_water_level_cmd_request = 'http://{}:{}/extract-data?' \
-                                   'run_date={}&run_time={}&model={} ' \
+                                   'run_date={}&run_time={}&model={}' \
                                    '&forward={}&backward={}&sim_tag={}'
 
 extract_water_discharge_cmd_template = 'curl -X GET "http://{}:{}/extract-discharge?' \
-                                   'run_date={}&run_time={}&model={} ' \
+                                   'run_date={}&run_time={}&model={}' \
                                    '&forward={}&backward={}&sim_tag={}"'
 extract_water_discharge_cmd_request = 'http://{}:{}/extract-discharge?' \
-                                  'run_date={}&run_time={}&model={} ' \
+                                  'run_date={}&run_time={}&model={}' \
                                   '&forward={}&backward={}&sim_tag={}'
 
 

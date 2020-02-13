@@ -6,8 +6,6 @@ import json
 from urllib.parse import urlparse, parse_qs
 from run_model import execute_flo2d, flo2d_model_completed
 
-from extract.extract_water_level_hourly_run import upload_waterlevels
-from extract.extract_discharge_hourly_run import upload_discharges
 
 import subprocess
 
