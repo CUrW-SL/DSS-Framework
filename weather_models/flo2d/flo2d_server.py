@@ -18,7 +18,7 @@ from extract.extract_discharge_hourly_run import upload_discharges
 import subprocess
 
 from os.path import join as pjoin
-from datetime import datetime
+from datetime import datetime, timedelta
 
 HOST_ADDRESS = '192.168.1.41'
 HOST_PORT = 8088
@@ -28,11 +28,11 @@ WIN_HOME_DIR_PATH = r"D:\DSS-Framework\weather_models\flo2d"
 WIN_FLO2D_DATA_MANAGER_PATH = r"D:\curw_flo2d_data_manager"
 
 # D:\>.\curw_flo2d_data_manager\input\chan\gen_chan.py -m flo2d_250 -s "2020-01-06 00:00:00" -d "D:\flo2d_output\output"
-CREATE_CHAN_CMD = '.\input\chan\gen_raincell.py -m {} -s "{}" -d "{}"'
-CREATE_RAINCELL_CMD = '.\input\chan\gen_chan.py -m {} -s "{}" -e "{}" -d "{}" -M "{}"'
-CREATE_INFLOW_250_CMD = '.\input\chan\get_inflow_250.py -s "{}" -d "{}" -M "{}"'
-CREATE_INFLOW_150_CMD = '.\input\chan\get_inflow_150.py -s "{}" -d "{}" -M "{}"'
-CREATE_OUTFLOW_CMD = '.\input\chan\gen_outflow.py -m {} -s "{}" -d "{}" -M "{}"'
+CREATE_CHAN_CMD = '.\input\chan\gen_chan.py -m {} -s "{}" -d "{}"'
+CREATE_RAINCELL_CMD = '.\input\raincell\gen_raincell.py -m {} -s "{}" -e "{}" -d "{}" -M "{}"'
+CREATE_INFLOW_250_CMD = '.\input\inflow\get_inflow_250.py -s "{}" -e "{}" -d "{}" -M "{}"'
+CREATE_INFLOW_150_CMD = '.\input\inflow\get_inflow_150.py -s "{}" -e "{}" -d "{}" -M "{}"'
+CREATE_OUTFLOW_CMD = '.\input\outflow\gen_outflow.py -m {} -s "{}" -e "{}" -d "{}" -M "{}"'
 EXTRACT_OUTPUT_CMD = ''
 
 
@@ -94,15 +94,29 @@ def get_input_file_creation_params(query_components, input_file_type=None):
                 backward = 2
             else:
                 backward = 3
+        ts_start_end = get_ts_start_end(run_date, run_time, int(forward), int(backward))
         if input_file_type == 'inflow' or input_file_type == 'outflow' or input_file_type == 'raincell':
             [pop_method] = query_components["pop_method"]
-            return {'run_date': run_date, 'run_time': run_time, 'forward': int(forward),
-                    'backward': int(backward), 'model': model, 'pop_method': pop_method}
+            return {'run_date': run_date, 'run_time': run_time, 'ts_start': ts_start_end['ts_start'],
+                    'ts_end': ts_start_end['ts_end'], 'model': model, 'pop_method': pop_method}
         else:
-            return {'run_date': run_date, 'run_time': run_time, 'forward': int(forward),
-                    'backward': int(backward), 'model': model}
+            return {'run_date': run_date, 'run_time': run_time, 'ts_start': ts_start_end['ts_start'],
+                    'ts_end': ts_start_end['ts_end'], 'model': model}
     except Exception as e:
         print('get_input_file_creation_params|Exception : ', str(e))
+
+
+def get_ts_start_end(run_date, run_time, forward=3, backward=2):
+    result = {}
+    run_datetime = datetime.strptime('%s %s' % (run_date, '00:00:00'), '%Y-%m-%d %H:%M:%S')
+    ts_start_datetime = run_datetime - timedelta(days=backward)
+    ts_end_datetime = run_datetime + timedelta(days=forward)
+    run_datetime = datetime.strptime('%s %s' % (run_date, run_time), '%Y-%m-%d %H:%M:%S')
+    result['ts_start'] = ts_start_datetime.strftime('%Y-%m-%d %H:%M:%S')
+    result['run_time'] = run_datetime.strftime('%Y-%m-%d %H:%M:%S')
+    result['ts_end'] = ts_end_datetime.strftime('%Y-%m-%d %H:%M:%S')
+    print(result)
+    return result
 
 
 class StoreHandler(BaseHTTPRequestHandler):
@@ -122,11 +136,15 @@ class StoreHandler(BaseHTTPRequestHandler):
 
                 dir_path = set_daily_dir(params['run_date'], params['run_time'])
                 try:
-                    create_raincell(dir_path, params['run_date'], params['run_time'],
-                                    params['forward'], params['backward'], params['model'])
-                    command = ''
+                    # create_raincell(dir_path, params['run_date'], params['run_time'],
+                    #                 params['forward'], params['backward'], params['model'])
+                    #CREATE_RAINCELL_CMD = '.\input\raincell\gen_raincell.py -m {} -s "{}" -e "{}" -d "{}" -M "{}"'
+                    command = CREATE_RAINCELL_CMD.format(params['model'], params['ts_start'],
+                                                         params['ts_end'], dir_path, params['pop_method'])
+                    print('create-raincell|command : ', command)
                     response = run_input_file_generation_methods(command)
                 except Exception as e:
+                    print(str(e))
                     response = {'response': 'fail'}
             except Exception as e:
                 print(str(e))
@@ -148,9 +166,16 @@ class StoreHandler(BaseHTTPRequestHandler):
                 print('StoreHandler|create-inflow|params : ', params)
                 dir_path = set_daily_dir(params['run_date'], params['run_time'])
 
-                create_inflow(dir_path, params['run_date'], params['run_time'],
-                              params['forward'], params['backward'], params['model'])
-                command = ''
+                # create_inflow(dir_path, params['run_date'], params['run_time'],
+                #               params['forward'], params['backward'], params['model'])
+                if params['model'] == 'flo2d_250':
+                    #CREATE_INFLOW_250_CMD = '.\input\inflow\get_inflow_250.py -s "{}" -e "{}" -d "{}" -M "{}"'
+                    command = CREATE_INFLOW_250_CMD.format(params['ts_start'], params['ts_end'], dir_path,
+                                                           params['pop_method'])
+                else:
+                    command = CREATE_INFLOW_150_CMD.format(params['ts_start'], params['ts_end'], dir_path,
+                                                           params['pop_method'])
+                print('create-inflow|command : ', command)
                 response = run_input_file_generation_methods(command)
             except Exception as e:
                 print(str(e))
@@ -173,9 +198,12 @@ class StoreHandler(BaseHTTPRequestHandler):
 
                 dir_path = set_daily_dir(params['run_date'], params['run_time'])
 
-                create_outflow(dir_path, params['run_date'], params['run_time'],
-                               params['forward'], params['backward'], params['model'])
-                command = ''
+                # create_outflow(dir_path, params['run_date'], params['run_time'],
+                #                params['forward'], params['backward'], params['model'])
+                #CREATE_OUTFLOW_CMD = '.\input\outflow\gen_outflow.py -m {} -s "{}" -d "{}" -M "{}"'
+                command = CREATE_OUTFLOW_CMD.format(params['model'], params['ts_start'],
+                                                    params['ts_end'], dir_path, params['pop_method'])
+                print('create-outflow|command : ', command)
                 response = run_input_file_generation_methods(command)
             except Exception as e:
                 print(str(e))
@@ -196,9 +224,11 @@ class StoreHandler(BaseHTTPRequestHandler):
                 print('StoreHandler|create-chan|params : ', params)
                 dir_path = set_daily_dir(params['run_date'], params['run_time'])
 
-                create_chan(dir_path, params['run_date'], params['run_time'],
-                            params['forward'], params['backward'], params['model'])
-                command = ''
+                # create_chan(dir_path, params['run_date'], params['run_time'],
+                #             params['forward'], params['backward'], params['model'])
+                #CREATE_CHAN_CMD = '.\input\chan\gen_chan.py -m {} -s "{}" -d "{}"'
+                command = CREATE_CHAN_CMD.format(params['model'], params['ts_start'], dir_path)
+                print('create-chan|command : ', command)
                 response = run_input_file_generation_methods(command)
             except Exception as e:
                 print(str(e))
