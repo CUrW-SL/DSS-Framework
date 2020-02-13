@@ -3,7 +3,8 @@ import os
 from distutils.dir_util import copy_tree
 
 COMPLETION_FILE = 'HYCHAN.OUT'
-SUPPORT_FILES_PATH = r"D:\DSS-Framework\weather_models\flo2d\support_files"
+TEMPLATES_PATH = r"D:\flo2d_templates"
+EXECUTABLES_PATH = r"D:\flo2d_executables"
 
 
 def create_dir_if_not_exists(path):
@@ -12,15 +13,14 @@ def create_dir_if_not_exists(path):
     return path
 
 
-def execute_flo2d(dir_path, run_date, run_time):
+def execute_flo2d(dir_path, target_model, run_date, run_time):
     print("Flo2d run_date : ", run_date)
     print("Flo2d run_time : ", run_time)
     output_dir = dir_path
-    template_dir = os.path.join(SUPPORT_FILES_PATH, 'template')
-    executable_dir = os.path.join(SUPPORT_FILES_PATH, 'executables')
+    template_dir = os.path.join(TEMPLATES_PATH, target_model)
     try:
         copy_tree(template_dir, output_dir)
-        copy_tree(executable_dir, output_dir)
+        copy_tree(EXECUTABLES_PATH, output_dir)
         try:
             os.chdir(output_dir)
             try:

@@ -9,9 +9,6 @@ import requests
 sys.path.insert(0, '/home/curw/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
-sys.path.insert(0, '/home/curw/git/DSS-Framework/accuracy_unit/flo2d')
-from flo2d_accuracy import calculate_flo2d_rule_accuracy
-
 prod_dag_name = 'flo2d_250m_dag'
 dag_pool = 'flo2d_pool'
 
@@ -57,12 +54,19 @@ run_flo2d_250m_cmd_request = 'http://{}:{}/run-flo2d?' \
                               'run_date={}&run_time={}&model={}' \
                               '&forward={}&backward={}'
 
-extract_water_level_cmd_template = 'curl -X GET "http://{}:{}/extract-data?' \
+extract_water_level_cmd_template = 'curl -X GET "http://{}:{}/extract-water-level?' \
                                    'run_date={}&run_time={}&model={} ' \
-                                   '&forward={}&backward={}"'
+                                   '&forward={}&backward={}&sim_tag={}"'
 extract_water_level_cmd_request = 'http://{}:{}/extract-data?' \
                                    'run_date={}&run_time={}&model={} ' \
-                                   '&forward={}&backward={}'
+                                   '&forward={}&backward={}&sim_tag={}'
+
+extract_water_discharge_cmd_template = 'curl -X GET "http://{}:{}/extract-discharge?' \
+                                   'run_date={}&run_time={}&model={} ' \
+                                   '&forward={}&backward={}&sim_tag={}"'
+extract_water_discharge_cmd_request = 'http://{}:{}/extract-discharge?' \
+                                  'run_date={}&run_time={}&model={} ' \
+                                  '&forward={}&backward={}&sim_tag={}'
 
 
 def send_http_get_request(url, params=None):
@@ -226,12 +230,13 @@ def get_extract_water_level_cmd(**context):
     target_model = rule['rule_info']['target_model']
     run_node = rule['rule_info']['rule_details']['run_node']
     run_port = rule['rule_info']['rule_details']['run_port']
+    sim_tag = 'event_run'
     extract_water_level_cmd = extract_water_level_cmd_template.format(run_node, run_port, exec_date, exec_time,
-                                                                      target_model, forward, backward)
+                                                                      target_model, forward, backward, sim_tag)
     print('get_extract_water_level_cmd|extract_water_level_cmd : ', extract_water_level_cmd)
-    subprocess.call(extract_water_level_cmd, shell=True)
+    # subprocess.call(extract_water_level_cmd, shell=True)
     request_url = extract_water_level_cmd_request.format(run_node, run_port, exec_date, exec_time,
-                                                         target_model, forward, backward)
+                                                         target_model, forward, backward, sim_tag)
     print('get_extract_water_level_cmd|request_url : ', request_url)
     if send_http_get_request(request_url):
         print('get_extract_water_level_cmd|success')
@@ -241,19 +246,28 @@ def get_extract_water_level_cmd(**context):
         )
 
 
-# def check_accuracy(**context):
-#     print('check_accuracy|context : ', context)
-#     rule_info = context['task_instance'].xcom_pull(task_ids='init_flo2d_250m')['rule_info']
-#     print('check_accuracy|rule_info : ', rule_info)
-#     flo2d_rule = {'model': 'FLO2D', 'version': '250', 'rule_info': rule_info}
-#     print('check_accuracy|flo2d_rule : ', flo2d_rule)
-#     exec_date = context["execution_date"].to_datetime_string()
-#     print('check_accuracy|exec_date : ', flo2d_rule)
-#     accuracy_rule_id = rule_info['accuracy_rule']
-#     if accuracy_rule_id == 0 or accuracy_rule_id == '0':
-#         return True
-#     else:
-#         calculate_flo2d_rule_accuracy(flo2d_rule, exec_date)
+def get_extract_water_discharge_cmd(**context):
+    rule = get_rule_from_context(context)
+    [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
+    forward = rule['rule_info']['forecast_days']
+    backward = rule['rule_info']['observed_days']
+    target_model = rule['rule_info']['target_model']
+    run_node = rule['rule_info']['rule_details']['run_node']
+    run_port = rule['rule_info']['rule_details']['run_port']
+    sim_tag = 'event_run'
+    extract_water_discharge_cmd = extract_water_discharge_cmd_template.format(run_node, run_port, exec_date, exec_time,
+                                                                      target_model, forward, backward, sim_tag)
+    print('get_extract_water_discharge_cmd|extract_water_discharge_cmd : ', extract_water_discharge_cmd)
+    # subprocess.call(extract_water_discharge_cmd, shell=True)
+    request_url = extract_water_discharge_cmd_request.format(run_node, run_port, exec_date, exec_time,
+                                                         target_model, forward, backward, sim_tag)
+    print('get_extract_water_discharge_cmd|request_url : ', request_url)
+    if send_http_get_request(request_url):
+        print('get_extract_water_discharge_cmd|success')
+    else:
+        raise AirflowException(
+            'get_extract_water_discharge_cmd|failed'
+        )
 
 
 def update_workflow_status(status, rule_id):
@@ -375,12 +389,12 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    # check_accuracy_flo2d250m = PythonOperator(
-    #     task_id='check_accuracy_flo2d250m',
-    #     provide_context=True,
-    #     python_callable=check_accuracy,
-    #     pool=dag_pool
-    # )
+    extract_water_discharge_flo2d_250m = PythonOperator(
+        task_id='extract_water_discharge_flo2d_250m',
+        provide_context=True,
+        python_callable=get_extract_water_discharge_cmd,
+        pool=dag_pool
+    )
 
     complete_state_flo2d_250m = PythonOperator(
         task_id='complete_state',
@@ -391,7 +405,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
 
     init_flo2d_250m >> running_state_flo2d_250m >> create_raincell_flo2d_250m >> create_chan_flo2d_250m >> \
     create_inflow_flo2d_250m >>  create_outflow_flo2d_250m >> run_flo2d_250m_flo2d_250m >> \
-    extract_water_level_flo2d_250m >> complete_state_flo2d_250m
+    extract_water_level_flo2d_250m >> extract_water_discharge_flo2d_250m >> complete_state_flo2d_250m
     # check_accuracy_flo2d250m >> complete_state_flo2d_250m
     # extract_water_level_flo2d_250m >> check_accuracy_flo2d250m >> complete_state_flo2d_250m
 
