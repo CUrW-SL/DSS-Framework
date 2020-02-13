@@ -29,7 +29,7 @@ WIN_FLO2D_DATA_MANAGER_PATH = r"D:\curw_flo2d_data_manager"
 
 
 CREATE_CHAN_CMD = '.\input\chan\gen_chan.py -m "{}" -s "{}" -d "{}"'
-CREATE_RAINCELL_CMD = '.\input\raincell\gen_raincell.py -m "{}" -s "{}" -e "{}" -d "{}" -M "{}"'
+CREATE_RAINCELL_CMD = '.\input\/raincell\gen_raincell.py -m "{}" -s "{}" -e "{}" -d "{}" -M "{}"'
 CREATE_INFLOW_250_CMD = '.\input\inflow\get_inflow_250.py -s "{}" -e "{}" -d "{}" -M "{}"'
 CREATE_INFLOW_150_CMD = '.\input\inflow\get_inflow_150.py -s "{}" -e "{}" -d "{}" -M "{}"'
 CREATE_OUTFLOW_CMD = '.\input\outflow\gen_outflow.py -m "{}" -s "{}" -e "{}" -d "{}" -M "{}"'
