@@ -54,7 +54,7 @@ def run_input_file_generation_methods(cmd):
         print('run_input_file_generation_methods|cmd: ', cmd)
         os.chdir(WIN_FLO2D_DATA_MANAGER_PATH)
         print('run_input_file_generation_methods|getcwd : ', os.getcwd())
-        subprocess.call('', shell=True)
+        subprocess.call(cmd, shell=True)
         return {'response': 'success'}
     except Exception as ex:
         print('run_input_file_generation_methods|Exception: ', str(ex))
