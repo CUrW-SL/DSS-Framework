@@ -5,10 +5,10 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 from urllib.parse import urlparse, parse_qs
 
-from raincelldat.gen_raincell import create_raincell
-from inflowdat.get_inflow import create_inflow
-from outflowdat.gen_outflow import create_outflow
-from chandat.gen_chan import create_chan
+# from raincelldat.gen_raincell import create_raincell
+# from inflowdat.get_inflow import create_inflow
+# from outflowdat.gen_outflow import create_outflow
+# from chandat.gen_chan import create_chan
 
 from run_model import execute_flo2d, flo2d_model_completed
 
@@ -27,7 +27,7 @@ WIN_OUTPUT_DIR_PATH = r"D:\flo2d_output"
 WIN_HOME_DIR_PATH = r"D:\DSS-Framework\weather_models\flo2d"
 WIN_FLO2D_DATA_MANAGER_PATH = r"D:\curw_flo2d_data_manager"
 
-# D:\>.\curw_flo2d_data_manager\input\chan\gen_chan.py -m flo2d_250 -s "2020-01-06 00:00:00" -d "D:\flo2d_output\output"
+
 CREATE_CHAN_CMD = '.\input\chan\gen_chan.py -m {} -s "{}" -d "{}"'
 CREATE_RAINCELL_CMD = '.\input\raincell\gen_raincell.py -m {} -s "{}" -e "{}" -d "{}" -M "{}"'
 CREATE_INFLOW_250_CMD = '.\input\inflow\get_inflow_250.py -s "{}" -e "{}" -d "{}" -M "{}"'
