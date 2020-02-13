@@ -28,11 +28,11 @@ WIN_HOME_DIR_PATH = r"D:\DSS-Framework\weather_models\flo2d"
 WIN_FLO2D_DATA_MANAGER_PATH = r"D:\curw_flo2d_data_manager"
 
 
-CREATE_CHAN_CMD = '.\input\chan\gen_chan.py -m {} -s "{}" -d "{}"'
-CREATE_RAINCELL_CMD = '.\input\raincell\gen_raincell.py -m {} -s "{}" -e "{}" -d "{}" -M "{}"'
+CREATE_CHAN_CMD = '.\input\chan\gen_chan.py -m "{}" -s "{}" -d "{}"'
+CREATE_RAINCELL_CMD = '.\input\raincell\gen_raincell.py -m "{}" -s "{}" -e "{}" -d "{}" -M "{}"'
 CREATE_INFLOW_250_CMD = '.\input\inflow\get_inflow_250.py -s "{}" -e "{}" -d "{}" -M "{}"'
 CREATE_INFLOW_150_CMD = '.\input\inflow\get_inflow_150.py -s "{}" -e "{}" -d "{}" -M "{}"'
-CREATE_OUTFLOW_CMD = '.\input\outflow\gen_outflow.py -m {} -s "{}" -e "{}" -d "{}" -M "{}"'
+CREATE_OUTFLOW_CMD = '.\input\outflow\gen_outflow.py -m "{}" -s "{}" -e "{}" -d "{}" -M "{}"'
 EXTRACT_OUTPUT_CMD = ''
 
 
@@ -53,6 +53,7 @@ def run_input_file_generation_methods(cmd):
     try:
         print('run_input_file_generation_methods|cmd: ', cmd)
         os.chdir(WIN_FLO2D_DATA_MANAGER_PATH)
+        print('run_input_file_generation_methods|getcwd : ', os.getcwd())
         subprocess.call('', shell=True)
         return {'response': 'success'}
     except Exception as ex:
