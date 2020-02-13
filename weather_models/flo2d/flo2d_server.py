@@ -60,7 +60,7 @@ def run_input_file_generation_methods(cmd):
         return {'response': 'fail'}
 
 
-def get_input_file_creation_params(query_components, input_file_type):
+def get_input_file_creation_params(query_components, input_file_type=None):
     try:
         print('get_input_file_creation_params|query_components : ', query_components)
 
@@ -192,7 +192,7 @@ class StoreHandler(BaseHTTPRequestHandler):
             try:
                 query_components = parse_qs(urlparse(self.path).query)
 
-                params = get_input_file_creation_params(query_components)
+                params = get_input_file_creation_params(query_components, 'chan')
                 print('StoreHandler|create-chan|params : ', params)
                 dir_path = set_daily_dir(params['run_date'], params['run_time'])
 
@@ -217,7 +217,7 @@ class StoreHandler(BaseHTTPRequestHandler):
                 query_components = parse_qs(urlparse(self.path).query)
                 print('query_components : ', query_components)
 
-                params = get_input_file_creation_params(query_components)
+                params = get_input_file_creation_params(query_components, 'run')
                 print('StoreHandler|run-flo2d|params : ', params)
 
                 dir_path = set_daily_dir(params['run_date'], params['run_time'])
@@ -243,7 +243,7 @@ class StoreHandler(BaseHTTPRequestHandler):
                 query_components = parse_qs(urlparse(self.path).query)
                 print('query_components : ', query_components)
 
-                params = get_input_file_creation_params(query_components)
+                params = get_input_file_creation_params(query_components, 'extract')
                 print('StoreHandler|extract-data|params : ', params)
                 dir_path = set_daily_dir(params['run_date'], params['run_time'])
 
