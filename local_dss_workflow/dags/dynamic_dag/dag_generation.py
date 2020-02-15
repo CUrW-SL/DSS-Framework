@@ -214,7 +214,7 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
                 checker = PythonOperator(
                     task_id='allow_checker_{}'.format(index),
                     provide_context=True,
-                    python_callable=allowed_to_proceed(dag_rule_id),
+                    python_callable=allowed_to_proceed,
                     pool=dag_pool
                 )
                 task_list.append(checker)
