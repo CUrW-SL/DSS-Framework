@@ -101,14 +101,14 @@ def is_allowed_to_run(rule_id):
     if adapter is not None:
         result = adapter.get_flo2d_rule_status_by_id(rule_id)
         if result is not None:
-            if result['status'] == 2:
-                return True
-            else:
+            if result['status'] == 5:
                 return False
+            else:
+                return True
         else:
-            return False
+            return True
     else:
-        return False
+        return True
 
 
 def get_rule_from_context(context):

@@ -166,9 +166,7 @@ def allowed_to_proceed(rule_id):
     if adapter is not None:
         result = adapter.get_dynamic_dag_routing_status(rule_id)
         if result is not None:
-            if result['status'] == 2:
-                return True
-            else:
+            if result['status'] == 5:
                 raise AirflowException(
                     'Dag has stopped by admin.'
                 )
