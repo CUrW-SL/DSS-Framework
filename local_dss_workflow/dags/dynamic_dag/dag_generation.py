@@ -209,7 +209,7 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
                 task_list.append(task)
 
                 checker = PythonOperator(
-                    task_id='allow_checker_{}'.format(str(index)),
+                    task_id='allow_checker_{}'.format(index),
                     provide_context=True,
                     python_callable=allowed_to_proceed(dag_rule_id),
                     pool=dag_pool
@@ -218,7 +218,7 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
 
             elif dag_task['task_type'] == 2:
 
-                print('create_dag|index : ', str(index))
+                print('create_dag|index : ', index)
                 task = DynamicTriggerDagRunOperator(
                     task_id=dag_task['task_name'],
                     python_callable=create_trigger_dag_run,
@@ -229,7 +229,7 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
                 task_list.append(task)
 
                 checker = PythonOperator(
-                    task_id='allow_checker_{}'.format(str(index)),
+                    task_id='allow_checker_{}'.format(index),
                     provide_context=True,
                     python_callable=allowed_to_proceed,
                     pool=dag_pool
@@ -237,7 +237,7 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
                 task_list.append(checker)
 
                 wait = BashOperator(
-                    task_id='wait_a_minute_task_{}'.format(str(index)),
+                    task_id='wait_a_minute_task_{}'.format(index),
                     bash_command='sleep 60',
                     pool=dag_pool)
                 task_list.append(wait)
