@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from airflow import DAG
+from airflow import DAG, AirflowException
 from airflow.models import Variable
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.bash_operator import BashOperator
@@ -161,7 +161,23 @@ def get_sensor_sql_query(model_type, model_rule_id):
     return sql_query
 
 
+def allowed_to_proceed(rule_id):
+    adapter = get_dss_db_adapter()
+    if adapter is not None:
+        result = adapter.get_dynamic_dag_routing_status(rule_id)
+        if result is not None:
+            if result['status'] == 2:
+                return True
+            else:
+                raise AirflowException(
+                    'Dag has stopped by admin.'
+                )
+
+
 def create_dag(dag_id, params, timeout, dag_tasks, default_args):
+    print('create_dag|params : ', params)
+    dag_rule_id = params['id']
+    print('create_dag|dag_rule_id : ', dag_rule_id)
     dag = DAG(dag_id, catchup=False,
               dagrun_timeout=timeout,
               schedule_interval=None,
@@ -181,6 +197,7 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
         index = 0
         for dag_task in dag_tasks:
             print('create_dag|dag_task : ', dag_task)
+            index += 1
             if dag_task['task_type'] == 1:
                 task = BashOperator(
                     task_id=dag_task['task_name'],
@@ -190,8 +207,17 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
                     pool=dag_pool
                 )
                 task_list.append(task)
+
+                checker = PythonOperator(
+                    task_id='allow_checker_{}'.format(index),
+                    provide_context=True,
+                    python_callable=allowed_to_proceed(dag_rule_id),
+                    pool=dag_pool
+                )
+                task_list.append(checker)
+
             elif dag_task['task_type'] == 2:
-                index += 1
+
                 print('create_dag|index : ', index)
                 task = DynamicTriggerDagRunOperator(
                     task_id=dag_task['task_name'],
@@ -201,6 +227,14 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
                     pool=dag_pool
                 )
                 task_list.append(task)
+
+                checker = PythonOperator(
+                    task_id='allow_checker_{}'.format(index),
+                    provide_context=True,
+                    python_callable=allowed_to_proceed(dag_rule_id),
+                    pool=dag_pool
+                )
+                task_list.append(checker)
 
                 wait = BashOperator(
                     task_id='wait_a_minute_task_{}'.format(index),

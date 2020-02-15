@@ -82,6 +82,35 @@ def send_http_get_request(url, params=None):
     return False
 
 
+def get_dss_adapter():
+    adapter = None
+    try:
+        db_config = Variable.get('db_config', deserialize_json=True)
+        try:
+            adapter = RuleEngineAdapter.get_instance(db_config)
+        except Exception as ex:
+            print('update_workflow_status|db_adapter|Exception: ', str(ex))
+    except Exception as e:
+        print('update_workflow_status|db_config|Exception: ', str(e))
+    finally:
+        return adapter
+
+
+def is_allowed_to_run(rule_id):
+    adapter = get_dss_adapter()
+    if adapter is not None:
+        result = adapter.get_flo2d_rule_status_by_id(rule_id)
+        if result is not None:
+            if result['status'] == 2:
+                return True
+            else:
+                return False
+        else:
+            return False
+    else:
+        return False
+
+
 def get_rule_from_context(context):
     rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
     print('get_rule_from_context|rule : ', rule)
@@ -108,166 +137,208 @@ def get_local_exec_date_time_from_context(context):
 def get_create_raincell_cmd(**context):
     rule = get_rule_from_context(context)
     [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
-    forward = rule['rule_info']['forecast_days']
-    backward = rule['rule_info']['observed_days']
-    target_model = rule['rule_info']['target_model']
-    pop_method = rule['rule_info']['raincell_data_from']
-    run_node = rule['rule_info']['rule_details']['run_node']
-    run_port = rule['rule_info']['rule_details']['run_port']
-    create_raincell_cmd = create_raincell_cmd_template.format(run_node, run_port, exec_date, exec_time,
-                                                              target_model, forward, backward, pop_method)
-    print('get_create_raincell_cmd|create_raincell_cmd : ', create_raincell_cmd)
-    # subprocess.call(create_raincell_cmd, shell=True)
-    request_url = create_raincell_cmd_request.format(run_node, run_port, exec_date, exec_time,
-                                                     target_model, forward, backward, pop_method)
-    print('get_create_raincell_cmd|request_url : ', request_url)
-    if send_http_get_request(request_url):
-        print('get_create_raincell_cmd|success')
+    rule_id = rule['rule_info']['id']
+    if is_allowed_to_run(rule_id):
+        forward = rule['rule_info']['forecast_days']
+        backward = rule['rule_info']['observed_days']
+        target_model = rule['rule_info']['target_model']
+        pop_method = rule['rule_info']['raincell_data_from']
+        run_node = rule['rule_info']['rule_details']['run_node']
+        run_port = rule['rule_info']['rule_details']['run_port']
+        create_raincell_cmd = create_raincell_cmd_template.format(run_node, run_port, exec_date, exec_time,
+                                                                  target_model, forward, backward, pop_method)
+        print('get_create_raincell_cmd|create_raincell_cmd : ', create_raincell_cmd)
+        # subprocess.call(create_raincell_cmd, shell=True)
+        request_url = create_raincell_cmd_request.format(run_node, run_port, exec_date, exec_time,
+                                                         target_model, forward, backward, pop_method)
+        print('get_create_raincell_cmd|request_url : ', request_url)
+        if send_http_get_request(request_url):
+            print('get_create_raincell_cmd|success')
+        else:
+            raise AirflowException(
+                'get_create_raincell_cmd|failed'
+            )
     else:
         raise AirflowException(
-            'get_create_raincell_cmd|failed'
+            'Dag has stopped by admin.'
         )
 
 
 def get_create_inflow_cmd(**context):
     rule = get_rule_from_context(context)
-    [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
-    forward = rule['rule_info']['forecast_days']
-    backward = rule['rule_info']['observed_days']
-    target_model = rule['rule_info']['target_model']
-    pop_method = rule['rule_info']['raincell_data_from']
-    run_node = rule['rule_info']['rule_details']['run_node']
-    run_port = rule['rule_info']['rule_details']['run_port']
-    create_inflow_cmd = create_inflow_cmd_template.format(run_node, run_port, exec_date, exec_time,
-                                                          target_model, forward, backward, pop_method)
-    print('get_create_inflow_cmd|create_inflow_cmd : ', create_inflow_cmd)
-    # subprocess.call(create_inflow_cmd, shell=True)
-    request_url = create_inflow_cmd_request.format(run_node, run_port, exec_date, exec_time,
-                                                   target_model, forward, backward, pop_method)
-    print('get_create_inflow_cmd|request_url : ', request_url)
-    if send_http_get_request(request_url):
-        print('get_create_inflow_cmd|success')
+    rule_id = rule['rule_info']['id']
+    if is_allowed_to_run(rule_id):
+        [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
+        forward = rule['rule_info']['forecast_days']
+        backward = rule['rule_info']['observed_days']
+        target_model = rule['rule_info']['target_model']
+        pop_method = rule['rule_info']['raincell_data_from']
+        run_node = rule['rule_info']['rule_details']['run_node']
+        run_port = rule['rule_info']['rule_details']['run_port']
+        create_inflow_cmd = create_inflow_cmd_template.format(run_node, run_port, exec_date, exec_time,
+                                                              target_model, forward, backward, pop_method)
+        print('get_create_inflow_cmd|create_inflow_cmd : ', create_inflow_cmd)
+        # subprocess.call(create_inflow_cmd, shell=True)
+        request_url = create_inflow_cmd_request.format(run_node, run_port, exec_date, exec_time,
+                                                       target_model, forward, backward, pop_method)
+        print('get_create_inflow_cmd|request_url : ', request_url)
+        if send_http_get_request(request_url):
+            print('get_create_inflow_cmd|success')
+        else:
+            raise AirflowException(
+                'get_create_inflow_cmd|failed'
+            )
     else:
         raise AirflowException(
-            'get_create_inflow_cmd|failed'
+            'Dag has stopped by admin.'
         )
 
 
 def get_create_chan_cmd(**context):
     rule = get_rule_from_context(context)
-    [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
-    forward = rule['rule_info']['forecast_days']
-    backward = rule['rule_info']['observed_days']
-    target_model = rule['rule_info']['target_model']
-    run_node = rule['rule_info']['rule_details']['run_node']
-    run_port = rule['rule_info']['rule_details']['run_port']
-    create_chan_cmd = create_chan_cmd_template.format(run_node, run_port, exec_date, exec_time,
-                                                      target_model, forward, backward)
-    print('get_create_chan_cmd|create_chan_cmd : ', create_chan_cmd)
-    # subprocess.call(create_chan_cmd, shell=True)
-    request_url = create_chan_cmd_request.format(run_node, run_port, exec_date, exec_time,
-                                                 target_model, forward, backward)
-    print('get_create_chan_cmd|request_url : ', request_url)
-    if send_http_get_request(request_url):
-        print('get_create_chan_cmd|success')
+    rule_id = rule['rule_info']['id']
+    if is_allowed_to_run(rule_id):
+        [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
+        forward = rule['rule_info']['forecast_days']
+        backward = rule['rule_info']['observed_days']
+        target_model = rule['rule_info']['target_model']
+        run_node = rule['rule_info']['rule_details']['run_node']
+        run_port = rule['rule_info']['rule_details']['run_port']
+        create_chan_cmd = create_chan_cmd_template.format(run_node, run_port, exec_date, exec_time,
+                                                          target_model, forward, backward)
+        print('get_create_chan_cmd|create_chan_cmd : ', create_chan_cmd)
+        # subprocess.call(create_chan_cmd, shell=True)
+        request_url = create_chan_cmd_request.format(run_node, run_port, exec_date, exec_time,
+                                                     target_model, forward, backward)
+        print('get_create_chan_cmd|request_url : ', request_url)
+        if send_http_get_request(request_url):
+            print('get_create_chan_cmd|success')
+        else:
+            raise AirflowException(
+                'get_create_chan_cmd|failed'
+            )
     else:
         raise AirflowException(
-            'get_create_chan_cmd|failed'
+            'Dag has stopped by admin.'
         )
 
 
 def get_create_outflow_cmd(**context):
     rule = get_rule_from_context(context)
-    [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
-    forward = rule['rule_info']['forecast_days']
-    backward = rule['rule_info']['observed_days']
-    target_model = rule['rule_info']['target_model']
-    pop_method = rule['rule_info']['raincell_data_from']
-    run_node = rule['rule_info']['rule_details']['run_node']
-    run_port = rule['rule_info']['rule_details']['run_port']
-    create_outflow_cmd = create_outflow_cmd_template.format(run_node, run_port, exec_date, exec_time,
-                                                            target_model, forward, backward, pop_method)
-    print('get_create_outflow_cmd|create_outflow_cmd : ', create_outflow_cmd)
-    # subprocess.call(create_outflow_cmd, shell=True)
-    request_url = create_outflow_cmd_request.format(run_node, run_port, exec_date, exec_time,
-                                                    target_model, forward, backward, pop_method)
-    print('get_create_outflow_cmd|request_url : ', request_url)
-    if send_http_get_request(request_url):
-        print('get_create_outflow_cmd|success')
+    rule_id = rule['rule_info']['id']
+    if is_allowed_to_run(rule_id):
+        [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
+        forward = rule['rule_info']['forecast_days']
+        backward = rule['rule_info']['observed_days']
+        target_model = rule['rule_info']['target_model']
+        pop_method = rule['rule_info']['raincell_data_from']
+        run_node = rule['rule_info']['rule_details']['run_node']
+        run_port = rule['rule_info']['rule_details']['run_port']
+        create_outflow_cmd = create_outflow_cmd_template.format(run_node, run_port, exec_date, exec_time,
+                                                                target_model, forward, backward, pop_method)
+        print('get_create_outflow_cmd|create_outflow_cmd : ', create_outflow_cmd)
+        # subprocess.call(create_outflow_cmd, shell=True)
+        request_url = create_outflow_cmd_request.format(run_node, run_port, exec_date, exec_time,
+                                                        target_model, forward, backward, pop_method)
+        print('get_create_outflow_cmd|request_url : ', request_url)
+        if send_http_get_request(request_url):
+            print('get_create_outflow_cmd|success')
+        else:
+            raise AirflowException(
+                'get_create_outflow_cmd|failed'
+            )
     else:
         raise AirflowException(
-            'get_create_outflow_cmd|failed'
+            'Dag has stopped by admin.'
         )
 
 
 def get_run_flo2d_cmd(**context):
     rule = get_rule_from_context(context)
-    [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
-    forward = rule['rule_info']['forecast_days']
-    backward = rule['rule_info']['observed_days']
-    target_model = rule['rule_info']['target_model']
-    run_node = rule['rule_info']['rule_details']['run_node']
-    run_port = rule['rule_info']['rule_details']['run_port']
-    run_flo2d_cmd = run_flo2d_cmd_template.format(run_node, run_port, exec_date, exec_time,
-                                                            target_model, forward, backward)
-    print('get_run_flo2d_cmd|run_flo2d_cmd : ', run_flo2d_cmd)
-    # subprocess.call(run_flo2d_250m_cmd, shell=True)
-    request_url = run_flo2d_cmd_request.format(run_node, run_port, exec_date, exec_time,
-                                                    target_model, forward, backward)
-    print('get_run_flo2d_cmd|request_url : ', request_url)
-    if send_http_get_request(request_url):
-        print('get_run_flo2d_cmd|success')
+    rule_id = rule['rule_info']['id']
+    if is_allowed_to_run(rule_id):
+        [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
+        forward = rule['rule_info']['forecast_days']
+        backward = rule['rule_info']['observed_days']
+        target_model = rule['rule_info']['target_model']
+        run_node = rule['rule_info']['rule_details']['run_node']
+        run_port = rule['rule_info']['rule_details']['run_port']
+        run_flo2d_cmd = run_flo2d_cmd_template.format(run_node, run_port, exec_date, exec_time,
+                                                                target_model, forward, backward)
+        print('get_run_flo2d_cmd|run_flo2d_cmd : ', run_flo2d_cmd)
+        # subprocess.call(run_flo2d_250m_cmd, shell=True)
+        request_url = run_flo2d_cmd_request.format(run_node, run_port, exec_date, exec_time,
+                                                        target_model, forward, backward)
+        print('get_run_flo2d_cmd|request_url : ', request_url)
+        if send_http_get_request(request_url):
+            print('get_run_flo2d_cmd|success')
+        else:
+            raise AirflowException(
+                'get_run_flo2d_cmd|failed'
+            )
     else:
         raise AirflowException(
-            'get_run_flo2d_cmd|failed'
+            'Dag has stopped by admin.'
         )
 
 
 def get_extract_water_level_cmd(**context):
     rule = get_rule_from_context(context)
-    [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
-    forward = rule['rule_info']['forecast_days']
-    backward = rule['rule_info']['observed_days']
-    target_model = rule['rule_info']['target_model']
-    run_node = rule['rule_info']['rule_details']['run_node']
-    run_port = rule['rule_info']['rule_details']['run_port']
-    sim_tag = 'event_run'
-    extract_water_level_cmd = extract_water_level_cmd_template.format(run_node, run_port, exec_date, exec_time,
-                                                                      target_model, forward, backward, sim_tag)
-    print('get_extract_water_level_cmd|extract_water_level_cmd : ', extract_water_level_cmd)
-    # subprocess.call(extract_water_level_cmd, shell=True)
-    request_url = extract_water_level_cmd_request.format(run_node, run_port, exec_date, exec_time,
-                                                         target_model, forward, backward, sim_tag)
-    print('get_extract_water_level_cmd|request_url : ', request_url)
-    if send_http_get_request(request_url):
-        print('get_extract_water_level_cmd|success')
+    rule_id = rule['rule_info']['id']
+    if is_allowed_to_run(rule_id):
+        [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
+        forward = rule['rule_info']['forecast_days']
+        backward = rule['rule_info']['observed_days']
+        target_model = rule['rule_info']['target_model']
+        run_node = rule['rule_info']['rule_details']['run_node']
+        run_port = rule['rule_info']['rule_details']['run_port']
+        sim_tag = 'event_run'
+        extract_water_level_cmd = extract_water_level_cmd_template.format(run_node, run_port, exec_date, exec_time,
+                                                                          target_model, forward, backward, sim_tag)
+        print('get_extract_water_level_cmd|extract_water_level_cmd : ', extract_water_level_cmd)
+        # subprocess.call(extract_water_level_cmd, shell=True)
+        request_url = extract_water_level_cmd_request.format(run_node, run_port, exec_date, exec_time,
+                                                             target_model, forward, backward, sim_tag)
+        print('get_extract_water_level_cmd|request_url : ', request_url)
+        if send_http_get_request(request_url):
+            print('get_extract_water_level_cmd|success')
+        else:
+            raise AirflowException(
+                'get_extract_water_level_cmd|failed'
+            )
     else:
         raise AirflowException(
-            'get_extract_water_level_cmd|failed'
+            'Dag has stopped by admin.'
         )
 
 
 def get_extract_water_discharge_cmd(**context):
     rule = get_rule_from_context(context)
-    [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
-    forward = rule['rule_info']['forecast_days']
-    backward = rule['rule_info']['observed_days']
-    target_model = rule['rule_info']['target_model']
-    run_node = rule['rule_info']['rule_details']['run_node']
-    run_port = rule['rule_info']['rule_details']['run_port']
-    sim_tag = 'event_run'
-    extract_water_discharge_cmd = extract_water_discharge_cmd_template.format(run_node, run_port, exec_date, exec_time,
-                                                                              target_model, forward, backward, sim_tag)
-    print('get_extract_water_discharge_cmd|extract_water_discharge_cmd : ', extract_water_discharge_cmd)
-    # subprocess.call(extract_water_discharge_cmd, shell=True)
-    request_url = extract_water_discharge_cmd_request.format(run_node, run_port, exec_date, exec_time,
-                                                             target_model, forward, backward, sim_tag)
-    print('get_extract_water_discharge_cmd|request_url : ', request_url)
-    if send_http_get_request(request_url):
-        print('get_extract_water_discharge_cmd|success')
+    rule_id = rule['rule_info']['id']
+    if is_allowed_to_run(rule_id):
+        [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
+        forward = rule['rule_info']['forecast_days']
+        backward = rule['rule_info']['observed_days']
+        target_model = rule['rule_info']['target_model']
+        run_node = rule['rule_info']['rule_details']['run_node']
+        run_port = rule['rule_info']['rule_details']['run_port']
+        sim_tag = 'event_run'
+        extract_water_discharge_cmd = extract_water_discharge_cmd_template.format(run_node, run_port, exec_date, exec_time,
+                                                                                  target_model, forward, backward, sim_tag)
+        print('get_extract_water_discharge_cmd|extract_water_discharge_cmd : ', extract_water_discharge_cmd)
+        # subprocess.call(extract_water_discharge_cmd, shell=True)
+        request_url = extract_water_discharge_cmd_request.format(run_node, run_port, exec_date, exec_time,
+                                                                 target_model, forward, backward, sim_tag)
+        print('get_extract_water_discharge_cmd|request_url : ', request_url)
+        if send_http_get_request(request_url):
+            print('get_extract_water_discharge_cmd|success')
+        else:
+            raise AirflowException(
+                'get_extract_water_discharge_cmd|failed'
+            )
     else:
         raise AirflowException(
-            'get_extract_water_discharge_cmd|failed'
+            'Dag has stopped by admin.'
         )
 
 

@@ -667,6 +667,16 @@ class RuleEngineAdapter:
                     self.update_initial_dynamic_dag_routing_status(1, routine['id'])
         return routines
 
+    def get_dynamic_dag_routing_status(self, id):
+        dag_rule = None
+        query = 'select id, status from dss.dynamic_routine where id={}'.format(id)
+        print('get_dynamic_dag_routing_status|query : ', query)
+        self.cursor.execute(query)
+        result = self.cursor.fetchone()
+        if result is not None:
+            dag_rule = {'id': result[0], 'status': result[1]}
+        return dag_rule
+
     # -----------------------------WRF definition--------------------------------
 
     def get_namelist_input_configs(self, config_id):
