@@ -83,7 +83,7 @@ def send_http_get_request(url, params=None):
 
 
 def get_rule_from_context(context):
-    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d_250m')
+    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
     print('get_rule_from_context|rule : ', rule)
     return rule
 
