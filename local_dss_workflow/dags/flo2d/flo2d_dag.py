@@ -284,7 +284,7 @@ def update_workflow_status(status, rule_id):
 
 
 def get_rule_id(context):
-    rule_info = context['task_instance'].xcom_pull(task_ids='init_flo2d_250m')['rule_info']
+    rule_info = context['task_instance'].xcom_pull(task_ids='init_flo2d')['rule_info']
     if rule_info:
         rule_id = rule_info['id']
         print('get_rule_id|rule_id : ', rule_id)
