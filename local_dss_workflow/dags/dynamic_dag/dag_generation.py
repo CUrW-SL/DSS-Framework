@@ -161,15 +161,17 @@ def get_sensor_sql_query(model_type, model_rule_id):
     return sql_query
 
 
-def allowed_to_proceed(rule_id):
-    adapter = get_dss_db_adapter()
-    if adapter is not None:
-        result = adapter.get_dynamic_dag_routing_status(rule_id)
-        if result is not None:
-            if result['status'] == 5:
-                raise AirflowException(
-                    'Dag has stopped by admin.'
-                )
+def allowed_to_proceed(context):
+    dag_rule_id = context['params']['id']
+    if dag_rule_id is not None:
+        adapter = get_dss_db_adapter()
+        if adapter is not None:
+            result = adapter.get_dynamic_dag_routing_status(dag_rule_id)
+            if result is not None:
+                if result['status'] == 5:
+                    raise AirflowException(
+                        'Dag has stopped by admin.'
+                    )
 
 
 def create_dag(dag_id, params, timeout, dag_tasks, default_args):
@@ -229,7 +231,7 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
                 checker = PythonOperator(
                     task_id='allow_checker_{}'.format(index),
                     provide_context=True,
-                    python_callable=allowed_to_proceed(dag_rule_id),
+                    python_callable=allowed_to_proceed,
                     pool=dag_pool
                 )
                 task_list.append(checker)
