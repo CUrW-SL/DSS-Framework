@@ -5,7 +5,6 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.operators.bash_operator import BashOperator
 from airflow.sensors.sql_sensor import SqlSensor
 import sys
-from airflow.sensors.time_delta_sensor import TimeDeltaSensor
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/gen_util')
 from dynamic_dag_util import get_all_dynamic_dag_routines, get_dynamic_dag_tasks, get_trigger_target_dag
@@ -16,8 +15,6 @@ from dss_db import RuleEngineAdapter
 sys.path.insert(0, '/home/curw/git/DSS-Framework/local_dss_workflow/plugins/operators')
 from dynamic_external_trigger_operator import DynamicTriggerDagRunOperator
 
-sys.path.insert(0, '/home/curw/git/DSS-Framework/local_dss_workflow/plugins/operators')
-from external_dag_sensor import ExternalDagSensorOperator
 
 dag_pool = 'external_dag_pool'
 

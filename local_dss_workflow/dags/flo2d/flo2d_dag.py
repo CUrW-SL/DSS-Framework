@@ -1,9 +1,8 @@
 from datetime import datetime, timedelta
 from airflow import DAG, AirflowException
-from airflow.operators.python_operator import PythonOperator, BranchPythonOperator
+from airflow.operators.python_operator import PythonOperator
 from airflow.models import Variable
 import sys
-import subprocess
 import requests
 
 # from requests import session, Timeout

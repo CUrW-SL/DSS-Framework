@@ -138,9 +138,6 @@ class StoreHandler(BaseHTTPRequestHandler):
 
                 dir_path = set_daily_dir(params['model'], params['run_date'], params['run_time'])
                 try:
-                    # create_raincell(dir_path, params['run_date'], params['run_time'],
-                    #                 params['forward'], params['backward'], params['model'])
-                    #CREATE_RAINCELL_CMD = '.\input\raincell\gen_raincell.py -m {} -s "{}" -e "{}" -d "{}" -M "{}"'
                     command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'input', 'raincell')
                     command = CREATE_RAINCELL_CMD.format(params['model'], params['ts_start'],
                                                          params['ts_end'], dir_path, params['pop_method'])
@@ -170,11 +167,8 @@ class StoreHandler(BaseHTTPRequestHandler):
                 print('StoreHandler|create-inflow|params : ', params)
                 dir_path = set_daily_dir(params['model'], params['run_date'], params['run_time'])
 
-                # create_inflow(dir_path, params['run_date'], params['run_time'],
-                #               params['forward'], params['backward'], params['model'])
                 command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'input', 'inflow')
                 if params['model'] == 'flo2d_250':
-                    #CREATE_INFLOW_250_CMD = '.\input\inflow\get_inflow_250.py -s "{}" -e "{}" -d "{}" -M "{}"'
                     command = CREATE_INFLOW_250_CMD.format(params['ts_start'], params['ts_end'], dir_path,
                                                            params['pop_method'])
                 else:
@@ -204,9 +198,6 @@ class StoreHandler(BaseHTTPRequestHandler):
 
                 dir_path = set_daily_dir(params['model'], params['run_date'], params['run_time'])
 
-                # create_outflow(dir_path, params['run_date'], params['run_time'],
-                #                params['forward'], params['backward'], params['model'])
-                #CREATE_OUTFLOW_CMD = '.\input\outflow\gen_outflow.py -m {} -s "{}" -d "{}" -M "{}"'
                 command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'input', 'outflow')
                 command = CREATE_OUTFLOW_CMD.format(params['model'], params['ts_start'],
                                                     params['ts_end'], dir_path, params['pop_method'])
@@ -232,9 +223,6 @@ class StoreHandler(BaseHTTPRequestHandler):
                 print('StoreHandler|create-chan|params : ', params)
                 dir_path = set_daily_dir(params['model'], params['run_date'], params['run_time'])
 
-                # create_chan(dir_path, params['run_date'], params['run_time'],
-                #             params['forward'], params['backward'], params['model'])
-                #CREATE_CHAN_CMD = '.\input\chan\gen_chan.py -m {} -s "{}" -d "{}"'
                 command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'input', 'chan')
                 command = CREATE_CHAN_CMD.format(params['model'], params['ts_start'], dir_path)
                 print('create-chan|command : ', command)
@@ -262,8 +250,6 @@ class StoreHandler(BaseHTTPRequestHandler):
 
                 dir_path = set_daily_dir(params['model'], params['run_date'], params['run_time'])
 
-                # execute_flo2d(dir_path, params['run_date'], params['run_time'],
-                #               params['forward'], params['backward'], params['model'])
                 execute_flo2d(dir_path, params['model'], params['run_date'], params['run_time'])
                 response = {'response': 'success'}
             except Exception as e:
@@ -285,9 +271,6 @@ class StoreHandler(BaseHTTPRequestHandler):
                 params = get_input_params(query_components, 'extract')
                 print('StoreHandler|extract-water-level|params : ', params)
                 dir_path = set_daily_dir(params['model'], params['run_date'], params['run_time'])
-
-                # EXTRACT_WATER_LEVEL_CMD = '.\extract_water_level.py -m "{}" -s "{}" -r "{}" -d "{}" -t "{}"'
-                # EXTRACT_WATER_DISCHARGE_CMD = '.\extract_discharge.py -m "{}" -s "{}" -r "{}" -d "{}" -t "{}"'
 
                 command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'output')
                 command = EXTRACT_WATER_LEVEL_CMD.format(params['model'], params['ts_start'],
@@ -315,8 +298,6 @@ class StoreHandler(BaseHTTPRequestHandler):
                 params = get_input_params(query_components, 'extract')
                 print('StoreHandler|extract-discharge|params : ', params)
                 dir_path = set_daily_dir(params['model'], params['run_date'], params['run_time'])
-
-                # EXTRACT_WATER_DISCHARGE_CMD = '.\extract_discharge.py -m "{}" -s "{}" -r "{}" -d "{}" -t "{}"'
 
                 command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'output')
                 command = EXTRACT_WATER_DISCHARGE_CMD.format(params['model'], params['ts_start'],
