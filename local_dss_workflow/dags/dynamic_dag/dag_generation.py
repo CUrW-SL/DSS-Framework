@@ -218,7 +218,7 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
 
             elif dag_task['task_type'] == 2:
 
-                print('create_dag|index : ', index)
+                print('create_dag|index : ', str(index))
                 task = DynamicTriggerDagRunOperator(
                     task_id=dag_task['task_name'],
                     python_callable=create_trigger_dag_run,
