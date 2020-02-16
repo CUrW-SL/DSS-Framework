@@ -161,7 +161,7 @@ def get_sensor_sql_query(model_type, model_rule_id):
     return sql_query
 
 
-def allowed_to_proceed(context):
+def allowed_to_proceed(**context):
     print('allowed_to_proceed|params : ', context['params'])
     dag_rule_id = context['params']['id']
     print('allowed_to_proceed|dag_rule_id : ', dag_rule_id)
@@ -175,6 +175,14 @@ def allowed_to_proceed(context):
                     raise AirflowException(
                         'Dag has stopped by admin.'
                     )
+                else:
+                    print('Allowed to proceed')
+            else:
+                print('Allowed to proceed')
+        else:
+            print('Allowed to proceed')
+    else:
+        print('Allowed to proceed')
 
 
 def create_dag(dag_id, params, timeout, dag_tasks, default_args):
