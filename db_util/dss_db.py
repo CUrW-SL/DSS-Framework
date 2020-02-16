@@ -171,7 +171,7 @@ class RuleEngineAdapter:
         query = 'select id, name, target_model, version, run, hour, ignore_previous_run, ' \
                 'check_gfs_data_availability,accuracy_rule, rule_details, namelist_wps, ' \
                 'namelist_input from dss.wrf_rules ' \
-                'where id = {} and status in (1,3,4)  '.format(rule_id)
+                'where id = {} and status in (1,3,4,5)  '.format(rule_id)
         print('get_wrf_rule_info_by_id|query : ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
@@ -242,7 +242,7 @@ class RuleEngineAdapter:
         query = 'select id, name, target_model,forecast_days, observed_days, ' \
                 'init_run, no_forecast_continue, no_observed_continue, rainfall_data_from, ' \
                 'ignore_previous_run, accuracy_rule, rule_details from dss.hechms_rules where ' \
-                'status in (1, 3, 4) and id = {}'.format(id)
+                'status in (1, 3, 4, 5) and id = {}'.format(id)
         print('get_hechms_rule_info_by_id|query : ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
@@ -305,7 +305,7 @@ class RuleEngineAdapter:
                 'no_forecast_continue, no_observed_continue, raincell_data_from, ' \
                 'inflow_data_from, outflow_data_from, ignore_previous_run, accuracy_rule,' \
                 'rule_details ' \
-                'from dss.flo2d_rules where status in (1, 3, 4) and id={}'.format(id)
+                'from dss.flo2d_rules where status in (1, 3, 4, 5) and id={}'.format(id)
         print('get_eligible_flo2d_rule_info_by_id|query : ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
@@ -405,7 +405,7 @@ class RuleEngineAdapter:
         else:
             schedule_date = datetime.strptime(schedule_date, '%Y-%m-%d %H:%M:%S')
         print('schedule_date : ', schedule_date)
-        query = 'select id,dss1,dss2,dss3,schedule,cascade_on from dss.workflow_routines where status in (1,3);'
+        query = 'select id,dss1,dss2,dss3,schedule,cascade_on from dss.workflow_routines where status in (1,3,4,5);'
         print('get_next_workflow_routines|query : ', query)
         results = self.get_multiple_result(query)
         routines = []
@@ -430,7 +430,7 @@ class RuleEngineAdapter:
         else:
             schedule_date = datetime.strptime(schedule_date, '%Y-%m-%d %H:%M:%S')
         print('schedule_date : ', schedule_date)
-        query = 'select id,dss1,dss2,dss3,schedule,cascade_on from dss.workflow_routines where status in (1,3);'
+        query = 'select id,dss1,dss2,dss3,schedule,cascade_on from dss.workflow_routines where status in (1,3,4,5);'
         print('get_next_workflow_routines|query : ', query)
         results = self.get_multiple_result(query)
         routines = []
@@ -485,7 +485,7 @@ class RuleEngineAdapter:
         else:
             schedule_date = datetime.strptime(schedule_date, '%Y-%m-%d %H:%M:%S')
         print('schedule_date : ', schedule_date)
-        query = 'select id,variable_name,variable_type,dag_name,schedule from dss.variable_routines where status in (1,3);'
+        query = 'select id,variable_name,variable_type,dag_name,schedule from dss.variable_routines where status in (1,3,4,5);'
         print('get_next_variable_routines|query : ', query)
         results = self.get_multiple_result(query)
         routines = []
@@ -520,7 +520,7 @@ class RuleEngineAdapter:
         else:
             schedule_date = datetime.strptime(schedule_date, '%Y-%m-%d %H:%M:%S')
         print('schedule_date : ', schedule_date)
-        query = 'select id, rule_name, rule_logic, dag_name, status, schedule from dss.pump_rules where status in (1,3);'
+        query = 'select id, rule_name, rule_logic, dag_name, status, schedule from dss.pump_rules where status in (1,3,4,5);'
         print('get_next_pump_routines|query : ', query)
         results = self.get_multiple_result(query)
         routines = []
@@ -613,7 +613,7 @@ class RuleEngineAdapter:
         else:
             schedule_date = datetime.strptime(schedule_date, '%Y-%m-%d %H:%M:%S')
         print('schedule_date : ', schedule_date)
-        query = 'select id, dag_name, schedule, timeout from dss.dynamic_dags where status in (1,3,4);'
+        query = 'select id, dag_name, schedule, timeout from dss.dynamic_dags where status in (1,3,4,5);'
         print('get_external_bash_routines|query : ', query)
         results = self.get_multiple_result(query)
         routines = []
@@ -649,7 +649,7 @@ class RuleEngineAdapter:
         else:
             schedule_date = datetime.strptime(schedule_date, '%Y-%m-%d %H:%M:%S')
         print('schedule_date : ', schedule_date)
-        query = 'select id, dag_name, schedule, timeout from dss.dynamic_routine where status in (1,3,4);'
+        query = 'select id, dag_name, schedule, timeout from dss.dynamic_routine where status in (1,3,4,5);'
         print('get_dynamic_dag_routines|query : ', query)
         results = self.get_multiple_result(query)
         routines = []

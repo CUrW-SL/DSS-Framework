@@ -106,6 +106,8 @@ def update_workflow_routine_status(db_adapter):
                         wrf_completed = True
                     elif (wrf_rule_status == 4) or (wrf_rule_status == '4'):
                         wrf_error = True
+                    elif (wrf_rule_status == 5) or (wrf_rule_status == '5'):
+                        wrf_error = True
             print('update_workflow_routine_status|wrf_completed : ', wrf_completed)
             if hechms_rule_id == 0 or hechms_rule_id == '0':
                 hechms_completed = True
@@ -117,6 +119,8 @@ def update_workflow_routine_status(db_adapter):
                         hechms_completed = True
                     elif (hechms_rule_status == 4) or (hechms_rule_status == '4'):
                         hechms_error = True
+                    elif (hechms_rule_status == 5) or (hechms_rule_status == '5'):
+                        hechms_error = True
             print('update_workflow_routine_status|hechms_completed : ', hechms_completed)
             if flo2d_rule_id == 0 or flo2d_rule_id == '0':
                 flo2d_completed = True
@@ -127,6 +131,8 @@ def update_workflow_routine_status(db_adapter):
                     if (flo2d_rule_status == 3) or (flo2d_rule_status == '3'):
                         flo2d_completed = True
                     elif (flo2d_rule_status == 4) or (flo2d_rule_status == '4'):
+                        flo2d_error = True
+                    elif (flo2d_rule_status == 5) or (flo2d_rule_status == '5'):
                         flo2d_error = True
             print('update_workflow_routine_status|flo2d_completed : ', flo2d_completed)
             if wrf_completed and hechms_completed and flo2d_completed:
