@@ -19,8 +19,8 @@ default_args = {
     'email_on_failure': True,
 }
 
-create_input_cmd_template = 'curl -X GET "http://{}:{}/HECHMS/distributed/init/{}/{}/{}/{}"'
-create_input_request = 'http://{}:{}/HECHMS/distributed/init/{}/{}/{}/{}'
+create_input_cmd_template = 'curl -X GET "http://{}:{}/HECHMS/distributed/init/{}/{}/{}/{}/{}"'
+create_input_request = 'http://{}:{}/HECHMS/distributed/init/{}/{}/{}/{}/{}'
 
 run_hechms_preprocess_cmd_template = 'curl -X GET "http://{}:{}/HECHMS/distributed/pre-process/{}/{}/{}"'
 run_hechms_preprocess_request = 'http://{}:{}/HECHMS/distributed/pre-process/{}/{}/{}'
@@ -72,12 +72,14 @@ def get_create_input_cmd(**context):
     forward = rule['rule_info']['forecast_days']
     backward = rule['rule_info']['observed_days']
     init_run = rule['rule_info']['init_run']
+    pop_method = rule['rule_info']['rainfall_data_from']
     run_node = rule['rule_info']['rule_details']['run_node']
     run_port = rule['rule_info']['rule_details']['run_port']
-    create_input_cmd = create_input_cmd_template.format(run_node, run_port, exec_date, backward, forward, init_run)
+    create_input_cmd = create_input_cmd_template.format(run_node, run_port, exec_date, backward, forward, init_run,
+                                                        pop_method)
     print('get_create_input_cmd|create_input_cmd : ', create_input_cmd)
     # subprocess.call(create_input_cmd, shell=True)
-    request_url = create_input_request.format(run_node, run_port, exec_date, backward, forward, init_run)
+    request_url = create_input_request.format(run_node, run_port, exec_date, backward, forward, init_run, pop_method)
     print('get_create_input_cmd|request_url : ', request_url)
     if send_http_get_request(request_url):
         print('get_create_input_cmd|success')
