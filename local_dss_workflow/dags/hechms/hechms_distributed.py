@@ -11,6 +11,7 @@ from dss_db import RuleEngineAdapter
 
 prod_dag_name = 'hechms_distributed_dag'
 dag_pool = 'hechms_pool'
+git_path = '/home/curw/git'
 
 default_args = {
     'owner': 'dss admin',
@@ -32,7 +33,7 @@ run_hechms_postprocess_cmd_template = 'curl -X GET "http://{}:{}/HECHMS/distribu
 run_hechms_postprocess_request = 'http://{}:{}/HECHMS/distributed/post-process/{}/{}/{}'
 
 upload_discharge_cmd_template = 'curl -X GET "http://{}:{}/HECHMS/distributed/upload-discharge/{}"'
-upload_discharge_cmd_request = 'http://{}:{}/HECHMS/distributed/upload-discharge/{}'
+upload_discharge_cmd_request = 'http://{}:{}/HECHMS/distributed/upload-discharge/{}/{}'
 
 
 def send_http_get_request(url, params=None):
@@ -148,15 +149,20 @@ def get_run_hechms_postprocess_cmd(**context):
         )
 
 
+#upload_discharge_cmd_template = './home/curw/git/output/extract_hechms_discharge.py -m hechms_{} ' \
+        # '-s "{YYYY-MM-DD HH:MM:SS}" -r "{YYYY-MM-DD HH:MM:SS}" ' \
+        # '-t event_run -d "{}"'
+
+
 def get_upload_discharge_cmd(**context):
     rule = get_rule_from_context(context)
     exec_date = get_local_exec_date_from_context(context)
     run_node = rule['rule_info']['rule_details']['run_node']
     run_port = rule['rule_info']['rule_details']['run_port']
+    target_model = rule['rule_info']['rule_details']['target_model']
     upload_discharge_cmd = upload_discharge_cmd_template.format(run_node, run_port, exec_date)
     print('get_upload_discharge_cmd|upload_discharge_cmd : ', upload_discharge_cmd)
-    #subprocess.call(upload_discharge_cmd, shell=True)
-    request_url = upload_discharge_cmd_request.format(run_node, run_port, exec_date)
+    request_url = upload_discharge_cmd_request.format(run_node, run_port, exec_date, target_model)
     print('get_upload_discharge_cmd|request_url : ', request_url)
     if send_http_get_request(request_url):
         print('get_upload_discharge_cmd|success')

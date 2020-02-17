@@ -40,10 +40,6 @@ def get_dss_db_adapter():
     return adapter
 
 
-def get_local_cloud_config():
-    print('')
-
-
 def set_running_status(**context):
     print('set_running_status|context : ', context)
     params = context['params']
@@ -113,6 +109,7 @@ def create_trigger_dag_run(context):
 
 
 # example bash command : /home/uwcc-admin/calculate.sh -a 23 -date '2020-01-11' -c 1.4
+# sshpass -p 'cfcwm07' ssh curw@124.43.13.195 -p 6022 /home/curw/task.sh -a 12 -b 2 -c 'hello'
 def get_bash_command(bash_script, input_params, dag):
     print('get_bash_command|dag : ', dag)
     last_dag_run = dag.get_last_dagrun(include_externally_triggered=True)
