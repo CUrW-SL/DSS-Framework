@@ -8,7 +8,7 @@ import sys
 import getopt
 
 DATE_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
-ROOT_DIRECTORY = 'D:\flo2d_hourly'
+ROOT_DIRECTORY = r"D:\flo2d_hourly"
 
 from db_adapter.base import get_Pool, destroy_Pool
 from db_adapter.constants import set_db_config_file_path
