@@ -68,7 +68,8 @@ class RuleEngineAdapter:
                 self.connection = mysql.connector.connect(user=mysql_user,
                                                           password=mysql_password,
                                                           host=mysql_host,
-                                                          database=mysql_db)
+                                                          database=mysql_db,
+                                                          port=6036)
                 self.cursor = self.connection.cursor(buffered=True)
                 logging.basicConfig(filename=os.path.join(log_path, 'rule_engine_db_adapter.log'),
                                     level=logging.DEBUG,
@@ -763,14 +764,45 @@ class RuleEngineAdapter:
         print('set_access_date_namelist_wps_configs|query : ', query)
         self.update_query(query)
 
+    #-----------------------retrieving rule definition data----------------------------------
+    def get_rule_definition_by_id(self, rule_id):
+        rule_definition = None
+        query = 'select id,name,logic,success_trigger,fail_trigger,params from dss.rule_definition where id={};'.format(
+            rule_id)
+        print('get_rule_definition_by_id|query : ', query)
+        self.cursor.execute(query)
+        result = self.cursor.fetchone()
+        if result is not None:
+            rule_definition = {'id': result[0], 'name': result[1], 'logic': result[2], 'success_trigger':
+                json.loads(result[3]), 'fail_trigger': json.loads(result[4]), 'params': json.loads(result[5])}
+        return rule_definition
+
+    def set_access_date_rule_definitions(self, rule_id):
+        query = 'update dss.rule_definition set last_access_date=now()  ' \
+                'where id=\'{}\''.format(rule_id)
+        print('set_access_date_rule_definitions|query : ', query)
+        self.update_query(query)
+
+    def evaluate_rule_logic(self, rule_logic):
+        sql_query = 'select exists (select location from dss.rule_variables where {})'.format(rule_logic)
+        print('evaluate_rule_logic|query : ', sql_query)
+        results = self.get_multiple_result(sql_query)
+        print('evaluate_rule_logic|results : ', results)
+        self.cursor.execute(sql_query)
+        result = self.cursor.fetchall()
+        if result is not None:
+            print('evaluate_rule_logic|result : ', result)
+
 
 if __name__ == "__main__":
-    db_config = {'mysql_user': 'admin', 'mysql_password': 'floody', 'mysql_host': '35.227.163.211', 'mysql_db': 'dss',
+    # db_config = {'mysql_user': 'admin', 'mysql_password': 'floody', 'mysql_host': '35.227.163.211', 'mysql_db': 'dss',
+    #              'log_path': '/home/hasitha/PycharmProjects/DSS-Framework/log'}
+    db_config = {'mysql_user': 'curw', 'mysql_password': 'cfcwm07', 'mysql_host': '124.43.13.195', 'mysql_db': 'dss',
                  'log_path': '/home/hasitha/PycharmProjects/DSS-Framework/log'}
     adapter = RuleEngineAdapter.get_instance(db_config)
     print(adapter)
     # adapter.get_location_names_from_rule_variables('Precipitation')
     # adapter.get_all_external_bash_routines()
     # adapter.get_external_bash_routines(datetime.now())
-    adapter.get_namelist_input_configs(1)
-    adapter.get_namelist_wps_configs(1)
+    # adapter.get_namelist_input_configs(1)
+    adapter.get_rule_definition_by_id(1)
