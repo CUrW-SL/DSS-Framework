@@ -139,7 +139,9 @@ def get_bash_command(bash_script, input_params, dag):
 
 def get_timeout(timeout):
     print('get_timeout|timeout : ', timeout)
-    return timedelta(hours=timeout['hours'], minutes=timeout['minutes'], seconds=timeout['seconds'])
+    timeout_in_timedelta = timedelta(hours=timeout['hours'], minutes=timeout['minutes'], seconds=timeout['seconds'])
+    print('get_timeout|timeout_in_timedelta : ', timeout_in_timedelta)
+    return timeout_in_timedelta
 
 
 def get_timeout_in_seconds(timeout):
