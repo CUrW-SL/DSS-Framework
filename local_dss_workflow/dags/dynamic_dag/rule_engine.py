@@ -280,15 +280,19 @@ def generate_dynamic_workflow_dag(dag_rule):
             'retries': 1,
             'retry_delay': timedelta(seconds=30)
         }
-        dag_id = dag_rule['dag_name']
+        dag_id = dag_rule['name']
         globals()[dag_id] = create_dag(dag_id, dag_rule, timeout, default_args)
 
 
-def start_creating(rule_id):
-    print('start_creating rule engine dags')
+def create_decision_dag(rule_id):
+    print('start_creating rule engine dags|rule_id : ', rule_id)
     db_config = Variable.get('db_config', deserialize_json=True)
     print('start_creating|db_config : ', db_config)
     adapter = RuleEngineAdapter.get_instance(db_config)
     rule = adapter.get_rule_definition_by_id(rule_id)
+    print('start_creating|rule : ', rule)
     if rule:
-        generate_dynamic_workflow_dag(rule)
+        try:
+            generate_dynamic_workflow_dag(rule)
+        except Exception as e:
+            print('create_decision_dag|Exception: ', str(e))
