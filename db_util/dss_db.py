@@ -68,8 +68,7 @@ class RuleEngineAdapter:
                 self.connection = mysql.connector.connect(user=mysql_user,
                                                           password=mysql_password,
                                                           host=mysql_host,
-                                                          database=mysql_db,
-                                                          port=6036)
+                                                          database=mysql_db)
                 self.cursor = self.connection.cursor(buffered=True)
                 logging.basicConfig(filename=os.path.join(log_path, 'rule_engine_db_adapter.log'),
                                     level=logging.DEBUG,
