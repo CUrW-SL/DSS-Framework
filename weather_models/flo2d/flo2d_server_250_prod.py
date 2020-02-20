@@ -7,6 +7,7 @@ from urllib.parse import urlparse, parse_qs
 from curw_sim.gen_raincell_curw_sim import create_sim_hybrid_raincell
 from inflowdat.get_inflow import create_inflow
 from outflow.gen_outflow import create_outflow
+from outflowdat.gen_outflow_old import create_outflow_old
 from flo2d.run_model import execute_flo2d_250m, flo2d_model_completed
 from waterlevel.upload_waterlevel import upload_waterlevels_curw
 from extract.extract_water_level_hourly_run import upload_waterlevels
@@ -173,6 +174,40 @@ class StoreHandler(BaseHTTPRequestHandler):
                 print('create_outflow-[ts_start, ts_end]', [ts_start, ts_end])
                 # create_outflow(dir_path, ts_start, ts_end)
                 create_outflow(dir_path, ts_start, ts_end, 'flo2d_250', 'TSF')
+                response = {'response': 'success'}
+            except Exception as e:
+                print(str(e))
+            reply = json.dumps(response)
+            self.send_response(200)
+            self.send_header('Content-type', 'text/json')
+            self.end_headers()
+            self.wfile.write(str.encode(reply))
+
+
+        if self.path.startswith('/create-outflow-old'):
+            os.chdir(r"D:\flo2d_hourly")
+            print('create-outflow')
+            response = {}
+            try:
+                query_components = parse_qs(urlparse(self.path).query)
+                print('query_components : ', query_components)
+                [run_date] = query_components["run_date"]
+                [run_time] = query_components["run_time"]
+                [forward] = query_components["forward"]
+                [backward] = query_components["backward"]
+                print('[run_date, run_time] : ', [run_date, run_time])
+                dir_path = set_daily_dir(run_date, run_time)
+                duration_days = (int(backward), int(forward))
+                ts_start_date = datetime.strptime(run_date, '%Y-%m-%d') - timedelta(days=duration_days[0])
+                ts_end_date = datetime.strptime(run_date, '%Y-%m-%d') + timedelta(days=duration_days[1])
+                ts_end_date = ts_end_date.strftime('%Y-%m-%d')
+                ts_start_date = ts_start_date.strftime('%Y-%m-%d')
+                ts_start_time = '00:00:00'
+                ts_start = '{} {}'.format(ts_start_date, ts_start_time)
+                ts_end = '{} {}'.format(ts_end_date, ts_start_time)
+                print('create_outflow-[ts_start, ts_end]', [ts_start, ts_end])
+                create_outflow_old(dir_path, ts_start, ts_end)
+                #create_outflow(dir_path, ts_start, ts_end, 'flo2d_250', 'TSF')
                 response = {'response': 'success'}
             except Exception as e:
                 print(str(e))
