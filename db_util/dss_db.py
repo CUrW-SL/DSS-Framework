@@ -768,7 +768,7 @@ class RuleEngineAdapter:
         rule_definition = None
         query = 'select id,name,logic,success_trigger,fail_trigger,params from dss.rule_definition ' \
                 'where status in (1, 3, 4, 5) and id={};'.format(rule_id)
-        print('get_rule_definition_by_id|query : ', query)
+        print('get_eligible_decision_rule_definition_by_id|query : ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
         if result is not None:
@@ -780,7 +780,7 @@ class RuleEngineAdapter:
         rule_definition = None
         query = 'select id,name,logic,success_trigger,fail_trigger,params from dss.rule_definition where id={};'.format(
             rule_id)
-        print('get_rule_definition_by_id|query : ', query)
+        print('get_decision_rule_definition_by_id|query : ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
         if result is not None:

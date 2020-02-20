@@ -289,7 +289,7 @@ def create_decision_dag(rule_id):
     db_config = Variable.get('db_config', deserialize_json=True)
     print('start_creating|db_config : ', db_config)
     adapter = RuleEngineAdapter.get_instance(db_config)
-    rule = adapter.get_rule_definition_by_id(rule_id)
+    rule = adapter.get_decision_rule_definition_by_id(rule_id)
     print('start_creating|rule : ', rule)
     if rule:
         try:
