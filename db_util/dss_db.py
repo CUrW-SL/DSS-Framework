@@ -566,7 +566,7 @@ class RuleEngineAdapter:
         self.update_query(sql_query)
 
     def evaluate_variable_rule_logic(self, rule_logic):
-        sql_query = 'select location_name from dss.rule_variables where {}'.format(rule_logic)
+        sql_query = 'select location from dss.rule_variables where {}'.format(rule_logic)
         print('evaluate_variable_rule_logic|query : ', sql_query)
         results = self.get_multiple_result(sql_query)
         print('evaluate_variable_rule_logic|results : ', results)
@@ -765,7 +765,19 @@ class RuleEngineAdapter:
         self.update_query(query)
 
     #-----------------------retrieving rule definition data----------------------------------
-    def get_rule_definition_by_id(self, rule_id):
+    def get_eligible_decision_rule_definition_by_id(self, rule_id):
+        rule_definition = None
+        query = 'select id,name,logic,success_trigger,fail_trigger,params from dss.rule_definition ' \
+                'where status in (1, 3, 4, 5) and id={};'.format(rule_id)
+        print('get_rule_definition_by_id|query : ', query)
+        self.cursor.execute(query)
+        result = self.cursor.fetchone()
+        if result is not None:
+            rule_definition = {'id': result[0], 'name': result[1], 'logic': result[2], 'success_trigger':
+                json.loads(result[3]), 'fail_trigger': json.loads(result[4]), 'params': json.loads(result[5])}
+        return rule_definition
+
+    def get_decision_rule_definition_by_id(self, rule_id):
         rule_definition = None
         query = 'select id,name,logic,success_trigger,fail_trigger,params from dss.rule_definition where id={};'.format(
             rule_id)
@@ -777,13 +789,13 @@ class RuleEngineAdapter:
                 json.loads(result[3]), 'fail_trigger': json.loads(result[4]), 'params': json.loads(result[5])}
         return rule_definition
 
-    def set_access_date_rule_definitions(self, rule_id):
+    def set_access_date_decision_rule_definitions(self, rule_id):
         query = 'update dss.rule_definition set last_access_date=now()  ' \
                 'where id=\'{}\''.format(rule_id)
         print('set_access_date_rule_definitions|query : ', query)
         self.update_query(query)
 
-    def evaluate_rule_logic(self, rule_logic):
+    def evaluate_decision_rule_logic(self, rule_logic):
         sql_query = 'select exists (select location from dss.rule_variables where {})'.format(rule_logic)
         print('evaluate_rule_logic|query : ', sql_query)
         results = self.get_multiple_result(sql_query)
