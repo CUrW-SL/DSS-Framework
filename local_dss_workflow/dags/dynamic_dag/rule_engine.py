@@ -208,7 +208,7 @@ def get_target_trigger(dag, dag_rule, trigger_target):
             task_id=trigger_target['target'],
             sql=trigger_target['target'],
             mysql_conn_id='dss_conn',
-            parameters=dag_rule['params'],
+            # parameters=dag_rule['params'],
             autocommit=True,
             database='dss'
         )
