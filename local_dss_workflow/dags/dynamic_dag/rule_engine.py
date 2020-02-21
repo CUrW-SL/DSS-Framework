@@ -114,6 +114,7 @@ def create_trigger_dag_run(context):
 def get_bash_command(bash_script, input_params, dag):
     print('get_bash_command|dag : ', dag)
     last_dag_run = dag.get_last_dagrun(include_externally_triggered=True)
+    print('get_bash_command|last_dag_run : ', last_dag_run)
     exec_date = last_dag_run.execution_date.strftime('%Y-%m-%d %H:%M:%S')
     print('get_bash_command|exec_date : ', exec_date)
     print('get_bash_command|bash_script : ', bash_script)
@@ -235,6 +236,7 @@ def create_dag(dag_id, dag_rule, timeout, default_args):
               schedule_interval=None,
               params=dag_rule,
               on_failure_callback=on_dag_failure,
+              is_paused_upon_creation=False,
               default_args=default_args)
 
     with dag:
