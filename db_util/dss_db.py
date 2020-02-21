@@ -766,26 +766,28 @@ class RuleEngineAdapter:
     #-----------------------retrieving rule definition data----------------------------------
     def get_eligible_decision_rule_definition_by_id(self, rule_id):
         rule_definition = None
-        query = 'select id,name,logic,success_trigger,fail_trigger,params from dss.rule_definition ' \
+        query = 'select id,name,logic,success_trigger,fail_trigger,params,timeout from dss.rule_definition ' \
                 'where status in (1, 3, 4, 5) and id={};'.format(rule_id)
         print('get_eligible_decision_rule_definition_by_id|query : ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
         if result is not None:
             rule_definition = {'id': result[0], 'name': result[1], 'logic': result[2], 'success_trigger':
-                json.loads(result[3]), 'fail_trigger': json.loads(result[4]), 'params': json.loads(result[5])}
+                               json.loads(result[3]), 'fail_trigger': json.loads(result[4]),
+                               'params': json.loads(result[5]), 'timeout': json.loads(result[6])}
         return rule_definition
 
     def get_decision_rule_definition_by_id(self, rule_id):
         rule_definition = None
-        query = 'select id,name,logic,success_trigger,fail_trigger,params from dss.rule_definition where id={};'.format(
+        query = 'select id,name,logic,success_trigger,fail_trigger,params,timeout from dss.rule_definition where id={};'.format(
             rule_id)
         print('get_decision_rule_definition_by_id|query : ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
         if result is not None:
             rule_definition = {'id': result[0], 'name': result[1], 'logic': result[2], 'success_trigger':
-                json.loads(result[3]), 'fail_trigger': json.loads(result[4]), 'params': json.loads(result[5])}
+                                json.loads(result[3]), 'fail_trigger': json.loads(result[4]),
+                               'params': json.loads(result[5]), 'timeout': json.loads(result[6])}
         return rule_definition
 
     def set_access_date_decision_rule_definitions(self, rule_id):
