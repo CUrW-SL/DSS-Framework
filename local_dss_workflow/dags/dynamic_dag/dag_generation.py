@@ -103,6 +103,7 @@ def create_trigger_dag_run(context):
         elif model_type == 'flo2d':
             payload = dss_adapter.get_eligible_flo2d_rule_info_by_id(model_rule)
         elif model_type == 'decision':
+            print('create_decision_dag|model_rule : ', model_rule)
             create_decision_dag(model_rule)
             payload = dss_adapter.get_eligible_decision_rule_definition_by_id(model_rule)
         else:
