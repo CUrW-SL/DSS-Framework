@@ -113,17 +113,9 @@ def create_trigger_dag_run(context):
 # sshpass -p 'cfcwm07' ssh curw@124.43.13.195 -p 6022 /home/curw/task.sh -a 12 -b 2 -c 'hello'
 def get_bash_command(bash_script, input_params, dag):
     print('get_bash_command|dag : ', dag)
-    last_dag_run = dag.get_last_dagrun(include_externally_triggered=True)
-    print('get_bash_command|last_dag_run : ', last_dag_run)
-    exec_date = last_dag_run.execution_date.strftime('%Y-%m-%d %H:%M:%S')
-    print('get_bash_command|exec_date : ', exec_date)
     print('get_bash_command|bash_script : ', bash_script)
     if input_params is None:
         input_params = {}
-    if 'run_date' not in input_params:
-        # if user hasn't pass 'd' execution date as a param, system will add
-        # it to the input params.
-        input_params['run_date'] = exec_date
     print('get_bash_command|input_params : ', input_params)
     inputs = []
     if input_params:
