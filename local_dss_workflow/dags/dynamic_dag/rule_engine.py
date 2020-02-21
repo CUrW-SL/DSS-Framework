@@ -205,6 +205,7 @@ def get_target_trigger(dag, dag_rule, trigger_target):
         )
     elif trigger_target['type'] == 2:  # sql operator
         task = MySqlOperator(
+            task_id=trigger_target['target'],
             sql=trigger_target['target'],
             mysql_conn_id='dss_conn',
             parameters=dag_rule['params'],
