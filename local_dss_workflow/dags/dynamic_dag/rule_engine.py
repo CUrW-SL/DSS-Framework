@@ -205,16 +205,16 @@ def get_target_trigger(dag, dag_rule, trigger_target):
         )
     elif trigger_target['type'] == 2:  # sql operator
         task = MySqlOperator(
-            task_id=trigger_target['target'],
+            task_id='mysql_trigger_task',
             sql=trigger_target['target'],
             mysql_conn_id='dss_conn',
-            # parameters=dag_rule['params'],
+            parameters=dag_rule['params'],
             autocommit=True,
             database='dss'
         )
     elif trigger_target['type'] == 3:  # external dag operator
         task = DynamicTriggerDagRunOperator(
-            task_id=trigger_target['target'],
+            task_id='external_dag_trigger_task',
             python_callable=create_trigger_dag_run,
             on_failure_callback=on_dag_failure,
             pool=dag_pool
