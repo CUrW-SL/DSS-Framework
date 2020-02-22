@@ -15,8 +15,6 @@ from dss_db import RuleEngineAdapter
 sys.path.insert(0, '/home/curw/git/DSS-Framework/local_dss_workflow/plugins/operators')
 from dynamic_external_trigger_operator import DynamicTriggerDagRunOperator
 
-sys.path.insert(0, '/home/curw/git/DSS-Framework/local_dss_workflow/dags/dynamic_dag')
-from rule_engine import create_decision_dag
 
 dag_pool = 'external_dag_pool'
 
@@ -104,7 +102,6 @@ def create_trigger_dag_run(context):
             payload = dss_adapter.get_eligible_flo2d_rule_info_by_id(model_rule)
         elif model_type == 'decision':
             print('create_decision_dag|model_rule : ', model_rule)
-            create_decision_dag(model_rule)
             payload = dss_adapter.get_eligible_decision_rule_definition_by_id(model_rule)
         else:
             print('create_trigger_dag_run|available for weather model dags only.')
