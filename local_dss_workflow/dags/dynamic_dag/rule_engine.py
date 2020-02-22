@@ -194,18 +194,18 @@ def evaluate_rule_logic(**context):
         return 'fail_trigger'
 
 
-def get_target_trigger(dag, dag_rule, trigger_target):
+def get_target_trigger(dag, dag_rule, trigger_target, task_name):
     print('get_target_trigger|trigger_target : ', trigger_target)
     if trigger_target['type'] == 1:  # bash operator
         task = BashOperator(
-            task_id='bash_trigger_task',
+            task_id=task_name,
             bash_command=get_bash_command(trigger_target['target'], dag_rule['params'], dag),
             on_failure_callback=on_dag_failure,
             pool=dag_pool
         )
     elif trigger_target['type'] == 2:  # sql operator
         task = MySqlOperator(
-            task_id='mysql_trigger_task',
+            task_id=task_name,
             sql=trigger_target['target'],
             mysql_conn_id='dss_conn',
             parameters=dag_rule['params'],
@@ -214,7 +214,7 @@ def get_target_trigger(dag, dag_rule, trigger_target):
         )
     elif trigger_target['type'] == 3:  # external dag operator
         task = DynamicTriggerDagRunOperator(
-            task_id='external_dag_trigger_task',
+            task_id=task_name,
             python_callable=create_trigger_dag_run,
             on_failure_callback=on_dag_failure,
             pool=dag_pool
@@ -247,8 +247,8 @@ def create_dag(dag_id, dag_rule, timeout, default_args):
             dag=dag
         )
 
-        success_trigger = get_target_trigger(dag, dag_rule, dag_rule['success_trigger'])
-        fail_trigger = get_target_trigger(dag, dag_rule, dag_rule['fail_trigger'])
+        success_trigger = get_target_trigger(dag, dag_rule, dag_rule['success_trigger'], 'success_trigger')
+        fail_trigger = get_target_trigger(dag, dag_rule, dag_rule['fail_trigger'], 'fail_trigger')
 
         end_task = PythonOperator(
             task_id='end_task',
@@ -257,7 +257,7 @@ def create_dag(dag_id, dag_rule, timeout, default_args):
             pool=dag_pool
         )
 
-        init_task >> branch >> [success_trigger.task_id, fail_trigger.task_id] >> end_task
+        init_task >> branch >> [success_trigger, fail_trigger] >> end_task
 
     return dag
 
