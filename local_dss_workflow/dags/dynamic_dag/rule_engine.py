@@ -250,7 +250,6 @@ def create_dag(dag_id, dag_rule, timeout, default_args):
         success_trigger = get_target_trigger(dag, dag_rule, dag_rule['success_trigger'])
         fail_trigger = get_target_trigger(dag, dag_rule, dag_rule['fail_trigger'])
 
-
         end_task = PythonOperator(
             task_id='end_task',
             provide_context=True,
@@ -279,15 +278,19 @@ def generate_dynamic_workflow_dag(dag_rule):
         globals()[dag_id] = create_dag(dag_id, dag_rule, timeout, default_args)
 
 
-def create_decision_dag(rule_id):
-    print('start_creating rule engine dags|rule_id : ', rule_id)
+def create_decision_dags():
     db_config = Variable.get('db_config', deserialize_json=True)
     print('start_creating|db_config : ', db_config)
     adapter = RuleEngineAdapter.get_instance(db_config)
-    rule = adapter.get_decision_rule_definition_by_id(rule_id)
-    print('start_creating|rule : ', rule)
-    if rule:
-        try:
-            generate_dynamic_workflow_dag(rule)
-        except Exception as e:
-            print('create_decision_dag|Exception: ', str(e))
+
+    rules = adapter.get_all_decision_rules()
+    print('start_creating|rules : ', rules)
+    if len(rules) > 0:
+        for rule in rules:
+            try:
+                generate_dynamic_workflow_dag(rule)
+            except Exception as e:
+                print('create_decision_dag|Exception: ', str(e))
+
+
+create_decision_dags()

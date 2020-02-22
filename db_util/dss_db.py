@@ -764,6 +764,20 @@ class RuleEngineAdapter:
         self.update_query(query)
 
     #-----------------------retrieving rule definition data----------------------------------
+    def get_all_decision_rules(self):
+        query = 'select id,name,logic,success_trigger,fail_trigger,params,timeout from dss.rule_definition ' \
+                'where status in (1, 3, 4, 5);'
+        print('get_all_decision_rules|query : ', query)
+        results = self.get_multiple_result(query)
+        rules = []
+        if results is not None:
+            for result in results:
+                rule = {'id': result[0], 'name': result[1], 'logic': result[2], 'success_trigger':
+                    json.loads(result[3]), 'fail_trigger': json.loads(result[4]),
+                    'params': json.loads(result[5]), 'timeout': json.loads(result[6])}
+                rules.append(rule)
+        return rules
+
     def get_eligible_decision_rule_definition_by_id(self, rule_id):
         rule_definition = None
         query = 'select id,name,logic,success_trigger,fail_trigger,params,timeout from dss.rule_definition ' \
