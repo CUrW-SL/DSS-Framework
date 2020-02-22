@@ -257,7 +257,7 @@ def create_dag(dag_id, dag_rule, timeout, default_args):
             pool=dag_pool
         )
 
-        init_task >> branch >> [success_trigger, fail_trigger] >> end_task
+        init_task >> branch >> [success_trigger.task_id, fail_trigger.task_id] >> end_task
 
     return dag
 
