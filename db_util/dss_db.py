@@ -765,8 +765,7 @@ class RuleEngineAdapter:
 
     #-----------------------retrieving rule definition data----------------------------------
     def get_all_decision_rules(self):
-        query = 'select id,name,logic,success_trigger,fail_trigger,params,timeout from dss.rule_definition ' \
-                'where status in (1, 3, 4, 5);'
+        query = 'select id,name,logic,success_trigger,fail_trigger,params,timeout from dss.rule_definition;'
         print('get_all_decision_rules|query : ', query)
         results = self.get_multiple_result(query)
         rules = []
