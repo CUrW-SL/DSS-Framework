@@ -764,6 +764,12 @@ class RuleEngineAdapter:
         self.update_query(query)
 
     #-----------------------retrieving rule definition data----------------------------------
+    def update_decision_rule_status(self, status, rule_id):
+        query = 'update dss.rule_definition set status={},last_access_date=now()  ' \
+                'where id=\'{}\''.format(status, rule_id)
+        print('update_initial_dynamic_dag_routing_status|query : ', query)
+        self.update_query(query)
+
     def get_all_decision_rules(self):
         query = 'select id,name,logic,success_trigger,fail_trigger,params,timeout from dss.rule_definition ' \
                 'where status !=0 ;'

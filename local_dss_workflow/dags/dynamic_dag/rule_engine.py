@@ -21,7 +21,7 @@ dag_pool = 'external_dag_pool'
 def update_workflow_status(status, rule_id):
     adapter = get_dss_db_adapter()
     if adapter is not None:
-        adapter.update_dynamic_dag_routing_status(status, rule_id)
+        adapter.update_decision_rule_status(status, rule_id)
     else:
         print('update_workflow_status|db adapter not found.')
 
