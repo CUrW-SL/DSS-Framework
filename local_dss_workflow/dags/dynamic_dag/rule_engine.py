@@ -1,9 +1,8 @@
 from datetime import datetime, timedelta
 from airflow import DAG, AirflowException
 from airflow.models import Variable
-from airflow.operators.python_operator import PythonOperator
+from airflow.operators.python_operator import PythonOperator, BranchPythonOperator
 from airflow.operators.bash_operator import BashOperator
-from airflow.operators.branch_operator import BaseBranchOperator
 from airflow.operators.mysql_operator import MySqlOperator
 import sys
 
@@ -240,9 +239,10 @@ def create_dag(dag_id, dag_rule, timeout, default_args):
             pool=dag_pool
         )
 
-        branch = BaseBranchOperator(
+        rule_decision = BranchPythonOperator(
             task_id='rule_decision',
             python_callable=evaluate_rule_logic,
+            provide_context=True,
             trigger_rule="all_done",
             dag=dag
         )
@@ -254,10 +254,11 @@ def create_dag(dag_id, dag_rule, timeout, default_args):
             task_id='end_task',
             provide_context=True,
             python_callable=set_complete_status,
+            trigger_rule='none_failed',
             pool=dag_pool
         )
 
-        init_task >> branch >> [success_trigger, fail_trigger] >> end_task
+        init_task >> rule_decision >> [success_trigger, fail_trigger] >> end_task
 
     return dag
 
