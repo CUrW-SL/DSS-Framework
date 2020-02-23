@@ -179,7 +179,9 @@ def allowed_to_proceed(**context):
 
 def evaluate_rule_logic(**context):
     print('evaluate_rule_logic|context : ', context)
-    logic = ''
+    params = context['params']
+    print('evaluate_rule_logic|params : ', params)
+    logic = params['logic']
     print('evaluate_rule_logic|logic : ', logic)
     adapter = get_dss_db_adapter()
     if adapter is not None:
