@@ -11,7 +11,7 @@ sys.path.insert(0, '/home/uwcc-admin/new_dss/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
 
-prod_dag_name = 'flo2d_250m_dag'
+prod_dag_name = 'flo2d_250_dag'
 dag_pool = 'flo2d_pool'
 
 SIM_TAG = 'hourly_run'
