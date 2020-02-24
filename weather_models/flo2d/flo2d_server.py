@@ -12,8 +12,8 @@ import subprocess
 from os.path import join as pjoin
 from datetime import datetime, timedelta
 
-HOST_ADDRESS = '10.138.0.7'
-HOST_PORT = 8082
+HOST_ADDRESS = '10.138.0.4'
+HOST_PORT = 8081
 
 WIN_OUTPUT_DIR_PATH = r"D:\flo2d_output"
 WIN_HOME_DIR_PATH = r"D:\DSS-Framework\weather_models\flo2d"
