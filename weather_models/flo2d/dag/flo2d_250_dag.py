@@ -10,13 +10,11 @@ import requests
 sys.path.insert(0, '/home/curw/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
-prod_dag_name = 'flo2d_dag'
-prod_dag_name = 'flo2d_150m_dag'
+
 prod_dag_name = 'flo2d_250m_dag'
 dag_pool = 'flo2d_pool'
 
 TARGET_MODEL = 'flo2d_250'
-TARGET_MODEL = 'flo2d_150'
 POP_METHOD = 'MME'
 SIM_TAG = 'hourly_run'
 
