@@ -56,9 +56,10 @@ def get_triggering_dags(db_adapter, dss_rule_id, model_type):
             for target_model in target_models:
                 target_model = target_model.strip()
                 print('target_model : ', target_model)
-                dag_name = 'flo2d_{}_dag'.format(target_model)
+                dag_name = '{}_dag'.format(target_model)
                 payload = {'id': flo2d_rule_info['id'], 'forecast_days': flo2d_rule_info['forecast_days'],
                            'observed_days': flo2d_rule_info['observed_days'],
+                           'target_model': flo2d_rule_info['target_model'],
                            'no_forecast_continue': flo2d_rule_info['no_forecast_continue'],
                            'no_observed_continue': flo2d_rule_info['no_observed_continue'],
                            'raincell_data_from': flo2d_rule_info['raincell_data_from'],
