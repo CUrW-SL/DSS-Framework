@@ -172,7 +172,7 @@ def get_create_inflow_cmd(**context):
         forward = rule['rule_info']['forecast_days']
         backward = rule['rule_info']['observed_days']
         target_model = rule['rule_info']['target_model']
-        pop_method = rule['rule_info']['raincell_data_from']
+        pop_method = rule['rule_info']['inflow_data_from']
         run_node = rule['rule_info']['rule_details']['run_node']
         run_port = rule['rule_info']['rule_details']['run_port']
         create_inflow_cmd = create_inflow_cmd_template.format(run_node, run_port, exec_date, exec_time,
@@ -231,7 +231,7 @@ def get_create_outflow_cmd(**context):
         forward = rule['rule_info']['forecast_days']
         backward = rule['rule_info']['observed_days']
         target_model = rule['rule_info']['target_model']
-        pop_method = rule['rule_info']['raincell_data_from']
+        pop_method = rule['rule_info']['outflow_data_from']
         run_node = rule['rule_info']['rule_details']['run_node']
         run_port = rule['rule_info']['rule_details']['run_port']
         create_outflow_cmd = create_outflow_cmd_template.format(run_node, run_port, exec_date, exec_time,

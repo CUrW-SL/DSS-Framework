@@ -14,8 +14,6 @@ from dss_db import RuleEngineAdapter
 prod_dag_name = 'flo2d_250m_dag'
 dag_pool = 'flo2d_pool'
 
-TARGET_MODEL = 'flo2d_250'
-POP_METHOD = 'MME'
 SIM_TAG = 'hourly_run'
 
 default_args = {
@@ -146,8 +144,8 @@ def get_create_raincell_cmd(**context):
     if is_allowed_to_run(rule_id):
         forward = rule['rule_info']['forecast_days']
         backward = rule['rule_info']['observed_days']
-        target_model = TARGET_MODEL
-        pop_method = POP_METHOD
+        target_model = rule['rule_info']['target_model']
+        pop_method = rule['rule_info']['raincell_data_from']
         run_node = rule['rule_info']['rule_details']['run_node']
         run_port = rule['rule_info']['rule_details']['run_port']
         create_raincell_cmd = create_raincell_cmd_template.format(run_node, run_port, exec_date, exec_time,
@@ -176,8 +174,8 @@ def get_create_inflow_cmd(**context):
         [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
         forward = rule['rule_info']['forecast_days']
         backward = rule['rule_info']['observed_days']
-        target_model = TARGET_MODEL
-        pop_method = POP_METHOD
+        target_model = rule['rule_info']['target_model']
+        pop_method = rule['rule_info']['inflow_data_from']
         run_node = rule['rule_info']['rule_details']['run_node']
         run_port = rule['rule_info']['rule_details']['run_port']
         create_inflow_cmd = create_inflow_cmd_template.format(run_node, run_port, exec_date, exec_time,
@@ -206,7 +204,7 @@ def get_create_chan_cmd(**context):
         [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
         forward = rule['rule_info']['forecast_days']
         backward = rule['rule_info']['observed_days']
-        target_model = TARGET_MODEL
+        target_model = rule['rule_info']['target_model']
         run_node = rule['rule_info']['rule_details']['run_node']
         run_port = rule['rule_info']['rule_details']['run_port']
         create_chan_cmd = create_chan_cmd_template.format(run_node, run_port, exec_date, exec_time,
@@ -235,8 +233,8 @@ def get_create_outflow_cmd(**context):
         [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
         forward = rule['rule_info']['forecast_days']
         backward = rule['rule_info']['observed_days']
-        target_model = TARGET_MODEL
-        pop_method = POP_METHOD
+        target_model = rule['rule_info']['target_model']
+        pop_method = rule['rule_info']['outflow_data_from']
         run_node = rule['rule_info']['rule_details']['run_node']
         run_port = rule['rule_info']['rule_details']['run_port']
         create_outflow_cmd = create_outflow_cmd_template.format(run_node, run_port, exec_date, exec_time,
@@ -265,7 +263,7 @@ def get_run_flo2d_cmd(**context):
         [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
         forward = rule['rule_info']['forecast_days']
         backward = rule['rule_info']['observed_days']
-        target_model = TARGET_MODEL
+        target_model = rule['rule_info']['target_model']
         run_node = rule['rule_info']['rule_details']['run_node']
         run_port = rule['rule_info']['rule_details']['run_port']
         run_flo2d_cmd = run_flo2d_cmd_template.format(run_node, run_port, exec_date, exec_time,
@@ -294,7 +292,7 @@ def get_extract_water_level_cmd(**context):
         [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
         forward = rule['rule_info']['forecast_days']
         backward = rule['rule_info']['observed_days']
-        target_model = TARGET_MODEL
+        target_model = rule['rule_info']['target_model']
         sim_tag = SIM_TAG
         run_node = rule['rule_info']['rule_details']['run_node']
         run_port = rule['rule_info']['rule_details']['run_port']
@@ -324,7 +322,7 @@ def get_extract_water_discharge_cmd(**context):
         [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
         forward = rule['rule_info']['forecast_days']
         backward = rule['rule_info']['observed_days']
-        target_model = TARGET_MODEL
+        target_model = rule['rule_info']['target_model']
         sim_tag = SIM_TAG
         run_node = rule['rule_info']['rule_details']['run_node']
         run_port = rule['rule_info']['rule_details']['run_port']
