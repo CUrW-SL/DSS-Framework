@@ -7,7 +7,7 @@ import requests
 
 # from requests import session, Timeout
 
-sys.path.insert(0, '/home/curw/git/DSS-Framework/db_util')
+sys.path.insert(0, '/home/uwcc-admin/new_dss/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
 
