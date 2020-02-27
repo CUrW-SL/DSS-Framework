@@ -159,7 +159,7 @@ def get_upload_discharge_cmd(**context):
     exec_date = get_local_exec_date_from_context(context)
     run_node = rule['rule_info']['rule_details']['run_node']
     run_port = rule['rule_info']['rule_details']['run_port']
-    target_model = rule['rule_info']['rule_details']['target_model']
+    target_model = rule['rule_info']['target_model']
     upload_discharge_cmd = upload_discharge_cmd_template.format(run_node, run_port, exec_date)
     print('get_upload_discharge_cmd|upload_discharge_cmd : ', upload_discharge_cmd)
     request_url = upload_discharge_cmd_request.format(run_node, run_port, exec_date, target_model)
