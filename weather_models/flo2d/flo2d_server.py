@@ -5,6 +5,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 from urllib.parse import urlparse, parse_qs
 from run_model import execute_flo2d, flo2d_model_completed
+from gen_old_outflow import create_outflow_old
 
 
 import subprocess
@@ -199,11 +200,18 @@ class StoreHandler(BaseHTTPRequestHandler):
                 dir_path = set_daily_dir(params['model'], params['run_date'], params['run_time'])
 
                 command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'input', 'outflow')
-                command = CREATE_OUTFLOW_CMD.format(params['model'], params['ts_start'],
+                if params['pop_method'] == 'CODE':
+                    print('Generating outflow from old method.')
+                    print('input parameters|[dir_path, ts_start, ts_end] : ', [dir_path, params['ts_start'],
+                                                                               params['ts_end']])
+                    create_outflow_old(dir_path, params['ts_start'], params['ts_end'])
+                    response = {'response': 'success'}
+                else:
+                    command = CREATE_OUTFLOW_CMD.format(params['model'], params['ts_start'],
                                                     params['ts_end'], dir_path, params['pop_method'])
-                print('create-outflow|command : ', command)
-                print('create-outflow|command_dir_path : ', command_dir_path)
-                response = run_input_file_generation_methods(command_dir_path, command)
+                    print('create-outflow|command : ', command)
+                    print('create-outflow|command_dir_path : ', command_dir_path)
+                    response = run_input_file_generation_methods(command_dir_path, command)
             except Exception as e:
                 print(str(e))
                 response = {'response': 'fail'}
