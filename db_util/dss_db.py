@@ -94,6 +94,21 @@ class RuleEngineAdapter:
         finally:
             return value
 
+    def get_single_row(self, sql_query):
+        cursor = self.cursor
+        try:
+            cursor.execute(sql_query)
+            result = cursor.fetchone()
+            if result:
+                return result
+            else:
+                self.log.error('no result|query:'.format(sql_query))
+                return None
+        except Exception as ex:
+            print('get_single_result|Exception : ', str(ex))
+            self.log.error('exception|query:'.format(sql_query))
+            return None
+
     def get_multiple_result(self, sql_query):
         cursor = self.cursor
         try:
@@ -156,7 +171,7 @@ class RuleEngineAdapter:
         query = 'select id, name, target_model, version, run, hour, ignore_previous_run, ' \
                 'check_gfs_data_availability,accuracy_rule, rule_details, namelist_wps, ' \
                 'namelist_input from dss.wrf_rules ' \
-                'where id = {} and status in (1,3,4)  '.format(rule_id)
+                'where id = {} and status in (1,3,4,5)  '.format(rule_id)
         print('get_wrf_rule_info_by_id|query : ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
@@ -227,7 +242,7 @@ class RuleEngineAdapter:
         query = 'select id, name, target_model,forecast_days, observed_days, ' \
                 'init_run, no_forecast_continue, no_observed_continue, rainfall_data_from, ' \
                 'ignore_previous_run, accuracy_rule, rule_details from dss.hechms_rules where ' \
-                'status in (1, 3, 4) and id = {}'.format(id)
+                'status in (1, 3, 4, 5) and id = {}'.format(id)
         print('get_hechms_rule_info_by_id|query : ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
@@ -290,8 +305,8 @@ class RuleEngineAdapter:
                 'no_forecast_continue, no_observed_continue, raincell_data_from, ' \
                 'inflow_data_from, outflow_data_from, ignore_previous_run, accuracy_rule,' \
                 'rule_details ' \
-                'from dss.flo2d_rules where status in (1, 3, 4) and id={}'.format(id)
-        print('get_flo2d_rule_info_by_id|query : ', query)
+                'from dss.flo2d_rules where status in (1, 3, 4, 5) and id={}'.format(id)
+        print('get_eligible_flo2d_rule_info_by_id|query : ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
         if result is not None:
@@ -306,7 +321,7 @@ class RuleEngineAdapter:
     def get_flo2d_rule_status_by_id(self, id):
         flo2d_rule = None
         query = 'select id, status from dss.flo2d_rules where id={}'.format(id)
-        print('get_flo2d_rule_info_by_id|query : ', query)
+        print('get_flo2d_rule_status_by_id|query : ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
         if result is not None:
@@ -390,7 +405,7 @@ class RuleEngineAdapter:
         else:
             schedule_date = datetime.strptime(schedule_date, '%Y-%m-%d %H:%M:%S')
         print('schedule_date : ', schedule_date)
-        query = 'select id,dss1,dss2,dss3,schedule,cascade_on from dss.workflow_routines where status in (1,3);'
+        query = 'select id,dss1,dss2,dss3,schedule,cascade_on from dss.workflow_routines where status in (1,3,4,5);'
         print('get_next_workflow_routines|query : ', query)
         results = self.get_multiple_result(query)
         routines = []
@@ -415,7 +430,7 @@ class RuleEngineAdapter:
         else:
             schedule_date = datetime.strptime(schedule_date, '%Y-%m-%d %H:%M:%S')
         print('schedule_date : ', schedule_date)
-        query = 'select id,dss1,dss2,dss3,schedule,cascade_on from dss.workflow_routines where status in (1,3);'
+        query = 'select id,dss1,dss2,dss3,schedule,cascade_on from dss.workflow_routines where status in (1,3,4,5);'
         print('get_next_workflow_routines|query : ', query)
         results = self.get_multiple_result(query)
         routines = []
@@ -470,7 +485,7 @@ class RuleEngineAdapter:
         else:
             schedule_date = datetime.strptime(schedule_date, '%Y-%m-%d %H:%M:%S')
         print('schedule_date : ', schedule_date)
-        query = 'select id,variable_name,variable_type,dag_name,schedule from dss.variable_routines where status in (1,3);'
+        query = 'select id,variable_name,variable_type,dag_name,schedule from dss.variable_routines where status in (1,3,4,5);'
         print('get_next_variable_routines|query : ', query)
         results = self.get_multiple_result(query)
         routines = []
@@ -505,7 +520,7 @@ class RuleEngineAdapter:
         else:
             schedule_date = datetime.strptime(schedule_date, '%Y-%m-%d %H:%M:%S')
         print('schedule_date : ', schedule_date)
-        query = 'select id, rule_name, rule_logic, dag_name, status, schedule from dss.pump_rules where status in (1,3);'
+        query = 'select id, rule_name, rule_logic, dag_name, status, schedule from dss.pump_rules where status in (1,3,4,5);'
         print('get_next_pump_routines|query : ', query)
         results = self.get_multiple_result(query)
         routines = []
@@ -537,11 +552,11 @@ class RuleEngineAdapter:
 
     def update_variable_value(self, variable_name, variable_value, variable_type, location_name):
         if variable_type == 'Precipitation':
-            sql_query = 'update `dss`.`rule_variables` set `{}`=\'{}\' ' \
+            sql_query = 'update `dss`.`rule_variables` set \`{}\`=\'{}\' ' \
                         'where `variable_type`=\'{}\' and`location_name`=\'{}\';'.format(variable_name, variable_value,
                                                                                          variable_type, location_name)
         elif variable_type == 'WaterLevel':
-            sql_query = 'update `dss`.`rule_variables` set `{}`=\'{}\' ' \
+            sql_query = 'update `dss`.`rule_variables` set \`{}\`=\'{}\' ' \
                         'where `variable_type`=\'{}\' and`location_name`=\'{}\';'.format(variable_name, variable_value,
                                                                                          variable_type, location_name)
         else:
@@ -550,7 +565,7 @@ class RuleEngineAdapter:
         self.update_query(sql_query)
 
     def evaluate_variable_rule_logic(self, rule_logic):
-        sql_query = 'select location_name from dss.rule_variables where {}'.format(rule_logic)
+        sql_query = 'select location from dss.rule_variables where {}'.format(rule_logic)
         print('evaluate_variable_rule_logic|query : ', sql_query)
         results = self.get_multiple_result(sql_query)
         print('evaluate_variable_rule_logic|results : ', results)
@@ -598,7 +613,7 @@ class RuleEngineAdapter:
         else:
             schedule_date = datetime.strptime(schedule_date, '%Y-%m-%d %H:%M:%S')
         print('schedule_date : ', schedule_date)
-        query = 'select id, dag_name, schedule, timeout from dss.dynamic_dags where status in (1,3,4);'
+        query = 'select id, dag_name, schedule, timeout from dss.dynamic_dags where status in (1,3,4,5);'
         print('get_external_bash_routines|query : ', query)
         results = self.get_multiple_result(query)
         routines = []
@@ -615,6 +630,52 @@ class RuleEngineAdapter:
                     print('update_initial_workflow_routing_status.')
                     self.update_initial_external_bash_routing_status(1, routine['id'])
         return routines
+
+    # Dynamic dag generation
+    def update_initial_dynamic_dag_routing_status(self, status, routine_id):
+        query = 'update dss.dynamic_routine set status={},last_trigger_date=now()  ' \
+                'where id=\'{}\''.format(status, routine_id)
+        print('update_initial_dynamic_dag_routing_status|query : ', query)
+        self.update_query(query)
+
+    def update_dynamic_dag_routing_status(self, status, routine_id):
+        query = 'update dss.dynamic_routine set status={} where id=\'{}\''.format(status, routine_id)
+        print('update_dynamic_dag_routing_status|query : ', query)
+        self.update_query(query)
+
+    def get_dynamic_dag_routines(self, schedule_date=datetime.now()):
+        if type(schedule_date) is datetime:
+            schedule_date = schedule_date
+        else:
+            schedule_date = datetime.strptime(schedule_date, '%Y-%m-%d %H:%M:%S')
+        print('schedule_date : ', schedule_date)
+        query = 'select id, dag_name, schedule, timeout from dss.dynamic_routine where status in (1,3,4,5);'
+        print('get_dynamic_dag_routines|query : ', query)
+        results = self.get_multiple_result(query)
+        routines = []
+        if results is not None:
+            for result in results:
+                print('get_dynamic_dag_routines|result : ', result)
+                routines.append({'id': result[0], 'dag_name': result[1], 'schedule': result[2],
+                                 'timeout': json.loads(result[3])})
+        print('get_dynamic_dag_routines|routines : ', routines)
+        if len(routines) > 0:
+            routines = get_next_scheduled_routines(schedule_date, routines)
+            if len(routines) > 0:
+                for routine in routines:
+                    print('update_initial_workflow_routing_status.')
+                    self.update_initial_dynamic_dag_routing_status(1, routine['id'])
+        return routines
+
+    def get_dynamic_dag_routing_status(self, id):
+        dag_rule = None
+        query = 'select id, status from dss.dynamic_routine where id={}'.format(id)
+        print('get_dynamic_dag_routing_status|query : ', query)
+        self.cursor.execute(query)
+        result = self.cursor.fetchone()
+        if result is not None:
+            dag_rule = {'id': result[0], 'status': result[1]}
+        return dag_rule
 
     # -----------------------------WRF definition--------------------------------
 
@@ -702,14 +763,79 @@ class RuleEngineAdapter:
         print('set_access_date_namelist_wps_configs|query : ', query)
         self.update_query(query)
 
+    #-----------------------retrieving rule definition data----------------------------------
+    def update_decision_rule_status(self, status, rule_id):
+        query = 'update dss.rule_definition set status={},last_access_date=now()  ' \
+                'where id=\'{}\''.format(status, rule_id)
+        print('update_initial_dynamic_dag_routing_status|query : ', query)
+        self.update_query(query)
+
+    def get_all_decision_rules(self):
+        query = 'select id,name,logic,success_trigger,fail_trigger,params,timeout from dss.rule_definition ' \
+                'where status !=0 ;'
+        print('get_all_decision_rules|query : ', query)
+        results = self.get_multiple_result(query)
+        rules = []
+        if results is not None:
+            for result in results:
+                rule = {'id': result[0], 'name': result[1], 'logic': result[2], 'success_trigger':
+                    json.loads(result[3]), 'fail_trigger': json.loads(result[4]),
+                    'params': json.loads(result[5]), 'timeout': json.loads(result[6])}
+                rules.append(rule)
+        return rules
+
+    def get_eligible_decision_rule_definition_by_id(self, rule_id):
+        rule_definition = None
+        query = 'select id,name,logic,success_trigger,fail_trigger,params,timeout from dss.rule_definition ' \
+                'where status in (1, 3, 4, 5) and id={};'.format(rule_id)
+        print('get_eligible_decision_rule_definition_by_id|query : ', query)
+        self.cursor.execute(query)
+        result = self.cursor.fetchone()
+        if result is not None:
+            rule_definition = {'id': result[0], 'name': result[1], 'logic': result[2], 'success_trigger':
+                               json.loads(result[3]), 'fail_trigger': json.loads(result[4]),
+                               'params': json.loads(result[5]), 'timeout': json.loads(result[6])}
+        return rule_definition
+
+    def get_decision_rule_definition_by_id(self, rule_id):
+        rule_definition = None
+        query = 'select id,name,logic,success_trigger,fail_trigger,params,timeout from dss.rule_definition where id={};'.format(
+            rule_id)
+        print('get_decision_rule_definition_by_id|query : ', query)
+        self.cursor.execute(query)
+        result = self.cursor.fetchone()
+        if result is not None:
+            rule_definition = {'id': result[0], 'name': result[1], 'logic': result[2], 'success_trigger':
+                                json.loads(result[3]), 'fail_trigger': json.loads(result[4]),
+                               'params': json.loads(result[5]), 'timeout': json.loads(result[6])}
+        return rule_definition
+
+    def set_access_date_decision_rule_definitions(self, rule_id):
+        query = 'update dss.rule_definition set last_access_date=now()  ' \
+                'where id=\'{}\''.format(rule_id)
+        print('set_access_date_rule_definitions|query : ', query)
+        self.update_query(query)
+
+    def evaluate_decision_rule_logic(self, rule_logic):
+        sql_query = 'select exists (select location from dss.rule_variables where {})'.format(rule_logic)
+        print('evaluate_rule_logic|query : ', sql_query)
+        results = self.get_multiple_result(sql_query)
+        print('evaluate_rule_logic|results : ', results)
+        self.cursor.execute(sql_query)
+        result = self.cursor.fetchall()
+        if result is not None:
+            print('evaluate_rule_logic|result : ', result)
+
 
 if __name__ == "__main__":
-    db_config = {'mysql_user': 'admin', 'mysql_password': 'floody', 'mysql_host': '35.227.163.211', 'mysql_db': 'dss',
+    # db_config = {'mysql_user': 'admin', 'mysql_password': 'floody', 'mysql_host': '35.227.163.211', 'mysql_db': 'dss',
+    #              'log_path': '/home/hasitha/PycharmProjects/DSS-Framework/log'}
+    db_config = {'mysql_user': 'curw', 'mysql_password': 'cfcwm07', 'mysql_host': '124.43.13.195', 'mysql_db': 'dss',
                  'log_path': '/home/hasitha/PycharmProjects/DSS-Framework/log'}
     adapter = RuleEngineAdapter.get_instance(db_config)
     print(adapter)
     # adapter.get_location_names_from_rule_variables('Precipitation')
     # adapter.get_all_external_bash_routines()
     # adapter.get_external_bash_routines(datetime.now())
-    adapter.get_namelist_input_configs(1)
-    adapter.get_namelist_wps_configs(1)
+    # adapter.get_namelist_input_configs(1)
+    adapter.get_rule_definition_by_id(1)

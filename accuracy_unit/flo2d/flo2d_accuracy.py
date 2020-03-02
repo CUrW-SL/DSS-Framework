@@ -5,7 +5,7 @@ from airflow.models import Variable
 import pandas as pd
 import numpy as np
 
-sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
+sys.path.insert(0, '/home/curw/git/DSS-Framework/db_util')
 # sys.path.insert(0, '/home/hasitha/PycharmProjects/DSS-Framework/db_util')
 from gen_db import CurwFcstAdapter, CurwObsAdapter, CurwSimAdapter
 from dss_db import RuleEngineAdapter

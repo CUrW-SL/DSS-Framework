@@ -28,7 +28,8 @@ RUN apt-get update \
         libhdf5-dev \
         ncl-ncarg \
         python3.6 \
-        python3-pip
+        python3-pip \
+        mysql-server
 
 RUN add-apt-repository "deb http://security.ubuntu.com/ubuntu xenial-security main" \
     && apt update \

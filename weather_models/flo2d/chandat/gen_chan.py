@@ -8,7 +8,7 @@ import sys
 import getopt
 
 DATE_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
-ROOT_DIRECTORY = 'D:\curw_flo2d_data_manager'
+WIN_HOME_DIR_PATH = r"D:\DSS-Framework\weather_models\flo2d"
 
 from db_adapter.base import get_Pool, destroy_Pool
 from db_adapter.constants import set_db_config_file_path
@@ -68,16 +68,14 @@ def read_attribute_from_config_file(attribute, config, compulsory=False):
 
 
 def check_time_format(time):
+    print('check_time_format|time : ', time)
     try:
-        time = datetime.strptime(time, DATE_TIME_FORMAT)
-
         if time.strftime('%S') != '00':
             print("Seconds should be always 00")
             exit(1)
         if time.strftime('%M') != '00':
             print("Minutes should be always 00")
             exit(1)
-
         return True
     except Exception:
         print("Time {} is not in proper format".format(time))
@@ -103,7 +101,7 @@ def prepare_chan(chan_file_path, start, flo2d_model):
         print(initial_conditions)
 
         # chan head
-        head_file = open(os.path.join(ROOT_DIRECTORY, "input", "chan", "chan_{}_head.dat".format(flo2d_version)), "r")
+        head_file = open(os.path.join(WIN_HOME_DIR_PATH, "chandat", "chan_{}_head.dat".format(flo2d_version)), "r")
         head = head_file.read()
         head_file.close()
         write_file_to_file(chan_file_path, file_content=head)
@@ -111,7 +109,7 @@ def prepare_chan(chan_file_path, start, flo2d_model):
         # chan body
         chan_processed_body = []
 
-        body_file_name = os.path.join(ROOT_DIRECTORY, "input", "chan", "chan_{}_body.dat".format(flo2d_version))
+        body_file_name = os.path.join(WIN_HOME_DIR_PATH, "chandat", "chan_{}_body.dat".format(flo2d_version))
         chan_body = [line.rstrip('\n') for line in open(body_file_name, "r")]
 
         i = 0
@@ -123,7 +121,7 @@ def prepare_chan(chan_file_path, start, flo2d_model):
             grid_id = "{}_{}_{}".format(flo2d_model, up_strm, dwn_strm)
             print(grid_id)
             wl_id = initial_conditions.get(grid_id)[2]
-            offset = (datetime.strptime(start, DATE_TIME_FORMAT) + timedelta(hours=2)).strftime(DATE_TIME_FORMAT)
+            offset = (start + timedelta(hours=2)).strftime(DATE_TIME_FORMAT)
             water_level = getWL(connection=obs_connection, wl_id=wl_id, start_date=start, end_date=offset)
             if water_level is None:
                 chan_processed_body.append("{}{}".format(up_strm.ljust(6), (str(up_strm_default)).rjust(6)))
@@ -136,7 +134,7 @@ def prepare_chan(chan_file_path, start, flo2d_model):
         append_to_file(chan_file_path, data=chan_processed_body)
 
         # chan tail
-        tail_file = open(os.path.join(ROOT_DIRECTORY, "input", "chan", "chan_{}_tail.dat".format(flo2d_version)), "r")
+        tail_file = open(os.path.join(WIN_HOME_DIR_PATH, "chandat", "chan_{}_tail.dat".format(flo2d_version)), "r")
         tail = tail_file.read()
         tail_file.close()
         append_file_to_file(chan_file_path, file_content=tail)
@@ -175,15 +173,36 @@ def usage():
     print(usageText)
 
 
-def create_chan(dir_path, ts_start_date, flo2d_model):
-    set_db_config_file_path(os.path.join(ROOT_DIRECTORY, 'db_adapter_config.json'))
+def get_ts_start_end_for_data_type(run_date, run_time, forward=3, backward=2):
+    result = {}
+    """
+    method for geting timeseries start and end using input params.
+    :param run_date:run_date: string yyyy-mm-ddd
+    :param run_time:run_time: string hh:mm:ss
+    :param forward:int
+    :param backward:int
+    :return: tuple (string, string)
+    """
+    run_datetime = datetime.strptime('%s %s' % (run_date, '00:00:00'), '%Y-%m-%d %H:%M:%S')
+    ts_start_datetime = run_datetime - timedelta(days=backward)
+    ts_end_datetime = run_datetime + timedelta(days=forward)
+    run_datetime = datetime.strptime('%s %s' % (run_date, run_time), '%Y-%m-%d %H:%M:%S')
+    result['obs_start'] = ts_start_datetime
+    result['run_time'] = run_datetime
+    result['forecast_time'] = ts_end_datetime
+    print(result)
+    return result
 
+
+def create_chan(dir_path, run_date, run_time, forward=3, backward=2, flo2d_model='flo2d_250'):
+    set_db_config_file_path(os.path.join(WIN_HOME_DIR_PATH, 'db_adapter_config.json'))
+    time_limits = get_ts_start_end_for_data_type(run_date, run_time, forward, backward)
+    print('create_chan|time_limits : ', time_limits)
     try:
-
         # Load config details and db connection params
-        config = json.loads(open(os.path.join(os.getcwd(), 'chan', "config.json")).read())
+        config = json.loads(open(os.path.join(WIN_HOME_DIR_PATH, 'chandat', "config.json")).read())
 
-        start_time = ts_start_date
+        start_time = time_limits['obs_start']
 
         output_dir = dir_path
         file_name = read_attribute_from_config_file('output_file_name', config)

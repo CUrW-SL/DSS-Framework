@@ -20,11 +20,13 @@ def get_triggering_dags(db_adapter, dss_rule_id, model_type):
             for target_model in target_models:
                 target_model = target_model.strip()
                 print('target_model : ', target_model)
-                dag_name = 'wrf_{}_{}_dag'.format(wrf_rule_info['version'], target_model)
+                dag_name = 'wrf_{}_dag'.format(wrf_rule_info['version'])
                 payload = {'id': wrf_rule_info['id'], 'run': wrf_rule_info['run'], 'hour': wrf_rule_info['hour'],
                            'ignore_previous_run': wrf_rule_info['ignore_previous_run'],
                            'check_gfs_data_availability': wrf_rule_info['check_gfs_data_availability'],
                            'accuracy_rule': wrf_rule_info['accuracy_rule'],
+                           'namelist_wps': wrf_rule_info['namelist_wps'],
+                           'namelist_input': wrf_rule_info['namelist_input'],
                            'rule_details': wrf_rule_info['rule_details']}
                 dag_info.append({'dag_name': dag_name, 'payload': payload})
         else:
@@ -105,6 +107,8 @@ def update_workflow_routine_status(db_adapter):
                         wrf_completed = True
                     elif (wrf_rule_status == 4) or (wrf_rule_status == '4'):
                         wrf_error = True
+                    elif (wrf_rule_status == 5) or (wrf_rule_status == '5'):
+                        wrf_error = True
             print('update_workflow_routine_status|wrf_completed : ', wrf_completed)
             if hechms_rule_id == 0 or hechms_rule_id == '0':
                 hechms_completed = True
@@ -116,6 +120,8 @@ def update_workflow_routine_status(db_adapter):
                         hechms_completed = True
                     elif (hechms_rule_status == 4) or (hechms_rule_status == '4'):
                         hechms_error = True
+                    elif (hechms_rule_status == 5) or (hechms_rule_status == '5'):
+                        hechms_error = True
             print('update_workflow_routine_status|hechms_completed : ', hechms_completed)
             if flo2d_rule_id == 0 or flo2d_rule_id == '0':
                 flo2d_completed = True
@@ -126,6 +132,8 @@ def update_workflow_routine_status(db_adapter):
                     if (flo2d_rule_status == 3) or (flo2d_rule_status == '3'):
                         flo2d_completed = True
                     elif (flo2d_rule_status == 4) or (flo2d_rule_status == '4'):
+                        flo2d_error = True
+                    elif (flo2d_rule_status == 5) or (flo2d_rule_status == '5'):
                         flo2d_error = True
             print('update_workflow_routine_status|flo2d_completed : ', flo2d_completed)
             if wrf_completed and hechms_completed and flo2d_completed:

@@ -1,0 +1,17 @@
+{
+  "CURW_FCST_USERNAME": "admin",
+  "CURW_FCST_PASSWORD": "floody",
+  "CURW_FCST_HOST": "35.227.163.211",
+  "CURW_FCST_PORT": 3306,
+  "CURW_FCST_DATABASE": "curw_fcst",
+  "CURW_OBS_USERNAME": "admin",
+  "CURW_OBS_PASSWORD": "floody",
+  "CURW_OBS_HOST": "35.227.163.211",
+  "CURW_OBS_PORT": 3306,
+  "CURW_OBS_DATABASE": "curw_obs",
+  "CURW_SIM_USERNAME": "admin",
+  "CURW_SIM_PASSWORD": "floody",
+  "CURW_SIM_HOST": "35.227.163.211",
+  "CURW_SIM_PORT": 3306,
+  "CURW_SIM_DATABASE": "curw_sim"
+}

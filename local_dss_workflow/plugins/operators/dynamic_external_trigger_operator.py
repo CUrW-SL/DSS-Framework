@@ -1,6 +1,7 @@
 import json
-from datetime import datetime, timezone
-# from airflow.utils import timezone
+# from datetime import timezone
+from datetime import datetime
+from airflow.utils import timezone
 import six
 from airflow.bin.cli import trigger_dag
 from airflow.models import BaseOperator

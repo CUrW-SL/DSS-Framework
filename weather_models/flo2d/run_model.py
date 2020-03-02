@@ -3,6 +3,8 @@ import os
 from distutils.dir_util import copy_tree
 
 COMPLETION_FILE = 'HYCHAN.OUT'
+TEMPLATES_PATH = r"D:\flo2d_templates"
+EXECUTABLES_PATH = r"D:\flo2d_executables"
 
 
 def create_dir_if_not_exists(path):
@@ -11,15 +13,14 @@ def create_dir_if_not_exists(path):
     return path
 
 
-def execute_flo2d_250m(dir_path, run_date, run_time):
+def execute_flo2d(dir_path, target_model, run_date, run_time):
     print("Flo2d run_date : ", run_date)
     print("Flo2d run_time : ", run_time)
     output_dir = dir_path
-    template_dir = os.path.join(os.getcwd(), 'template')
-    # executable_dir = os.path.join(os.getcwd(), 'RunForProjectFolder')
+    template_dir = os.path.join(TEMPLATES_PATH, target_model)
     try:
         copy_tree(template_dir, output_dir)
-        # copy_tree(executable_dir, output_dir)
+        copy_tree(EXECUTABLES_PATH, output_dir)
         try:
             os.chdir(output_dir)
             try:
@@ -29,7 +30,7 @@ def execute_flo2d_250m(dir_path, run_date, run_time):
         except Exception as ex:
             print('Change the current working directory|Exception : ', str(ex))
     except Exception as e:
-        print('template/executable copy error|Exception : ', str(e))
+        print('template/support_files copy error|Exception : ', str(e))
 
 
 def flo2d_model_completed(dir_path, run_date, run_time):

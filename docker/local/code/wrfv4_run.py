@@ -23,6 +23,8 @@ from joblib import Parallel, delayed
 # from docker.wrfv4_ubuntu import constants
 import constants
 
+from model_definition import create_namelist_wps_file, create_namelist_input_file
+
 LOG_FORMAT = '[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s'
 logging.basicConfig(filename='/home/Build_WRF/logs/wrf_preprocessing.log',
                     level=logging.DEBUG,
@@ -598,6 +600,12 @@ def parse_args():
     parser.add_argument('-run_id')
     parser.add_argument('-start_date')
     parser.add_argument('-mode')
+    parser.add_argument('-wps_config_id')
+    parser.add_argument('-input_config_id')
+    parser.add_argument('-db_user')
+    parser.add_argument('-db_password')
+    parser.add_argument('-db_host')
+    parser.add_argument('-db_name')
     parser.add_argument('-wrf_config', default={})
     return parser.parse_args()
 
@@ -636,49 +644,38 @@ def run_wrf_model(run_mode, wrf_conf):
         log.error('download_gfs_data exception')
 
 
-def write_namelist_wps_to_file(wrf_conf, zipped_wps_content):
-    wps_content = zlib.decompress(zipped_wps_content)
-    wps_content = wps_content.decode()
-    namelist_wsp_file_path = wrf_conf['namelist_wps']
-    with open(namelist_wsp_file_path, 'w') as file:
-        file.write(wps_content)
-
-
-def write_namelist_input_to_file(wrf_conf, zipped_input_content):
-    input_content = zlib.decompress(zipped_input_content)
-    input_content = input_content.decode()
-    namelist_input_file_path = wrf_conf['namelist_input']
-    with open(namelist_input_file_path, 'w') as file:
-        file.write(input_content)
-
-
 if __name__ == '__main__':
     args = vars(parse_args())
-    logging.info('Running arguments:\n%s' % json.dumps(args, sort_keys=True, indent=0))
+    print('Running arguments:\n%s' % json.dumps(args, sort_keys=True, indent=0))
     start_date = args['start_date']
-    logging.info('**** WRF RUN **** start_date: {}'.format(start_date))
+    print('**** WRF RUN **** start_date: {}'.format(start_date))
 
     run_id = args['run_id']
-    logging.info('**** WRF RUN **** run_id: {}'.format(run_id))
+    print('**** WRF RUN **** run_id: {}'.format(run_id))
 
     run_mode = args['mode']
-    logging.info('**** WRF RUN Mode**** run_mode: {}'.format(run_mode))
+    print('**** WRF RUN Mode**** run_mode: {}'.format(run_mode))
 
-    zipped_wps_content = args['wps_content']
-    logging.info('**** WPS content Mode**** zipped_wps_content: {}'.format(zipped_wps_content))
+    wps_config_id = args['wps_config_id']
+    print('**** WPS wps_config_id: {}'.format(wps_config_id))
 
-    zipped_input_content = args['input_content']
-    logging.info('**** WRF input content Mode**** zipped_input_content: {}'.format(zipped_input_content))
+    input_config_id = args['input_config_id']
+    print('**** WRF input content input_config_id: {}'.format(input_config_id))
+
+    db_config = {'mysql_user': args['db_user'], 'mysql_password': args['db_password'],
+                 'mysql_host': args['db_host'], 'mysql_db': args['db_name'],
+                 'log_path': ''}
+    print('**** WRF db_config: {}'.format(db_config))
 
     with open('wrfv4_config.json') as json_file:
         wrf_config = json.load(json_file)
         wrf_conf = wrf_config['wrf_config']
-        logging.info('**** WRF RUN **** wrf_conf: {}'.format(wrf_conf))
+        print('**** WRF RUN **** wrf_conf: {}'.format(wrf_conf))
         wrf_conf['run_id'] = run_id
         wrf_conf['start_date'] = start_date
-        write_namelist_wps_to_file(wrf_conf, zipped_wps_content)
+        create_namelist_wps_file(db_config, wps_config_id, wrf_conf['namelist_wps'])
         try:
-            write_namelist_input_to_file(wrf_conf, zipped_input_content)
+            create_namelist_input_file(db_config, input_config_id, wrf_conf['namelist_input'])
             try:
                 run_wrf_model(run_mode, wrf_conf)
             except Exception as ex:

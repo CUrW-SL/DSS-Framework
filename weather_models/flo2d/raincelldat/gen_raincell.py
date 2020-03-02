@@ -1,19 +1,18 @@
 import pymysql
 from datetime import datetime, timedelta
 import traceback
-from weather_models.flo2d.db_plugin import get_cell_mapping, select_distinct_observed_stations, \
+from db_plugin import get_cell_mapping, select_distinct_observed_stations, \
     select_obs_station_precipitation_for_timestamp
 import os
-from weather_models.flo2d.utils import search_value_in_dictionary_list
+from utils import search_value_in_dictionary_list
 
 DATE_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 INVALID_VALUE = -9999
 
 # connection params
-# HOST = "10.138.0.13"
 HOST = "35.227.163.211"
-USER = "routine_user"
-PASSWORD = "aquaroutine"
+USER = "admin"
+PASSWORD = "floody"
 SIM_DB = "curw_sim"
 FCST_DB = "curw_fcst"
 OBS_DB = "curw_obs"
@@ -51,10 +50,11 @@ def prepare_raincell(raincell_file_path, start_time, end_time,
     """
     connection = pymysql.connect(host=HOST, user=USER, password=PASSWORD, db=SIM_DB,
                                  cursorclass=pymysql.cursors.DictCursor)
-    print("Connected to database")
+    print("************Connected to database**************")
 
-    end_time = datetime.strptime(end_time, DATE_TIME_FORMAT)
-    start_time = datetime.strptime(start_time, DATE_TIME_FORMAT)
+    print('prepare_raincell|[start_time, end_time, target_model] : ', [start_time, end_time, target_model])
+    #end_time = datetime.strptime(end_time, DATE_TIME_FORMAT)
+    #start_time = datetime.strptime(start_time, DATE_TIME_FORMAT)
 
     if end_time < start_time:
         print("start_time should be less than end_time")
@@ -71,6 +71,7 @@ def prepare_raincell(raincell_file_path, start_time, end_time,
                                          DATE_TIME_FORMAT)
 
     min_start_time = datetime.strptime("2019-06-28 00:00:00", DATE_TIME_FORMAT)
+    print('prepare_raincell| [min_start_time, max_end_time] :', [min_start_time, max_end_time])
 
     if end_time > max_end_time:
         end_time = max_end_time
@@ -83,11 +84,13 @@ def prepare_raincell(raincell_file_path, start_time, end_time,
     elif target_model == "flo2d_150":
         timestep = 15
 
+    print('prepare_raincell|[start_time, end_time, timestep] :', [start_time, end_time, timestep])
     length = int(((end_time - start_time).total_seconds() / 60) / timestep)
 
     write_to_file(raincell_file_path,
                   ['{} {} {} {}\n'.format(timestep, length, start_time.strftime(DATE_TIME_FORMAT),
                                           end_time.strftime(DATE_TIME_FORMAT))])
+    print('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
     try:
         timestamp = start_time
         while timestamp < end_time:
@@ -160,6 +163,8 @@ def generate_raincell(raincell_file_path, time_limits, model, data_type, any_wrf
     write_to_file(raincell_file_path,
                   ['{} {} {} {}\n'.format(timestep, length, start_time.strftime(DATE_TIME_FORMAT),
                                           end_time.strftime(DATE_TIME_FORMAT))])
+
+    print('generate_raincell|raincell_file_path : ', raincell_file_path)
     grid_maps = get_cell_mapping(sim_connection, model)
     station_id_list = select_distinct_observed_stations(sim_connection, model)
     station_ids = ','.join(str(i) for i in station_id_list)
@@ -275,19 +280,20 @@ def get_ts_start_end_for_data_type(run_date, run_time, forward=3, backward=2):
     return result
 
 
-def create_raincell(dir_path, run_date, run_time, forward, backward, model, data_type, any_wrf, sim_tag):
+def create_raincell(dir_path, run_date, run_time, forward, backward, model):
     time_limits = get_ts_start_end_for_data_type(run_date, run_time, forward, backward)
     raincell_file_path = os.path.join(dir_path, 'RAINCELL.DAT')
+    print('create_raincell|time_limits : ', time_limits)
+    print('create_raincell|raincell_file_path : ', raincell_file_path)
     start_time = datetime.now()
-    generate_raincell(raincell_file_path, time_limits, model, data_type, any_wrf, sim_tag)
-    # generate_raincell(raincell_file_path, time_limits, model, data_type, any_wrf, sim_tag)
+    if not os.path.isfile(raincell_file_path):
+        prepare_raincell(raincell_file_path, target_model=model, start_time=time_limits['obs_start'], end_time=time_limits['forecast_time'])
+        #generate_raincell(raincell_file_path, time_limits, model, 1, None, None)
+    else:
+        print('Raincell file already in path : ', raincell_file_path)
     end_time = datetime.now()
     duration = (end_time - start_time).total_seconds() / 60
     print('create_raincell|duration : ', duration)
-    # if not os.path.isfile(raincell_file_path):
-    #     print('')
-    # else:
-    #     print('Raincell file already in path : ', raincell_file_path)
 
 
 if __name__ == '__main__':

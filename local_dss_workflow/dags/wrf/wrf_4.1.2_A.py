@@ -28,7 +28,7 @@ default_args = {
     'email_on_failure': True,
 }
 
-ssh_cmd_template = "ssh -i /home/curw/.ssh/uwcc-admin -o \"StrictHostKeyChecking no\" uwcc-admin@{} " \
+ssh_cmd_template = "ssh -i /home/curw/.ssh/curw -o \"StrictHostKeyChecking no\" curw@{} " \
                    "\'bash -c \"{}\"'"
 
 

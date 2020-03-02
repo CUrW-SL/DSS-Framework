@@ -4,7 +4,6 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.models import Variable
 import sys
 import subprocess
-import zlib
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/local_dss_workflow/plugins/operators')
 from gfs_sensor import GfsSensorOperator
@@ -15,8 +14,6 @@ from dss_db import RuleEngineAdapter
 sys.path.insert(0, '/home/curw/git/DSS-Framework/accuracy_unit/wrf')
 from wrf_accuracy import calculate_wrf_rule_accuracy
 
-sys.path.insert(0, '/home/curw/git/DSS-Framework/weather_models/wrf')
-from model_definition import get_namelist_wps_config, get_namelist_input_config
 
 prod_dag_name = 'wrf_4.1.2_dag'
 dag_pool = 'wrf_pool'
@@ -28,8 +25,12 @@ default_args = {
     'email_on_failure': True,
 }
 
-ssh_cmd_template = "ssh -i /home/curw/.ssh/uwcc-admin -o \"StrictHostKeyChecking no\" uwcc-admin@{} " \
-                   "\'bash -c \"{}\"'"
+# ssh curw@192.168.1.43 /home/curw/task.sh -a 12 -b 2 -c 'hello'
+# sshpass -p 'cfcwm07' ssh curw@124.43.13.195 -p 6022 /home/curw/task.sh -a 12 -b 2 -c 'hello'
+# sshpass -p 'cfcwm07' ssh curw@124.43.13.195 /home/curw/task.sh -a 12 -b 2 -c 'hello'
+# sshpass -p '{}' ssh {}@{} {}
+# ssh_cmd_template = 'ssh curw@{} {}'
+ssh_cmd_template = 'sshpass -p \'{}\' ssh {}@{} {}'
 
 
 def get_dss_db_adapter():
@@ -46,11 +47,14 @@ def get_dss_db_adapter():
 
 
 def get_push_command(**context):
-    wrf_rule = context['task_instance'].xcom_pull(task_ids='init_wrfv4A')
+    wrf_rule = context['task_instance'].xcom_pull(task_ids='init_wrf')
     print('get_wrf_run_command|wrf_rule : ', wrf_rule)
     wrf_model = wrf_rule['model']
     wrf_run = wrf_rule['rule_info']['run']
     gfs_hour = wrf_rule['rule_info']['hour']
+    vm_config = Variable.get('ubuntu1_config', deserialize_json=True)
+    vm_user = vm_config['user']
+    vm_password = vm_config['password']
     print('get_wrf_run_command|rule_details: ', wrf_rule['rule_info']['rule_details'])
     push_node = wrf_rule['rule_info']['rule_details']['push_node']
     bash_script = wrf_rule['rule_info']['rule_details']['push_script']
@@ -61,13 +65,22 @@ def get_push_command(**context):
     push_script = '{} {} {} d{} {} {} {}'.format(bash_script, push_config, wrf_bucket, wrf_run,
                                                  gfs_hour, wrf_model, exec_date)
     print('get_push_command|run_script : ', push_script)
-    push_wrf4_A_cmd = ssh_cmd_template.format(push_node, push_script)
-    print('get_push_command|push_wrf4_A_cmd : ', push_wrf4_A_cmd)
-    subprocess.call(push_wrf4_A_cmd, shell=True)
+    push_wrf_cmd = ssh_cmd_template.format(vm_password, vm_user, push_node, push_script)
+    print('get_push_command|push_wrf_cmd : ', push_wrf_cmd)
+    subprocess.call(push_wrf_cmd, shell=True)
 
 
+# {mysql_user: curw, mysql_password: cfcwm07, mysql_host: 192.168.1.43, mysql_db: dss, log_path: /home/curw/dss/logs}
 def get_wrf_run_command(**context):
-    wrf_rule = context['task_instance'].xcom_pull(task_ids='init_wrfv4A')
+    wrf_rule = context['task_instance'].xcom_pull(task_ids='init_wrf')
+    db_config = Variable.get('db_config', deserialize_json=True)
+    db_user = db_config['mysql_user']
+    db_password = db_config['mysql_password']
+    db_name = db_config['mysql_db']
+    db_host = db_config['mysql_host']
+    vm_config = Variable.get('ubuntu1_config', deserialize_json=True)
+    vm_user = vm_config['user']
+    vm_password = vm_config['password']
     print('get_wrf_run_command|wrf_rule : ', wrf_rule)
     wrf_model = wrf_rule['model']
     wrf_version = wrf_rule['version']
@@ -78,26 +91,19 @@ def get_wrf_run_command(**context):
     print('get_wrf_run_command|rule_details: ', wrf_rule['rule_info']['rule_details'])
     run_node = wrf_rule['rule_info']['rule_details']['run_node']
     run_script = wrf_rule['rule_info']['rule_details']['run_script']
-    namelist_wps_template = wrf_rule['rule_info']['rule_details']['namelist_wps_template']
-    namelist_input_template = wrf_rule['rule_info']['rule_details']['namelist_input_template']
     exec_date = context["execution_date"].to_datetime_string()
-    dss_adapter = get_dss_db_adapter()
-    if dss_adapter is not None:
-        wps_content = get_namelist_wps_config(dss_adapter, namelist_wps_id, namelist_wps_template)
-        if wps_content is not None:
-            zipped_wps_content = zlib.compress(wps_content.encode())
-            input_content = get_namelist_input_config(dss_adapter, namelist_input_id, namelist_input_template)
-            if input_content is not None:
-                zipped_input_content = zlib.compress(input_content.encode())
-                run_script = '{}  -r {} -m {} -v {} -h {} -d {} -a {} -b {}'.format(run_script, wrf_run,
-                                                                                    wrf_model, wrf_version,
-                                                                                    gfs_hour, exec_date,
-                                                                                    zipped_wps_content,
-                                                                                    zipped_input_content)
-                print('get_wrf_run_command|run_script : ', run_script)
-                run_wrf4_A_cmd = ssh_cmd_template.format(run_node, run_script)
-                print('get_wrf_run_command|run_wrf4_A_cmd : ', run_wrf4_A_cmd)
-                subprocess.call(run_wrf4_A_cmd, shell=True)
+    if db_config is not None:
+        run_script = '{}  -r {} -m {} -v {} -h {} -a {} -b {} -p {} -q {} -t {} -s {} -d {}'.format(run_script, wrf_run,
+                                                                                              wrf_model, wrf_version,
+                                                                                              gfs_hour, namelist_wps_id,
+                                                                                              namelist_input_id,
+                                                                                              db_user, db_password,
+                                                                                              db_name, db_host,
+                                                                                              exec_date)
+        print('get_wrf_run_command|run_script : ', run_script)
+        run_wrf_cmd = ssh_cmd_template.format(vm_password, vm_user, run_node, run_script)
+        print('get_wrf_run_command|run_wrf_cmd : ', run_wrf_cmd)
+        subprocess.call(run_wrf_cmd, shell=True)
 
 
 def update_workflow_status(status, rule_id):
@@ -113,7 +119,7 @@ def update_workflow_status(status, rule_id):
 
 
 def get_rule_id(context):
-    rule_info = context['task_instance'].xcom_pull(task_ids='init_wrfv4A')['rule_info']
+    rule_info = context['task_instance'].xcom_pull(task_ids='init_wrf')['rule_info']
     if rule_info:
         rule_id = rule_info['id']
         print('get_rule_id|rule_id : ', rule_id)
@@ -148,9 +154,9 @@ def run_this_func(dag_run, **kwargs):
 
 def check_accuracy(**context):
     print('check_accuracy|context : ', context)
-    task_info = context['task_instance'].xcom_pull(task_ids='init_wrfv4A')
+    task_info = context['task_instance'].xcom_pull(task_ids='init_wrf')
     print('check_accuracy|task_info : ', task_info)
-    rule_info = context['task_instance'].xcom_pull(task_ids='init_wrfv4A')['rule_info']
+    rule_info = context['task_instance'].xcom_pull(task_ids='init_wrf')['rule_info']
     print('check_accuracy|rule_info : ', rule_info)
     accuracy_rule_id = rule_info['accuracy_rule']
     if accuracy_rule_id == 0 or accuracy_rule_id == '0':
@@ -173,59 +179,59 @@ def on_dag_failure(context):
 
 
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
-         description='Run WRF v4 A DAG', dagrun_timeout=timedelta(hours=9), catchup=False,
+         description='Run WRF DAG', dagrun_timeout=timedelta(hours=9), catchup=False,
          on_failure_callback=on_dag_failure, max_active_runs=2, concurrency=2) as dag:
-    init_wrfv4_A = PythonOperator(
-        task_id='init_wrfv4A',
+    init_wrf = PythonOperator(
+        task_id='init_wrf',
         provide_context=True,
         python_callable=run_this_func,
         pool=dag_pool
     )
 
-    running_state_wrfv4A = PythonOperator(
-        task_id='running_state_wrfv4A',
+    running_state_wrf = PythonOperator(
+        task_id='running_state_wrf',
         provide_context=True,
         python_callable=set_running_status,
         pool=dag_pool
     )
 
-    check_gfs_availability_wrfv4A = GfsSensorOperator(
-        task_id='check_gfs_availability_wrfv4A',
+    check_gfs_availability_wrf = GfsSensorOperator(
+        task_id='check_gfs_availability_wrf',
         poke_interval=60,
         execution_timeout=timedelta(minutes=45),
-        params={'model': 'A', 'init_task_id': 'init_wrfv4A'},
+        params={'model': 'A', 'init_task_id': 'init_wrf'},
         provide_context=True,
         pool=dag_pool
     )
 
-    run_wrf4_A = PythonOperator(
-        task_id='run_wrf4_A',
+    run_wrf = PythonOperator(
+        task_id='run_wrf',
         provide_context=True,
         execution_timeout=timedelta(hours=8, minutes=30),
         python_callable=get_wrf_run_command,
         pool=dag_pool
     )
 
-    wrf_data_push_wrfv4A = PythonOperator(
-        task_id='wrf_data_push_wrfv4A',
+    wrf_data_push_wrf = PythonOperator(
+        task_id='wrf_data_push_wrf',
         provide_context=True,
         python_callable=get_push_command,
         pool=dag_pool
     )
 
-    check_accuracy_wrfv4A = PythonOperator(
-        task_id='check_accuracy_wrfv4A',
+    check_accuracy_wrf = PythonOperator(
+        task_id='check_accuracy_wrf',
         provide_context=True,
         python_callable=check_accuracy,
         pool=dag_pool
     )
 
-    complete_state_wrfv4A = PythonOperator(
-        task_id='complete_state_wrfv4A',
+    complete_state_wrf = PythonOperator(
+        task_id='complete_state_wrf',
         provide_context=True,
         python_callable=set_complete_status,
         pool=dag_pool
     )
 
-    init_wrfv4_A >> running_state_wrfv4A >> check_gfs_availability_wrfv4A >> \
-    run_wrf4_A >> wrf_data_push_wrfv4A >> check_accuracy_wrfv4A >> complete_state_wrfv4A
+    init_wrf >> running_state_wrf >> check_gfs_availability_wrf >> \
+    run_wrf >> wrf_data_push_wrf >> check_accuracy_wrf >> complete_state_wrf
