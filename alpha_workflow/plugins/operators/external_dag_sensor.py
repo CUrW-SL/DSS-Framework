@@ -5,10 +5,10 @@ from airflow.plugins_manager import AirflowPlugin
 from airflow.models import Variable
 import sys
 
-sys.path.insert(0, '/home/curw/git/DSS-Framework/db_util')
-from dss_db import RuleEngineAdapter
+sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/utils')
+from db_util import RuleEngineAdapter
 
-sys.path.insert(0, '/home/curw/git/DSS-Framework/gen_util')
+sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/utils')
 from dynamic_dag_util import get_all_dynamic_dag_routines, get_dynamic_dag_tasks, get_trigger_target_dag
 
 

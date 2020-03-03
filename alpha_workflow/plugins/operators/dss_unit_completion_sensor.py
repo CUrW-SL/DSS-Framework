@@ -5,8 +5,8 @@ from airflow.plugins_manager import AirflowPlugin
 from airflow.models import Variable
 import sys
 
-sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
-from dss_db import RuleEngineAdapter
+sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/utils')
+from db_util import RuleEngineAdapter
 
 
 class DssUnitSensorOperator(BaseSensorOperator):

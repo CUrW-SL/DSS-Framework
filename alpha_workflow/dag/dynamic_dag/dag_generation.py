@@ -6,13 +6,13 @@ from airflow.operators.bash_operator import BashOperator
 from airflow.sensors.sql_sensor import SqlSensor
 import sys
 
-sys.path.insert(0, '/home/curw/git/DSS-Framework/gen_util')
+sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/utils')
 from dynamic_dag_util import get_all_dynamic_dag_routines, get_dynamic_dag_tasks, get_trigger_target_dag
 
-sys.path.insert(0, '/home/curw/git/DSS-Framework/db_util')
+sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/utils')
 from dss_db import RuleEngineAdapter
 
-sys.path.insert(0, '/home/curw/git/DSS-Framework/local_dss_workflow/plugins/operators')
+sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/plugins/operators')
 from dynamic_external_trigger_operator import DynamicTriggerDagRunOperator
 
 
