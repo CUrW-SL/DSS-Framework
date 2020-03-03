@@ -12,7 +12,7 @@ from db_util import RuleEngineAdapter
 sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/plugins/operators')
 from gfs_sensor import GfsSensorOperator
 
-dag_pool = 'external_dag_pool'
+dag_pool = 'wrf_pool'
 ssh_cmd_template = 'sshpass -p \'{}\' ssh {}@{} {}'
 
 

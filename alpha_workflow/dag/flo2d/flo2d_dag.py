@@ -10,7 +10,6 @@ import requests
 sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/utils')
 from db_util import RuleEngineAdapter
 
-prod_dag_name = 'flo2d_dag'
 dag_pool = 'flo2d_pool'
 
 default_args = {

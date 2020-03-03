@@ -15,7 +15,7 @@ from db_util import RuleEngineAdapter
 sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/plugins/operators')
 from dynamic_external_trigger_operator import DynamicTriggerDagRunOperator
 
-dag_pool = 'external_dag_pool'
+dag_pool = 'rule_engine_dag_pool'
 
 
 def update_workflow_status(status, rule_id):

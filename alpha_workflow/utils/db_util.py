@@ -602,32 +602,6 @@ class RuleEngineAdapter:
                     self.update_initial_pump_routing_status(1, routine['id'])
         return routines
 
-    def get_location_names_from_rule_variables(self, variable_type):
-        print('get_location_names_from_rule_variables|variable_type : ', variable_type)
-        query = 'select location_name from dss.rule_variables where variable_type=\'{}\';'.format(variable_type)
-        print('get_next_variable_routines|query : ', query)
-        results = self.get_multiple_result(query)
-        locations = []
-        if results is not None:
-            for result in results:
-                locations.append(result[0])
-        print('locations : ', locations)
-        return locations
-
-    def update_variable_value(self, variable_name, variable_value, variable_type, location_name):
-        if variable_type == 'Precipitation':
-            sql_query = 'update `dss`.`rule_variables` set \`{}\`=\'{}\' ' \
-                        'where `variable_type`=\'{}\' and`location_name`=\'{}\';'.format(variable_name, variable_value,
-                                                                                         variable_type, location_name)
-        elif variable_type == 'WaterLevel':
-            sql_query = 'update `dss`.`rule_variables` set \`{}\`=\'{}\' ' \
-                        'where `variable_type`=\'{}\' and`location_name`=\'{}\';'.format(variable_name, variable_value,
-                                                                                         variable_type, location_name)
-        else:
-            print('Invalid_variable type|variable_type : ', variable_type)
-        print('update_variable_value|query : ', sql_query)
-        self.update_query(sql_query)
-
     def evaluate_variable_rule_logic(self, rule_logic):
         sql_query = 'select location from dss.rule_variables where {}'.format(rule_logic)
         print('evaluate_variable_rule_logic|query : ', sql_query)

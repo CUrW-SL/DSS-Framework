@@ -16,7 +16,7 @@ sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/plugins/operator
 from dynamic_external_trigger_operator import DynamicTriggerDagRunOperator
 
 
-dag_pool = 'external_dag_pool'
+dag_pool = 'dynamic_dag_pool'
 
 
 def update_workflow_status(status, rule_id):
