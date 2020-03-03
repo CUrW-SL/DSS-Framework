@@ -79,3 +79,16 @@ docker build --no-cache -t curw-wrf-18_04:wrf_4.1.2 .
 # Run already built docker image and connect to its shell
 docker run -it curw-wrf-18_04:wrf_4.1.2 /bin/bash
 
+airflow email configurations
+[smtp]
+# If you want airflow to send emails on retries, failure, and you want to use
+# the airflow.utils.email.send_email_smtp function, you have to configure an
+# smtp server here
+smtp_host = smtp.gmail.com
+smtp_starttls = True
+smtp_ssl = False
+# Uncomment and set the user/pass settings if you want to use SMTP AUTH
+smtp_user = curwalerts@gmail.com
+smtp_password = curwalerts@data
+smtp_port = 587
+smtp_mail_from = curwalerts@gmail.com
