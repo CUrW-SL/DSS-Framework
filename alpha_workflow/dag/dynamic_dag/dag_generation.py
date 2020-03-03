@@ -199,6 +199,7 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
               dagrun_timeout=timeout,
               schedule_interval=None,
               params=params,
+              is_paused_upon_creation=False,
               on_failure_callback=on_dag_failure,
               default_args=default_args)
 
