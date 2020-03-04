@@ -16,7 +16,6 @@ from db_util import RuleEngineAdapter
 sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/plugins/operators')
 from dynamic_external_trigger_operator import DynamicTriggerDagRunOperator
 
-
 dag_pool = 'dynamic_dag_pool'
 
 
@@ -168,6 +167,8 @@ def get_sensor_sql_query(model_type, model_rule_id):
         sql_query = 'select TRUE from dss.flo2d_rules where id={} and status in (3, 4)'.format(model_rule_id)
     elif model_type == 'decision':
         sql_query = 'select TRUE from dss.rule_definition where id={} and status in (3, 4)'.format(model_rule_id)
+    else:
+        print('get_sensor_sql_query|no sql for the model type')
     return sql_query
 
 
@@ -258,22 +259,23 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
                 )
                 task_list.append(checker)
 
-                wait = BashOperator(
-                    task_id='wait_a_minute_task_{}'.format(index),
-                    bash_command='sleep 60',
-                    pool=dag_pool)
-                task_list.append(wait)
-
-                sensor = SqlSensor(
-                    task_id='wait_for_{}_to_be_completed'.format(dag_task['task_name']),
-                    conn_id='dss_conn',
-                    sql=get_sensor_sql_query(dag_task['input_params']['model_type'],
-                                             dag_task['input_params']['rule_id']),
-                    poke_interval=60,
-                    allow_null=False,
-                    timeout=get_timeout_in_seconds(dag_task['timeout']),
-                    pool=dag_pool)
-                task_list.append(sensor)
+                if dag_task['input_params']['model_type'] != 'pump':
+                    wait = BashOperator(
+                        task_id='wait_a_minute_task_{}'.format(index),
+                        bash_command='sleep 60',
+                        pool=dag_pool)
+                    task_list.append(wait)
+                    
+                    sensor = SqlSensor(
+                        task_id='wait_for_{}_to_be_completed'.format(dag_task['task_name']),
+                        conn_id='dss_conn',
+                        sql=get_sensor_sql_query(dag_task['input_params']['model_type'],
+                                                 dag_task['input_params']['rule_id']),
+                        poke_interval=60,
+                        allow_null=False,
+                        timeout=get_timeout_in_seconds(dag_task['timeout']),
+                        pool=dag_pool)
+                    task_list.append(sensor)
 
                 print('create_dag|timeout:', sensor.timeout)
                 print('create_dag|dag_id', sensor.dag_id)
