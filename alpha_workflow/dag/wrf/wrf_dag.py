@@ -243,28 +243,12 @@ def create_dag(dag_id, dag_rule, timeout, default_args):
             pool=dag_pool
         )
 
-        check_point1 = PythonOperator(
-            task_id='check_point1',
-            provide_context=True,
-            python_callable=allowed_to_proceed,
-            params=dag_rule,
-            pool=dag_pool
-        )
-
         run_wrf = PythonOperator(
             task_id='run_wrf',
             provide_context=True,
             execution_timeout=timedelta(hours=8, minutes=30),
             params=dag_rule,
             python_callable=get_wrf_run_command,
-            pool=dag_pool
-        )
-
-        check_point2 = PythonOperator(
-            task_id='check_point2',
-            provide_context=True,
-            python_callable=allowed_to_proceed,
-            params=dag_rule,
             pool=dag_pool
         )
 
