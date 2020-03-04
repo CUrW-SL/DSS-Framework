@@ -112,8 +112,8 @@ def is_allowed_to_run(rule_id):
 
 def get_local_exec_date_time_from_context(context):
     rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
-    if 'run_date' in rule['rule_info']:
-        exec_datetime_str = rule['rule_info']['run_date']
+    if 'run_date' in rule:
+        exec_datetime_str = rule['run_date']
         exec_datetime = datetime.strptime(exec_datetime_str, '%Y-%m-%d %H:%M:%S')
         exec_date = exec_datetime.strftime('%Y-%m-%d')
         exec_time = exec_datetime.strftime('%H:%M:%S')
