@@ -64,6 +64,7 @@ def get_trigger_target_dag(dss_adapter, dag_rule_id, task_name):
 
 def get_pump_trigger_payload(dss_adapter, id_list):
     rule_list = dss_adapter.get_pump_operating_rules(id_list)
+    print('get_pump_trigger_payload|rule_list : ', rule_list)
     for rule in rule_list:
         print('get_pump_trigger_payload|rule : ', rule)
         logic = rule['logic']

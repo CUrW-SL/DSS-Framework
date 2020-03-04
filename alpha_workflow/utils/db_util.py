@@ -934,6 +934,7 @@ class RuleEngineAdapter:
             return False
 
     def get_pump_operating_rules(self, id_list, status=1):
+        print('get_pump_operating_rules|id_list : ', id_list)
         if len(id_list) > 0:
             rule_list = []
             for id in id_list:
@@ -941,6 +942,7 @@ class RuleEngineAdapter:
                             'where status={} and id={};'.format(status, id)
                 print('get_pump_operating_rules|sql_query : ', sql_query)
                 result = self.get_single_result(sql_query)
+                print('get_pump_operating_rules|result : ', result)
                 if result is not None:
                     rule_list.append({'id': result[0], 'name': result[1], 'logic': result[2], 'flo2d_rule': result[3]})
             return rule_list
