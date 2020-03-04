@@ -941,7 +941,7 @@ class RuleEngineAdapter:
                 sql_query = 'select id,name,logic,flo2d_rule from dss.pump_rules ' \
                             'where status={} and id={};'.format(status, id)
                 print('get_pump_operating_rules|sql_query : ', sql_query)
-                result = self.get_single_result(sql_query)
+                result = self.get_single_row(sql_query)
                 print('get_pump_operating_rules|result : ', result)
                 if result is not None:
                     rule_list.append({'id': result[0], 'name': result[1], 'logic': result[2], 'flo2d_rule': result[3]})
