@@ -7,7 +7,8 @@ from airflow.sensors.sql_sensor import SqlSensor
 import sys
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/utils')
-from dynamic_dag_util import get_all_dynamic_dag_routines, get_dynamic_dag_tasks, get_trigger_target_dag
+from dynamic_dag_util import get_all_dynamic_dag_routines, get_dynamic_dag_tasks, \
+    get_trigger_target_dag, get_pump_trigger_payload
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/utils')
 from db_util import RuleEngineAdapter
@@ -103,12 +104,15 @@ def create_trigger_dag_run(context):
         elif model_type == 'decision':
             print('create_decision_dag|model_rule : ', model_rule)
             payload = dss_adapter.get_eligible_decision_rule_definition_by_id(model_rule)
+        elif model_type == 'pump':
+            print('create_pump_dag|model_rule : ', model_rule)
+            payload = get_pump_trigger_payload(model_rule)
         else:
             print('create_trigger_dag_run|available for weather model dags only.')
         if payload is not None:
             payload['run_date'] = run_date
             print('create_trigger_dag_run|payload : ', payload)
-            dag_info.append({'dag_name': target_dag_info['task_content'], 'payload': payload})
+            dag_info.append({'dag_name': payload['name'], 'payload': payload})
             print('create_dag_run|dag_info : ', dag_info)
     return dag_info
 
