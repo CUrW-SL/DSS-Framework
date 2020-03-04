@@ -272,7 +272,7 @@ class RuleEngineAdapter:
         hechms_rule = None
         query = 'select id, name, target_model,forecast_days, observed_days, ' \
                 'init_run, no_forecast_continue, no_observed_continue, rainfall_data_from, ' \
-                'ignore_previous_run, accuracy_rule, rule_details from dss.hechms_rules where and id = {}'.format(id)
+                'ignore_previous_run, accuracy_rule, rule_details from dss.hechms_rules where id = {}'.format(id)
         print('get_hechms_rule_info_by_id|query : ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
