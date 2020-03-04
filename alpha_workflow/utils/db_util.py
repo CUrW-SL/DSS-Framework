@@ -230,6 +230,28 @@ class RuleEngineAdapter:
                             'timeout': json.loads(result[12])})
         return wrf_rules
 
+    def get_all_wrf_rules(self):
+        '''
+        :param status:0-disable,1-enable,2-running,3-completed
+        :return:[{}{}]
+        '''
+        wrf_rules = []
+        query = 'select id, name, target_model, version, run, hour, ignore_previous_run, ' \
+                'check_gfs_data_availability,accuracy_rule, rule_details, namelist_wps, ' \
+                'namelist_input, timeout from dss.wrf_rules ' \
+                'where status in (1,2, 3,4,5)  '
+        print('get_wrf_rule_info_by_id|query : ', query)
+        results = self.get_multiple_result(query)
+        if results is not None:
+            for result in results:
+                wrf_rules.append({'id': result[0], 'name': result[1], 'target_model': result[2],
+                                  'version': result[3], 'run': result[4], 'hour': result[5],
+                                  'ignore_previous_run': result[6], 'check_gfs_data_availability': result[7],
+                                  'accuracy_rule': result[8], 'rule_details': json.loads(result[9]),
+                                  'namelist_wps': result[10], 'namelist_input': result[11],
+                                  'timeout': json.loads(result[12])})
+        return wrf_rules
+
     # -------------------------HecHms rule information-------------------------
     def get_hechms_rule_info(self, status=1):
         hechms_rules = []
@@ -302,6 +324,21 @@ class RuleEngineAdapter:
         query = 'select id, name, target_model,forecast_days, observed_days, ' \
                 'init_run, no_forecast_continue, no_observed_continue, rainfall_data_from, ' \
                 'ignore_previous_run, timeout from dss.hechms_rules where status in (1, 3, 4, 5)'
+        results = self.get_multiple_result(query)
+        if results is not None:
+            for row in results:
+                hechms_rules.append({'id': row[0], 'name': row[1], 'target_model': row[2],
+                                     'forecast_days': row[3], 'observed_days': row[4],
+                                     'init_run': row[5], 'no_forecast_continue': row[6],
+                                     'no_observed_continue': row[7], 'rainfall_data_from': row[8],
+                                     'ignore_previous_run': row[9], 'timeout': json.loads(row[10])})
+        return hechms_rules
+
+    def get_all_hechms_rules(self):
+        hechms_rules = []
+        query = 'select id, name, target_model,forecast_days, observed_days, ' \
+                'init_run, no_forecast_continue, no_observed_continue, rainfall_data_from, ' \
+                'ignore_previous_run, timeout from dss.hechms_rules where status in (1, 2, 3, 4, 5)'
         results = self.get_multiple_result(query)
         if results is not None:
             for row in results:
@@ -388,6 +425,23 @@ class RuleEngineAdapter:
                 'no_forecast_continue, no_observed_continue, raincell_data_from, ' \
                 'inflow_data_from, outflow_data_from, ignore_previous_run, timeout ' \
                 'from dss.flo2d_rules where status in (1, 3, 4, 5) '
+        results = self.get_multiple_result(query)
+        if results is not None:
+            for result in results:
+                flo2d_rules.append({'id': result[0], 'name': result[1], 'target_model': result[2],
+                                    'forecast_days': result[3], 'observed_days': result[4],
+                                    'no_forecast_continue': result[5], 'no_observed_continue': result[6],
+                                    'raincell_data_from': result[7], 'inflow_data_from': result[8],
+                                    'outflow_data_from': result[9], 'ignore_previous_run': result[10],
+                                    'timeout': json.loads(result[11])})
+        return flo2d_rules
+
+    def get_all_flo2d_rules(self):
+        flo2d_rules = []
+        query = 'select id, name, target_model, forecast_days, observed_days, ' \
+                'no_forecast_continue, no_observed_continue, raincell_data_from, ' \
+                'inflow_data_from, outflow_data_from, ignore_previous_run, timeout ' \
+                'from dss.flo2d_rules where status in (1,2, 3, 4, 5) '
         results = self.get_multiple_result(query)
         if results is not None:
             for result in results:
