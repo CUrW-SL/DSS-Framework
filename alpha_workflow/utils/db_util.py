@@ -223,11 +223,11 @@ class RuleEngineAdapter:
         if results is not None:
             for result in results:
                 wrf_rules.append({'id': result[0], 'name': result[1], 'target_model': result[2],
-                            'version': result[3], 'run': result[4], 'hour': result[5],
-                            'ignore_previous_run': result[6], 'check_gfs_data_availability': result[7],
-                            'accuracy_rule': result[8], 'rule_details': json.loads(result[9]),
-                            'namelist_wps': result[10], 'namelist_input': result[11],
-                            'timeout': json.loads(result[12])})
+                                  'version': result[3], 'run': result[4], 'hour': result[5],
+                                  'ignore_previous_run': result[6], 'check_gfs_data_availability': result[7],
+                                  'accuracy_rule': result[8], 'rule_details': json.loads(result[9]),
+                                  'namelist_wps': result[10], 'namelist_input': result[11],
+                                  'timeout': json.loads(result[12])})
         return wrf_rules
 
     def get_all_wrf_rules(self):
@@ -348,6 +348,7 @@ class RuleEngineAdapter:
                                      'no_observed_continue': row[7], 'rainfall_data_from': row[8],
                                      'ignore_previous_run': row[9], 'timeout': json.loads(row[10])})
         return hechms_rules
+
     # -------------------------Flo2d rule information-------------------------
     def get_flo2d_rule_info(self, status=1):
         flo2d_rules = []
@@ -452,6 +453,7 @@ class RuleEngineAdapter:
                                     'outflow_data_from': result[9], 'ignore_previous_run': result[10],
                                     'timeout': json.loads(result[11])})
         return flo2d_rules
+
     # ---------------------------Workflow routine-----------------------------
     def get_workflow_routines(self, status):
         workflow_routines = []
@@ -913,10 +915,38 @@ class RuleEngineAdapter:
         print('evaluate_rule_logic|query : ', sql_query)
         results = self.get_multiple_result(sql_query)
         print('evaluate_rule_logic|results : ', results)
-        self.cursor.execute(sql_query)
-        result = self.cursor.fetchall()
-        if result is not None:
-            print('evaluate_rule_logic|result : ', result)
+        if results is not None:
+            print('evaluate_rule_logic|results : ', results)
+            return results
+
+    def evaluate_rule_logic(self, rule_logic):
+        sql_query = 'select location from dss.rule_variables where {}'.format(rule_logic)
+        print('evaluate_rule_logic|query : ', sql_query)
+        results = self.get_multiple_result(sql_query)
+        print('evaluate_rule_logic|results : ', results)
+        if results is not None:
+            print('evaluate_rule_logic|results : ', results)
+            if len(results) > 0:
+                return True
+            else:
+                return False
+        else:
+            return False
+
+    def get_pump_operating_rules(self, id_list, status=1):
+        if len(id_list) > 0:
+            rule_list = []
+            for id in id_list:
+                sql_query = 'select id,name,logic,flo2d_rule from dss.pump_rules ' \
+                            'where status={} and id={};'.format(status, id)
+                print('get_pump_operating_rules|sql_query : ', sql_query)
+                result = self.get_single_result(sql_query)
+                if result is not None:
+                    rule_list.append({'id': result[0], 'name': result[1], 'logic': result[2], 'flo2d_rule': result[3]})
+            return rule_list
+        else:
+            print('get_pump_operating_rules|no ids.')
+            return []
 
 
 if __name__ == "__main__":
