@@ -522,7 +522,7 @@ def create_flo2d_dags():
     db_config = Variable.get('db_config', deserialize_json=True)
     print('start_creating|db_config : ', db_config)
     adapter = RuleEngineAdapter.get_instance(db_config)
-    rules = adapter.get_eligible_flo2d_rules()
+    rules = adapter.get_all_flo2d_rules()
     print('create_flo2d_dags|rules : ', rules)
     if len(rules) > 0:
         for rule in rules:

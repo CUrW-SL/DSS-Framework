@@ -392,7 +392,7 @@ def create_hechms_dags():
     db_config = Variable.get('db_config', deserialize_json=True)
     print('start_creating|db_config : ', db_config)
     adapter = RuleEngineAdapter.get_instance(db_config)
-    rules = adapter.get_eligible_wrf_rules()
+    rules = adapter.get_all_hechms_rules()
     print('create_hechms_dags|rules : ', rules)
     if len(rules) > 0:
         for rule in rules:
