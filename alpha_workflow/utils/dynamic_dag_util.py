@@ -24,7 +24,7 @@ def get_all_dynamic_dag_routines(dss_adapter):
             print('get_all_external_bash_routines|result : ', result)
             routines.append({'id': result[0], 'dag_name': result[1], 'schedule': result[2],
                              'timeout': json.loads(result[3])})
-    print('get_all_external_bash_routines|routines : ', routines)
+    print('get_all_dynamic_dag_routines|routines : ', routines)
     return routines
 
 
