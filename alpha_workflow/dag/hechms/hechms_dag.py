@@ -62,7 +62,7 @@ def get_local_exec_date_from_context(context):
 def get_create_input_cmd(**context):
     exec_date = get_local_exec_date_from_context(context)
     rule_id = get_rule_id(context)
-    allowed_to_proceed(context)
+    allowed_to_proceed(rule_id)
     rule = get_rule_by_id(rule_id)
     if rule is not None:
         forward = rule['forecast_days']
@@ -91,7 +91,7 @@ def get_create_input_cmd(**context):
 def get_run_hechms_preprocess_cmd(**context):
     exec_date = get_local_exec_date_from_context(context)
     rule_id = get_rule_id(context)
-    allowed_to_proceed(context)
+    allowed_to_proceed(rule_id)
     rule = get_rule_by_id(rule_id)
     if rule is not None:
         forward = rule['forecast_days']
@@ -117,7 +117,7 @@ def get_run_hechms_preprocess_cmd(**context):
 
 def get_run_hechms_cmd(**context):
     rule_id = get_rule_id(context)
-    allowed_to_proceed(context)
+    allowed_to_proceed(rule_id)
     rule = get_rule_by_id(rule_id)
     if rule is not None:
         run_node = rule['rule_details']['run_node']
@@ -141,7 +141,7 @@ def get_run_hechms_cmd(**context):
 def get_run_hechms_postprocess_cmd(**context):
     exec_date = get_local_exec_date_from_context(context)
     rule_id = get_rule_id(context)
-    allowed_to_proceed(context)
+    allowed_to_proceed(rule_id)
     rule = get_rule_by_id(rule_id)
     if rule is not None:
         forward = rule['forecast_days']
@@ -168,7 +168,7 @@ def get_run_hechms_postprocess_cmd(**context):
 def get_upload_discharge_cmd(**context):
     exec_date = get_local_exec_date_from_context(context)
     rule_id = get_rule_id(context)
-    allowed_to_proceed(context)
+    allowed_to_proceed(rule_id)
     rule = get_rule_by_id(rule_id)
     if rule is not None:
         run_node = rule['rule_info']['rule_details']['run_node']
@@ -241,21 +241,16 @@ def get_rule_by_id(rule_id):
         return None
 
 
-def allowed_to_proceed(**context):
-    rule_id = get_rule_id(context)
-    print('allowed_to_proceed|rule_id : ', rule_id)
-    if rule_id is not None:
-        adapter = get_dss_db_adapter()
-        if adapter is not None:
-            result = adapter.get_hechms_rule_status_by_id(rule_id)
-            print('allowed_to_proceed|result : ', result)
-            if result is not None:
-                if result['status'] == 5:
-                    raise AirflowException(
-                        'Dag has stopped by admin.'
-                    )
-                else:
-                    print('Allowed to proceed')
+def allowed_to_proceed(rule_id):
+    adapter = get_dss_db_adapter()
+    if adapter is not None:
+        result = adapter.get_hechms_rule_status_by_id(rule_id)
+        print('allowed_to_proceed|result : ', result)
+        if result is not None:
+            if result['status'] == 5:
+                raise AirflowException(
+                    'Dag has stopped by admin.'
+                )
             else:
                 print('Allowed to proceed')
         else:
