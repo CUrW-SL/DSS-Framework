@@ -106,7 +106,7 @@ def create_trigger_dag_run(context):
             payload = dss_adapter.get_eligible_decision_rule_definition_by_id(model_rule)
         elif model_type == 'pump':
             print('create_pump_dag|model_rule : ', model_rule)
-            payload = get_pump_trigger_payload(model_rule)
+            payload = get_pump_trigger_payload(dss_adapter, model_rule)
         else:
             print('create_trigger_dag_run|available for weather model dags only.')
         if payload is not None:
