@@ -174,36 +174,12 @@ def get_sensor_sql_query(model_type, model_rule_id):
     return sql_query
 
 
-def allowed_to_proceed(**context):
-    print('allowed_to_proceed|params : ', context['params'])
-    dag_rule_id = context['params']['id']
-    print('allowed_to_proceed|dag_rule_id : ', dag_rule_id)
-    if dag_rule_id is not None:
-        adapter = get_dss_db_adapter()
-        if adapter is not None:
-            result = adapter.get_dynamic_dag_routing_status(dag_rule_id)
-            print('allowed_to_proceed|result : ', result)
-            if result is not None:
-                if result['status'] == 5:
-                    raise AirflowException(
-                        'Dag has stopped by admin.'
-                    )
-                else:
-                    print('Allowed to proceed')
-            else:
-                print('Allowed to proceed')
-        else:
-            print('Allowed to proceed')
-    else:
-        print('Allowed to proceed')
-
-
 def allowed_to_proceed_by_id(dag_rule_id):
-    print('allowed_to_proceed|dag_rule_id : ', dag_rule_id)
+    print('allowed_to_proceed_by_id|dag_rule_id : ', dag_rule_id)
     adapter = get_dss_db_adapter()
     if adapter is not None:
         result = adapter.get_dynamic_dag_routing_status(dag_rule_id)
-        print('allowed_to_proceed|result : ', result)
+        print('allowed_to_proceed_by_id|result : ', result)
         if result is not None:
             if result['status'] == 5:
                 raise AirflowException(
