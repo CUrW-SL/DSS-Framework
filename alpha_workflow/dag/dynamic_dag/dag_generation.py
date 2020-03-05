@@ -80,6 +80,7 @@ def create_trigger_dag_run(context):
     run_date = context["execution_date"].to_datetime_string()
     task_name = context['task'].task_id
     dag_rule_id = context['params']['id']
+    allowed_to_proceed_by_id(dag_rule_id)
     print('create_trigger_dag_run|[run_date, task_name, dag_rule_id] : ', [run_date, task_name, dag_rule_id])
     dss_adapter = get_dss_db_adapter()
     payload = {}
@@ -118,8 +119,9 @@ def create_trigger_dag_run(context):
 
 # example bash command : /home/uwcc-admin/calculate.sh -a 23 -date '2020-01-11' -c 1.4
 # sshpass -p 'cfcwm07' ssh curw@124.43.13.195 -p 6022 /home/curw/task.sh -a 12 -b 2 -c 'hello'
-def get_bash_command(bash_script, input_params, dag):
+def get_bash_command(bash_script, input_params, dag_rule_id, dag):
     print('get_bash_command|dag : ', dag)
+    allowed_to_proceed_by_id(dag_rule_id)
     last_dag_run = dag.get_last_dagrun(include_externally_triggered=True)
     exec_date = last_dag_run.execution_date.strftime('%Y-%m-%d %H:%M:%S')
     print('get_bash_command|exec_date : ', exec_date)
@@ -196,6 +198,25 @@ def allowed_to_proceed(**context):
         print('Allowed to proceed')
 
 
+def allowed_to_proceed_by_id(dag_rule_id):
+    print('allowed_to_proceed|dag_rule_id : ', dag_rule_id)
+    adapter = get_dss_db_adapter()
+    if adapter is not None:
+        result = adapter.get_dynamic_dag_routing_status(dag_rule_id)
+        print('allowed_to_proceed|result : ', result)
+        if result is not None:
+            if result['status'] == 5:
+                raise AirflowException(
+                    'Dag has stopped by admin.'
+                )
+            else:
+                print('Allowed to proceed')
+        else:
+            print('Allowed to proceed')
+    else:
+        print('Allowed to proceed')
+
+
 def create_dag(dag_id, params, timeout, dag_tasks, default_args):
     print('create_dag|params : ', params)
     dag_rule_id = params['id']
@@ -224,20 +245,12 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
             if dag_task['task_type'] == 1:
                 task = BashOperator(
                     task_id=dag_task['task_name'],
-                    bash_command=get_bash_command(dag_task['task_content'], dag_task['input_params'], dag),
+                    bash_command=get_bash_command(dag_task['task_content'], dag_task['input_params'], dag_rule_id, dag),
                     execution_timeout=get_timeout(dag_task['timeout']),
                     on_failure_callback=on_dag_failure,
                     pool=dag_pool
                 )
                 task_list.append(task)
-
-                checker = PythonOperator(
-                    task_id='allow_checker_{}'.format(index),
-                    provide_context=True,
-                    python_callable=allowed_to_proceed,
-                    pool=dag_pool
-                )
-                task_list.append(checker)
 
             elif dag_task['task_type'] == 2:
 
@@ -251,21 +264,13 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
                 )
                 task_list.append(task)
 
-                checker = PythonOperator(
-                    task_id='allow_checker_{}'.format(index),
-                    provide_context=True,
-                    python_callable=allowed_to_proceed,
-                    pool=dag_pool
-                )
-                task_list.append(checker)
-
                 if dag_task['input_params']['model_type'] != 'pump':
                     wait = BashOperator(
                         task_id='wait_a_minute_task_{}'.format(index),
                         bash_command='sleep 60',
                         pool=dag_pool)
                     task_list.append(wait)
-                    
+
                     sensor = SqlSensor(
                         task_id='wait_for_{}_to_be_completed'.format(dag_task['task_name']),
                         conn_id='dss_conn',
