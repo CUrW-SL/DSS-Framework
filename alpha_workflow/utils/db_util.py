@@ -36,7 +36,8 @@ def validate_workflow(workflow_routine, schedule_date):
     cron = croniter.croniter(schedule, schedule_date)
     run_date = cron.get_next(datetime)
     print('validate_workflow|run_date : ', run_date)
-    current_date = datetime.now()
+    # current_date = datetime.now()
+    current_date = datetime.utcnow()
     print('validate_workflow|current_date : ', current_date)
     if current_date >= run_date:
         print('validate_workflow|True')
