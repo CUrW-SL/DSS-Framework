@@ -53,7 +53,7 @@ def check_gfs_data(gfs_hour, wrf_run,
 class GfsSensorOperator(BaseSensorOperator):
     @apply_defaults
     def __init__(self, params, *args, **kwargs):
-        self.init_task_id = params['init_task_id']
+        self.init_task_id = 'init_wrf'
         self.model = params['model']
         print('GfsSensorOperator|[init_task_id, model]: ', [self.init_task_id, self.model])
         super(GfsSensorOperator, self).__init__(*args, **kwargs)
@@ -64,7 +64,7 @@ class GfsSensorOperator(BaseSensorOperator):
             init_task_id = self.init_task_id
             task_info = context['task_instance'].xcom_pull(task_ids=init_task_id)
             print('GfsSensorOperator|task_info : ', task_info)
-            rule_info = context['task_instance'].xcom_pull(task_ids=init_task_id)['rule_info']
+            rule_info = context['task_instance'].xcom_pull(task_ids=init_task_id)
             print('GfsSensorOperator|rule_info : ', rule_info)
             gfs_hour = rule_info['hour']
             wrf_run = rule_info['run']
