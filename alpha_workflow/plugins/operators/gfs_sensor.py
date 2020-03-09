@@ -53,22 +53,17 @@ def check_gfs_data(gfs_hour, wrf_run,
 class GfsSensorOperator(BaseSensorOperator):
     @apply_defaults
     def __init__(self, params, *args, **kwargs):
-        self.init_task_id = 'init_wrf'
+        self.gfs_hour = params['hour']
+        self.wrf_run = params['run']
+        print('GfsSensorOperator|gfs_hour : ', self.gfs_hour)
+        print('GfsSensorOperator|wrf_run : ', self.wrf_run)
         super(GfsSensorOperator, self).__init__(*args, **kwargs)
 
     def poke(self, context):
         try:
             print('-----------------------------------------------------------------------')
-            init_task_id = self.init_task_id
-            task_info = context['task_instance'].xcom_pull(task_ids=init_task_id)
-            print('GfsSensorOperator|task_info : ', task_info)
-            rule_info = context['task_instance'].xcom_pull(task_ids=init_task_id)
-            print('GfsSensorOperator|rule_info : ', rule_info)
-            gfs_hour = rule_info['hour']
-            wrf_run = rule_info['run']
-            print('GfsSensorOperator|gfs_hour : ', gfs_hour)
-            print('GfsSensorOperator|wrf_run : ', wrf_run)
-            condition = check_gfs_data(gfs_hour, wrf_run)
+            print('GfsSensorOperator|poke|context : ', context)
+            condition = check_gfs_data(self.gfs_hour, self.wrf_run)
             print('GFSsensor|condition : ', condition)
             print('-----------------------------------------------------------------------')
             return condition
