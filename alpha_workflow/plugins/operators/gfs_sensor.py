@@ -54,8 +54,6 @@ class GfsSensorOperator(BaseSensorOperator):
     @apply_defaults
     def __init__(self, params, *args, **kwargs):
         self.init_task_id = 'init_wrf'
-        self.model = params['model']
-        print('GfsSensorOperator|[init_task_id, model]: ', [self.init_task_id, self.model])
         super(GfsSensorOperator, self).__init__(*args, **kwargs)
 
     def poke(self, context):
