@@ -1,10 +1,13 @@
 import pymysql
 from datetime import datetime, timedelta
 import traceback
-from db_plugin import get_cell_mapping, select_distinct_observed_stations, \
+from weather_models.flo2d.db_plugin import get_cell_mapping, select_distinct_observed_stations, \
     select_obs_station_precipitation_for_timestamp
+# from db_plugin import get_cell_mapping, select_distinct_observed_stations, \
+#     select_obs_station_precipitation_for_timestamp
 import os
-from utils import search_value_in_dictionary_list
+from weather_models.flo2d.utils import search_value_in_dictionary_list
+# from utils import search_value_in_dictionary_list
 
 DATE_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 INVALID_VALUE = -9999
@@ -287,8 +290,8 @@ def create_raincell(dir_path, run_date, run_time, forward, backward, model):
     print('create_raincell|raincell_file_path : ', raincell_file_path)
     start_time = datetime.now()
     if not os.path.isfile(raincell_file_path):
-        prepare_raincell(raincell_file_path, target_model=model, start_time=time_limits['obs_start'], end_time=time_limits['forecast_time'])
-        #generate_raincell(raincell_file_path, time_limits, model, 1, None, None)
+        #prepare_raincell(raincell_file_path, target_model=model, start_time=time_limits['obs_start'], end_time=time_limits['forecast_time'])
+        generate_raincell(raincell_file_path, time_limits, model, 1, None, None)
     else:
         print('Raincell file already in path : ', raincell_file_path)
     end_time = datetime.now()
@@ -298,7 +301,9 @@ def create_raincell(dir_path, run_date, run_time, forward, backward, model):
 
 if __name__ == '__main__':
     try:
+        # create_raincell('/home/hasitha/PycharmProjects/DSS-Framework/output',
+        #                 '2020-01-27', '08:00:00', 3, 2, 'flo2d_250', 0, 1, 'mwrf_gfs_d0_00')
         create_raincell('/home/hasitha/PycharmProjects/DSS-Framework/output',
-                        '2020-01-27', '08:00:00', 3, 2, 'flo2d_250', 0, 1, 'mwrf_gfs_d0_00')
+                        '2020-03-10', '08:00:00', 3, 2, 'flo2d_250')
     except Exception as e:
         print(str(e))
