@@ -75,5 +75,3 @@ def get_pump_trigger_payload(dss_adapter, id_list):
             return flo2d_rule
     return None
 
-
-

@@ -951,6 +951,23 @@ class RuleEngineAdapter:
             print('get_pump_operating_rules|no ids.')
             return []
 
+    def get_logic_rules(self, id_list, status=1):
+        print('get_logic_rules|id_list : ', id_list)
+        if len(id_list) > 0:
+            rule_list = []
+            for id in id_list:
+                sql_query = 'select id,name,logic from dss.rule_logics ' \
+                            'where id={};'.format(status, id)
+                print('get_logic_rules|sql_query : ', sql_query)
+                result = self.get_single_row(sql_query)
+                print('get_logic_rules|result : ', result)
+                if result is not None:
+                    rule_list.append({'id': result[0], 'name': result[1], 'logic': result[2]})
+            return rule_list
+        else:
+            print('get_logic_rules|no ids.')
+            return []
+
 
 if __name__ == "__main__":
     # db_config = {'mysql_user': 'admin', 'mysql_password': 'floody', 'mysql_host': '35.227.163.211', 'mysql_db': 'dss',
