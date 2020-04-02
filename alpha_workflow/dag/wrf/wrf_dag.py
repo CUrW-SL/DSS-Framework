@@ -82,8 +82,7 @@ def get_timeout(timeout):
     return timeout_in_timedelta
 
 
-def allowed_to_proceed(**context):
-    rule_id = get_rule_id(context)
+def allowed_to_proceed(rule_id):
     print('allowed_to_proceed|rule_id : ', rule_id)
     if rule_id is not None:
         adapter = get_dss_db_adapter()
@@ -130,7 +129,7 @@ def get_wrf_run_command(**context):
     vm_user = vm_config['user']
     vm_password = vm_config['password']
     print('get_wrf_run_command|wrf_rule_id : ', wrf_rule_id)
-    allowed_to_proceed(context)
+    allowed_to_proceed(wrf_rule_id)
     wrf_rule = get_rule_by_id(wrf_rule_id)
     if wrf_rule is not None:
         wrf_model = wrf_rule['target_model']
