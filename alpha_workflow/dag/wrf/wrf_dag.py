@@ -164,7 +164,7 @@ def get_wrf_run_command(**context):
 def get_push_command(**context):
     wrf_rule_id = get_rule_id(context)
     print('get_wrf_run_command|wrf_rule_id : ', wrf_rule_id)
-    allowed_to_proceed(context)
+    allowed_to_proceed(wrf_rule_id)
     wrf_rule = get_rule_by_id(wrf_rule_id)
     if wrf_rule is not None:
         print('get_wrf_run_command|wrf_rule : ', wrf_rule)
