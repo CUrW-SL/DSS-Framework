@@ -110,12 +110,26 @@ def get_execusion_date(context):
         if 'run_date' in rule:
             exec_datetime_str = rule['run_date']
             exec_datetime = datetime.strptime(exec_datetime_str, '%Y-%m-%d %H:%M:%S')
-            exec_date = exec_datetime.strftime('%Y-%m-%d_%H:00:00')
+            exec_date = exec_datetime.strftime('%Y-%m-%d')
         else:
             exec_datetime_str = context["execution_date"].to_datetime_string()
             exec_datetime = datetime.strptime(exec_datetime_str, '%Y-%m-%d %H:%M:%S')
-            exec_date = exec_datetime.strftime('%Y-%m-%d %H:%M:%S')
+            exec_date = exec_datetime.strftime('%Y-%m-%d')
     return exec_date
+
+
+# def get_execusion_date(context):
+#     rule = context['task_instance'].xcom_pull(task_ids='init_wrf')
+#     if rule is not None:
+#         if 'run_date' in rule:
+#             exec_datetime_str = rule['run_date']
+#             exec_datetime = datetime.strptime(exec_datetime_str, '%Y-%m-%d %H:%M:%S')
+#             exec_date = exec_datetime.strftime('%Y-%m-%d_%H:00:00')
+#         else:
+#             exec_datetime_str = context["execution_date"].to_datetime_string()
+#             exec_datetime = datetime.strptime(exec_datetime_str, '%Y-%m-%d %H:%M:%S')
+#             exec_date = exec_datetime.strftime('%Y-%m-%d %H:%M:%S')
+#     return exec_date
 
 
 def get_wrf_run_command(**context):
@@ -168,7 +182,7 @@ def get_push_command(**context):
     wrf_rule = get_rule_by_id(wrf_rule_id)
     if wrf_rule is not None:
         print('get_wrf_run_command|wrf_rule : ', wrf_rule)
-        wrf_model = wrf_rule['model']
+        wrf_model = wrf_rule['target_model']
         wrf_run = wrf_rule['run']
         gfs_hour = wrf_rule['hour']
         vm_config = Variable.get('ubuntu1_config', deserialize_json=True)
