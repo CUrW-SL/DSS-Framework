@@ -61,7 +61,7 @@ if [[ ${WRF_RUN} == 0 ]] || [[ ${WRF_RUN} == "0" ]]; then
 fi
 
 exec_date=${RUN_DATE}
-docker_tag="wrf_${VERSION}"
+docker_tag="wrf_${VERSION}_${MODEL}"
 
 echo "runner tmp_date : ${tmp_date}"
 echo "runner gfs_date : ${gfs_date}"

@@ -9,6 +9,8 @@ docker build -t curw-wrfv4:wrf_4.1.2_SE .
 docker build --no-cache -t curw-wrfv4:ubuntu1604 .
 docker build --no-cache -t curw-wrfv4:wrf_4.1.2_A .
 
+docker build --no-cache -t curw-wrf-18_04:wrf_4.1.2_A .
+
 # Run already built docker image and connect to its shell
 docker run -it curw-wrfv4:wrf_4.1.2_A /bin/bash
 docker run -it curw-wrfv4:wrf_4.1.2_C /bin/bash
