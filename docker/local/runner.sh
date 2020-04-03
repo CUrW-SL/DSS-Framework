@@ -36,7 +36,7 @@ echo "DB_NAME : $DB_NAME"
 echo "DB_HOST : $DB_HOST"
 
 
-if [[ ${WRF_RUN} == 0 ]] || [[ ${WRF_RUN} == "0" ]]; then
+if [[ ${WRF_RUN} == 1 ]] || [[ ${WRF_RUN} == "1" ]]; then
     if [ -z "$RUN_DATE" ];then
           tmp_date=`date '+%Y-%m-%d' --date="1 days ago"`
           exec_date=`date '+%Y-%m-%d'`
@@ -48,7 +48,7 @@ if [[ ${WRF_RUN} == 0 ]] || [[ ${WRF_RUN} == "0" ]]; then
     wrf_id="dwrf_${VERSION}_${WRF_RUN}_${GFS_HOUR}_${exec_date}_${MODEL}"
 fi
 
-if [[ ${WRF_RUN} == 1 ]] || [[ ${WRF_RUN} == "1" ]]; then
+if [[ ${WRF_RUN} == 0 ]] || [[ ${WRF_RUN} == "0" ]]; then
     if [ -z "$RUN_DATE" ];then
           tmp_date=`date '+%Y-%m-%d'`
           exec_date=`date '+%Y-%m-%d'`
@@ -60,6 +60,7 @@ if [[ ${WRF_RUN} == 1 ]] || [[ ${WRF_RUN} == "1" ]]; then
     wrf_id="dwrf_${VERSION}_${WRF_RUN}_${GFS_HOUR}_${exec_date}_${MODEL}"
 fi
 
+exec_date=${RUN_DATE}
 docker_tag="wrf_${VERSION}"
 
 echo "runner tmp_date : ${tmp_date}"

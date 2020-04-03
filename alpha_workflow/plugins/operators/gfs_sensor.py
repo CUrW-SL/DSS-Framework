@@ -25,8 +25,9 @@ def check_gfs_data(gfs_hour, wrf_run,
     if check_dt is not None:
         gfs_dt = datetime.strptime(check_dt, '%Y-%m-%d %H:%M:%S')
     else:
-        gfs_dt = datetime.strptime((datetime.now() - timedelta(days=int(wrf_run))).strftime('%Y-%m-%d %H:%M:%S'),
-                                   '%Y-%m-%d %H:%M:%S')
+        gfs_dt = datetime.now()
+    gfs_dt = datetime.strptime((gfs_dt - timedelta(days=int(wrf_run))).strftime('%Y-%m-%d %H:%M:%S'),
+                               '%Y-%m-%d %H:%M:%S')
     print('check_gfs_data|gfs_dt: ', gfs_dt)
     ftp = FTP(gfs_server)
     ftp.login()
