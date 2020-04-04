@@ -11,11 +11,17 @@ docker build --no-cache -t curw-wrfv4:wrf_4.1.2_A .
 
 docker build --no-cache -t curw-wrf-18_04:wrf_4.1.2_A .
 
+docker build --no-cache -t curw-wrf-18_04:wrf_4.1.2 .
+
+docker build -t curw-wrf-18_04:wrf_4.1.2 .
+
 # Run already built docker image and connect to its shell
 docker run -it curw-wrfv4:wrf_4.1.2_A /bin/bash
 docker run -it curw-wrfv4:wrf_4.1.2_C /bin/bash
 docker run -it curw-wrfv4:wrf_4.1.2_E /bin/bash
 docker run -it curw-wrfv4:wrf_4.1.2_SE /bin/bash
+
+docker run -it curw-wrf-18_04:wrf_4.1.2_A /bin/bash
 
 # view <none><none> docker images
 docker images -f dangling=true -q

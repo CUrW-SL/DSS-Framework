@@ -7,10 +7,16 @@ import sys
 
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/utils')
+from curw_obs import CurwFcstAdapter
+
+sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/utils')
 from db_util import RuleEngineAdapter
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/plugins/operators')
 from gfs_sensor import GfsSensorOperator
+
+sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/utils')
+from mean_util import update_sub_basin_mean_rain
 
 dag_pool = 'wrf_pool'
 ssh_cmd_template = 'sshpass -p \'{}\' ssh {}@{} {}'
@@ -118,18 +124,14 @@ def get_execusion_date(context):
     return exec_date
 
 
-# def get_execusion_date(context):
-#     rule = context['task_instance'].xcom_pull(task_ids='init_wrf')
-#     if rule is not None:
-#         if 'run_date' in rule:
-#             exec_datetime_str = rule['run_date']
-#             exec_datetime = datetime.strptime(exec_datetime_str, '%Y-%m-%d %H:%M:%S')
-#             exec_date = exec_datetime.strftime('%Y-%m-%d_%H:00:00')
-#         else:
-#             exec_datetime_str = context["execution_date"].to_datetime_string()
-#             exec_datetime = datetime.strptime(exec_datetime_str, '%Y-%m-%d %H:%M:%S')
-#             exec_date = exec_datetime.strftime('%Y-%m-%d %H:%M:%S')
-#     return exec_date
+def get_execution_date_time(context):
+    rule = context['task_instance'].xcom_pull(task_ids='init_wrf')
+    if rule is not None:
+        if 'run_date' in rule:
+            exec_datetime_str = rule['run_date']
+        else:
+            exec_datetime_str = context["execution_date"].to_datetime_string()
+    return exec_datetime_str
 
 
 def get_wrf_run_command(**context):
@@ -202,6 +204,25 @@ def get_push_command(**context):
         subprocess.call(push_wrf_cmd, shell=True)
     else:
         raise AirflowException('wrf rule not found')
+
+
+def update_sub_basin_mean_rain_falls(**context):
+    wrf_rule_id = get_rule_id(context)
+    print('get_wrf_run_command|wrf_rule_id : ', wrf_rule_id)
+    allowed_to_proceed(wrf_rule_id)
+    wrf_rule = get_rule_by_id(wrf_rule_id)
+    if wrf_rule is not None:
+        print('get_wrf_run_command|wrf_rule : ', wrf_rule)
+        wrf_model = wrf_rule['target_model']
+        wrf_run = wrf_rule['run']
+        gfs_hour = wrf_rule['hour']
+        wrf_version = wrf_rule['version']
+        fcst_db_config = Variable.get('fcst_db_config', deserialize_json=True)
+        fcst_adapter = CurwFcstAdapter.get_instance(fcst_db_config)
+        try:
+            update_sub_basin_mean_rain(fcst_adapter, wrf_model, wrf_version, wrf_run, gfs_hour)
+        except Exception as e:
+            print('update_sub_basin_mean_rain|Exception : ', str(e))
 
 
 def push_rule_to_xcom(dag_run, **kwargs):
