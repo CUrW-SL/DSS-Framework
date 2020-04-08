@@ -83,37 +83,51 @@ def create_trigger_dag_run(context):
     allowed_to_proceed_by_id(dag_rule_id)
     print('create_trigger_dag_run|[run_date, task_name, dag_rule_id] : ', [run_date, task_name, dag_rule_id])
     dss_adapter = get_dss_db_adapter()
-    payload = {}
+    payloads = []
     dag_info = []
     if dss_adapter is not None:
         target_dag_info = get_trigger_target_dag(dss_adapter, dag_rule_id, task_name)
         print('create_trigger_dag_run|target_dag_info : ', target_dag_info)
         model_type = target_dag_info['input_params']['model_type']
-        model_rule = target_dag_info['input_params']['rule_id']
-        print('create_trigger_dag_run|[model_type, model_rule] : ', [model_type, model_rule])
+        model_rules = target_dag_info['input_params']['rule_id']
+        print('create_trigger_dag_run|[model_type, model_rules] : ', [model_type, model_rules])
         if 'run_date' in target_dag_info['input_params']:
             run_date = target_dag_info['input_params']['run_date']
             print('********create_trigger_dag_run|run on user defined date|run_date : ', run_date)
-        print('create_trigger_dag_run|[model_type, model_rule] : ', [model_type, model_rule])
+        print('create_trigger_dag_run|[model_type, model_rules] : ', [model_type, model_rules])
         if model_type == 'wrf':
-            payload = dss_adapter.get_eligible_wrf_rule_info_by_id(model_rule)
+            for model_rule in model_rules:
+                payload = dss_adapter.get_eligible_wrf_rule_info_by_id(model_rule)
+                payloads.append(payload)
         elif model_type == 'hechms':
-            payload = dss_adapter.get_eligible_hechms_rule_info_by_id(model_rule)
+            for model_rule in model_rules:
+                payload = dss_adapter.get_eligible_hechms_rule_info_by_id(model_rule)
+                payloads.append(payload)
         elif model_type == 'flo2d':
-            payload = dss_adapter.get_eligible_flo2d_rule_info_by_id(model_rule)
+            for model_rule in model_rules:
+                payload = dss_adapter.get_eligible_flo2d_rule_info_by_id(model_rule)
+                payloads.append(payload)
         elif model_type == 'decision':
-            print('create_decision_dag|model_rule : ', model_rule)
-            payload = dss_adapter.get_eligible_decision_rule_definition_by_id(model_rule)
+            for model_rule in model_rules:
+                payload = dss_adapter.get_eligible_decision_rule_definition_by_id(model_rule)
+                payloads.append(payload)
         elif model_type == 'pump':
-            print('create_pump_dag|model_rule : ', model_rule)
-            payload = get_pump_trigger_payload(dss_adapter, model_rule)
+            for model_rule in model_rules:
+                payload = get_pump_trigger_payload(dss_adapter, model_rule)
+                payloads.append(payload)
+        elif model_type == 'event_wrf':
+            for model_rule in model_rules:
+                payload = get_pump_trigger_payload(dss_adapter, model_rule)
+                payloads.append(payload)
         else:
             print('create_trigger_dag_run|available for weather model dags only.')
-        if payload is not None:
-            payload['run_date'] = run_date
-            print('create_trigger_dag_run|payload : ', payload)
-            dag_info.append({'dag_name': payload['name'], 'payload': payload})
-            print('create_dag_run|dag_info : ', dag_info)
+        if len(payloads) > 0:
+            for payload in payloads:
+                if payload is not None:
+                    payload['run_date'] = run_date
+                    print('create_trigger_dag_run|payload : ', payload)
+                    dag_info.append({'dag_name': payload['name'], 'payload': payload})
+                    print('create_dag_run|dag_info : ', dag_info)
     return dag_info
 
 
