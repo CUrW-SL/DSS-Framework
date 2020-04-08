@@ -84,7 +84,7 @@ def create_trigger_dag_run(context):
     print('create_trigger_dag_run|[run_date, task_name, dag_rule_id] : ', [run_date, task_name, dag_rule_id])
     dss_adapter = get_dss_db_adapter()
     payloads = []
-    dag_info = []
+    dag_infos = []
     if dss_adapter is not None:
         target_dag_info = get_trigger_target_dag(dss_adapter, dag_rule_id, task_name)
         print('create_trigger_dag_run|target_dag_info : ', target_dag_info)
@@ -126,9 +126,9 @@ def create_trigger_dag_run(context):
                 if payload is not None:
                     payload['run_date'] = run_date
                     print('create_trigger_dag_run|payload : ', payload)
-                    dag_info.append({'dag_name': payload['name'], 'payload': payload})
-                    print('create_dag_run|dag_info : ', dag_info)
-    return dag_info
+                    dag_infos.append({'dag_name': payload['name'], 'payload': payload})
+                    print('create_dag_run|dag_infos : ', dag_infos)
+    return dag_infos
 
 
 # example bash command : /home/uwcc-admin/calculate.sh -a 23 -date '2020-01-11' -c 1.4
