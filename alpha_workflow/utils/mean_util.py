@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from shapely.geometry import Polygon, Point
 import geopandas as gpd
+from functools import reduce
 
 RESOURCE_PATH = '/home/curw/git/DSS-Framework/resources'
 
@@ -35,14 +36,22 @@ def get_sub_basin_stations(fcst_adapter, basin_shape_file):
 
 def get_basin_mean_rain(fcst_adapter, sim_tag, source_id, exec_date):
     basin_shape_file = os.path.join(RESOURCE_PATH, 'shape_files/150m_Boundary_wgs/150m_Boundary_wgs.shp')
-    basin_stations = get_basin_stations(fcst_adapter, basin_shape_file)
+    all_basin_stations_df = fcst_adapter.get_wrf_fcst_station_ids()
+    basin_stations = get_basin_stations(all_basin_stations_df, basin_shape_file)
     if len(basin_stations) > 0:
+        tms_df_list = []
         for basin_station in basin_stations:
             print('basin_station id : ', basin_station)
             station_hash_id = fcst_adapter.get_wrf_station_hash_id(sim_tag, source_id, basin_station)
             if station_hash_id is not None:
                 fgt_limits = get_fgt_limits(exec_date)
                 tms_df = fcst_adapter.get_stations_time_series(station_hash_id, fgt_limits)
+                tms_df_list.append(tms_df)
+        if len(tms_df_list) > 0:
+            tms_sum_df = reduce(lambda x, y: x.add(y, fill_value=0), tms_df_list)
+            tms_cum_sum_df = tms_sum_df.cumsum()
+            return tms_cum_sum_df
+    return None
 
 
 def get_fgt_limits(exec_date):
@@ -51,9 +60,8 @@ def get_fgt_limits(exec_date):
     return [exec_date, fgt_end.strftime('%Y-%m-%d')]
 
 
-def get_basin_stations(fcst_adapter, basin_shape_file):
+def get_basin_stations(all_basin_stations_df, basin_shape_file):
     basin_stations = []
-    all_basin_stations_df = fcst_adapter.get_wrf_fcst_station_ids()
     if all_basin_stations_df is not None:
         shape_attribute = ['OBJECTID', 1]
         shape_df = gpd.GeoDataFrame.from_file(basin_shape_file)

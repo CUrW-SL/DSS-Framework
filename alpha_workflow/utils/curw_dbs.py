@@ -560,7 +560,7 @@ class CurwFcstAdapter:
         print('get_station_tms|sql_query : ', sql_query)
         results = self.get_multiple_result(sql_query)
         if results is not None:
-            df = pd.DataFrame(data=results, columns=['time', 'value'])
+            df = pd.DataFrame(data=results, columns=['time', 'value']).set_index(keys='time')
             return df
         return None
 
@@ -829,4 +829,12 @@ class CurwObsAdapter:
                 variable_values = self.get_multiple_values_for_hash_ids(location_hash_ids)
                 if len(variable_values):
                     return variable_values
+        return None
+
+    def get_obs_station_ids(self):
+        sql_query = 'select id, latitude, longitude from curw_obs.station  where station_type=\'CUrW_WeatherStation\''
+        results = self.get_multiple_result(sql_query)
+        if results is not None:
+            df = pd.DataFrame(data=results, columns=['id', 'latitude', 'longitude'])
+            return df
         return None
