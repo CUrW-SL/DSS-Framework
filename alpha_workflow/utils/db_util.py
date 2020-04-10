@@ -203,7 +203,7 @@ class RuleEngineAdapter:
             print('get_wrf_rule_status_by_id|wrf_rule : ', wrf_rule)
         return wrf_rule
 
-    def update_wrf_rule_status(self, rule_id, status):
+    def update_wrf_rule_status(self, status, rule_id):
         query = 'update `dss`.`wrf_rules` set `status`=\'{}\' ' \
                 'WHERE `id`=\'{}\';'.format(status, rule_id)
         print('update_wrf_rule_status|query : ', query)

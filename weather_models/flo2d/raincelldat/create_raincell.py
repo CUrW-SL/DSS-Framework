@@ -2,12 +2,10 @@ import pymysql
 from datetime import datetime, timedelta
 import traceback
 from weather_models.flo2d.db_plugin import get_cell_mapping, select_distinct_observed_stations, \
-    select_obs_station_precipitation_for_timestamp
-# from db_plugin import get_cell_mapping, select_distinct_observed_stations, \
-#     select_obs_station_precipitation_for_timestamp
+    select_obs_station_precipitation_for_timestamp, select_fcst_station_precipitation_for_timestamp, \
+    select_distinct_forecast_stations
 import os
 from weather_models.flo2d.utils import search_value_in_dictionary_list
-# from utils import search_value_in_dictionary_list
 
 DATE_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 INVALID_VALUE = -9999
@@ -56,8 +54,8 @@ def prepare_raincell(raincell_file_path, start_time, end_time,
     print("************Connected to database**************")
 
     print('prepare_raincell|[start_time, end_time, target_model] : ', [start_time, end_time, target_model])
-    #end_time = datetime.strptime(end_time, DATE_TIME_FORMAT)
-    #start_time = datetime.strptime(start_time, DATE_TIME_FORMAT)
+    # end_time = datetime.strptime(end_time, DATE_TIME_FORMAT)
+    # start_time = datetime.strptime(start_time, DATE_TIME_FORMAT)
 
     if end_time < start_time:
         print("start_time should be less than end_time")
@@ -93,7 +91,6 @@ def prepare_raincell(raincell_file_path, start_time, end_time,
     write_to_file(raincell_file_path,
                   ['{} {} {} {}\n'.format(timestep, length, start_time.strftime(DATE_TIME_FORMAT),
                                           end_time.strftime(DATE_TIME_FORMAT))])
-    print('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
     try:
         timestamp = start_time
         while timestamp < end_time:
@@ -146,7 +143,8 @@ def create_sim_hybrid_raincell(dir_path, run_date, run_time, forward, backward,
         print('Raincell file already in path : ', raincell_file_path)
 
 
-def generate_raincell(raincell_file_path, time_limits, model, data_type, any_wrf=None, sim_tag=None):
+def generate_raincell(raincell_file_path, time_limits, model, data_type, sim_tag=None):
+    print('[raincell_file_path, time_limits, model, data_type, sim_tag] : ', [raincell_file_path, time_limits, model, data_type, sim_tag])
     sim_connection = pymysql.connect(host=HOST, user=USER, password=PASSWORD, db=SIM_DB,
                                      cursorclass=pymysql.cursors.DictCursor)
     fcst_connection = pymysql.connect(host=HOST, user=USER, password=PASSWORD, db=FCST_DB,
@@ -166,21 +164,24 @@ def generate_raincell(raincell_file_path, time_limits, model, data_type, any_wrf
     write_to_file(raincell_file_path,
                   ['{} {} {} {}\n'.format(timestep, length, start_time.strftime(DATE_TIME_FORMAT),
                                           end_time.strftime(DATE_TIME_FORMAT))])
-
     print('generate_raincell|raincell_file_path : ', raincell_file_path)
     grid_maps = get_cell_mapping(sim_connection, model)
-    station_id_list = select_distinct_observed_stations(sim_connection, model)
-    station_ids = ','.join(str(i) for i in station_id_list)
-    print('station_ids : ', station_ids)
+    obs_station_id_list = select_distinct_observed_stations(sim_connection, model)
+    obs_station_ids = ','.join(str(i) for i in obs_station_id_list)
+    print('obs_station_ids : ', obs_station_ids)
+    fcst_station_id_list = select_distinct_forecast_stations(sim_connection, model)
+    fcst_station_ids = ','.join(str(i) for i in fcst_station_id_list)
+    print('fcst_station_ids : ', fcst_station_ids)
     if data_type == 1:  # Observed only
         try:
             timestamp = start_time
             while timestamp < run_time:
                 timestamp = timestamp + timedelta(minutes=timestep)
-                obs_station_precipitations = select_obs_station_precipitation_for_timestamp(obs_connection, station_ids,
+                obs_station_precipitations = select_obs_station_precipitation_for_timestamp(obs_connection,
+                                                                                            obs_station_ids,
                                                                                             timestamp.strftime(
                                                                                                 DATE_TIME_FORMAT))
-                raincell_entries = get_raincell_entries_for_timestamp(grid_maps, obs_station_precipitations)
+                raincell_entries = get_obs_raincell_entries_for_timestamp(grid_maps, obs_station_precipitations)
                 if len(raincell_entries) > 0:
                     append_to_file(raincell_file_path, raincell_entries)
                 print(timestamp)
@@ -196,31 +197,67 @@ def generate_raincell(raincell_file_path, time_limits, model, data_type, any_wrf
             sim_connection.close()
             fcst_connection.close()
             obs_connection.close()
-            print("{} raincell generation process completed".format(datetime.now()))
+            print("{} observed raincell generation process completed".format(datetime.now()))
     elif data_type == 2:  # Forecast only
         try:
             timestamp = start_time
-            if sim_tag is not None:
-                print('')
-            else:
-                print('sim_tag is required for forecast raincell generation.')
+            while timestamp < end_time:
+                timestamp = timestamp + timedelta(minutes=timestep)
+                minutes = timestamp.strftime('%M')
+                if minutes == '00' or minutes == '15' or minutes == '30' or minutes == '45':
+                    print('15 min intervals')
+                    fcst_station_precipitations = select_fcst_station_precipitation_for_timestamp(fcst_connection,
+                                                                                                  fcst_station_ids,
+                                                                                                  timestamp.strftime(
+                                                                                                      DATE_TIME_FORMAT),
+                                                                                                  sim_tag)
+                    raincell_entries = get_fcst_raincell_entries_for_timestamp(grid_maps, fcst_station_precipitations)
+                    for i in range(3):
+                        if len(raincell_entries) > 0:
+                            append_to_file(raincell_file_path, raincell_entries)
+                print(timestamp)
         except Exception as ex:
             traceback.print_exc()
         finally:
             sim_connection.close()
             fcst_connection.close()
             obs_connection.close()
-            print("{} raincell generation process completed".format(datetime.now()))
+            print("{} forecast raincell generation process completed".format(datetime.now()))
     elif data_type == 3:  # Observed + Forecast
         try:
             timestamp = start_time
+            while timestamp < run_time:
+                timestamp = timestamp + timedelta(minutes=timestep)
+                obs_station_precipitations = select_obs_station_precipitation_for_timestamp(obs_connection,
+                                                                                            obs_station_ids,
+                                                                                            timestamp.strftime(
+                                                                                                DATE_TIME_FORMAT))
+                raincell_entries = get_obs_raincell_entries_for_timestamp(grid_maps, obs_station_precipitations)
+                if len(raincell_entries) > 0:
+                    append_to_file(raincell_file_path, raincell_entries)
+                print(timestamp)
+            while timestamp < end_time:
+                timestamp = timestamp + timedelta(minutes=timestep)
+                minutes = timestamp.strftime('%M')
+                if minutes == '00' or minutes == '15' or minutes == '30' or minutes == '45':
+                    print('15 min intervals')
+                    fcst_station_precipitations = select_fcst_station_precipitation_for_timestamp(fcst_connection,
+                                                                                                  fcst_station_ids,
+                                                                                                  timestamp.strftime(
+                                                                                                      DATE_TIME_FORMAT),
+                                                                                                  sim_tag)
+                    raincell_entries = get_fcst_raincell_entries_for_timestamp(grid_maps, fcst_station_precipitations)
+                    for i in range(3):
+                        if len(raincell_entries) > 0:
+                            append_to_file(raincell_file_path, raincell_entries)
+                print(timestamp)
         except Exception as ex:
             traceback.print_exc()
         finally:
             sim_connection.close()
             fcst_connection.close()
             obs_connection.close()
-            print("{} raincell generation process completed".format(datetime.now()))
+            print("{} hybrid raincell generation process completed".format(datetime.now()))
     else:
         print('data_type mismatched...')
 
@@ -239,7 +276,7 @@ def get_empty_raincell_entries(model):
     return raincell_entries
 
 
-def get_raincell_entries_for_timestamp(grid_maps, obs_station_precipitations):
+def get_obs_raincell_entries_for_timestamp(grid_maps, obs_station_precipitations):
     raincell_entries = []
     for grid_map in grid_maps:
         grid_id = int(grid_map['grid_id'].split('_')[3])
@@ -255,6 +292,22 @@ def get_raincell_entries_for_timestamp(grid_maps, obs_station_precipitations):
                                                                 'step_value')
                 if precipitation == INVALID_VALUE:
                     precipitation = 0
+        raincell_entry = '{} {}'.format(grid_id, '%.1f' % precipitation)
+        raincell_entries.append(raincell_entry)
+    raincell_entries.append('')
+    return raincell_entries
+
+
+def get_fcst_raincell_entries_for_timestamp(grid_maps, fcst_station_precipitations):
+    raincell_entries = []
+    for grid_map in grid_maps:
+        grid_id = int(grid_map['grid_id'].split('_')[3])
+        fcst_id = grid_map['fcst']
+        precipitation = search_value_in_dictionary_list(fcst_station_precipitations, 'station_id', fcst_id,
+                                                        'step_value')
+        precipitation = precipitation / 3
+        if precipitation == INVALID_VALUE:
+            precipitation = 0
         raincell_entry = '{} {}'.format(grid_id, '%.1f' % precipitation)
         raincell_entries.append(raincell_entry)
     raincell_entries.append('')
@@ -282,15 +335,14 @@ def get_ts_start_end_for_data_type(run_date, run_time, forward=3, backward=2):
     return result
 
 
-def create_raincell(dir_path, run_date, run_time, forward, backward, model):
+def create_raincell(dir_path, run_date, run_time, forward, backward, model, sim_tag='dwrf_gfs_d1_18', data_type=1):
     time_limits = get_ts_start_end_for_data_type(run_date, run_time, forward, backward)
     raincell_file_path = os.path.join(dir_path, 'RAINCELL.DAT')
     print('create_raincell|time_limits : ', time_limits)
     print('create_raincell|raincell_file_path : ', raincell_file_path)
     start_time = datetime.now()
     if not os.path.isfile(raincell_file_path):
-        #prepare_raincell(raincell_file_path, target_model=model, start_time=time_limits['obs_start'], end_time=time_limits['forecast_time'])
-        generate_raincell(raincell_file_path, time_limits, model, 1, None, None)
+        generate_raincell(raincell_file_path, time_limits, model, data_type, sim_tag)
     else:
         print('Raincell file already in path : ', raincell_file_path)
     end_time = datetime.now()
@@ -300,8 +352,6 @@ def create_raincell(dir_path, run_date, run_time, forward, backward, model):
 
 if __name__ == '__main__':
     try:
-        # create_raincell('/home/hasitha/PycharmProjects/DSS-Framework/output',
-        #                 '2020-01-27', '08:00:00', 3, 2, 'flo2d_250', 0, 1, 'mwrf_gfs_d0_00')
         create_raincell('/home/hasitha/PycharmProjects/DSS-Framework/output',
                         '2020-03-10', '08:00:00', 3, 2, 'flo2d_250')
     except Exception as e:

@@ -174,15 +174,18 @@ def get_timeout_in_seconds(timeout):
     return total_seconds
 
 
-def get_sensor_sql_query(model_type, model_rule_id):
-    print('get_sensor_sql_query|[model_type, model_rule_id] : ', [model_type, model_rule_id])
+def get_sensor_sql_query(model_type, model_rule_ids):
+    print('get_sensor_sql_query|[model_type, model_rule_ids] : ', [model_type, model_rule_ids])
+    model_rules = ','.join([str(x) for x in model_rule_ids])
     sql_query = None
-    if model_type == 'hechms':
-        sql_query = 'select TRUE from dss.hechms_rules where id={} and status in (3, 4)'.format(model_rule_id)
+    if model_type == 'wrf':
+        sql_query = 'select TRUE from dss.hechms_rules where id in ({}) and status in (3, 4)'.format(model_rules)
+    elif model_type == 'hechms':
+        sql_query = 'select TRUE from dss.hechms_rules where id in ({}) and status in (3, 4)'.format(model_rules)
     elif model_type == 'flo2d':
-        sql_query = 'select TRUE from dss.flo2d_rules where id={} and status in (3, 4)'.format(model_rule_id)
+        sql_query = 'select TRUE from dss.flo2d_rules where id in ({}) and status in (3, 4)'.format(model_rules)
     elif model_type == 'decision':
-        sql_query = 'select TRUE from dss.rule_definition where id={} and status in (3, 4)'.format(model_rule_id)
+        sql_query = 'select TRUE from dss.rule_definition where id in ({}) and status in (3, 4)'.format(model_rules)
     else:
         print('get_sensor_sql_query|no sql for the model type')
     return sql_query

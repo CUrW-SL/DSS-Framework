@@ -40,7 +40,32 @@ def select_obs_station_precipitation_for_timestamp(obs_connection, station_ids, 
             'where station_tbl.hash_id = time_tbl.hash_id;'.format(station_ids, time_step)
     print('select_obs_station_precipitation_for_timestamp|query : ', query)
     rows = get_multiple_result(obs_connection, query)
-    print('select_obs_station_precipitation_for_timestamp|rows : ', rows)
+    return rows
+
+
+def select_distinct_forecast_stations(fcst_connection, flo2d_model):
+    if 'flo2d_150' == flo2d_model:
+        query = 'select distinct(fcst) from curw_sim.grid_map_flo2d_raincell where grid_id like "flo2d_150_%" ;'
+    elif 'flo2d_250' == flo2d_model:
+        query = 'select distinct(fcst) from curw_sim.grid_map_flo2d_raincell where grid_id like "flo2d_250_%" ;'
+    print('select_distinct_forecast_stations|query : ', query)
+    rows = get_multiple_result(fcst_connection, query)
+    # print('select_distinct_observed_stations|rows : ', rows)
+    id_list = []
+    for row in rows:
+        id_list.append(row['fcst'])
+    print('select_distinct_forecast_stations|id_list : ', id_list)
+    return id_list
+
+
+def select_fcst_station_precipitation_for_timestamp(fcst_connection, station_ids, time_step, sim_tag='dwrf_gfs_d1_18'):
+    query = 'select station_tbl.station_id,time_tbl.step_value from ' \
+            '(select id as hash_id, station as station_id from curw_fcst.run where unit=1 and variable=1 ' \
+            'and sim_tag=\'{}\' and station in ({})) station_tbl,' \
+            '(select id as hash_id, value as step_value from curw_fcst.data where time=\'{}\') time_tbl ' \
+            'where station_tbl.hash_id = time_tbl.hash_id;'.format(sim_tag, station_ids, time_step)
+    print('select_fcst_station_precipitation_for_timestamp|query : ', query)
+    rows = get_multiple_result(fcst_connection, query)
     return rows
 
 
