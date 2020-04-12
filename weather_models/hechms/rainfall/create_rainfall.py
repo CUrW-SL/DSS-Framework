@@ -5,14 +5,24 @@ import geopandas as gpd
 import numpy as np
 from scipy.spatial import Voronoi
 from shapely.geometry import Polygon, Point
-from db_layer import CurwSimAdapter
-from resources import manager as res_mgr
-from config import MYSQL_USER, MYSQL_DB, MYSQL_HOST, MYSQL_PASSWORD
 from functools import reduce
+import pymysql
+from datetime import datetime, timedelta
+
+from weather_models.hechms.rainfall.db_plugin import get_basin_available_stations_timeseries
 
 THESSIAN_DECIMAL_POINTS = 4
 
-RESOURCE_PATH = '/home/curw/git/distributed_hechms/resources'
+RESOURCE_PATH = '/home/hasitha/PycharmProjects/DSS-Framework/resources/shape_files'
+
+# connection params
+HOST = "35.227.163.211"
+USER = "admin"
+PASSWORD = "floody"
+SIM_DB = "curw_sim"
+FCST_DB = "curw_fcst"
+OBS_DB = "curw_obs"
+PORT = 3306
 
 
 def _voronoi_finite_polygons_2d(vor, radius=None):
@@ -162,20 +172,21 @@ def calculate_intersection(thessian_df, catchment_df):
     return sub_ratios
 
 
-def get_mean_rain(ts_start, ts_end, output_dir, model, pop_method, catchment='kub'):
+def get_mean_rain(run_datetime, forward, backward, output_dir, wrf_model, sim_tag='dwrf_gfs_d1_18'):
     try:
-        print('[ts_start, ts_end, output_dir, pop_method, catchment] : ', [ts_start, ts_end, output_dir,
-                                                                           pop_method, catchment])
-        sim_adapter = CurwSimAdapter(MYSQL_USER, MYSQL_PASSWORD, MYSQL_HOST, MYSQL_DB)
-        if catchment == 'kub':
-            # shape_file = res_mgr.get_resource_path('resources/kub-wgs84/kub-wgs84.shp')
-            shape_file = os.path.join(RESOURCE_PATH, 'kub-wgs84/kub-wgs84.shp')
-        else:
-            shape_file = os.path.join(RESOURCE_PATH, 'klb-wgs84/klb-wgs84.shp')
-            # shape_file = res_mgr.get_resource_path('resources/klb-wgs84/klb-wgs84.shp')
+        print('[run_datetime, forward, backward, output_dir, sim_tag] : ', [run_datetime, forward, backward, output_dir, sim_tag])
+        date_limits = get_ts_start_end(run_datetime, forward, backward)
+        print('get_mean_rain|date_limits : ', date_limits)
+        sim_connection = pymysql.connect(host=HOST, user=USER, password=PASSWORD, db=SIM_DB,
+                                         cursorclass=pymysql.cursors.DictCursor)
+        fcst_connection = pymysql.connect(host=HOST, user=USER, password=PASSWORD, db=FCST_DB,
+                                          cursorclass=pymysql.cursors.DictCursor)
+        obs_connection = pymysql.connect(host=HOST, user=USER, password=PASSWORD, db=OBS_DB,
+                                         cursorclass=pymysql.cursors.DictCursor)
+        shape_file = os.path.join(RESOURCE_PATH, 'kub-wgs84/kub-wgs84.shp')
         # {station1:{'hash_id': hash_id1, 'latitude': latitude1, 'longitude': longitude1, 'timeseries': timeseries1}}
-        available_stations = sim_adapter.get_basin_available_stations_timeseries(shape_file, ts_start, ts_end, model,
-                                                                                 pop_method, allowed_error=0.5)
+        available_stations = get_basin_available_stations_timeseries(obs_connection, fcst_connection, sim_connection, shape_file,
+                                                date_limits, sim_tag, wrf_model, max_error=0.3)
         # {'id' --> [lon, lat]}
         gauge_points = {}
         for station, info in available_stations.items():
@@ -213,7 +224,6 @@ def get_mean_rain(ts_start, ts_end, output_dir, model, pop_method, catchment='ku
         if len(catchment_rain) >= 1:
             mean_rain = catchment_rain[0].join(catchment_rain[1:])
             output_file = os.path.join(output_dir, 'DailyRain.csv')
-            # mean_rain.to_csv(output_file, header=False)
             file_handler = open(output_file, 'w')
             csvWriter = csv.writer(file_handler, delimiter=',', quotechar='|')
             # Write Metadata https://publicwiki.deltares.nl/display/FEWSDOC/CSV
@@ -229,6 +239,44 @@ def get_mean_rain(ts_start, ts_end, output_dir, model, pop_method, catchment='ku
             csvWriter.writerow(third_row)
             file_handler.close()
             mean_rain.to_csv(output_file, mode='a', header=False)
-        sim_adapter.close_connection()
+        sim_connection.close()
+        fcst_connection.close()
+        obs_connection.close()
     except Exception as e:
         print("get_mean_rain|Exception|e : ", e)
+
+
+def get_ts_start_end(run_datetime, forward=3, backward=2):
+    result = []
+    """
+    method for geting timeseries start and end using input params.
+    :param run_date:run_date: string yyyy-mm-ddd
+    :param run_time:run_time: string hh:mm:ss
+    :param forward:int
+    :param backward:int
+    :return: tuple (string, string)
+    """
+    run_datetime_tmp = datetime.strptime(run_datetime, '%Y-%m-%d %H:%M:%S')
+    print('get_ts_start_end|run_datetime_tmp : ', run_datetime_tmp)
+    run_date = run_datetime_tmp.strftime('%Y-%m-%d')
+    run_datetime_tmp = datetime.strptime('%s %s' % (run_date, '00:00:00'), '%Y-%m-%d %H:%M:%S')
+    ts_start_datetime = run_datetime_tmp - timedelta(days=backward)
+    ts_end_datetime = run_datetime_tmp + timedelta(days=forward)
+    result.append(ts_start_datetime.strftime('%Y-%m-%d %H:%M:%S'))
+    result.append(run_datetime)
+    result.append(ts_end_datetime.strftime('%Y-%m-%d %H:%M:%S'))
+    print(result)
+    return result
+
+
+if __name__ == '__main__':
+    try:
+        output_dir = '/home/hasitha/PycharmProjects/DSS-Framework/output/hechms'
+        run_datetime = '2020-03-10 08:00:00'
+        forward = 3
+        backward = 2
+        wrf_model = 19
+        get_mean_rain(run_datetime, forward, backward, output_dir, wrf_model, sim_tag='dwrf_gfs_d1_18')
+    except Exception as e:
+        print(str(e))
+
