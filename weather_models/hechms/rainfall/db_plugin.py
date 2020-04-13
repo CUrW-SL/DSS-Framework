@@ -188,7 +188,11 @@ def get_fcst_timeseries_by_id(fcst_connection, station_id, sim_tag, wrf_model, t
         data_sql = 'select time,value from curw_fcst.data where id=\'{}\' and time>\'{}\' ' \
                    'and time <= \'{}\';'.format(hash_id, timeseries_start, timeseries_end)
         rows = get_multiple_result(fcst_connection, data_sql)
-        df = pd.DataFrame(data=rows, columns=['time', 'value']).set_index(keys='time')
+        df = pd.DataFrame(data=rows, columns=['time', 'value'])
+        df['time'] = pd.to_datetime(df['time'])
+        df = (df.set_index('time').resample('5T').first().reset_index().reindex(columns=df.columns))
+        df.set_index(keys='time')
+        df.interpolate(method='linear', limit_direction='forward')
         return df
     return None
 
