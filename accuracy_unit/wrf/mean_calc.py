@@ -1,5 +1,9 @@
+from decimal import Decimal
+from functools import reduce
+import pandas as pd
 import pymysql
 import os
+import matplotlib.pyplot as plt
 from accuracy_unit.db_plugin import get_wrf_basin_stations, \
     get_wrf_station_hash_ids, get_station_timeseries, get_latest_fgt, \
     get_obs_basin_stations, get_obs_station_hash_ids, get_obs_station_timeseries
@@ -25,8 +29,46 @@ def calculate_wrf_model_mean(sim_tag, wrf_model, start_time, end_time):
                                      cursorclass=pymysql.cursors.DictCursor)
     # shape_file = os.path.join(RESOURCE_PATH, 'klb-wgs84/klb-wgs84.shp')
     shape_file = os.path.join(RESOURCE_PATH, 'Kalani_basin_hec_wgs/Kalani_basin_hec_wgs.shp')
-    get_obs_cum_mean_df(obs_connection, shape_file, start_time, end_time)
-    get_fcst_cum_mean_df(fcst_connection, shape_file, sim_tag, wrf_model, start_time, end_time)
+    obs_cum_mean_df = get_obs_cum_mean_df(obs_connection, shape_file, start_time, end_time)
+    if obs_cum_mean_df is not None:
+        fcst_cum_mean_df = get_fcst_cum_mean_df(fcst_connection, shape_file, sim_tag, wrf_model, start_time, end_time)
+        if fcst_cum_mean_df is not None:
+            obs_cum_mean_df = pd.DataFrame({'time': obs_cum_mean_df.index, 'observed': obs_cum_mean_df.values})
+            fcst_cum_mean_df = pd.DataFrame({'time': fcst_cum_mean_df.index, 'forecast': fcst_cum_mean_df.values})
+            print('calculate_wrf_model_mean|type(obs_cum_mean_df)', type(obs_cum_mean_df))
+            print('calculate_wrf_model_mean|type(fcst_cum_mean_df)', type(fcst_cum_mean_df))
+            [formatted_obs_cum_mean_df, formatted_fcst_cum_mean_df] = get_common_start_end(obs_cum_mean_df, fcst_cum_mean_df)
+            print('calculate_wrf_model_mean|formatted_obs_cum_mean_df : ', formatted_obs_cum_mean_df)
+            print('calculate_wrf_model_mean|formatted_fcst_cum_mean_df : ', formatted_fcst_cum_mean_df)
+            compare_cum_mean_df = pd.merge(formatted_obs_cum_mean_df, formatted_fcst_cum_mean_df, left_on='time', right_on='time')
+            compare_cum_mean_df.observed = pd.to_numeric(compare_cum_mean_df.observed)
+            compare_cum_mean_df.forecast = pd.to_numeric(compare_cum_mean_df.forecast)
+            print('calculate_wrf_model_mean|compare_cum_mean_df : ', compare_cum_mean_df)
+            ax = plt.gca()
+            compare_cum_mean_df.plot(kind='line', x='time', y='observed', ax=ax)
+            compare_cum_mean_df.plot(kind='line', x='time', y='forecast', color='red', ax=ax)
+            plt.show()
+            # plt.savefig('/home/hasitha/PycharmProjects/DSS-Framework/output/mean_rain_{}.png'.format(wrf_model))
+
+
+def get_common_start_end(obs_cum_mean_df, fcst_cum_mean_df):
+    print('get_common_start_end|type(obs_cum_mean_df):', type(obs_cum_mean_df))
+    print('get_common_start_end|obs_cum_mean_df :', obs_cum_mean_df)
+    print('get_common_start_end|type(fcst_cum_mean_df):', type(fcst_cum_mean_df))
+    print('get_common_start_end|fcst_cum_mean_df :', fcst_cum_mean_df)
+    if len(obs_cum_mean_df.index) - len(fcst_cum_mean_df.index) > 0:
+        smallest_df = fcst_cum_mean_df
+    else:
+        smallest_df = obs_cum_mean_df
+    start = smallest_df.iloc[0]['time']
+    end = smallest_df.iloc[-1]['time']
+    print('get_common_start_end|start : ', start)
+    print('get_common_start_end|end : ', end)
+    obs_cum_mean_df1 = obs_cum_mean_df[obs_cum_mean_df['time'] >= start]
+    obs_cum_mean_df2 = obs_cum_mean_df1[obs_cum_mean_df1['time'] <= end]
+    fcst_cum_mean_df1 = fcst_cum_mean_df[fcst_cum_mean_df['time'] >= start]
+    fcst_cum_mean_df2 = fcst_cum_mean_df1[fcst_cum_mean_df1['time'] <= end]
+    return [obs_cum_mean_df2, fcst_cum_mean_df2]
 
 
 def get_obs_cum_mean_df(obs_connection, shape_file, start_time, end_time, max_error=0.7):
@@ -38,8 +80,8 @@ def get_obs_cum_mean_df(obs_connection, shape_file, start_time, end_time, max_er
         hash_ids = get_obs_station_hash_ids(obs_connection, basin_points, start_time)
         for hash_id in hash_ids:
             df = get_obs_station_timeseries(obs_connection, hash_id, start_time, end_time, max_error)
-            print('get_obs_cum_mean_df|df : ', df)
             if df is not None:
+                df.to_csv('/home/hasitha/PycharmProjects/DSS-Framework/output/obs_rain_{}.csv'.format(station_count))
                 if station_count == 0:
                     total_df = df
                 else:
@@ -65,7 +107,7 @@ def get_fcst_cum_mean_df(fcst_connection, shape_file, sim_tag, wrf_model, start_
         print('calculate_wrf_model_mean|latest_fgt : ', latest_fgt)
         for hash_id in hash_ids:
             df = get_station_timeseries(fcst_connection, hash_id, latest_fgt, start_time, end_time)
-            print('calculate_wrf_model_mean|df : ', df)
+            # print('calculate_wrf_model_mean|df : ', df)
             if df is not None:
                 if station_count == 0:
                     total_df = df
@@ -85,6 +127,9 @@ def get_fcst_cum_mean_df(fcst_connection, shape_file, sim_tag, wrf_model, start_
 if __name__ == '__main__':
     try:
         run_datetime = '2020-03-10 08:00:00'
-        calculate_wrf_model_mean('dwrf_gfs_d1_18', 19, '2020-03-08 00:00:00', '2020-03-09 00:00:00')
+        calculate_wrf_model_mean('gfs_d0_18', 19, '2020-01-03 00:00:00', '2020-01-04 00:00:00')
+        calculate_wrf_model_mean('gfs_d0_18', 20, '2020-01-03 00:00:00', '2020-01-04 00:00:00')
+        calculate_wrf_model_mean('gfs_d0_18', 21, '2020-01-03 00:00:00', '2020-01-04 00:00:00')
+        calculate_wrf_model_mean('gfs_d0_18', 22, '2020-01-03 00:00:00', '2020-01-04 00:00:00')
     except Exception as e:
         print(str(e))

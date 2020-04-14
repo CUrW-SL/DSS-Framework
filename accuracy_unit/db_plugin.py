@@ -64,7 +64,7 @@ def get_wrf_station_hash_ids(fcst_connection, sim_tag, wrf_model_id, basin_point
 
 def get_station_timeseries(fcst_connection, hash_id, latest_fgt, start_time, end_time):
     sql_query = 'select time,value from curw_fcst.data where id=\'{}\' and time>=\'{}\' ' \
-                'and time<\'{}\' and fgt=\'{}\''.format(hash_id, start_time, end_time, latest_fgt)
+                'and time<=\'{}\' and fgt=\'{}\''.format(hash_id, start_time, end_time, latest_fgt)
     rows = get_multiple_result(fcst_connection, sql_query)
     df = pd.DataFrame(data=rows, columns=['time', 'value'])
     df['time'] = pd.to_datetime(df['time'])
