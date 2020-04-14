@@ -128,7 +128,7 @@ def get_obs_station_timeseries(obs_connection, hash_id, timeseries_start, timese
                         formatted_ts.append({'time': tms_step, 'value': Decimal(0)})
                     i += 1
                 df = pd.DataFrame(data=formatted_ts, columns=['time', 'value']).set_index(keys='time')
-                print('get_station_timeseries|df: ', df)
+                # print('get_station_timeseries|df: ', df)
                 return df
             else:
                 print('data_error : {}'.format(data_error))

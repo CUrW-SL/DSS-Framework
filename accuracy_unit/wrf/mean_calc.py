@@ -1,5 +1,6 @@
 from decimal import Decimal
 from functools import reduce
+from sklearn.metrics import mean_squared_error
 import pandas as pd
 import pymysql
 import os
@@ -38,12 +39,9 @@ def calculate_wrf_model_mean(sim_tag, wrf_model, start_time, end_time):
             compare_cum_mean_df = pd.merge(formatted_obs_cum_mean_df, formatted_fcst_cum_mean_df, left_on='time', right_on='time')
             compare_cum_mean_df.observed = pd.to_numeric(compare_cum_mean_df.observed)
             compare_cum_mean_df.forecast = pd.to_numeric(compare_cum_mean_df.forecast)
-            print('calculate_wrf_model_mean|compare_cum_mean_df : ', compare_cum_mean_df)
-            ax = plt.gca()
-            compare_cum_mean_df.plot(kind='line', x='time', y='observed', ax=ax)
-            compare_cum_mean_df.plot(kind='line', x='time', y='forecast', ax=ax)
-            plt.show()
-            # plt.savefig('/home/hasitha/PycharmProjects/DSS-Framework/output/mean_rain_{}.png'.format(wrf_model))
+            # print('calculate_wrf_model_mean|compare_cum_mean_df : ', compare_cum_mean_df)
+            rmse = ((compare_cum_mean_df.observed - compare_cum_mean_df.forecast) ** 2).mean() ** .5
+            print('calculate_wrf_model_mean|{wrf_model, rmse} : ', {wrf_model, rmse})
 
 
 def get_common_start_end(obs_cum_mean_df, fcst_cum_mean_df):
@@ -53,8 +51,6 @@ def get_common_start_end(obs_cum_mean_df, fcst_cum_mean_df):
         smallest_df = obs_cum_mean_df
     start = smallest_df.iloc[0]['time']
     end = smallest_df.iloc[-1]['time']
-    print('get_common_start_end|start : ', start)
-    print('get_common_start_end|end : ', end)
     obs_cum_mean_df1 = obs_cum_mean_df[obs_cum_mean_df['time'] >= start]
     obs_cum_mean_df2 = obs_cum_mean_df1[obs_cum_mean_df1['time'] <= end]
     fcst_cum_mean_df1 = fcst_cum_mean_df[fcst_cum_mean_df['time'] >= start]
@@ -72,17 +68,14 @@ def get_obs_cum_mean_df(obs_connection, shape_file, start_time, end_time, max_er
         for hash_id in hash_ids:
             df = get_obs_station_timeseries(obs_connection, hash_id, start_time, end_time, max_error)
             if df is not None:
-                df.to_csv('/home/hasitha/PycharmProjects/DSS-Framework/output/obs_rain_{}.csv'.format(station_count))
                 if station_count == 0:
                     total_df = df
                 else:
                     total_df = total_df.add(df, fill_value=0)
                 station_count += 1
         if total_df is not None:
-            print('get_obs_cum_mean_df|total_df : ', total_df)
             obs_mean_df = total_df['value'] / station_count
             obs_cum_mean_df = obs_mean_df.cumsum()
-            print('get_obs_cum_mean_df|obs_cum_mean_df : ', obs_cum_mean_df)
             obs_cum_mean_df.to_csv('/home/hasitha/PycharmProjects/DSS-Framework/output/obs_cum_mean_df.csv')
             return obs_cum_mean_df
 
@@ -95,10 +88,8 @@ def get_fcst_cum_mean_df(fcst_connection, shape_file, sim_tag, wrf_model, start_
         print(basin_points)
         hash_ids = get_wrf_station_hash_ids(fcst_connection, sim_tag, wrf_model, basin_points)
         latest_fgt = get_latest_fgt(fcst_connection, hash_ids[0], start_time)
-        print('calculate_wrf_model_mean|latest_fgt : ', latest_fgt)
         for hash_id in hash_ids:
             df = get_station_timeseries(fcst_connection, hash_id, latest_fgt, start_time, end_time)
-            # print('calculate_wrf_model_mean|df : ', df)
             if df is not None:
                 if station_count == 0:
                     total_df = df
@@ -106,11 +97,8 @@ def get_fcst_cum_mean_df(fcst_connection, shape_file, sim_tag, wrf_model, start_
                     total_df = total_df.add(df, fill_value=0)
                 station_count += 1
         if total_df is not None:
-            print('calculate_wrf_model_mean|total_df : ', total_df)
-            total_df.to_csv('/home/hasitha/PycharmProjects/DSS-Framework/output/rain.csv')
             fcst_mean_df = total_df['value'] / station_count
             fcst_cum_mean_df = fcst_mean_df.cumsum()
-            print('calculate_wrf_model_mean|fcst_cum_mean_df : ', fcst_cum_mean_df)
             fcst_cum_mean_df.to_csv('/home/hasitha/PycharmProjects/DSS-Framework/output/fcst_cum_mean_df.csv')
             return fcst_cum_mean_df
 
