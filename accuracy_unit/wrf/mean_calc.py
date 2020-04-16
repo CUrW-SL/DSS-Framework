@@ -41,7 +41,7 @@ def calculate_wrf_model_mean(sim_tag, wrf_model, start_time, end_time):
             compare_cum_mean_df.forecast = pd.to_numeric(compare_cum_mean_df.forecast)
             # print('calculate_wrf_model_mean|compare_cum_mean_df : ', compare_cum_mean_df)
             rmse = ((compare_cum_mean_df.observed - compare_cum_mean_df.forecast) ** 2).mean() ** .5
-            print('calculate_wrf_model_mean|{wrf_model, rmse} : ', {wrf_model, rmse})
+            print('calculate_wrf_model_mean|{sim_tag, wrf_model, rmse} : ', {sim_tag, wrf_model, rmse})
 
 
 def get_common_start_end(obs_cum_mean_df, fcst_cum_mean_df):
