@@ -107,7 +107,7 @@ def create_trigger_dag_run(context):
             for model_rule in model_rules:
                 payload = dss_adapter.get_eligible_flo2d_rule_info_by_id(model_rule)
                 payloads.append(payload)
-        elif model_type == 'decision':
+        elif model_type == 'decision_logic':
             for model_rule in model_rules:
                 payload = dss_adapter.get_eligible_decision_rule_definition_by_id(model_rule)
                 payloads.append(payload)
@@ -115,7 +115,7 @@ def create_trigger_dag_run(context):
             for model_rule in model_rules:
                 payload = get_pump_trigger_payload(dss_adapter, model_rule)
                 payloads.append(payload)
-        elif model_type == 'event_wrf':
+        elif model_type == 'decision_unit':
             for model_rule in model_rules:
                 payload = get_pump_trigger_payload(dss_adapter, model_rule)
                 payloads.append(payload)
