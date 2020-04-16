@@ -143,8 +143,8 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     )
 
     init_task >> run_purpose_branch >> [production_flow, event_flow]
-    production_flow >> [wrf_flow, hechms_flow]
-    event_flow >> [wrf_flow, hechms_flow]
+    production_flow >> model_selection_branch >> [wrf_flow, hechms_flow]
+    event_flow >> model_selection_branch >> [wrf_flow, hechms_flow]
 
     wrf_decision = PythonOperator(
         task_id='wrf_decision',
