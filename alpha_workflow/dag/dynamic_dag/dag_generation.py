@@ -285,8 +285,8 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
                         pool=dag_pool)
                     task_list.append(sensor)
 
-                print('create_dag|timeout:', sensor.timeout)
-                print('create_dag|dag_id', sensor.dag_id)
+                    print('create_dag|timeout:', sensor.timeout)
+                    print('create_dag|dag_id', sensor.dag_id)
         end_task = PythonOperator(
             task_id='end_task',
             provide_context=True,
