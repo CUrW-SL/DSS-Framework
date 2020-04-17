@@ -18,6 +18,7 @@ def get_triggering_decision_dag(decision_config):
     dag_info = None
     if decision_config is not None:
         print('get_triggering_decision_dag|decision_config : ', decision_config)
+        decision_config['name'] = 'decision_dag'
         payload = decision_config
         dag_info = {'dag_name': 'decision_dag', 'payload': payload}
     else:
