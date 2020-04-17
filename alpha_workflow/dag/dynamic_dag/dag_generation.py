@@ -123,9 +123,7 @@ def create_trigger_dag_run(context):
             decision_config = target_dag_info['input_params']
             decision_config['name'] = 'decision_dag'
             print('create_trigger_dag_run|xxxxxxxxxxxxxxx|decision_config : ', decision_config)
-            payload = decision_config
-            print('create_trigger_dag_run|xxxxxxxxxxxxxxx|payload : ', payload)
-            payloads.append(payload)
+            payloads.append(decision_config)
         else:
             print('create_trigger_dag_run|available for weather model dags only.')
         print('create_trigger_dag_run|payloads : ', payloads)
@@ -134,6 +132,9 @@ def create_trigger_dag_run(context):
                 if payload is not None:
                     payload['run_date'] = run_date
                     print('create_trigger_dag_run|payload : ', payload)
+                    #{'dag_name': 'decision_dag',
+                    # 'payload': {'model_type': 'decision_unit', 'decision_type': 'production', 'decision_model': 'wrf', 'name': 'decision_dag'},
+                    # 'run_date': '2020-04-17 17:10:10'}
                     dag_infos.append({'dag_name': payload['name'], 'payload': payload})
                     print('create_dag_run|dag_infos : ', dag_infos)
     return dag_infos
