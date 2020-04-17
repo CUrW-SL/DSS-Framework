@@ -266,7 +266,8 @@ def create_dag(dag_id, params, timeout, dag_tasks, default_args):
                 )
                 task_list.append(task)
 
-                if dag_task['input_params']['model_type'] != 'pump':
+                model_type = dag_task['input_params']['model_type']
+                if model_type != 'pump' and model_type != 'decision_unit':
                     wait = BashOperator(
                         task_id='wait_a_minute_task_{}'.format(index),
                         bash_command='sleep 60',
