@@ -121,8 +121,9 @@ def create_trigger_dag_run(context):
         elif model_type == 'decision_unit':
             print('create_trigger_dag_run|xxxxxxxxxxxxxxx|model_type : ', model_type)
             decision_config = target_dag_info['input_params']
+            decision_config['name'] = 'decision_dag'
             print('create_trigger_dag_run|xxxxxxxxxxxxxxx|decision_config : ', decision_config)
-            payload = get_triggering_decision_dag(decision_config)
+            payload = decision_config
             print('create_trigger_dag_run|xxxxxxxxxxxxxxx|payload : ', payload)
             payloads.append(payload)
         else:
