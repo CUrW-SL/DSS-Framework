@@ -178,16 +178,22 @@ def get_timeout_in_seconds(timeout):
 
 
 def get_sensor_sql_query(model_type, model_rule_ids):
-    print('get_sensor_sql_query|[model_type, model_rule_ids] : ', [model_type, model_rule_ids])
-    model_rules = ','.join([str(x) for x in model_rule_ids])
     sql_query = None
     if model_type == 'wrf':
+        print('get_sensor_sql_query|[model_type, model_rule_ids] : ', [model_type, model_rule_ids])
+        model_rules = ','.join([str(x) for x in model_rule_ids])
         sql_query = 'select TRUE from dss.hechms_rules where id in ({}) and status in (3, 4)'.format(model_rules)
     elif model_type == 'hechms':
+        print('get_sensor_sql_query|[model_type, model_rule_ids] : ', [model_type, model_rule_ids])
+        model_rules = ','.join([str(x) for x in model_rule_ids])
         sql_query = 'select TRUE from dss.hechms_rules where id in ({}) and status in (3, 4)'.format(model_rules)
     elif model_type == 'flo2d':
+        print('get_sensor_sql_query|[model_type, model_rule_ids] : ', [model_type, model_rule_ids])
+        model_rules = ','.join([str(x) for x in model_rule_ids])
         sql_query = 'select TRUE from dss.flo2d_rules where id in ({}) and status in (3, 4)'.format(model_rules)
-    elif model_type == 'decision':
+    elif model_type == 'decision_logic':
+        print('get_sensor_sql_query|[model_type, model_rule_ids] : ', [model_type, model_rule_ids])
+        model_rules = ','.join([str(x) for x in model_rule_ids])
         sql_query = 'select TRUE from dss.rule_definition where id in ({}) and status in (3, 4)'.format(model_rules)
     else:
         print('get_sensor_sql_query|no sql for the model type')
