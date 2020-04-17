@@ -104,7 +104,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     init_task = PythonOperator(
         task_id='init_task',
         provide_context=True,
-        python_callable=decide_run_purpose,
+        python_callable=push_decision_config_to_xcom,
         pool=dag_pool
     )
 
