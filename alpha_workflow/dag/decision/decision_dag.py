@@ -150,6 +150,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         task_id='wrf_decision',
         provide_context=True,
         python_callable=wrf_models_decision,
+        trigger_rule="all_done",
         pool=dag_pool
     )
 
@@ -157,6 +158,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         task_id='hechms_decision',
         provide_context=True,
         python_callable=hechms_models_decision,
+        trigger_rule="all_done",
         pool=dag_pool
     )
 
@@ -180,7 +182,8 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
 
     end_task = DummyOperator(
         task_id='end_task',
-        pool=dag_pool
+        pool=dag_pool,
+        trigger_rule="all_done"
     )
 
     wrf_decision >> end_task
