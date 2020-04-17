@@ -15,11 +15,11 @@ def get_triggering_dynamic_dags(routines):
 
 
 def get_triggering_decision_dag(decision_config):
-    dag_info = []
+    dag_info = None
     if decision_config is not None:
         print('get_triggering_decision_dag|decision_config : ', decision_config)
         payload = decision_config
-        dag_info.append({'dag_name': 'decision_dag', 'payload': payload})
+        dag_info = {'dag_name': 'decision_dag', 'payload': payload}
     else:
         print('No triggering_dags found.')
     return dag_info
