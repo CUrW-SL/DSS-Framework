@@ -8,7 +8,7 @@ import sys
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/utils')
 from dynamic_dag_util import get_all_dynamic_dag_routines, get_dynamic_dag_tasks, \
-    get_trigger_target_dag, get_pump_trigger_payload
+    get_trigger_target_dag, get_pump_trigger_payload, get_triggering_decision_dag
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/utils')
 from db_util import RuleEngineAdapter
@@ -89,36 +89,39 @@ def create_trigger_dag_run(context):
         target_dag_info = get_trigger_target_dag(dss_adapter, dag_rule_id, task_name)
         print('create_trigger_dag_run|target_dag_info : ', target_dag_info)
         model_type = target_dag_info['input_params']['model_type']
-        model_rules = target_dag_info['input_params']['rule_id']
-        print('create_trigger_dag_run|[model_type, model_rules] : ', [model_type, model_rules])
+
         if 'run_date' in target_dag_info['input_params']:
             run_date = target_dag_info['input_params']['run_date']
             print('********create_trigger_dag_run|run on user defined date|run_date : ', run_date)
-        print('create_trigger_dag_run|[model_type, model_rules] : ', [model_type, model_rules])
         if model_type == 'wrf':
+            model_rules = target_dag_info['input_params']['rule_id']
             for model_rule in model_rules:
                 payload = dss_adapter.get_eligible_wrf_rule_info_by_id(model_rule)
                 payloads.append(payload)
         elif model_type == 'hechms':
+            model_rules = target_dag_info['input_params']['rule_id']
             for model_rule in model_rules:
                 payload = dss_adapter.get_eligible_hechms_rule_info_by_id(model_rule)
                 payloads.append(payload)
         elif model_type == 'flo2d':
+            model_rules = target_dag_info['input_params']['rule_id']
             for model_rule in model_rules:
                 payload = dss_adapter.get_eligible_flo2d_rule_info_by_id(model_rule)
                 payloads.append(payload)
         elif model_type == 'decision_logic':
+            model_rules = target_dag_info['input_params']['rule_id']
             for model_rule in model_rules:
                 payload = dss_adapter.get_eligible_decision_rule_definition_by_id(model_rule)
                 payloads.append(payload)
         elif model_type == 'pump':
+            model_rules = target_dag_info['input_params']['rule_id']
             for model_rule in model_rules:
                 payload = get_pump_trigger_payload(dss_adapter, model_rule)
                 payloads.append(payload)
         elif model_type == 'decision_unit':
-            for model_rule in model_rules:
-                payload = get_pump_trigger_payload(dss_adapter, model_rule)
-                payloads.append(payload)
+            decision_config = target_dag_info['input_params']
+            payload = get_triggering_decision_dag(decision_config)
+            payloads.append(payload)
         else:
             print('create_trigger_dag_run|available for weather model dags only.')
         if len(payloads) > 0:

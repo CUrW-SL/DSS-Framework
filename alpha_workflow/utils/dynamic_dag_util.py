@@ -14,6 +14,17 @@ def get_triggering_dynamic_dags(routines):
     return dag_info
 
 
+def get_triggering_decision_dag(decision_config):
+    dag_info = []
+    if decision_config is not None:
+        print('get_triggering_decision_dag|decision_config : ', decision_config)
+        payload = decision_config
+        dag_info.append({'dag_name': 'decision_dag', 'payload': payload})
+    else:
+        print('No triggering_dags found.')
+    return dag_info
+
+
 def get_all_dynamic_dag_routines(dss_adapter):
     query = 'select id, dag_name, schedule, timeout from dss.dynamic_routine;'
     print('get_all_dynamic_dag_routines|query : ', query)
