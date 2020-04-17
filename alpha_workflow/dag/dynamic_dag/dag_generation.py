@@ -89,7 +89,7 @@ def create_trigger_dag_run(context):
         target_dag_info = get_trigger_target_dag(dss_adapter, dag_rule_id, task_name)
         print('create_trigger_dag_run|target_dag_info : ', target_dag_info)
         model_type = target_dag_info['input_params']['model_type']
-
+        print('create_trigger_dag_run|model_type : ', model_type)
         if 'run_date' in target_dag_info['input_params']:
             run_date = target_dag_info['input_params']['run_date']
             print('********create_trigger_dag_run|run on user defined date|run_date : ', run_date)
@@ -119,11 +119,15 @@ def create_trigger_dag_run(context):
                 payload = get_pump_trigger_payload(dss_adapter, model_rule)
                 payloads.append(payload)
         elif model_type == 'decision_unit':
+            print('create_trigger_dag_run|xxxxxxxxxxxxxxx|model_type : ', model_type)
             decision_config = target_dag_info['input_params']
+            print('create_trigger_dag_run|xxxxxxxxxxxxxxx|decision_config : ', decision_config)
             payload = get_triggering_decision_dag(decision_config)
+            print('create_trigger_dag_run|xxxxxxxxxxxxxxx|payload : ', payload)
             payloads.append(payload)
         else:
             print('create_trigger_dag_run|available for weather model dags only.')
+        print('create_trigger_dag_run|payloads : ', payloads)
         if len(payloads) > 0:
             for payload in payloads:
                 if payload is not None:
