@@ -129,18 +129,16 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         task_id='model_selection_branch',
         provide_context=True,
         python_callable=select_decision_model,
-        trigger_rule='all_done',
+        trigger_rule='none_failed',
         dag=dag)
 
     wrf_flow = DummyOperator(
         task_id='wrf_flow',
-        trigger_rule='all_done',
         pool=dag_pool
     )
 
     hechms_flow = DummyOperator(
         task_id='hechms_flow',
-        trigger_rule='all_done',
         pool=dag_pool
     )
 
@@ -152,6 +150,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         task_id='wrf_decision',
         provide_context=True,
         python_callable=wrf_models_decision,
+        trigger_rule='none_failed',
         pool=dag_pool
     )
 
@@ -159,6 +158,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         task_id='hechms_decision',
         provide_context=True,
         python_callable=hechms_models_decision,
+        trigger_rule='none_failed',
         pool=dag_pool
     )
 
@@ -182,6 +182,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
 
     end_task = DummyOperator(
         task_id='end_task',
+        trigger_rule='none_failed',
         pool=dag_pool
     )
 
