@@ -82,12 +82,20 @@ def push_decision_config_to_xcom(dag_run, **kwargs):
     return decision_config
 
 
+def get_decision_config(context):
+    decision_config = context['task_instance'].xcom_pull(task_ids='init_task')
+    print('get_decision_config|decision_config : ', decision_config)
+    return decision_config
+
+
 def wrf_models_decision(**context):
     print('wrf_models_decision|context:', context)
 
 
 def evaluate_wrf_model(**context):
     print('evaluate_wrf_model|context:', context)
+    task_id = context['task'].task_id
+    print('evaluate_wrf_model|task_id : ', task_id)
 
 
 def hechms_models_decision(**context):
