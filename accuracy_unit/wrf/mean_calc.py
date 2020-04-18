@@ -4,11 +4,14 @@
 import pandas as pd
 import pymysql
 import os
-from accuracy_unit.db_plugin import get_wrf_basin_stations, \
+import sys
+
+sys.path.insert(0, '/home/curw/git/DSS-Framework/accuracy_unit')
+from db_plugin import get_wrf_basin_stations, \
     get_wrf_station_hash_ids, get_station_timeseries, get_latest_fgt, \
     get_obs_basin_stations, get_obs_station_hash_ids, get_obs_station_timeseries
 
-RESOURCE_PATH = '/home/hasitha/PycharmProjects/DSS-Framework/resources/shape_files'
+RESOURCE_PATH = '/home/curw/git/DSS-Framework/resources/shape_files'
 
 # connection params
 HOST = "35.227.163.211"
