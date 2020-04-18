@@ -262,7 +262,7 @@ class RuleEngineAdapter:
         query = 'select id, name, target_model, version, run, hour, ignore_previous_run, ' \
                 'check_gfs_data_availability,accuracy_rule, rule_details, namelist_wps, ' \
                 'namelist_input from dss.wrf_rules ' \
-                'where name = {} and status=3  '.format(rule_name)
+                'where name = \'{}\' and status=3  '.format(rule_name)
         print('get_wrf_rule_info_by_name|query : ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
@@ -385,7 +385,7 @@ class RuleEngineAdapter:
         query = 'select id, name, target_model,forecast_days, observed_days, ' \
                 'init_run, no_forecast_continue, no_observed_continue, rainfall_data_from, ' \
                 'ignore_previous_run, accuracy_rule, rule_details from dss.hechms_rules where ' \
-                'status=3 and name = {}'.format(rule_name)
+                'status=3 and name = \'{}\''.format(rule_name)
         print('get_hechms_rule_info_by_id|query : ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
