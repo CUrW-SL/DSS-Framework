@@ -132,9 +132,10 @@ def evaluate_wrf_model(**context):
             sim_tag = 'gfs_d0_18'
             wrf_model_id = WRF_MODEL_MAP[target_model]
             print('evaluate_wrf_model|event|[wrf_model_id,sim_tag : ', [wrf_model_id,sim_tag])
-            # {sim_tag, wrf_model, rmse}
             mean_calc = calculate_wrf_model_mean(sim_tag, wrf_model_id, start_limit, end_limit)
+            print('evaluate_wrf_model|event|mean_calc : ', mean_calc)
             task_instance = context['task_instance']
+            print('evaluate_wrf_model|event|task_instance : ', task_instance)
             task_instance.xcom_push(key=rule_name, value=mean_calc)
 
 
