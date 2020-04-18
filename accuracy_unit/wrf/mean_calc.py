@@ -79,7 +79,6 @@ def get_obs_cum_mean_df(obs_connection, shape_file, start_time, end_time, max_er
         if total_df is not None:
             obs_mean_df = total_df['value'] / station_count
             obs_cum_mean_df = obs_mean_df.cumsum()
-            obs_cum_mean_df.to_csv('/home/hasitha/PycharmProjects/DSS-Framework/output/obs_cum_mean_df.csv')
             return obs_cum_mean_df
 
 
@@ -102,7 +101,6 @@ def get_fcst_cum_mean_df(fcst_connection, shape_file, sim_tag, wrf_model, start_
         if total_df is not None:
             fcst_mean_df = total_df['value'] / station_count
             fcst_cum_mean_df = fcst_mean_df.cumsum()
-            fcst_cum_mean_df.to_csv('/home/hasitha/PycharmProjects/DSS-Framework/output/fcst_cum_mean_df.csv')
             return fcst_cum_mean_df
 
 
