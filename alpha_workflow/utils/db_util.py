@@ -253,6 +253,36 @@ class RuleEngineAdapter:
                                   'timeout': json.loads(result[12])})
         return wrf_rules
 
+    def get_wrf_rule_info_by_name(self, rule_name):
+        '''
+        :param status:0-disable,1-enable,2-running,3-completed
+        :return:[{}{}]
+        '''
+        wrf_rule = None
+        query = 'select id, name, target_model, version, run, hour, ignore_previous_run, ' \
+                'check_gfs_data_availability,accuracy_rule, rule_details, namelist_wps, ' \
+                'namelist_input from dss.wrf_rules ' \
+                'where name = {} and status=3  '.format(rule_name)
+        print('get_wrf_rule_info_by_name|query : ', query)
+        self.cursor.execute(query)
+        result = self.cursor.fetchone()
+        if result is not None:
+            wrf_rule = {'id': result[0], 'name': result[1], 'target_model': result[2],
+                        'version': result[3], 'run': result[4], 'hour': result[5],
+                        'ignore_previous_run': result[6], 'check_gfs_data_availability': result[7],
+                        'accuracy_rule': result[8], 'rule_details': json.loads(result[9]),
+                        'namelist_wps': result[10], 'namelist_input': result[11]}
+        return wrf_rule
+
+    def get_wrf_rule_names(self):
+        rule_names = []
+        query = 'select name from dss.wrf_rules'
+        results = self.get_multiple_result(query)
+        if results is not None:
+            for result in results:
+                rule_names.append(result[0])
+        return rule_names
+
     # -------------------------HecHms rule information-------------------------
     def get_hechms_rule_info(self, status=1):
         hechms_rules = []
@@ -349,6 +379,24 @@ class RuleEngineAdapter:
                                      'no_observed_continue': row[7], 'rainfall_data_from': row[8],
                                      'ignore_previous_run': row[9], 'timeout': json.loads(row[10])})
         return hechms_rules
+
+    def get_hechms_rule_info_by_name(self, rule_name):
+        hechms_rule = None
+        query = 'select id, name, target_model,forecast_days, observed_days, ' \
+                'init_run, no_forecast_continue, no_observed_continue, rainfall_data_from, ' \
+                'ignore_previous_run, accuracy_rule, rule_details from dss.hechms_rules where ' \
+                'status=3 and name = {}'.format(rule_name)
+        print('get_hechms_rule_info_by_id|query : ', query)
+        self.cursor.execute(query)
+        result = self.cursor.fetchone()
+        if result is not None:
+            hechms_rule = {'id': result[0], 'name': result[1], 'target_model': result[2],
+                           'forecast_days': result[3], 'observed_days': result[4],
+                           'init_run': result[5], 'no_forecast_continue': result[6],
+                           'no_observed_continue': result[7], 'rainfall_data_from': result[8],
+                           'ignore_previous_run': result[9], 'accuracy_rule': result[10],
+                           'rule_details': json.loads(result[11])}
+        return hechms_rule
 
     # -------------------------Flo2d rule information-------------------------
     def get_flo2d_rule_info(self, status=1):
