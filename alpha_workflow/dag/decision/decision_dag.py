@@ -47,7 +47,11 @@ def get_dss_db_adapter():
     return adapter
 
 
-def get_wrf_rules(dag_run):
+def get_wrf_rules(dag):
+    print('get_wrf_rules|dag : ', dag)
+    print('get_wrf_rules|dag.get_last_dagrun : ', dag.get_last_dagrun())
+    print('get_wrf_rules|dag.latest_execution_date : ', dag.latest_execution_date)
+    dag_run = dag.get_last_dagrun()
     decision_config = dag_run.conf
     print('get_wrf_rules|decision_config : ', decision_config)
     dss_adapter = get_dss_db_adapter()
@@ -57,8 +61,8 @@ def get_wrf_rules(dag_run):
     return rule_names
 
 
-def get_hechms_rules(dag_run):
-    decision_config = dag_run.conf
+def get_hechms_rules(dag):
+    decision_config = ''
     print('get_wrf_rules|decision_config : ', decision_config)
     dss_adapter = get_dss_db_adapter()
     hechms_rules = dss_adapter.get_all_hechms_rules()
@@ -232,7 +236,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    for wrf_rule_name in get_wrf_rules():
+    for wrf_rule_name in get_wrf_rules(dag):
         wrf_rule = PythonOperator(
             task_id='{}_task'.format(wrf_rule_name),
             provide_context=True,
@@ -241,7 +245,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         )
         wrf_flow >> wrf_rule >> wrf_decision
 
-    for hechms_rule_name in get_hechms_rules():
+    for hechms_rule_name in get_hechms_rules(dag):
         hechms_rule = PythonOperator(
             task_id='{}_task'.format(hechms_rule_name),
             provide_context=True,
