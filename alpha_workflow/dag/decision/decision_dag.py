@@ -223,8 +223,12 @@ def evaluate_wrf_model(**context):
             task_instance.xcom_push(rule_name, mean_calc)
 
 
-def hechms_models_decision(**context):
-    print('hechms_models_decision|context:', context)
+def hechms_event_models_decision(**context):
+    print('hechms_event_models_decision|context:', context)
+
+
+def hechms_production_models_decision(**context):
+    print('hechms_production_models_decision|context:', context)
 
 
 def evaluate_hechms_model(**context):
