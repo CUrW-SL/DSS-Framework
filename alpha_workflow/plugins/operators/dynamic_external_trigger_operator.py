@@ -58,7 +58,6 @@ class DynamicTriggerDagRunOperator(BaseOperator):
                 trigger_dag(dag_id=trigger_dag_id,
                             run_id=dro.run_id,
                             conf=json.dumps(payload),
-                            params=json.dumps(payload),
                             execution_date=self.execution_date,
                             replace_microseconds=False)
                 count += 1
