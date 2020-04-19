@@ -49,6 +49,7 @@ def get_dss_db_adapter():
 
 def get_wrf_rules(dag):
     print('get_wrf_rules|dag : ', dag)
+    print('get_wrf_rules|dag.params : ', dag.params)
     print('get_wrf_rules|dag.get_last_dagrun : ', dag.get_last_dagrun())
     print('get_wrf_rules|dag.latest_execution_date : ', dag.latest_execution_date)
     print('get_wrf_rules|dag.get_dagrun : ', dag.get_dagrun(dag.latest_execution_date))
@@ -127,7 +128,6 @@ def wrf_models_decision(**context):
             rmse_params = task_instance.xcom_pull(task_id, key=rule_name)
             print('wrf_models_decision|rmse_params : ', rmse_params)
             print('wrf_models_decision|type(rmse_params) : ', type(rmse_params))
-            #rmse_params = {'sim_tag': 'gfs_d0_18', 'wrf_model': 20, 'rmse': 1.0133267641225574}
             if rmse_params is not None:
                 if i == 0:
                     min_rmse_params = rmse_params
