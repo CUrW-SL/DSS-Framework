@@ -51,7 +51,8 @@ def get_wrf_rules(dag):
     print('get_wrf_rules|dag : ', dag)
     print('get_wrf_rules|dag.get_last_dagrun : ', dag.get_last_dagrun())
     print('get_wrf_rules|dag.latest_execution_date : ', dag.latest_execution_date)
-    dag_run = dag.get_last_dagrun()
+    print('get_wrf_rules|dag.get_dagrun : ', dag.get_dagrun(dag.latest_execution_date))
+    dag_run = dag.get_dagrun(dag.latest_execution_date)
     decision_config = dag_run.conf
     print('get_wrf_rules|decision_config : ', decision_config)
     dss_adapter = get_dss_db_adapter()
