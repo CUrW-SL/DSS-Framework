@@ -117,12 +117,15 @@ def wrf_models_decision(**context):
             task_instance = context['task_instance']
             rmse_params = task_instance.xcom_pull(task_id, key=rule_name)
             print('wrf_models_decision|rmse_params : ', rmse_params)
-            if i == 0:
-                min_rmse_params = rmse_params
-            else:
-                if min_rmse_params['rmse'] > rmse_params['rmse']:
+            print('wrf_models_decision|type(rmse_params) : ', type(rmse_params))
+            #rmse_params = {'sim_tag': 'gfs_d0_18', 'wrf_model': 20, 'rmse': 1.0133267641225574}
+            if rmse_params is not None:
+                if i == 0:
                     min_rmse_params = rmse_params
-            i += 1
+                else:
+                    if min_rmse_params['rmse'] > rmse_params['rmse']:
+                        min_rmse_params = rmse_params
+                i += 1
     print('wrf_models_decision|min_rmse_params : ', min_rmse_params)
 
 
