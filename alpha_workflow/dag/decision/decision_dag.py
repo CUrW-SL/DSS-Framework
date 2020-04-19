@@ -280,6 +280,9 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
+    wrf_flow_branch >> [wrf_event, wrf_production]
+    hechms_flow_branch >> [hechms_event, hechms_production]
+
     wrf_decision = PythonOperator(
         task_id='wrf_decision',
         provide_context=True,
