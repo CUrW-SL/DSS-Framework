@@ -14,6 +14,9 @@ from db_util import RuleEngineAdapter
 sys.path.insert(0, '/home/curw/git/DSS-Framework/accuracy_unit/wrf')
 from mean_calc import calculate_wrf_model_mean
 
+sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/utils')
+from tag_config import WRF_SIMS, HECHMS_SIMS
+
 dag_pool = 'decision_pool'
 prod_dag_name = 'decision_dag'
 
@@ -47,15 +50,7 @@ def get_dss_db_adapter():
     return adapter
 
 
-def get_wrf_rules(dag):
-    print('get_wrf_rules|dag : ', dag)
-    print('get_wrf_rules|dag.params : ', dag.params)
-    print('get_wrf_rules|dag.get_last_dagrun : ', dag.get_last_dagrun())
-    print('get_wrf_rules|dag.latest_execution_date : ', dag.latest_execution_date)
-    print('get_wrf_rules|dag.get_dagrun : ', dag.get_dagrun(dag.latest_execution_date))
-    dag_run = dag.get_dagrun(dag.latest_execution_date)
-    decision_config = dag_run.conf
-    print('get_wrf_rules|decision_config : ', decision_config)
+def get_wrf_rules():
     dss_adapter = get_dss_db_adapter()
     wrf_rules = dss_adapter.get_all_wrf_rules()
     rule_names = [wrf_rule['name'] for wrf_rule in wrf_rules]
@@ -63,7 +58,16 @@ def get_wrf_rules(dag):
     return rule_names
 
 
-def get_hechms_rules(dag):
+def get_wrf_sim_names():
+    wrf_sim_names = []
+    for key, id_list in WRF_SIMS.items():
+        for id in id_list:
+            wrf_sim_name = '{}_{}'.format(key, id)
+            wrf_sim_names.append(wrf_sim_name)
+    return wrf_sim_names
+
+
+def get_hechms_rules():
     decision_config = ''
     print('get_wrf_rules|decision_config : ', decision_config)
     dss_adapter = get_dss_db_adapter()
@@ -71,6 +75,15 @@ def get_hechms_rules(dag):
     rule_names = [hechms_rule['name'] for hechms_rule in hechms_rules]
     print('get_hechms_rules|rule_names : ', rule_names)
     return rule_names
+
+
+def get_hechms_sim_names():
+    hechms_sim_names = []
+    for key, id_list in HECHMS_SIMS.items():
+        for id in id_list:
+            hechms_sim_name = '{}_{}'.format(key, id)
+            hechms_sim_names.append(hechms_sim_name)
+    return hechms_sim_names
 
 
 def decide_run_purpose(**context):
@@ -91,6 +104,26 @@ def select_decision_model(**context):
         return 'wrf_flow'
     else:
         return 'hechms_flow'
+
+
+def select_wrf_decision_type(**context):
+    print('select_wrf_decision_type|context : ', context)
+    decision_config = context['task_instance'].xcom_pull(task_ids='init_task')
+    decision_type = decision_config['decision_type']
+    if decision_type == 'event':
+        return 'wrf_event'
+    else:
+        return 'wrf_production'
+
+
+def select_hechms_decision_type(**context):
+    print('select_hechms_decision_type|context : ', context)
+    decision_config = context['task_instance'].xcom_pull(task_ids='init_task')
+    decision_type = decision_config['decision_type']
+    if decision_type == 'event':
+        return 'wrf_event'
+    else:
+        return 'hechms_production'
 
 
 def push_decision_config_to_xcom(dag_run, **kwargs):
@@ -207,19 +240,43 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         trigger_rule='none_failed',
         dag=dag)
 
-    wrf_flow = DummyOperator(
-        task_id='wrf_flow',
-        pool=dag_pool
-    )
+    wrf_flow_branch = BranchPythonOperator(
+        task_id='wrf_flow_branch',
+        provide_context=True,
+        python_callable=select_wrf_decision_type,
+        trigger_rule='none_failed',
+        dag=dag)
 
-    hechms_flow = DummyOperator(
-        task_id='hechms_flow',
-        pool=dag_pool
-    )
+    hechms_flow_branch = BranchPythonOperator(
+        task_id='hechms_flow_branch',
+        provide_context=True,
+        python_callable=select_hechms_decision_type,
+        trigger_rule='none_failed',
+        dag=dag)
 
     init_task >> run_purpose_branch >> [production_flow, event_flow]
-    production_flow >> model_selection_branch >> [wrf_flow, hechms_flow]
-    event_flow >> model_selection_branch >> [wrf_flow, hechms_flow]
+    production_flow >> model_selection_branch >> [wrf_flow_branch, hechms_flow_branch]
+    event_flow >> model_selection_branch >> [wrf_flow_branch, hechms_flow_branch]
+
+    wrf_event = DummyOperator(
+        task_id='wrf_event',
+        pool=dag_pool
+    )
+
+    wrf_production = DummyOperator(
+        task_id='wrf_production',
+        pool=dag_pool
+    )
+
+    hechms_event = DummyOperator(
+        task_id='hechms_event',
+        pool=dag_pool
+    )
+
+    hechms_production = DummyOperator(
+        task_id='hechms_production',
+        pool=dag_pool
+    )
 
     wrf_decision = PythonOperator(
         task_id='wrf_decision',
@@ -237,23 +294,41 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    for wrf_rule_name in get_wrf_rules(dag):
+    for wrf_rule_name in get_wrf_rules():
         wrf_rule = PythonOperator(
             task_id='{}_task'.format(wrf_rule_name),
             provide_context=True,
             python_callable=evaluate_wrf_model,
             pool=dag_pool
         )
-        wrf_flow >> wrf_rule >> wrf_decision
+        wrf_production >> wrf_rule >> wrf_decision
 
-    for hechms_rule_name in get_hechms_rules(dag):
+    for wrf_sim_tag_name in get_wrf_sim_names():
+        wrf_sim = PythonOperator(
+            task_id='{}_task'.format(wrf_sim_tag_name),
+            provide_context=True,
+            python_callable=evaluate_wrf_model,
+            pool=dag_pool
+        )
+        wrf_event >> wrf_sim >> wrf_decision
+
+    for hechms_rule_name in get_hechms_rules():
         hechms_rule = PythonOperator(
             task_id='{}_task'.format(hechms_rule_name),
             provide_context=True,
             python_callable=evaluate_hechms_model,
             pool=dag_pool
         )
-        hechms_flow >> hechms_rule >> hechms_decision
+        hechms_production >> hechms_rule >> hechms_decision
+
+    for hechms_sim_tag_name in get_hechms_sim_names():
+        hechms_sim = PythonOperator(
+            task_id='{}_task'.format(hechms_sim_tag_name),
+            provide_context=True,
+            python_callable=evaluate_hechms_model,
+            pool=dag_pool
+        )
+        hechms_event >> hechms_sim >> hechms_decision
 
     end_task = DummyOperator(
         task_id='end_task',
