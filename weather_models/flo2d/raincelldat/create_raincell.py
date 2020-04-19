@@ -143,8 +143,9 @@ def create_sim_hybrid_raincell(dir_path, run_date, run_time, forward, backward,
         print('Raincell file already in path : ', raincell_file_path)
 
 
-def generate_raincell(raincell_file_path, time_limits, model, data_type, sim_tag=None):
-    print('[raincell_file_path, time_limits, model, data_type, sim_tag] : ', [raincell_file_path, time_limits, model, data_type, sim_tag])
+def generate_raincell(raincell_file_path, time_limits, model, data_type, wrf_model, sim_tag=None):
+    print('[raincell_file_path, time_limits, model, data_type, wrf_model, sim_tag] : ', [raincell_file_path, time_limits, model, data_type,
+                                                                              wrf_model, sim_tag])
     sim_connection = pymysql.connect(host=HOST, user=USER, password=PASSWORD, db=SIM_DB,
                                      cursorclass=pymysql.cursors.DictCursor)
     fcst_connection = pymysql.connect(host=HOST, user=USER, password=PASSWORD, db=FCST_DB,
@@ -210,6 +211,7 @@ def generate_raincell(raincell_file_path, time_limits, model, data_type, sim_tag
                                                                                                   fcst_station_ids,
                                                                                                   timestamp.strftime(
                                                                                                       DATE_TIME_FORMAT),
+                                                                                                  wrf_model,
                                                                                                   sim_tag)
                     raincell_entries = get_fcst_raincell_entries_for_timestamp(grid_maps, fcst_station_precipitations)
                     for i in range(3):
@@ -245,6 +247,7 @@ def generate_raincell(raincell_file_path, time_limits, model, data_type, sim_tag
                                                                                                   fcst_station_ids,
                                                                                                   timestamp.strftime(
                                                                                                       DATE_TIME_FORMAT),
+                                                                                                  wrf_model,
                                                                                                   sim_tag)
                     raincell_entries = get_fcst_raincell_entries_for_timestamp(grid_maps, fcst_station_precipitations)
                     for i in range(3):
@@ -335,14 +338,14 @@ def get_ts_start_end_for_data_type(run_date, run_time, forward=3, backward=2):
     return result
 
 
-def create_raincell(dir_path, run_date, run_time, forward, backward, model, sim_tag='dwrf_gfs_d1_18', data_type=1):
+def create_raincell(dir_path, run_date, run_time, forward, backward, model, sim_tag='dwrf_gfs_d1_18', wrf_model=20, data_type=1):
     time_limits = get_ts_start_end_for_data_type(run_date, run_time, forward, backward)
     raincell_file_path = os.path.join(dir_path, 'RAINCELL.DAT')
     print('create_raincell|time_limits : ', time_limits)
     print('create_raincell|raincell_file_path : ', raincell_file_path)
     start_time = datetime.now()
     if not os.path.isfile(raincell_file_path):
-        generate_raincell(raincell_file_path, time_limits, model, data_type, sim_tag)
+        generate_raincell(raincell_file_path, time_limits, model, data_type, wrf_model, sim_tag)
     else:
         print('Raincell file already in path : ', raincell_file_path)
     end_time = datetime.now()
@@ -353,6 +356,6 @@ def create_raincell(dir_path, run_date, run_time, forward, backward, model, sim_
 if __name__ == '__main__':
     try:
         create_raincell('/home/hasitha/PycharmProjects/DSS-Framework/output',
-                        '2020-03-10', '08:00:00', 3, 2, 'flo2d_250')
+                        '2020-03-10', '08:00:00', 3, 2, 'flo2d_250', 'dwrf_gfs_d1_18', 19)
     except Exception as e:
         print(str(e))

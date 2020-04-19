@@ -58,19 +58,15 @@ def select_distinct_forecast_stations(fcst_connection, flo2d_model):
     return id_list
 
 
-def select_fcst_station_precipitation_for_timestamp(fcst_connection, station_ids, time_step, sim_tag='dwrf_gfs_d1_18'):
+def select_fcst_station_precipitation_for_timestamp(fcst_connection, station_ids, time_step, wrf_model, sim_tag='dwrf_gfs_d1_18'):
     query = 'select station_tbl.station_id,time_tbl.step_value from ' \
             '(select id as hash_id, station as station_id from curw_fcst.run where unit=1 and variable=1 ' \
-            'and sim_tag=\'{}\' and station in ({})) station_tbl,' \
+            'and sim_tag=\'{}\' and source={} and station in ({})) station_tbl,' \
             '(select id as hash_id, value as step_value from curw_fcst.data where time=\'{}\') time_tbl ' \
-            'where station_tbl.hash_id = time_tbl.hash_id;'.format(sim_tag, station_ids, time_step)
+            'where station_tbl.hash_id = time_tbl.hash_id;'.format(sim_tag, wrf_model, station_ids, time_step)
     print('select_fcst_station_precipitation_for_timestamp|query : ', query)
     rows = get_multiple_result(fcst_connection, query)
     return rows
-
-
-def get_latest_fgt_of_the_day(given_datetime, sim_tag, ):
-    print('')
 
 
 def get_single_result(sim_connection, query):

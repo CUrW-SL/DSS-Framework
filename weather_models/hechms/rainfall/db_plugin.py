@@ -1,5 +1,4 @@
 from decimal import Decimal
-from scipy.spatial import Voronoi
 from shapely.geometry import Polygon, Point
 import geopandas as gpd
 import pandas as pd
