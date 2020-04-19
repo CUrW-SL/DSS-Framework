@@ -109,8 +109,12 @@ def wrf_models_decision(**context):
     if len(rule_names) > 0:
         for rule_name in rule_names:
             task_id = '{}_task'.format(rule_name)
-            rmse_params = context['ti'].xcom_pull(task_id)
+            print('wrf_models_decision|task_id : ', task_id)
+            # rmse_params = context['ti'].xcom_pull(task_ids=task_id)
+            task_instance = context['task_instance']
+            rmse_params = task_instance.xcom_pull(task_id, key=rule_name)
             print('wrf_models_decision|rmse_params : ', rmse_params)
+            # print('wrf_models_decision|rmse_params : ', rmse_params)
 
 
 def evaluate_wrf_model(**context):
@@ -136,7 +140,8 @@ def evaluate_wrf_model(**context):
             print('evaluate_wrf_model|event|mean_calc : ', mean_calc)
             task_instance = context['task_instance']
             print('evaluate_wrf_model|event|task_instance : ', task_instance)
-            task_instance.xcom_push(key=rule_name, value=mean_calc)
+            task_instance.xcom_push(rule_name, mean_calc)
+            # task_instance.xcom_push(key=rule_name, value=mean_calc)
 
 
 def hechms_models_decision(**context):
