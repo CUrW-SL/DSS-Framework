@@ -25,7 +25,9 @@ default_args = {
 }
 
 DATE_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
-WRF_MODEL_MAP = {'A':19,'C':20,'E':21,'SE':22}
+WRF_MODEL_MAP = {'A': 19, 'C': 20, 'E': 21, 'SE': 22}
+
+
 # {'model_type':'decision_unit',
 # 'decision_type':'event',
 # 'decision_model':'wrf',
@@ -106,15 +108,22 @@ def wrf_models_decision(**context):
     dss_adapter = get_dss_db_adapter()
     rule_names = dss_adapter.get_wrf_rule_names()
     print('wrf_models_decision|rule_names : ', rule_names)
+    min_rmse_params = None
+    i = 0
     if len(rule_names) > 0:
         for rule_name in rule_names:
             task_id = '{}_task'.format(rule_name)
             print('wrf_models_decision|task_id : ', task_id)
-            # rmse_params = context['ti'].xcom_pull(task_ids=task_id)
             task_instance = context['task_instance']
             rmse_params = task_instance.xcom_pull(task_id, key=rule_name)
             print('wrf_models_decision|rmse_params : ', rmse_params)
-            # print('wrf_models_decision|rmse_params : ', rmse_params)
+            if i == 0:
+                min_rmse_params = rmse_params
+            else:
+                if min_rmse_params['rmse'] > rmse_params['rmse']:
+                    min_rmse_params = rmse_params
+            i += 1
+    print('wrf_models_decision|min_rmse_params : ', min_rmse_params)
 
 
 def evaluate_wrf_model(**context):
@@ -135,13 +144,12 @@ def evaluate_wrf_model(**context):
             end_limit = end_limit.strftime(DATE_TIME_FORMAT)
             sim_tag = 'gfs_d0_18'
             wrf_model_id = WRF_MODEL_MAP[target_model]
-            print('evaluate_wrf_model|event|[wrf_model_id,sim_tag : ', [wrf_model_id,sim_tag])
+            print('evaluate_wrf_model|event|[wrf_model_id,sim_tag : ', [wrf_model_id, sim_tag])
             mean_calc = calculate_wrf_model_mean(sim_tag, wrf_model_id, start_limit, end_limit)
             print('evaluate_wrf_model|event|mean_calc : ', mean_calc)
             task_instance = context['task_instance']
             print('evaluate_wrf_model|event|task_instance : ', task_instance)
             task_instance.xcom_push(rule_name, mean_calc)
-            # task_instance.xcom_push(key=rule_name, value=mean_calc)
 
 
 def hechms_models_decision(**context):
@@ -242,4 +250,3 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
 
     wrf_decision >> end_task
     hechms_decision >> end_task
-
