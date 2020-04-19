@@ -60,6 +60,8 @@ def get_wrf_rules():
 
 def get_wrf_sim_names():
     wrf_sim_names = []
+    print('get_wrf_sim_names|WRF_SIMS : ', WRF_SIMS)
+    print('get_wrf_sim_names|type(WRF_SIMS) : ', type(WRF_SIMS))
     for key, id_list in WRF_SIMS.items():
         for id in id_list:
             wrf_sim_name = '{}_{}'.format(key, id)
