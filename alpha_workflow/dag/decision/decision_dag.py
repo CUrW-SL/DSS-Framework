@@ -232,7 +232,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    for wrf_rule_name in get_wrf_rules(dag.get_dagrun()):
+    for wrf_rule_name in get_wrf_rules():
         wrf_rule = PythonOperator(
             task_id='{}_task'.format(wrf_rule_name),
             provide_context=True,
@@ -241,7 +241,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         )
         wrf_flow >> wrf_rule >> wrf_decision
 
-    for hechms_rule_name in get_hechms_rules(dag.get_dagrun()):
+    for hechms_rule_name in get_hechms_rules():
         hechms_rule = PythonOperator(
             task_id='{}_task'.format(hechms_rule_name),
             provide_context=True,
