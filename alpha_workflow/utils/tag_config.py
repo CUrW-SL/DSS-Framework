@@ -6,7 +6,7 @@ WRF_SIMS = {
           'mwrf_gfs_d0_00': [23],
           'dwrf_gfs_d0_18': [19, 20, 21, 22],
           'dwrf_gfs_d1_00': [19, 20, 21, 22]
-      },
+      }
 HECHMS_SIMS = {
     'hechms_run': [11, 17]
 }
