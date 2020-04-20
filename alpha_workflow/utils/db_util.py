@@ -1016,6 +1016,20 @@ class RuleEngineAdapter:
             print('get_logic_rules|no ids.')
             return []
 
+    def set_hechms_rain_tag(self, tag, rule_name):
+        print('set_hechms_rain_tag|tag: ', tag)
+        query = 'update dss.hechms_rules set rainfall_data_from={} where name=\'{}\''.format(tag, rule_name)
+        print('set_hechms_rain_tag|query: ', query)
+        self.update_query(query)
+        print('set_hechms_rain_tag|tag successfully updated.')
+
+    def set_flo2d_rain_tag(self, tag, rule_name):
+        print('set_flo2d_rain_tag|tag: ', tag)
+        query = 'update dss.flo2d_rules set raincell_data_from={} where name=\'{}\''.format(tag, rule_name)
+        print('set_flo2d_rain_tag|query: ', query)
+        self.update_query(query)
+        print('set_flo2d_rain_tag|tag successfully updated.')
+
 
 if __name__ == "__main__":
     # db_config = {'mysql_user': 'admin', 'mysql_password': 'floody', 'mysql_host': '35.227.163.211', 'mysql_db': 'dss',

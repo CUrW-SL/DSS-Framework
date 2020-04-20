@@ -129,6 +129,7 @@ def select_hechms_decision_type(**context):
 def push_decision_config_to_xcom(dag_run, **kwargs):
     decision_config = dag_run.conf
     print('push_decision_config_to_xcom|decision_config : ', decision_config)
+    print('push_decision_config_to_xcom|kwargs : ', kwargs)
     return decision_config
 
 
