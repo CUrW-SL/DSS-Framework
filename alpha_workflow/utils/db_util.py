@@ -1016,24 +1016,23 @@ class RuleEngineAdapter:
             print('get_logic_rules|no ids.')
             return []
 
-    def set_hechms_rain_tag(self, tag, rule_name):
+    def set_hechms_rain_tag(self, tag, id):
         print('set_hechms_rain_tag|tag: ', tag)
-        query = 'update dss.hechms_rules set rainfall_data_from={} where name=\'{}\''.format(tag, rule_name)
+        query = 'update dss.hechms_rules set rainfall_data_from={} where id=\'{}\''.format(tag, id)
         print('set_hechms_rain_tag|query: ', query)
         self.update_query(query)
         print('set_hechms_rain_tag|tag successfully updated.')
 
-    def set_flo2d_rain_tag(self, tag, rule_name):
+    def set_flo2d_rain_tag(self, tag, id):
         print('set_flo2d_rain_tag|tag: ', tag)
-        query = 'update dss.flo2d_rules set raincell_data_from={} where name=\'{}\''.format(tag, rule_name)
+        query = 'update dss.flo2d_rules set raincell_data_from={} where id=\'{}\''.format(tag, id)
         print('set_flo2d_rain_tag|query: ', query)
         self.update_query(query)
         print('set_flo2d_rain_tag|tag successfully updated.')
 
     def get_parent_dag_tasks(self, dag_rule_id):
         task_param_list = []
-        #query = 'select input_params from dss.dynamic_workflow where owner_dag_id={}'.format(dag_rule_id)
-        query = 'select task_content, input_params from dss.dynamic_workflow where owner_dag_id={}'.format(1)
+        query = 'select input_params from dss.dynamic_workflow where owner_dag_id={}'.format(dag_rule_id)
         print('get_parent_dag_tasks|query: ', query)
         results = self.get_multiple_result(query)
         print('get_parent_dag_tasks|results: ', results)
