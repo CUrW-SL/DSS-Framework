@@ -1,4 +1,3 @@
-import subprocess
 from datetime import datetime, timedelta
 from airflow import DAG, AirflowException
 from airflow.models import Variable
@@ -6,7 +5,6 @@ from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.python_operator import BranchPythonOperator
 import sys
-from airflow.models import XCom
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/utils')
 from db_util import RuleEngineAdapter
@@ -201,26 +199,30 @@ def evaluate_wrf_model(**context):
     print('evaluate_wrf_model|context:', context)
     rule_name = get_rule_name(context)
     decision_config = get_decision_config(context)
-    dss_adapter = get_dss_db_adapter()
-    wrf_rule = dss_adapter.get_wrf_rule_info_by_name(rule_name)
-    if wrf_rule is not None:
-        target_model = wrf_rule['target_model']
-        if decision_config['decision_type'] == 'production':
+    if decision_config['decision_type'] == 'production':
+        print('evaluate_wrf_model|production')
+        dss_adapter = get_dss_db_adapter()
+        wrf_rule = dss_adapter.get_wrf_rule_info_by_name(rule_name)
+        if wrf_rule is not None:
             print('evaluate_wrf_model|production')
-        elif decision_config['decision_type'] == 'event':
-            run_date = decision_config['run_date']
-            start_limit = run_date
-            run_date = datetime.strptime(run_date, DATE_TIME_FORMAT)
-            end_limit = run_date + timedelta(days=1)
-            end_limit = end_limit.strftime(DATE_TIME_FORMAT)
-            sim_tag = 'gfs_d0_18'
-            wrf_model_id = WRF_MODEL_MAP[target_model]
-            print('evaluate_wrf_model|event|[wrf_model_id,sim_tag : ', [wrf_model_id, sim_tag])
-            mean_calc = calculate_wrf_model_mean(sim_tag, wrf_model_id, start_limit, end_limit)
-            print('evaluate_wrf_model|event|mean_calc : ', mean_calc)
-            task_instance = context['task_instance']
-            print('evaluate_wrf_model|event|task_instance : ', task_instance)
-            task_instance.xcom_push(rule_name, mean_calc)
+            print('evaluate_wrf_model|production|wrf_rule:', wrf_rule)
+    elif decision_config['decision_type'] == 'event':
+        print('evaluate_wrf_model|event')
+        rule_name = get_rule_name(context)
+        print('evaluate_wrf_model|event|rule_name:', rule_name)
+        sim_tag = rule_name[:len(rule_name) - 3]
+        source_id = int(rule_name[len(rule_name) - 2:])
+        print('evaluate_wrf_model|event|[wrf_model_id,sim_tag : ', [source_id, sim_tag])
+        run_date = decision_config['run_date']
+        start_limit = run_date
+        run_date = datetime.strptime(run_date, DATE_TIME_FORMAT)
+        end_limit = run_date + timedelta(days=1)
+        end_limit = end_limit.strftime(DATE_TIME_FORMAT)
+        mean_calc = calculate_wrf_model_mean(sim_tag, source_id, start_limit, end_limit)
+        print('evaluate_wrf_model|event|mean_calc : ', mean_calc)
+        task_instance = context['task_instance']
+        print('evaluate_wrf_model|event|task_instance : ', task_instance)
+        task_instance.xcom_push(rule_name, mean_calc)
 
 
 def hechms_event_models_decision(**context):
