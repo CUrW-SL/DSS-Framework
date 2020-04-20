@@ -56,6 +56,8 @@ def get_common_start_end(obs_cum_mean_df, fcst_cum_mean_df):
     else:
         smallest_df = obs_cum_mean_df
     print('get_common_start_end|smallest_df :', smallest_df)
+    print('get_common_start_end|smallest_df.iloc[0] :', smallest_df.iloc[0])
+    print('get_common_start_end|smallest_df.iloc[-1] :', smallest_df.iloc[-1])
     start = smallest_df.iloc[0]['time']
     end = smallest_df.iloc[-1]['time']
     obs_cum_mean_df1 = obs_cum_mean_df[obs_cum_mean_df['time'] >= start]
