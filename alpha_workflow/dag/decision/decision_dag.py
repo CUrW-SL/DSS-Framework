@@ -150,13 +150,29 @@ def get_rule_name(context):
 def get_hechms_rule_ids(context):
     decision_config = get_decision_config(context)
     parent_dag_id = decision_config['parent_rule_id']
+    hechms_ids = []
+    if parent_dag_id is not None:
+        dss_adapter = get_dss_db_adapter()
+        task_params = dss_adapter.get_parent_dag_tasks(parent_dag_id)
+        for task_param in task_params:
+            if task_param['model_type'] == 'hechms':
+                hechms_ids = hechms_ids + task_param['rule_id']
+    return hechms_ids
 
 
 def get_both_hechms_flo2d_rule_ids(decision_config):
+    hechms_ids = []
+    flo2d_ids = []
     parent_dag_id = decision_config['parent_rule_id']
     if parent_dag_id is not None:
         dss_adapter = get_dss_db_adapter()
-        dss_adapter.get_parent_dag_tasks(parent_dag_id)
+        task_params = dss_adapter.get_parent_dag_tasks(parent_dag_id)
+        for task_param in task_params:
+            if task_param['model_type'] == 'hechms':
+                hechms_ids = hechms_ids + task_param['rule_id']
+            elif task_param['model_type'] == 'flo2d':
+                flo2d_ids = flo2d_ids + task_param['rule_id']
+    return [hechms_ids, flo2d_ids]
 
 
 def wrf_event_models_decision(**context):
@@ -181,7 +197,9 @@ def wrf_event_models_decision(**context):
                         min_rmse_params = rmse_params
                 i += 1
     print('wrf_event_models_decision|min_rmse_params : ', min_rmse_params)
-    get_both_hechms_flo2d_rule_ids(decision_config)
+    [hechms_ids, flo2d_ids] = get_both_hechms_flo2d_rule_ids(decision_config)
+    print('wrf_event_models_decision|hechms_ids : ', hechms_ids)
+    print('wrf_event_models_decision|flo2d_ids : ', flo2d_ids)
 
 
 def wrf_production_models_decision(**context):

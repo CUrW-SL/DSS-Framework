@@ -1031,11 +1031,16 @@ class RuleEngineAdapter:
         print('set_flo2d_rain_tag|tag successfully updated.')
 
     def get_parent_dag_tasks(self, dag_rule_id):
+        task_param_list = []
         #query = 'select input_params from dss.dynamic_workflow where owner_dag_id={}'.format(dag_rule_id)
         query = 'select task_content, input_params from dss.dynamic_workflow where owner_dag_id={}'.format(1)
         print('get_parent_dag_tasks|query: ', query)
         results = self.get_multiple_result(query)
-        print('get_parent_dag_tasks|query: ', results)
+        print('get_parent_dag_tasks|results: ', results)
+        for result in results:
+            task_param_list.append(json.loads(result[1]))
+        return task_param_list
+
 
 
 if __name__ == "__main__":
