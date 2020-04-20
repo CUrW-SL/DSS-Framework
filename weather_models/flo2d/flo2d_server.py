@@ -6,6 +6,7 @@ import json
 from urllib.parse import urlparse, parse_qs
 from run_model import execute_flo2d, flo2d_model_completed
 from gen_old_outflow import create_outflow_old
+from raincelldat.create_raincell import create_event_raincell
 
 
 import subprocess
@@ -142,9 +143,16 @@ class StoreHandler(BaseHTTPRequestHandler):
                     command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'input', 'raincell')
                     command = CREATE_RAINCELL_CMD.format(params['model'], params['ts_start'],
                                                          params['ts_end'], dir_path, params['pop_method'])
-                    print('create-raincell|command_dir_path : ', command_dir_path)
-                    print('create-raincell|command : ', command)
-                    response = run_input_file_generation_methods(command_dir_path, command)
+                    if params['pop_method'].is_upper():
+                        print('create-raincell|command_dir_path : ', command_dir_path)
+                        print('create-raincell|command : ', command)
+                        response = run_input_file_generation_methods(command_dir_path, command)
+                    else:
+                        rule_name = params['pop_method']
+                        sim_tag = rule_name[:len(rule_name) - 3]
+                        source_id = int(rule_name[len(rule_name) - 2:])
+                        create_event_raincell(dir_path, params['run_date'], params['run_time'], params['forward'],
+                                              params['backward'], 'flo2d_250', sim_tag, source_id)
                 except Exception as e:
                     print(str(e))
                     response = {'response': 'fail'}

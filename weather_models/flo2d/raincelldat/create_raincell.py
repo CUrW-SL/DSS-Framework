@@ -6,6 +6,7 @@ from weather_models.flo2d.db_plugin import get_cell_mapping, select_distinct_obs
     select_distinct_forecast_stations
 import os
 from weather_models.flo2d.utils import search_value_in_dictionary_list
+import pandas as pd
 
 DATE_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 INVALID_VALUE = -9999
@@ -338,11 +339,11 @@ def get_ts_start_end_for_data_type(run_date, run_time, forward=3, backward=2):
     return result
 
 
-def create_raincell(dir_path, run_date, run_time, forward, backward, model, sim_tag='dwrf_gfs_d1_18', wrf_model=20, data_type=1):
+def create_event_raincell(dir_path, run_date, run_time, forward, backward, model, sim_tag='dwrf_gfs_d1_18', wrf_model=20, data_type=1):
     time_limits = get_ts_start_end_for_data_type(run_date, run_time, forward, backward)
     raincell_file_path = os.path.join(dir_path, 'RAINCELL.DAT')
-    print('create_raincell|time_limits : ', time_limits)
-    print('create_raincell|raincell_file_path : ', raincell_file_path)
+    print('create_event_raincell|time_limits : ', time_limits)
+    print('create_event_raincell|raincell_file_path : ', raincell_file_path)
     start_time = datetime.now()
     if not os.path.isfile(raincell_file_path):
         generate_raincell(raincell_file_path, time_limits, model, data_type, wrf_model, sim_tag)
@@ -353,9 +354,92 @@ def create_raincell(dir_path, run_date, run_time, forward, backward, model, sim_
     print('create_raincell|duration : ', duration)
 
 
+def get_cell_mapping(sim_connection, flo2d_model):
+    if 'flo2d_150' == flo2d_model:
+        query = 'select grid_id,obs1,obs2,obs3,fcst from curw_sim.grid_map_flo2d_raincell where grid_id like \"flo2d_150_%\";'
+    elif 'flo2d_250' == flo2d_model:
+        query = 'select grid_id,obs1,obs2,obs3,fcst from curw_sim.grid_map_flo2d_raincell where grid_id like \"flo2d_250_%\";'
+    print('get_cell_mapping|query : ', query)
+    rows = get_multiple_result(sim_connection, query)
+    print('get_cell_mapping|rows : ', rows)
+    cell_map = pd.DataFrame(data=rows, columns=['grid_id', 'obs1', 'obs2', 'obs3', 'fcst'])
+    print('get_cell_mapping|cell_map : ', cell_map)
+    return rows
+
+
+def select_distinct_observed_stations(obs_connection, flo2d_model):
+    if 'flo2d_150' == flo2d_model:
+        query = 'select distinct(obs1) from curw_sim.grid_map_flo2d_raincell where grid_id like "flo2d_150_%" union ' \
+                'select distinct(obs2) from curw_sim.grid_map_flo2d_raincell where grid_id like "flo2d_150_%" union ' \
+                'select distinct(obs3) from curw_sim.grid_map_flo2d_raincell where grid_id like "flo2d_150_%";'
+    elif 'flo2d_250' == flo2d_model:
+        query = 'select distinct(obs1) from curw_sim.grid_map_flo2d_raincell where grid_id like "flo2d_250_%" union ' \
+                'select distinct(obs2) from curw_sim.grid_map_flo2d_raincell where grid_id like "flo2d_250_%" union ' \
+                'select distinct(obs3) from curw_sim.grid_map_flo2d_raincell where grid_id like "flo2d_250_%";'
+    print('select_distinct_observed_stations|query : ', query)
+    rows = get_multiple_result(obs_connection, query)
+    # print('select_distinct_observed_stations|rows : ', rows)
+    id_list = []
+    for row in rows:
+        id_list.append(row['obs1'])
+    print('select_distinct_observed_stations|id_list : ', id_list)
+    return id_list
+
+
+def select_obs_station_precipitation_for_timestamp(obs_connection, station_ids, time_step):
+    query = 'select station_tbl.station_id,time_tbl.step_value from ' \
+            '(select id as hash_id, station as station_id from curw_obs.run where unit=9 and variable=10 and station in ({})) station_tbl,' \
+            '(select id as hash_id, value as step_value from curw_obs.data where time=\'{}\') time_tbl ' \
+            'where station_tbl.hash_id = time_tbl.hash_id;'.format(station_ids, time_step)
+    print('select_obs_station_precipitation_for_timestamp|query : ', query)
+    rows = get_multiple_result(obs_connection, query)
+    return rows
+
+
+def select_distinct_forecast_stations(fcst_connection, flo2d_model):
+    if 'flo2d_150' == flo2d_model:
+        query = 'select distinct(fcst) from curw_sim.grid_map_flo2d_raincell where grid_id like "flo2d_150_%" ;'
+    elif 'flo2d_250' == flo2d_model:
+        query = 'select distinct(fcst) from curw_sim.grid_map_flo2d_raincell where grid_id like "flo2d_250_%" ;'
+    print('select_distinct_forecast_stations|query : ', query)
+    rows = get_multiple_result(fcst_connection, query)
+    # print('select_distinct_observed_stations|rows : ', rows)
+    id_list = []
+    for row in rows:
+        id_list.append(row['fcst'])
+    print('select_distinct_forecast_stations|id_list : ', id_list)
+    return id_list
+
+
+def select_fcst_station_precipitation_for_timestamp(fcst_connection, station_ids, time_step, wrf_model,
+                                                    sim_tag='dwrf_gfs_d1_18'):
+    query = 'select station_tbl.station_id,time_tbl.step_value from ' \
+            '(select id as hash_id, station as station_id from curw_fcst.run where unit=1 and variable=1 ' \
+            'and sim_tag=\'{}\' and source={} and station in ({})) station_tbl,' \
+            '(select id as hash_id, value as step_value from curw_fcst.data where time=\'{}\') time_tbl ' \
+            'where station_tbl.hash_id = time_tbl.hash_id;'.format(sim_tag, wrf_model, station_ids, time_step)
+    print('select_fcst_station_precipitation_for_timestamp|query : ', query)
+    rows = get_multiple_result(fcst_connection, query)
+    return rows
+
+
+def get_single_result(sim_connection, query):
+    cur = sim_connection.cursor()
+    cur.execute(query)
+    row = cur.fetchone()
+    return row
+
+
+def get_multiple_result(sim_connection, query):
+    cur = sim_connection.cursor()
+    cur.execute(query)
+    rows = cur.fetchall()
+    return rows
+
+
 if __name__ == '__main__':
     try:
-        create_raincell('/home/hasitha/PycharmProjects/DSS-Framework/output',
+        create_event_raincell('/home/hasitha/PycharmProjects/DSS-Framework/output',
                         '2020-03-10', '08:00:00', 3, 2, 'flo2d_250', 'dwrf_gfs_d1_18', 19)
     except Exception as e:
         print(str(e))
