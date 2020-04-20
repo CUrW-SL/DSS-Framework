@@ -37,8 +37,10 @@ def calculate_wrf_model_mean(sim_tag, wrf_model, start_time, end_time):
         if fcst_cum_mean_df is not None:
             obs_cum_mean_df = pd.DataFrame({'time': obs_cum_mean_df.index, 'observed': obs_cum_mean_df.values})
             fcst_cum_mean_df = pd.DataFrame({'time': fcst_cum_mean_df.index, 'forecast': fcst_cum_mean_df.values})
-            [formatted_obs_cum_mean_df, formatted_fcst_cum_mean_df] = get_common_start_end(obs_cum_mean_df, fcst_cum_mean_df)
-            compare_cum_mean_df = pd.merge(formatted_obs_cum_mean_df, formatted_fcst_cum_mean_df, left_on='time', right_on='time')
+            [formatted_obs_cum_mean_df, formatted_fcst_cum_mean_df] = get_common_start_end(obs_cum_mean_df,
+                                                                                           fcst_cum_mean_df)
+            compare_cum_mean_df = pd.merge(formatted_obs_cum_mean_df, formatted_fcst_cum_mean_df, left_on='time',
+                                           right_on='time')
             compare_cum_mean_df.observed = pd.to_numeric(compare_cum_mean_df.observed)
             compare_cum_mean_df.forecast = pd.to_numeric(compare_cum_mean_df.forecast)
             # print('calculate_wrf_model_mean|compare_cum_mean_df : ', compare_cum_mean_df)
@@ -53,6 +55,7 @@ def get_common_start_end(obs_cum_mean_df, fcst_cum_mean_df):
         smallest_df = fcst_cum_mean_df
     else:
         smallest_df = obs_cum_mean_df
+    print('get_common_start_end|smallest_df :', smallest_df)
     start = smallest_df.iloc[0]['time']
     end = smallest_df.iloc[-1]['time']
     obs_cum_mean_df1 = obs_cum_mean_df[obs_cum_mean_df['time'] >= start]
@@ -91,6 +94,8 @@ def get_fcst_cum_mean_df(fcst_connection, shape_file, sim_tag, wrf_model, start_
         print(basin_points)
         hash_ids = get_wrf_station_hash_ids(fcst_connection, sim_tag, wrf_model, basin_points)
         latest_fgt = get_latest_fgt(fcst_connection, hash_ids[0], start_time)
+        print('get_fcst_cum_mean_df|latest_fgt : ', latest_fgt)
+        print('get_fcst_cum_mean_df|hash_ids : ', hash_ids)
         for hash_id in hash_ids:
             df = get_station_timeseries(fcst_connection, hash_id, latest_fgt, start_time, end_time)
             if df is not None:
