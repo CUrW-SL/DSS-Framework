@@ -32,9 +32,9 @@ def calculate_wrf_model_mean(sim_tag, wrf_model, start_time, end_time):
                                      cursorclass=pymysql.cursors.DictCursor)
     shape_file = os.path.join(RESOURCE_PATH, 'Kalani_basin_hec_wgs/Kalani_basin_hec_wgs.shp')
     obs_cum_mean_df = get_obs_cum_mean_df(obs_connection, shape_file, start_time, end_time)
-    if obs_cum_mean_df is not None:
+    if obs_cum_mean_df is not None and obs_cum_mean_df.empty is False:
         fcst_cum_mean_df = get_fcst_cum_mean_df(fcst_connection, shape_file, sim_tag, wrf_model, start_time, end_time)
-        if fcst_cum_mean_df is not None:
+        if fcst_cum_mean_df is not None and fcst_cum_mean_df.empty is False:
             obs_cum_mean_df = pd.DataFrame({'time': obs_cum_mean_df.index, 'observed': obs_cum_mean_df.values})
             fcst_cum_mean_df = pd.DataFrame({'time': fcst_cum_mean_df.index, 'forecast': fcst_cum_mean_df.values})
             [formatted_obs_cum_mean_df, formatted_fcst_cum_mean_df] = get_common_start_end(obs_cum_mean_df,
