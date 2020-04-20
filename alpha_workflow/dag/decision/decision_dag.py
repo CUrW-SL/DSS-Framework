@@ -101,9 +101,9 @@ def select_decision_model(**context):
     decision_config = context['task_instance'].xcom_pull(task_ids='init_task')
     decision_model = decision_config['decision_model']
     if decision_model == 'wrf':
-        return 'wrf_flow'
+        return 'wrf_flow_branch'
     else:
-        return 'hechms_flow'
+        return 'hechms_flow_branch'
 
 
 def select_wrf_decision_type(**context):
