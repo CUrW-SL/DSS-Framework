@@ -147,6 +147,18 @@ def get_rule_name(context):
     return rule_name
 
 
+def get_hechms_rule_ids(context):
+    decision_config = get_decision_config(context)
+    parent_dag_id = decision_config['parent_rule_id']
+
+
+def get_both_hechms_flo2d_rule_ids(decision_config):
+    parent_dag_id = decision_config['parent_rule_id']
+    if parent_dag_id is not None:
+        dss_adapter = get_dss_db_adapter()
+        dss_adapter.get_parent_dag_tasks(parent_dag_id)
+
+
 def wrf_event_models_decision(**context):
     decision_config = get_decision_config(context)
     sim_tag = decision_config['sim_tag']
@@ -169,6 +181,7 @@ def wrf_event_models_decision(**context):
                         min_rmse_params = rmse_params
                 i += 1
     print('wrf_event_models_decision|min_rmse_params : ', min_rmse_params)
+    get_both_hechms_flo2d_rule_ids(decision_config)
 
 
 def wrf_production_models_decision(**context):
