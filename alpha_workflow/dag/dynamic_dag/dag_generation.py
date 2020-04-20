@@ -122,6 +122,7 @@ def create_trigger_dag_run(context):
             print('create_trigger_dag_run|xxxxxxxxxxxxxxx|model_type : ', model_type)
             decision_config = target_dag_info['input_params']
             decision_config['name'] = 'decision_dag'
+            decision_config['parent_rule_id'] = dag_rule_id
             print('create_trigger_dag_run|xxxxxxxxxxxxxxx|decision_config : ', decision_config)
             payloads.append(decision_config)
         else:
