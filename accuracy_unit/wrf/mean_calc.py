@@ -95,6 +95,8 @@ def get_fcst_cum_mean_df(fcst_connection, shape_file, sim_tag, wrf_model, start_
     if len(basin_points) > 0:
         print(basin_points)
         hash_ids = get_wrf_station_hash_ids(fcst_connection, sim_tag, wrf_model, basin_points)
+        print('get_fcst_cum_mean_df|hash_ids : ', hash_ids)
+        print('get_fcst_cum_mean_df|[hash_ids[0], start_time] : ', [hash_ids[0], start_time])
         latest_fgt = get_latest_fgt(fcst_connection, hash_ids[0], start_time)
         print('get_fcst_cum_mean_df|latest_fgt : ', latest_fgt)
         print('get_fcst_cum_mean_df|hash_ids : ', hash_ids)

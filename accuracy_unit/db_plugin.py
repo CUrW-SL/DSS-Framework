@@ -20,6 +20,7 @@ def get_multiple_result(db_connection, query):
 
 
 def get_latest_fgt(fcst_connection, hash_id, start_time):
+    print('get_latest_fgt|[hash_id, start_time] : ', [hash_id, start_time])
     cur = fcst_connection.cursor()
     cur.callproc('getLatestFGTs', (hash_id, start_time))
     rows = cur.fetchall()
