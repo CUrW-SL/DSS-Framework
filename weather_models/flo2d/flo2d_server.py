@@ -143,7 +143,7 @@ class StoreHandler(BaseHTTPRequestHandler):
                     command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'input', 'raincell')
                     command = CREATE_RAINCELL_CMD.format(params['model'], params['ts_start'],
                                                          params['ts_end'], dir_path, params['pop_method'])
-                    if params['pop_method'].is_upper():
+                    if params['pop_method'].isupper():
                         print('create-raincell|command_dir_path : ', command_dir_path)
                         print('create-raincell|command : ', command)
                         response = run_input_file_generation_methods(command_dir_path, command)
