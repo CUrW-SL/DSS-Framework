@@ -24,8 +24,14 @@ def get_latest_fgt(fcst_connection, hash_id, start_time):
     cur = fcst_connection.cursor()
     cur.callproc('getLatestFGTs', (hash_id, start_time))
     rows = cur.fetchall()
-    print('get_latest_fgts|rows: ', rows)
-    return rows[0]['fgt'].strftime('%Y-%m-%d %H:%M:%S')
+    if rows is not None:
+        if rows:
+            print('get_latest_fgts|rows: ', rows)
+            return rows[0]['fgt'].strftime('%Y-%m-%d %H:%M:%S')
+        else:
+            return None
+    else:
+        return None
 
 
 def is_inside_basin(shape_file, latitude, longitude):

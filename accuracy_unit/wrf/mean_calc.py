@@ -99,19 +99,21 @@ def get_fcst_cum_mean_df(fcst_connection, shape_file, sim_tag, wrf_model, start_
         print('get_fcst_cum_mean_df|[hash_ids[0], start_time] : ', [hash_ids[0], start_time])
         latest_fgt = get_latest_fgt(fcst_connection, hash_ids[0], start_time)
         print('get_fcst_cum_mean_df|latest_fgt : ', latest_fgt)
-        print('get_fcst_cum_mean_df|hash_ids : ', hash_ids)
-        for hash_id in hash_ids:
-            df = get_station_timeseries(fcst_connection, hash_id, latest_fgt, start_time, end_time)
-            if df is not None:
-                if station_count == 0:
-                    total_df = df
-                else:
-                    total_df = total_df.add(df, fill_value=0)
-                station_count += 1
-        if total_df is not None:
-            fcst_mean_df = total_df['value'] / station_count
-            fcst_cum_mean_df = fcst_mean_df.cumsum()
-            return fcst_cum_mean_df
+        if latest_fgt is not None:
+            for hash_id in hash_ids:
+                df = get_station_timeseries(fcst_connection, hash_id, latest_fgt, start_time, end_time)
+                if df is not None:
+                    if station_count == 0:
+                        total_df = df
+                    else:
+                        total_df = total_df.add(df, fill_value=0)
+                    station_count += 1
+            if total_df is not None:
+                fcst_mean_df = total_df['value'] / station_count
+                fcst_cum_mean_df = fcst_mean_df.cumsum()
+                return fcst_cum_mean_df
+        else:
+            return None
 
 
 if __name__ == '__main__':
