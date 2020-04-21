@@ -14,8 +14,8 @@ import subprocess
 from os.path import join as pjoin
 from datetime import datetime, timedelta
 
-HOST_ADDRESS = '10.138.0.4'
-HOST_PORT = 8081
+HOST_ADDRESS = '192.168.1.41'
+HOST_PORT = 8088
 
 WIN_OUTPUT_DIR_PATH = r"D:\flo2d_output"
 WIN_HOME_DIR_PATH = r"D:\DSS-Framework\weather_models\flo2d"
@@ -149,8 +149,11 @@ class StoreHandler(BaseHTTPRequestHandler):
                         response = run_input_file_generation_methods(command_dir_path, command)
                     else:
                         rule_name = params['pop_method']
+                        print('create-raincell|rule_name : ', rule_name)
                         sim_tag = rule_name[:len(rule_name) - 3]
+                        print('create-raincell|sim_tag : ', sim_tag)
                         source_id = int(rule_name[len(rule_name) - 2:])
+                        print('create-raincell|source_id : ', source_id)
                         create_event_raincell(dir_path, params['run_date'], params['run_time'], params['forward'],
                                               params['backward'], 'flo2d_250', sim_tag, source_id)
                 except Exception as e:
