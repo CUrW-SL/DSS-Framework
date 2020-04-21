@@ -154,8 +154,10 @@ class StoreHandler(BaseHTTPRequestHandler):
                         print('create-raincell|sim_tag : ', sim_tag)
                         source_id = int(rule_name[len(rule_name) - 2:])
                         print('create-raincell|source_id : ', source_id)
-                        create_event_raincell(dir_path, params['run_date'], params['run_time'], params['forward'],
-                                              params['backward'], 'flo2d_250', sim_tag, source_id)
+                        [forward] = query_components['forward']
+                        [backward] = query_components['backward']
+                        create_event_raincell(dir_path, params['run_date'], params['run_time'], int(forward),
+                                              int(backward), 'flo2d_250', sim_tag, source_id)
                 except Exception as e:
                     print(str(e))
                     response = {'response': 'fail'}
