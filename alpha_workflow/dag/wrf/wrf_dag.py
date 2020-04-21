@@ -179,6 +179,7 @@ def get_push_command(**context):
     if wrf_rule is not None:
         print('get_wrf_run_command|wrf_rule : ', wrf_rule)
         wrf_model = wrf_rule['target_model']
+        rule_name = wrf_rule['name']
         wrf_run = wrf_rule['run']
         gfs_hour = wrf_rule['hour']
         vm_config = Variable.get('ubuntu1_config', deserialize_json=True)
@@ -190,8 +191,8 @@ def get_push_command(**context):
         push_config = wrf_rule['rule_details']['push_config']
         wrf_bucket = wrf_rule['rule_details']['wrf_bucket']
         exec_date = get_execusion_date(context)
-        push_script = '{} {} {} d{} {} {} {}'.format(bash_script, push_config, wrf_bucket, wrf_run,
-                                                     gfs_hour, wrf_model, exec_date)
+        push_script = '{} {} {} d{} {} {} {} {}'.format(bash_script, push_config, wrf_bucket, wrf_run,
+                                                     gfs_hour, wrf_model, exec_date, rule_name)
         print('get_push_command|run_script : ', push_script)
         push_wrf_cmd = ssh_cmd_template.format(vm_password, vm_user, push_node, push_script)
         print('get_push_command|push_wrf_cmd : ', push_wrf_cmd)
