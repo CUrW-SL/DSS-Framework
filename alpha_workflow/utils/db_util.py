@@ -1018,14 +1018,14 @@ class RuleEngineAdapter:
 
     def set_hechms_rain_tag(self, tag, id):
         print('set_hechms_rain_tag|tag: ', tag)
-        query = 'update dss.hechms_rules set rainfall_data_from={} where id=\'{}\''.format(tag, id)
+        query = 'update dss.hechms_rules set rainfall_data_from=\'{}\' where id=\'{}\''.format(tag, id)
         print('set_hechms_rain_tag|query: ', query)
         self.update_query(query)
         print('set_hechms_rain_tag|tag successfully updated.')
 
     def set_flo2d_rain_tag(self, tag, id):
         print('set_flo2d_rain_tag|tag: ', tag)
-        query = 'update dss.flo2d_rules set raincell_data_from={} where id=\'{}\''.format(tag, id)
+        query = 'update dss.flo2d_rules set raincell_data_from=\'{}\' where id=\'{}\''.format(tag, id)
         print('set_flo2d_rain_tag|query: ', query)
         self.update_query(query)
         print('set_flo2d_rain_tag|tag successfully updated.')
