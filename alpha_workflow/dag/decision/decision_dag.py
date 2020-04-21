@@ -200,13 +200,15 @@ def wrf_event_models_decision(**context):
     [hechms_ids, flo2d_ids] = get_both_hechms_flo2d_rule_ids(decision_config)
     print('wrf_event_models_decision|hechms_ids : ', hechms_ids)
     print('wrf_event_models_decision|flo2d_ids : ', flo2d_ids)
+    tag = '{}_{}'.format(min_rmse_params['sim_tag'], min_rmse_params['wrf_model'])
+    print('wrf_event_models_decision|tag : ', tag)
     dss_adapter = get_dss_db_adapter()
     if len(hechms_ids) > 0:
         for hechms_id in hechms_ids:
-            dss_adapter.set_hechms_rain_tag(min_rmse_params['sim_tag'], hechms_id)
+            dss_adapter.set_hechms_rain_tag(tag, hechms_id)
     if len(flo2d_ids) > 0:
         for flo2d_id in flo2d_ids:
-            dss_adapter.set_flo2d_rain_tag(min_rmse_params['sim_tag'], flo2d_id)
+            dss_adapter.set_flo2d_rain_tag(tag, flo2d_id)
 
 
 def wrf_production_models_decision(**context):
