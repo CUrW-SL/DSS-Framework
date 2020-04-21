@@ -158,6 +158,7 @@ class StoreHandler(BaseHTTPRequestHandler):
                         [backward] = query_components['backward']
                         create_event_raincell(dir_path, params['run_date'], params['run_time'], int(forward),
                                               int(backward), 'flo2d_250', sim_tag, source_id)
+                        response = {'response': 'success'}
                 except Exception as e:
                     print(str(e))
                     response = {'response': 'fail'}
