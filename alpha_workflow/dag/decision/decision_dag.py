@@ -201,7 +201,7 @@ def wrf_event_models_decision(**context):
     print('wrf_event_models_decision|hechms_ids : ', hechms_ids)
     print('wrf_event_models_decision|flo2d_ids : ', flo2d_ids)
     dss_adapter = get_dss_db_adapter()
-    if len(hechms_ids)>0:
+    if len(hechms_ids) > 0:
         for hechms_id in hechms_ids:
             dss_adapter.set_hechms_rain_tag(min_rmse_params['sim_tag'], hechms_id)
     if len(flo2d_ids) > 0:
@@ -279,7 +279,6 @@ def evaluate_hechms_model(**context):
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
          description='Run Decision Making DAG', dagrun_timeout=timedelta(minutes=10),
          catchup=False) as dag:
-
     init_task = PythonOperator(
         task_id='init_task',
         provide_context=True,
