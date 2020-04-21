@@ -335,7 +335,7 @@ def get_ts_start_end_for_data_type(run_date, run_time, forward=3, backward=2):
     return result
 
 
-def create_event_raincell(dir_path, run_date, run_time, forward, backward, model, sim_tag='dwrf_gfs_d1_18', wrf_model=20, data_type=1):
+def create_event_raincell(dir_path, run_date, run_time, forward, backward, model, sim_tag='dwrf_gfs_d1_18', wrf_model=20, data_type=2):
     time_limits = get_ts_start_end_for_data_type(run_date, run_time, forward, backward)
     raincell_file_path = os.path.join(dir_path, 'RAINCELL.DAT')
     print('create_event_raincell|time_limits : ', time_limits)
