@@ -6,7 +6,7 @@ import json
 from urllib.parse import urlparse, parse_qs
 from run_model import execute_flo2d, flo2d_model_completed
 from gen_old_outflow import create_outflow_old
-from raincelldat.create_raincell import create_event_raincell
+from create_raincell import create_event_raincell
 
 
 import subprocess
