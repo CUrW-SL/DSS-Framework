@@ -1052,6 +1052,8 @@ class RuleEngineAdapter:
         return locations
 
     def update_max_flo2d_250_forecast_water_level(self, locations, exec_date, sim_tag, fcst_db_config):
+        print('update_max_flo2d_250_forecast_water_level|[exec_date, sim_tag, fcst_db_config] : ', [exec_date, sim_tag,
+                                                                                                    fcst_db_config])
         for location in locations:
             print('update_max_flo2d_250_forecast_water_level|location : ', location)
             station_query = 'select id,latitude,longitude from curw_fcst.station where ' \
@@ -1105,14 +1107,14 @@ def get_multiple_result(type, db_config, query):
 
 
 def get_fcst_connection(fcst_config):
-    fcst_connection = pymysql.connect(host=fcst_config[''], user=fcst_config[''], password=fcst_config[''],
-                                      db= fcst_config[''],cursorclass=pymysql.cursors.DictCursor)
+    fcst_connection = pymysql.connect(host=fcst_config['mysql_host'], user=fcst_config['mysql_user'], password=fcst_config['mysql_password'],
+                                      db= fcst_config['mysql_db'],cursorclass=pymysql.cursors.DictCursor)
     return fcst_connection
 
 
 def get_obs_connection(obs_config):
-    obs_connection = pymysql.connect(host=obs_config[''], user=obs_config[''], password=obs_config[''],
-                                     db=obs_config[''],cursorclass=pymysql.cursors.DictCursor)
+    obs_connection = pymysql.connect(host=obs_config['mysql_host'], user=obs_config['mysql_user'], password=obs_config['mysql_password'],
+                                     db=obs_config['mysql_db'],cursorclass=pymysql.cursors.DictCursor)
     return obs_connection
 
 
