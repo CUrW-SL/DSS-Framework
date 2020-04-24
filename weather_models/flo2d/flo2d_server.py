@@ -45,7 +45,7 @@ def set_daily_dir(target_model, run_date, run_time):
     return dir_path
 
 
-def run_input_file_generation_methods(dir_path, command):
+def  run_input_file_generation_methods(dir_path, command):
     try:
         print('run_input_file_generation_methods|dir_path: ', dir_path)
         print('run_input_file_generation_methods|command: ', command)
