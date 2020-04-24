@@ -1061,27 +1061,28 @@ class RuleEngineAdapter:
             print('update_max_flo2d_250_forecast_water_level|station_query: ', station_query)
             result = get_single_result('fcst', fcst_db_config, station_query)
             print('update_max_flo2d_250_forecast_water_level|station_query|result: ', result)
-            station_id = result['id']
-            print('update_max_flo2d_250_forecast_water_level|station_id : ', station_id)
-            if station_id is not None:
-                hash_query = 'select id from curw_fcst.run where variable=2 and unit=2 and source=9 ' \
-                        'and sim_tag=\'{}\' and station=\'{}\''.format(sim_tag, station_id)
-                print('update_max_flo2d_250_forecast_water_level|hash_query : ', hash_query)
-                result = get_single_result('fcst', fcst_db_config, hash_query)
-                print('update_max_flo2d_250_forecast_water_level|hash_query|result : ', result)
-                station_hash = result['id']
-                print('update_max_flo2d_250_forecast_water_level|station_hash : ', station_hash)
-                max_query = 'select max(value) as max_water_level from curw_fcst.data where time>\'{}\' and fgt>\'{}\' ' \
-                            'and id=\'{}\';'.format(exec_date, exec_date, station_hash)
-                print('update_max_flo2d_250_forecast_water_level|max_query : ', max_query)
-                max_result = get_single_result('fcst', fcst_db_config, max_query)
-                print('update_max_flo2d_250_forecast_water_level|max_query|max_result : ', max_result)
-                max_value = max_result['max_water_level']
-                print('update_max_flo2d_250_forecast_water_level|max_value : ', max_value)
-                update_query = 'update dss.rule_variables set flo2d_250_max_water_level={} where ' \
-                               'variable=2 and location=\'{}\';'.format(max_value, location)
-                print('update_max_flo2d_250_forecast_water_level|update_query : ', update_query)
-                self.update_query(update_query)
+            if result is not None:
+                station_id = result['id']
+                print('update_max_flo2d_250_forecast_water_level|station_id : ', station_id)
+                if station_id is not None:
+                    hash_query = 'select id from curw_fcst.run where variable=2 and unit=2 and source=9 ' \
+                            'and sim_tag=\'{}\' and station=\'{}\''.format(sim_tag, station_id)
+                    print('update_max_flo2d_250_forecast_water_level|hash_query : ', hash_query)
+                    result = get_single_result('fcst', fcst_db_config, hash_query)
+                    print('update_max_flo2d_250_forecast_water_level|hash_query|result : ', result)
+                    station_hash = result['id']
+                    print('update_max_flo2d_250_forecast_water_level|station_hash : ', station_hash)
+                    max_query = 'select max(value) as max_water_level from curw_fcst.data where time>\'{}\' and fgt>\'{}\' ' \
+                                'and id=\'{}\';'.format(exec_date, exec_date, station_hash)
+                    print('update_max_flo2d_250_forecast_water_level|max_query : ', max_query)
+                    max_result = get_single_result('fcst', fcst_db_config, max_query)
+                    print('update_max_flo2d_250_forecast_water_level|max_query|max_result : ', max_result)
+                    max_value = max_result['max_water_level']
+                    print('update_max_flo2d_250_forecast_water_level|max_value : ', max_value)
+                    update_query = 'update dss.rule_variables set flo2d_250_max_water_level={} where ' \
+                                   'variable=2 and location=\'{}\';'.format(max_value, location)
+                    print('update_max_flo2d_250_forecast_water_level|update_query : ', update_query)
+                    self.update_query(update_query)
 
 
 def get_single_result(type, db_config, query):
