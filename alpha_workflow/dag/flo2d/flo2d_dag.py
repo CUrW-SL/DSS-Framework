@@ -433,7 +433,8 @@ def update_max_water_levels(**context):
         if run_type == 'event':
             sim_tag = 'event_run'
         else:
-            sim_tag = rule['name']
+            # sim_tag = rule['name']
+            sim_tag = 'event_run'
         if rule['target_model'] == 'flo2d_250':
             locations = dss_adapter.get_water_level_locations()
             print('update_max_water_levels|locations : ', locations)
