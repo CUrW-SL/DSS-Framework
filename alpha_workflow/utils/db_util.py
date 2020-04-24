@@ -1069,7 +1069,7 @@ class RuleEngineAdapter:
                 print('update_max_flo2d_250_forecast_water_level|hash_query : ', hash_query)
                 result = get_single_result('fcst', fcst_db_config, hash_query)
                 print('update_max_flo2d_250_forecast_water_level|hash_query|result : ', result)
-                station_hash = result[0]
+                station_hash = result['id']
                 print('update_max_flo2d_250_forecast_water_level|station_hash : ', station_hash)
                 max_query = 'select max(value) as max_water_level from curw_fcst.data where time>\'{}\' and fgt>\'{}\' ' \
                             'and id=\'{}\';'.format(exec_date, exec_date, station_hash)
