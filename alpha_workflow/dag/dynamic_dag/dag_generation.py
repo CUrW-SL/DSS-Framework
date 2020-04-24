@@ -90,6 +90,11 @@ def create_trigger_dag_run(context):
         print('create_trigger_dag_run|target_dag_info : ', target_dag_info)
         model_type = target_dag_info['input_params']['model_type']
         print('create_trigger_dag_run|model_type : ', model_type)
+        if 'run_type' in target_dag_info['input_params']:
+            run_type = target_dag_info['input_params']['run_type']
+        else:
+            run_type = 'production'
+        print('create_trigger_dag_run|run_type : ', run_type)
         if 'run_date' in target_dag_info['input_params']:
             run_date = target_dag_info['input_params']['run_date']
             print('********create_trigger_dag_run|run on user defined date|run_date : ', run_date)
@@ -132,6 +137,7 @@ def create_trigger_dag_run(context):
             for payload in payloads:
                 if payload is not None:
                     payload['run_date'] = run_date
+                    payload['run_type'] = run_type
                     print('create_trigger_dag_run|payload : ', payload)
                     dag_infos.append({'dag_name': payload['name'], 'payload': payload})
                     print('create_dag_run|dag_infos : ', dag_infos)

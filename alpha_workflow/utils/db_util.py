@@ -4,6 +4,7 @@ import os
 from datetime import datetime
 import croniter
 import json
+import pymysql
 
 LOG_FORMAT = '[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s'
 
@@ -1040,6 +1041,76 @@ class RuleEngineAdapter:
             task_param_list.append(json.loads(result[1]))
         return task_param_list
 
+    def get_water_level_locations(self):
+        locations = []
+        query = 'select id, location from dss.rule_variables where variable=2;'
+        print('get_water_level_locations|query: ', query)
+        results = self.get_multiple_result(query)
+        print('get_water_level_locations|results: ', results)
+        for result in results:
+            locations.append(result[1])
+        return locations
+
+    def update_max_flo2d_250_forecast_water_level(self, locations, exec_date, sim_tag, fcst_db_config):
+        for location in locations:
+            print('update_max_flo2d_250_forecast_water_level|location : ', location)
+            station_query = 'select id,latitude,longitude from curw_fcst.station where ' \
+                    'description=\'flo2d_250_channel_cell_map_element\' and name like \'%_{}\''.format(location)
+            print('update_max_flo2d_250_forecast_water_level|station_query: ', station_query)
+            result = get_single_result('fcst', fcst_db_config, station_query)
+            station_id = result['id']
+            print('update_max_flo2d_250_forecast_water_level|station_id : ', station_id)
+            if station_id is not None:
+                hash_query = 'select id from curw_fcst.run where variable=2 and unit=2 and source=9 ' \
+                        'and sim_tag=\'{}\' and station=\'{}\''.format(sim_tag, station_id)
+                print('update_max_flo2d_250_forecast_water_level|query : ', hash_query)
+                result = get_single_result('fcst', fcst_db_config, hash_query)
+                station_hash = result[0]
+                print('update_max_flo2d_250_forecast_water_level|station_hash : ', station_hash)
+                max_query = 'select max(value) as max_water_level from curw_fcst.data where time>\'{}\' and fgt>\'{}\' ' \
+                            'and id=\'{}\';'.format(exec_date, exec_date, station_hash)
+                print('update_max_flo2d_250_forecast_water_level|max_query : ', max_query)
+                max_result = get_single_result('fcst', fcst_db_config, max_query)
+                max_value = max_result['max_water_level']
+                print('update_max_flo2d_250_forecast_water_level|max_value : ', max_value)
+                update_query = 'update dss.rule_variables set flo2d_250_max_water_level={} where ' \
+                               'variable=2 and location=\'{}\';'.format(max_value, location)
+                print('update_max_flo2d_250_forecast_water_level|update_query : ', update_query)
+                self.update_query(update_query)
+
+
+def get_single_result(type, db_config, query):
+    if type == 'fcst':
+        db_connection = get_fcst_connection(db_config)
+    else:
+        db_connection = get_obs_connection(db_config)
+    cur = db_connection.cursor()
+    cur.execute(query)
+    row = cur.fetchone()
+    return row
+
+
+def get_multiple_result(type, db_config, query):
+    if type == 'fcst':
+        db_connection = get_fcst_connection(db_config)
+    else:
+        db_connection = get_obs_connection(db_config)
+    cur = db_connection.cursor()
+    cur.execute(query)
+    rows = cur.fetchall()
+    return rows
+
+
+def get_fcst_connection(fcst_config):
+    fcst_connection = pymysql.connect(host=fcst_config[''], user=fcst_config[''], password=fcst_config[''],
+                                      db= fcst_config[''],cursorclass=pymysql.cursors.DictCursor)
+    return fcst_connection
+
+
+def get_obs_connection(obs_config):
+    obs_connection = pymysql.connect(host=obs_config[''], user=obs_config[''], password=obs_config[''],
+                                     db=obs_config[''],cursorclass=pymysql.cursors.DictCursor)
+    return obs_connection
 
 
 if __name__ == "__main__":
