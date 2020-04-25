@@ -143,3 +143,35 @@ def get_obs_station_timeseries(obs_connection, hash_id, timeseries_start, timese
     except Exception as e:
         print('get_timeseries_by_id|data fetch|Exception:', e)
         return None
+
+
+def get_discharge_obs_df(db_connection, start_date, end_date, model='flo2d_150', grid_id='discharge_glencourse', method='SF'):
+    id_query = 'select id from curw_sim.dis_run where model=\'{}\' and method=\'{}\' and ' \
+               'grid_id=\'{}\';'.format(model, method, grid_id)
+    print('get_discharge_obs_df|id_query : ', id_query)
+    id_result = get_single_result(db_connection, id_query)
+    print('get_discharge_obs_df|id_result : ', id_result)
+    hash_id = id_result['id']
+    print('get_discharge_obs_df|hash_id : ', hash_id)
+    if hash_id is not None:
+        data_query = 'select time,value from curw_sim.dis_data where id=\'{}\' and time>\'{}\' ' \
+                     'and time<\'{}\';'.format(hash_id,start_date, end_date)
+        print('get_discharge_obs_df|data_query : ', data_query)
+        data_result = get_multiple_result(db_connection, id_query)
+        print('get_discharge_obs_df|data_result : ', data_result)
+
+
+def get_discharge_fcst_df(db_connection, start_date, end_date, sim_tag='event_run', source_id=17):
+    id_query = 'select id from curw_fcst.run where variable=3 and unit=3 and source={} and sim_tag=\'{}\';'.format(source_id, sim_tag)
+    print('get_discharge_fcst_df|id_query : ', id_query)
+    id_result = get_single_result(db_connection, id_query)
+    print('get_discharge_fcst_df|id_result : ', id_result)
+    hash_id = id_result['id']
+    print('get_discharge_fcst_df|hash_id : ', hash_id)
+    if hash_id is not None:
+        data_query = 'select time,value from curw_fcst.data where id=\'{}\' and time>\'{}\' ' \
+                     'and time<\'{}\';'.format(hash_id, start_date, end_date)
+        print('get_discharge_fcst_df|data_query : ', data_query)
+        data_result = get_multiple_result(db_connection, id_query)
+        print('get_discharge_fcst_df|data_result : ', data_result)
+
