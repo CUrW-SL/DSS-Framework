@@ -12,7 +12,7 @@ from db_util import RuleEngineAdapter
 sys.path.insert(0, '/home/curw/git/DSS-Framework/accuracy_unit/wrf')
 from mean_calc import calculate_wrf_model_mean
 
-sys.path.insert(0, '/home/curw/git/DSS-Framework/accuracy_unit/wrf')
+sys.path.insert(0, '/home/curw/git/DSS-Framework/accuracy_unit/hechms')
 from hec_mean_calc import calculate_hechms_model_mean
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/utils')
