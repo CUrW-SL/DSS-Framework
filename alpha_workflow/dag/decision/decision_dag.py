@@ -12,6 +12,9 @@ from db_util import RuleEngineAdapter
 sys.path.insert(0, '/home/curw/git/DSS-Framework/accuracy_unit/wrf')
 from mean_calc import calculate_wrf_model_mean
 
+sys.path.insert(0, '/home/curw/git/DSS-Framework/accuracy_unit/wrf')
+from hec_mean_calc import calculate_hechms_model_mean
+
 sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/utils')
 from tag_config import WRF_SIMS, HECHMS_SIMS
 
@@ -276,6 +279,32 @@ def hechms_production_models_decision(**context):
 
 def evaluate_hechms_model(**context):
     print('evaluate_hechms_model|context:', context)
+    rule_name = get_rule_name(context)
+    decision_config = get_decision_config(context)
+    if decision_config['decision_type'] == 'production':
+        print('evaluate_hechms_model|production')
+        dss_adapter = get_dss_db_adapter()
+        hechms_rule = dss_adapter.get_hechms_rule_info_by_name(rule_name)
+        if hechms_rule is not None:
+            print('evaluate_hechms_model|production')
+            print('evaluate_hechms_model|production|hechms_rule:', hechms_rule)
+    elif decision_config['decision_type'] == 'event':
+        print('evaluate_hechms_model|event')
+        rule_name = get_rule_name(context)
+        print('evaluate_hechms_model|event|rule_name:', rule_name)
+        sim_tag = rule_name[:len(rule_name) - 3]
+        source_id = int(rule_name[len(rule_name) - 2:])
+        print('evaluate_wrf_model|event|[wrf_model_id,sim_tag : ', [source_id, sim_tag])
+        run_date = decision_config['run_date']
+        start_limit = run_date
+        run_date = datetime.strptime(run_date, DATE_TIME_FORMAT)
+        end_limit = run_date + timedelta(days=1)
+        end_limit = end_limit.strftime(DATE_TIME_FORMAT)
+        mean_calc = calculate_wrf_model_mean(sim_tag, source_id, start_limit, end_limit)
+        print('evaluate_wrf_model|event|mean_calc : ', mean_calc)
+        task_instance = context['task_instance']
+        print('evaluate_wrf_model|event|task_instance : ', task_instance)
+        task_instance.xcom_push(rule_name, mean_calc)
 
 
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,

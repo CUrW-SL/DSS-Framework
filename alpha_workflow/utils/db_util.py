@@ -317,6 +317,23 @@ class RuleEngineAdapter:
                            'rule_details': json.loads(result[11])}
         return hechms_rule
 
+    def get_hechms_rule_info_by_name(self, rule_name):
+        hechms_rule = None
+        query = 'select id, name, target_model,forecast_days, observed_days, ' \
+                'init_run, no_forecast_continue, no_observed_continue, rainfall_data_from, ' \
+                'ignore_previous_run, accuracy_rule, rule_details from dss.hechms_rules where name = {}'.format(rule_name)
+        print('get_hechms_rule_info_by_name|query : ', query)
+        self.cursor.execute(query)
+        result = self.cursor.fetchone()
+        if result is not None:
+            hechms_rule = {'id': result[0], 'name': result[1], 'target_model': result[2],
+                           'forecast_days': result[3], 'observed_days': result[4],
+                           'init_run': result[5], 'no_forecast_continue': result[6],
+                           'no_observed_continue': result[7], 'rainfall_data_from': result[8],
+                           'ignore_previous_run': result[9], 'accuracy_rule': result[10],
+                           'rule_details': json.loads(result[11])}
+        return hechms_rule
+
     def get_eligible_hechms_rule_info_by_id(self, id):
         hechms_rule = None
         query = 'select id, name, target_model,forecast_days, observed_days, ' \
