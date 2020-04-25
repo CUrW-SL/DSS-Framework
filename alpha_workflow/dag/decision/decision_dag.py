@@ -29,7 +29,7 @@ default_args = {
 }
 
 DATE_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
-WRF_MODEL_MAP = {'A': 19, 'C': 20, 'E': 21, 'SE': 22}
+WRF_MODEL_MAP = {'A': 19, 'C': 20, 'E': 22, 'SE': 21}
 
 
 # {'model_type':'decision_unit',
@@ -246,13 +246,28 @@ def evaluate_wrf_model(**context):
     if decision_config['decision_type'] == 'production':
         print('evaluate_wrf_model|production')
         dss_adapter = get_dss_db_adapter()
-        wrf_rule = dss_adapter.get_wrf_rule_info_by_name(rule_name)
+        wrf_rule_name = rule_name[:len(rule_name) - 3]
+        wrf_rule = dss_adapter.get_wrf_rule_info_by_name(wrf_rule_name)
         if wrf_rule is not None:
-            print('evaluate_wrf_model|production')
             print('evaluate_wrf_model|production|wrf_rule:', wrf_rule)
+            target_model = wrf_rule['target_model']
+            print('evaluate_wrf_model|production|target_model:', target_model)
+            sim_tag = wrf_rule_name
+            source_id = WRF_MODEL_MAP[target_model]
+            print('evaluate_wrf_model|production|sim_tag:', sim_tag)
+            print('evaluate_wrf_model|production|source_id:', source_id)
+            run_date = decision_config['run_date']
+            start_limit = run_date
+            run_date = datetime.strptime(run_date, DATE_TIME_FORMAT)
+            end_limit = run_date + timedelta(days=1)
+            end_limit = end_limit.strftime(DATE_TIME_FORMAT)
+            mean_calc = calculate_wrf_model_mean(sim_tag, source_id, start_limit, end_limit)
+            print('evaluate_wrf_model|production|mean_calc : ', mean_calc)
+            task_instance = context['task_instance']
+            print('evaluate_wrf_model|production|task_instance : ', task_instance)
+            task_instance.xcom_push(rule_name, mean_calc)
     elif decision_config['decision_type'] == 'event':
         print('evaluate_wrf_model|event')
-        rule_name = get_rule_name(context)
         print('evaluate_wrf_model|event|rule_name:', rule_name)
         sim_tag = rule_name[:len(rule_name) - 3]
         source_id = int(rule_name[len(rule_name) - 2:])
