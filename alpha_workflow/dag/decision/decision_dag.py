@@ -254,7 +254,7 @@ def evaluate_wrf_model(**context):
     if decision_config['decision_type'] == 'production':
         print('evaluate_wrf_model|production')
         dss_adapter = get_dss_db_adapter()
-        wrf_rule_name = rule_name[:len(rule_name) - 3]
+        wrf_rule_name = rule_name
         wrf_rule = dss_adapter.get_wrf_rule_info_by_name(wrf_rule_name)
         if wrf_rule is not None:
             print('evaluate_wrf_model|production|wrf_rule:', wrf_rule)
