@@ -5,6 +5,13 @@ from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.python_operator import BranchPythonOperator
 import sys
+import logging
+
+logging.basicConfig(filename='/home/curw/dss_log/decision.log',
+                    filemode='a',
+                    format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S',
+                    level=logging.DEBUG)
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/utils')
 from db_util import RuleEngineAdapter
@@ -132,6 +139,7 @@ def select_hechms_decision_type(**context):
 def push_decision_config_to_xcom(dag_run, **kwargs):
     decision_config = dag_run.conf
     print('push_decision_config_to_xcom|decision_config : ', decision_config)
+    logging.info('start decision flow|{}'.format(decision_config))
     print('push_decision_config_to_xcom|kwargs : ', kwargs)
     return decision_config
 
@@ -322,6 +330,10 @@ def evaluate_hechms_model(**context):
         task_instance.xcom_push(rule_name, mean_calc)
 
 
+def log_end_task(**context):
+    logging.info('End of decision flow.')
+
+
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
          description='Run Decision Making DAG', dagrun_timeout=timedelta(minutes=10),
          catchup=False) as dag:
@@ -465,9 +477,11 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         )
         hechms_event >> hechms_sim >> hechms_event_decision
 
-    end_task = DummyOperator(
+    end_task = PythonOperator(
         task_id='end_task',
         trigger_rule='none_failed',
+        provide_context=True,
+        python_callable=log_end_task,
         pool=dag_pool
     )
 

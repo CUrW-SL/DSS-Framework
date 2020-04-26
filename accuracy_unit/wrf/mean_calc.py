@@ -5,6 +5,7 @@ import pandas as pd
 import pymysql
 import os
 import sys
+from datetime import datetime
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/accuracy_unit')
 from db_plugin import get_wrf_basin_stations, \
@@ -21,6 +22,11 @@ SIM_DB = "curw_sim"
 FCST_DB = "curw_fcst"
 OBS_DB = "curw_obs"
 PORT = 3306
+
+
+def create_dir(dir_path):
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
 
 
 def calculate_wrf_model_mean(sim_tag, wrf_model, start_time, end_time):
@@ -41,6 +47,10 @@ def calculate_wrf_model_mean(sim_tag, wrf_model, start_time, end_time):
                                                                                            fcst_cum_mean_df)
             compare_cum_mean_df = pd.merge(formatted_obs_cum_mean_df, formatted_fcst_cum_mean_df, left_on='time',
                                            right_on='time')
+            test_result_dir = os.path.join('/home/curw/wrf_test',
+                                           '{}'.format(datetime.now().strftime('%Y-%m-%d')),
+                                           '{}_{}_cum_mean.csv'.format(sim_tag, wrf_model))
+            create_dir(test_result_dir)
             compare_cum_mean_df.observed = pd.to_numeric(compare_cum_mean_df.observed)
             compare_cum_mean_df.forecast = pd.to_numeric(compare_cum_mean_df.forecast)
             # print('calculate_wrf_model_mean|compare_cum_mean_df : ', compare_cum_mean_df)
