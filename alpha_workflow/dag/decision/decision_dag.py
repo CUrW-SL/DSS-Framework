@@ -12,6 +12,7 @@ logging.basicConfig(filename='/home/curw/dss_log/decision.log',
                     format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S',
                     level=logging.DEBUG)
+logger = logging.getLogger()
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/utils')
 from db_util import RuleEngineAdapter
@@ -139,7 +140,7 @@ def select_hechms_decision_type(**context):
 def push_decision_config_to_xcom(dag_run, **kwargs):
     decision_config = dag_run.conf
     print('push_decision_config_to_xcom|decision_config : ', decision_config)
-    logging.info('start decision flow|{}'.format(decision_config))
+    logger.info('start decision flow|{}'.format(decision_config))
     print('push_decision_config_to_xcom|kwargs : ', kwargs)
     return decision_config
 
@@ -331,7 +332,7 @@ def evaluate_hechms_model(**context):
 
 
 def log_end_task(**context):
-    logging.info('End of decision flow.')
+    logger.info('End of decision flow.')
 
 
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
