@@ -6,12 +6,12 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.operators.python_operator import BranchPythonOperator
 import sys
 import logging
+import os
 
-logging.basicConfig(filename='/home/curw/dss_log/decision.log',
-                    filemode='a',
-                    format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
-                    datefmt='%Y-%m-%d %H:%M:%S',
-                    level=logging.DEBUG)
+LOG_FORMAT = '[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s'
+logging.basicConfig(filename=os.path.join('/home/curw/dss_log', 'decision.log'),
+                    level=logging.DEBUG,
+                    format=LOG_FORMAT)
 logger = logging.getLogger()
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/utils')
@@ -140,7 +140,7 @@ def select_hechms_decision_type(**context):
 def push_decision_config_to_xcom(dag_run, **kwargs):
     decision_config = dag_run.conf
     print('push_decision_config_to_xcom|decision_config : ', decision_config)
-    logger.info('start decision flow|{}'.format(decision_config))
+    logger .info('start decision flow|{}'.format(decision_config))
     print('push_decision_config_to_xcom|kwargs : ', kwargs)
     return decision_config
 
