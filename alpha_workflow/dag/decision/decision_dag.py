@@ -5,14 +5,9 @@ from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.python_operator import BranchPythonOperator
 import sys
-import logging
 import os
 
-LOG_FORMAT = '[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s'
-logging.basicConfig(filename=os.path.join('/home/curw/dss_log', 'decision.log'),
-                    level=logging.DEBUG,
-                    format=LOG_FORMAT)
-logger = logging.getLogger()
+log_path = os.path.join('/home/curw/dss_log', 'decision.log')
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/utils')
 from db_util import RuleEngineAdapter
@@ -44,6 +39,12 @@ WRF_MODEL_MAP = {'A': 19, 'C': 20, 'E': 22, 'SE': 21}
 # 'decision_type':'event',
 # 'decision_model':'wrf',
 # 'rule_ids':[1,2,3,4]}
+
+def custom_log(message):
+    time = datetime.now().strftime(DATE_TIME_FORMAT)
+    with open(log_path, 'a') as cx_log:
+        message = '{}|{}\n'.format(time, message)
+        cx_log.write(message)
 
 
 def get_dss_db_adapter():
@@ -140,7 +141,7 @@ def select_hechms_decision_type(**context):
 def push_decision_config_to_xcom(dag_run, **kwargs):
     decision_config = dag_run.conf
     print('push_decision_config_to_xcom|decision_config : ', decision_config)
-    logger .info('start decision flow|{}'.format(decision_config))
+    custom_log('start decision flow|{}'.format(decision_config))
     print('push_decision_config_to_xcom|kwargs : ', kwargs)
     return decision_config
 
@@ -332,7 +333,7 @@ def evaluate_hechms_model(**context):
 
 
 def log_end_task(**context):
-    logger.info('End of decision flow.')
+    custom_log('End of decision flow.')
 
 
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
