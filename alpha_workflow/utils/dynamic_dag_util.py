@@ -85,5 +85,8 @@ def get_pump_trigger_payload(dss_adapter, id_list):
             flo2d_rule = dss_adapter.get_flo2d_rule_info_by_id(flo2d_rule_id)
             print('get_pump_trigger_payload|flo2d_rule : ', flo2d_rule)
             return flo2d_rule
+        else:
+            print('get_pump_trigger_payload|rule logic evaluated false|logic : ', logic)
+            return None
     return None
 
