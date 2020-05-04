@@ -160,8 +160,7 @@ def get_rule_name(context):
     return rule_name
 
 
-def get_hechms_rule_ids(context):
-    decision_config = get_decision_config(context)
+def get_hechms_rule_ids(decision_config):
     parent_dag_id = decision_config['parent_rule_id']
     hechms_ids = []
     if parent_dag_id is not None:
@@ -171,6 +170,18 @@ def get_hechms_rule_ids(context):
             if task_param['model_type'] == 'hechms':
                 hechms_ids = hechms_ids + task_param['rule_id']
     return hechms_ids
+
+
+def get_flo2d_rule_ids(decision_config):
+    flo2d_ids = []
+    parent_dag_id = decision_config['parent_rule_id']
+    if parent_dag_id is not None:
+        dss_adapter = get_dss_db_adapter()
+        task_params = dss_adapter.get_parent_dag_tasks(parent_dag_id)
+        for task_param in task_params:
+            if task_param['model_type'] == 'flo2d':
+                flo2d_ids = flo2d_ids + task_param['rule_id']
+    return flo2d_ids
 
 
 def get_both_hechms_flo2d_rule_ids(decision_config):
