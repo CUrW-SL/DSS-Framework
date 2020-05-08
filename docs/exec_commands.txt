@@ -100,3 +100,10 @@ smtp_user = curwalerts@gmail.com
 smtp_password = curwalerts@data
 smtp_port = 587
 smtp_mail_from = curwalerts@gmail.com
+
+scp -P 6022 ./Dockerfile curw@124.43.13.195:/home/curw/hechms/Dockerfile
+
+scp -P 6022 ./runner.sh curw@124.43.13.195:/home/curw/hechms/runner.sh
+
+docker build -t curw-hechms-16_04:hechms_4.2.1 .
+
