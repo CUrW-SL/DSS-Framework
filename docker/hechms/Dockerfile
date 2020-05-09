@@ -25,9 +25,9 @@ RUN tar -xvzf hec-hms421-linux.tar.gz
 #Remove tar file
 RUN rm -f hec-hms421-linux.tar.gz
 
-COPY run.sh /home/run.sh
+COPY hechms_run.sh /home/hechms_run.sh
 
-RUN chmod a+x /home/run.sh
+RUN chmod a+x /home/hechms_run.sh
 
 WORKDIR /home
 
@@ -69,7 +69,7 @@ RUN yum -y --enablerepo=extras install epel-release \
     yum -y install \
         glibc-devel \
         net-tools \
-        gcc
+        gcc \
         https://centos7.iuscommunity.org/ius-release.rpm \
         python36u \
         python36u-devel \
