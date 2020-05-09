@@ -14,22 +14,30 @@ RUN yum -y install \
     libXtst.i686 \
     libgcc.i686 \
     libstdc++.i686 \
-    xorg-x11-server-Xvfb
+    xorg-x11-server-Xvfb \
+    git
+
+RUN mkdir -p curw/distributed_hec \
+    && mkdir -p curw/git
+
+WORKDIR /home/curw/distributed_hec
 
 # Download hec-hms421-linux.tar.gz
-RUN wget 'http://www.hec.usace.army.mil/software/hec-hms/downloads/hec-hms421-linux.tar.gz'
+RUN wget 'http://www.hec.usace.army.mil/software/hec-hms/downloads/hec-hms421-linux.tar.gz' \
+    && wget 'https://files.pythonhosted.org/packages/f3/e0/8949888568534046c5c847d26c89a05c05f3151ab06728dbeca2d1621002/simplejson-2.5.2.tar.gz'
 
 # Unzip tar file
-RUN tar -xvzf hec-hms421-linux.tar.gz
+RUN tar -xvzf hec-hms421-linux.tar.gz \
+    && tar -xvzf simplejson-2.5.2.tar.gz
 
 #Remove tar file
 RUN rm -f hec-hms421-linux.tar.gz
 
-COPY hechms_run.sh /home/hechms_run.sh
+COPY hechms_run.sh /home/curw/hechms_run.sh
 
-RUN chmod a+x /home/hechms_run.sh
+RUN chmod a+x /home/curw/hechms_run.sh
 
-WORKDIR /home
+WORKDIR /home/curw/distributed_hec
 
 #install java for jython
 RUN yum -y install java-1.6.0-openjdk
@@ -45,7 +53,7 @@ WORKDIR /usr/share/jython
 RUN cp jython.jar jythonlib.jar
 RUN zip -r jythonlib.jar Lib
 
-WORKDIR /home
+WORKDIR /home/curw/distributed_hec
 
 #-----------Uncomment later usage---------#
 RUN wget 'http://www.hec.usace.army.mil/software/hec-dssvue/downloads/hec-dssvue201-linux.bin.zip'
@@ -55,15 +63,15 @@ RUN unzip hec-dssvue201-linux.bin.zip
 RUN yes | ./hec-dssvue201.bin
 #ADD hec-dssvue201 /home/hec-dssvue201
 
-WORKDIR /home/hec-dssvue201
+WORKDIR /home/curw/distributed_hec/hec-dssvue201
 RUN rm -f hec-dssvue201-linux.bin.zip \
     rm -f hec-dssvue201.bin
 
 # Replace existing jythonlib.jar with newly created one
-RUN rm -f /home/hec-dssvue201/jar/sys/jythonlib.jar \
-    mv /usr/share/jython/jythonlib.jar /home/hec-dssvue201/jar/sys
+RUN rm -f jar/sys/jythonlib.jar
+RUN mv /usr/share/jython/jythonlib.jar /home/curw/distributed_hec/hec-dssvue201/jar/sys
 
-WORKDIR /home
+WORKDIR /home/curw/distributed_hec
 
 RUN yum -y --enablerepo=extras install epel-release \
     yum -y install \
@@ -72,10 +80,25 @@ RUN yum -y --enablerepo=extras install epel-release \
         gcc \
         https://centos7.iuscommunity.org/ius-release.rpm \
         python36u \
+        python36u-libs \
         python36u-devel \
-        wget https://bootstrap.pypa.io/get-pip.py \
-        python3.6 get-pip.py \
-        yum -y install build-dep python-psycopg2 \
-        pip install psycopg2
+        python36u-pip \
+        python36-setuptools
 
-CMD ["hechms_run.sh"]
+RUN easy_install-3.6 pip
+
+RUN pip3 install Flask \
+                 Flask-JSON \
+                 pandas \
+                 geopandas \
+                 shapely \
+                 scipy \
+                 mysql-connector
+
+WORKDIR /home/curw/git
+
+RUN git clone https://github.com/CUrW-SL/distributed_hechms.git
+
+WORKDIR /home/curw
+
+ENTRYPOINT ["./hechms_run.sh"]
