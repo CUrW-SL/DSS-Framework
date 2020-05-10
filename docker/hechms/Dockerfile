@@ -99,6 +99,7 @@ WORKDIR /home/curw/git
 
 RUN git clone https://github.com/CUrW-SL/distributed_hechms.git
 
-WORKDIR /home/curw
+CMD ["hechms_run.sh"]
 
-ENTRYPOINT ["./hechms_run.sh"]
+VOLUME /home/curw
+
