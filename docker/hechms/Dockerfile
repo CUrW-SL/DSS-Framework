@@ -108,6 +108,8 @@ RUN sed -i "s|PROG_ROOT=.|PROG_ROOT=/home/curw/distributed_hec/hec-dssvue201|g" 
 WORKDIR /home/curw/distributed_hec/hec-hms-421
 RUN sed -i "s|PROG=hms.Hms|PROG=hms.Hms\nDISPLAY=\":0\"\n |g" /home/curw/distributed_hec/hec-hms-421/hec-hms.sh
 
+WORKDIR /home/curw
+COPY hechms_run.sh /home/curw/hechms_run.sh
 CMD ["hechms_run.sh"]
 
 VOLUME /home/curw
