@@ -117,3 +117,4 @@ curl -X GET "http://172.17.0.2:5000/HECHMS/distributed/pre-process/2020-03-22_10
 curl -X GET "http://172.17.0.2:5000/HECHMS/distributed/run"
 curl -X GET "http://172.17.0.2:5000/HECHMS/distributed/post-process/2020-03-22_10:00:00/3/2"
 
+./runner.sh -d 2020-03-22 14:00:00 -f 3 -b 2 -r 0 -p MME
