@@ -110,6 +110,7 @@ RUN sed -i "s|PROG=hms.Hms|PROG=hms.Hms\nDISPLAY=\":0\"\n |g" /home/curw/distrib
 
 WORKDIR /home/curw
 COPY hechms_run.sh /home/curw/hechms_run.sh
+RUN chmod +x hechms_run.sh
 CMD ["hechms_run.sh"]
 
 VOLUME /home/curw
