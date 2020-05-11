@@ -1,3 +1,4 @@
+import subprocess
 from datetime import datetime, timedelta
 from airflow import DAG, AirflowException
 from airflow.operators.python_operator import PythonOperator
@@ -11,12 +12,16 @@ from db_util import RuleEngineAdapter
 dag_pool = 'hechms_pool'
 git_path = '/home/curw/git'
 
+RUN_SCRIPT = '/home/curw/git/DSS-Framework/docker/hechms/runner.sh'
+
 default_args = {
     'owner': 'dss admin',
     'start_date': datetime.utcnow(),
     'email': ['hasithadkr7@gmail.com'],
     'email_on_failure': True,
 }
+
+ssh_cmd_template = 'sshpass -p \'{}\' ssh {}@{} {}'
 
 create_input_cmd_template = 'curl -X GET "http://{}:{}/HECHMS/distributed/init/{}/{}/{}/{}/{}"'
 create_input_request = 'http://{}:{}/HECHMS/distributed/init/{}/{}/{}/{}/{}'
@@ -190,6 +195,31 @@ def get_upload_discharge_cmd(**context):
         )
 
 
+def run_hechms_workflow(**context):
+    exec_date = get_local_exec_date_from_context(context)
+    rule_id = get_rule_id(context)
+    print('run_hechms|[exec_date, rule_id] : ', [exec_date, rule_id])
+    allowed_to_proceed(rule_id)
+    vm_config = Variable.get('ubuntu1_config', deserialize_json=True)
+    vm_user = vm_config['user']
+    vm_password = vm_config['password']
+    rule = get_rule_by_id(rule_id)
+    if rule is not None:
+        forward = rule['forecast_days']
+        backward = rule['observed_days']
+        init_run = rule['init_run']
+        pop_method = rule['rainfall_data_from']
+        run_node = rule['rule_details']['run_node']
+        run_script = '{}  -d {} -f {} -b {} -r {} -p {} '.format(RUN_SCRIPT, exec_date, forward, backward, init_run, pop_method)
+        print('get_wrf_run_command|run_script : ', run_script)
+        run_wrf_cmd = ssh_cmd_template.format(vm_password, vm_user, run_node, run_script)
+        print('get_wrf_run_command|run_wrf_cmd : ', run_wrf_cmd)
+        print('get_wrf_run_command|run_wrf_cmd : ', run_wrf_cmd)
+        subprocess.call(run_wrf_cmd, shell=True)
+    else:
+        raise AirflowException('hechms rule not found')
+
+
 def update_workflow_status(status, rule_id):
     try:
         db_config = Variable.get('db_config', deserialize_json=True)
@@ -311,40 +341,47 @@ def create_dag(dag_id, dag_rule, timeout, default_args):
             pool=dag_pool
         )
 
-        create_input_hec_dis = PythonOperator(
-            task_id='create_input_hec_dis',
+        run_hechms = PythonOperator(
+            task_id='run_hechms',
             provide_context=True,
-            python_callable=get_create_input_cmd,
+            python_callable=run_hechms_workflow,
             pool=dag_pool
         )
 
-        run_hechms_preprocess_hec_dis = PythonOperator(
-            task_id='run_hechms_preprocess_hec_dis',
-            provide_context=True,
-            python_callable=get_run_hechms_preprocess_cmd,
-            pool=dag_pool
-        )
-
-        run_hechms_hec_dis = PythonOperator(
-            task_id='run_hechms_hec_dis',
-            provide_context=True,
-            python_callable=get_run_hechms_cmd,
-            pool=dag_pool
-        )
-
-        run_hechms_postprocess_hec_dis = PythonOperator(
-            task_id='run_hechms_postprocess_hec_dis',
-            provide_context=True,
-            python_callable=get_run_hechms_postprocess_cmd,
-            pool=dag_pool
-        )
-
-        upload_discharge_hec_dis = PythonOperator(
-            task_id='upload_discharge_hec_dis',
-            provide_context=True,
-            python_callable=get_upload_discharge_cmd,
-            pool=dag_pool
-        )
+        # create_input_hec_dis = PythonOperator(
+        #     task_id='create_input_hec_dis',
+        #     provide_context=True,
+        #     python_callable=get_create_input_cmd,
+        #     pool=dag_pool
+        # )
+        #
+        # run_hechms_preprocess_hec_dis = PythonOperator(
+        #     task_id='run_hechms_preprocess_hec_dis',
+        #     provide_context=True,
+        #     python_callable=get_run_hechms_preprocess_cmd,
+        #     pool=dag_pool
+        # )
+        #
+        # run_hechms_hec_dis = PythonOperator(
+        #     task_id='run_hechms_hec_dis',
+        #     provide_context=True,
+        #     python_callable=get_run_hechms_cmd,
+        #     pool=dag_pool
+        # )
+        #
+        # run_hechms_postprocess_hec_dis = PythonOperator(
+        #     task_id='run_hechms_postprocess_hec_dis',
+        #     provide_context=True,
+        #     python_callable=get_run_hechms_postprocess_cmd,
+        #     pool=dag_pool
+        # )
+        #
+        # upload_discharge_hec_dis = PythonOperator(
+        #     task_id='upload_discharge_hec_dis',
+        #     provide_context=True,
+        #     python_callable=get_upload_discharge_cmd,
+        #     pool=dag_pool
+        # )
 
         complete_state = PythonOperator(
             task_id='complete_state',
@@ -354,8 +391,9 @@ def create_dag(dag_id, dag_rule, timeout, default_args):
             pool=dag_pool
         )
 
-        init_hechms >> running_status >> create_input_hec_dis >> run_hechms_preprocess_hec_dis >> \
-        run_hechms_hec_dis >> run_hechms_postprocess_hec_dis >> upload_discharge_hec_dis >> complete_state
+        # init_hechms >> running_status >> create_input_hec_dis >> run_hechms_preprocess_hec_dis >> \
+        # run_hechms_hec_dis >> run_hechms_postprocess_hec_dis >> upload_discharge_hec_dis >> complete_state
+        init_hechms >> running_status >> run_hechms >> complete_state
 
     return dag
 
