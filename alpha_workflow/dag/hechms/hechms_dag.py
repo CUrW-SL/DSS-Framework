@@ -61,7 +61,7 @@ def get_local_exec_date_from_context(context):
         exec_datetime_str = context["execution_date"].to_datetime_string()
         exec_datetime = datetime.strptime(exec_datetime_str, '%Y-%m-%d %H:%M:%S') + timedelta(hours=5, minutes=30)
         exec_date = exec_datetime.strftime('%Y-%m-%d_%H:00:00')
-    return exec_date
+    return [exec_date, exec_datetime.strftime('%Y-%m-%d'), exec_datetime.strftime('%H-00-00')]
 
 
 def get_create_input_cmd(**context):
@@ -196,9 +196,9 @@ def get_upload_discharge_cmd(**context):
 
 
 def run_hechms_workflow(**context):
-    exec_date = get_local_exec_date_from_context(context)
+    [exec_date, date_only, time_only] = get_local_exec_date_from_context(context)
     rule_id = get_rule_id(context)
-    print('run_hechms|[exec_date, rule_id] : ', [exec_date, rule_id])
+    print('run_hechms|[exec_date,date_only, time_only, rule_id] : ', [exec_date, date_only, time_only, rule_id])
     allowed_to_proceed(rule_id)
     vm_config = Variable.get('ubuntu1_config', deserialize_json=True)
     vm_user = vm_config['user']
@@ -210,7 +210,11 @@ def run_hechms_workflow(**context):
         init_run = rule['init_run']
         pop_method = rule['rainfall_data_from']
         run_node = rule['rule_details']['run_node']
-        run_script = '{}  -d {} -f {} -b {} -r {} -p {} '.format(RUN_SCRIPT, exec_date, forward, backward, init_run, pop_method)
+        run_script = '{}  -d {} -f {} -b {} -r {} -p {} -D {} -T {}'.format(RUN_SCRIPT,
+                                                                            exec_date,
+                                                                            forward, backward,
+                                                                            init_run, pop_method,
+                                                                            date_only, time_only)
         print('get_wrf_run_command|run_script : ', run_script)
         run_wrf_cmd = ssh_cmd_template.format(vm_password, vm_user, run_node, run_script)
         print('get_wrf_run_command|run_wrf_cmd : ', run_wrf_cmd)
