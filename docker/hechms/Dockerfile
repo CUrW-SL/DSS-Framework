@@ -93,11 +93,20 @@ RUN pip3 install Flask \
                  geopandas \
                  shapely \
                  scipy \
-                 mysql-connector
+                 mysql-connector \
+                 virtualenv
 
 WORKDIR /home/curw/git
 
 RUN git clone https://github.com/CUrW-SL/distributed_hechms.git
+
+
+WORKDIR /home/curw/distributed_hec/hec-dssvue201
+RUN sed -i "s|        exit|        #exit |g" /home/curw/distributed_hec/hec-dssvue201/hec-dssvue.sh
+RUN sed -i "s|PROG_ROOT=.|PROG_ROOT=/home/curw/distributed_hec/hec-dssvue201|g" /home/curw/distributed_hec/hec-dssvue201/hec-dssvue.sh
+
+WORKDIR /home/curw/distributed_hec/hec-hms-421
+RUN sed -i "s|PROG=hms.Hms|PROG=hms.Hms\nDISPLAY=\":0\"\n |g" /home/curw/distributed_hec/hec-hms-421/hec-hms.sh
 
 CMD ["hechms_run.sh"]
 
