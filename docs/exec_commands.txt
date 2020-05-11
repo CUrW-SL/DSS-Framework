@@ -110,6 +110,7 @@ docker build -t curw-hechms-16_04:hechms_4.2.1 .
 docker build -t curw-hechms-centos7:hechms_4.2.1 .
 docker run -it curw-hechms-centos7:hechms_4.2.1  /bin/bash
 
+docker build --no-cache -t curw-hechms-centos7:hechms_4.2.1 .
 
 curl -X GET "http://172.17.0.2:5000/HECHMS/distributed/init/2020-03-22_10:00:00/3/2/0/MME"
 curl -X GET "http://172.17.0.2:5000/HECHMS/distributed/pre-process/2020-03-22_10:00:00/3/2"
