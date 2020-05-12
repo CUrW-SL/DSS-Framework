@@ -104,7 +104,7 @@ RUN sed -i "s|        exit|        #exit |g" /home/curw/distributed_hec/hec-dssv
 RUN sed -i "s|PROG_ROOT=.|PROG_ROOT=/home/curw/distributed_hec/hec-dssvue201|g" /home/curw/distributed_hec/hec-dssvue201/hec-dssvue.sh
 
 WORKDIR /home/curw/distributed_hec/hec-hms-421
-RUN sed -i "s|PROG=hms.Hms|PROG=hms.Hms\nDISPLAY=\":0\"\n |g" /home/curw/distributed_hec/hec-hms-421/hec-hms.sh
+RUN sed -i "s|PROG=hms.Hms|PROG=hms.Hms\nDISPLAY=\":1.0\"\n |g" /home/curw/distributed_hec/hec-hms-421/hec-hms.sh
 
 WORKDIR /home/curw
 COPY hechms_run.sh /home/curw/hechms_run.sh
