@@ -1110,7 +1110,7 @@ class RuleEngineAdapter:
         if results is not None:
             for result in results:
                 rule = {'id': result[0], 'name': result[1], 'logic': result[2], 'trigger_type':
-                    result[3], 'trigger': json.loads(result[4]), 'input_params': json.loads(result[5])}
+                    result[3], 'trigger_unit': json.loads(result[4]), 'input_params': json.loads(result[5])}
                 rules.append(rule)
         return rules
 
