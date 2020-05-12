@@ -1105,6 +1105,7 @@ class RuleEngineAdapter:
         query = 'select id,name,logic,trigger_type,\'trigger\', input_params from dss.rule_logics;'
         print('get_all_decisions_logics|query : ', query)
         results = self.get_multiple_result(query)
+        print('get_all_decisions_logics|results : ', results)
         rules = []
         if results is not None:
             for result in results:
