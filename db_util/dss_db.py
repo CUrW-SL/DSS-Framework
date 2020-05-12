@@ -828,7 +828,7 @@ class RuleEngineAdapter:
 
     #------------------------------------------------------------
     def get_all_decisions_logics(self):
-        query = 'select id,name,logic,trigger_type, trigger, input_params from dss.rule_logics;'
+        query = 'select id,name,logic,trigger_type,trigger, input_params from dss.rule_logics;'
         print('get_all_decisions_logics|query : ', query)
         results = self.get_multiple_result(query)
         rules = []

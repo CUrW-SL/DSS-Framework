@@ -1101,6 +1101,18 @@ class RuleEngineAdapter:
                     print('update_max_flo2d_250_forecast_water_level|update_query : ', update_query)
                     self.update_query(update_query)
 
+    def get_all_decisions_logics(self):
+        query = 'select id,name,logic,trigger_type,trigger, input_params from dss.rule_logics;'
+        print('get_all_decisions_logics|query : ', query)
+        results = self.get_multiple_result(query)
+        rules = []
+        if results is not None:
+            for result in results:
+                rule = {'id': result[0], 'name': result[1], 'logic': result[2], 'trigger_type':
+                    result[3], 'trigger': json.loads(result[4]), 'input_params': json.loads(result[5])}
+                rules.append(rule)
+        return rules
+
 
 def get_single_result(type, db_config, query):
     if type == 'fcst':
