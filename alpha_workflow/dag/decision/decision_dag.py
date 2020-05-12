@@ -92,6 +92,7 @@ def get_hechms_rules():
 def get_decision_logics():
     dss_adapter = get_dss_db_adapter()
     decision_logics = dss_adapter.get_all_decisions_logics()
+    print('get_decision_logics|decision_logics : ', decision_logics)
     rule_names = [decision_logic['name'] for decision_logic in decision_logics]
     print('get_decision_logics|rule_names : ', rule_names)
     return rule_names
