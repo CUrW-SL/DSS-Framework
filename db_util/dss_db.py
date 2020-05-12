@@ -826,6 +826,19 @@ class RuleEngineAdapter:
         if result is not None:
             print('evaluate_rule_logic|result : ', result)
 
+    #------------------------------------------------------------
+    def get_all_decisions_logics(self):
+        query = 'select id,name,logic,trigger_type, trigger, input_params from dss.rule_logics;'
+        print('get_all_decisions_logics|query : ', query)
+        results = self.get_multiple_result(query)
+        rules = []
+        if results is not None:
+            for result in results:
+                rule = {'id': result[0], 'name': result[1], 'logic': result[2], 'trigger_type':
+                    result[3], 'trigger': json.loads(result[4]), 'input_params': json.loads(result[5])}
+                rules.append(rule)
+        return rules
+
 
 if __name__ == "__main__":
     # db_config = {'mysql_user': 'admin', 'mysql_password': 'floody', 'mysql_host': '35.227.163.211', 'mysql_db': 'dss',
