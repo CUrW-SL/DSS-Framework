@@ -2,12 +2,9 @@ import pandas as pd
 import pymysql
 import sys
 
-# sys.path.insert(0, '/home/curw/git/DSS-Framework/accuracy_unit')
-# from db_plugin import get_discharge_obs_df, get_discharge_fcst_df
+sys.path.insert(0, '/home/curw/git/DSS-Framework/accuracy_unit')
+from db_plugin import get_obs_water_levels, get_discharge_fcst_df
 
-from accuracy_unit.db_plugin import get_obs_water_levels, get_discharge_fcst_df
-
-# from accuracy_unit.db_plugin import get_discharge_obs_df, get_discharge_fcst_df
 
 # connection params
 OBS_HOST = '35.227.163.211'
