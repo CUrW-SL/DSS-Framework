@@ -557,7 +557,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
 
     for decision_rule_name in get_decision_logics():
         decision_rule = PythonOperator(
-            task_id='{}_task'.format(decision_rule_name),
+            task_id='{}_task_prod'.format(decision_rule_name),
             provide_context=True,
             python_callable=evaluate_decision_rule,
             pool=dag_pool
