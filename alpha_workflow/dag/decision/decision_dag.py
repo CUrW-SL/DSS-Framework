@@ -89,6 +89,14 @@ def get_hechms_rules():
     return rule_names
 
 
+def get_decision_logics():
+    dss_adapter = get_dss_db_adapter()
+    decision_logics = dss_adapter.get_all_decisions_logics()
+    rule_names = [decision_logic['name'] for decision_logic in decision_logics]
+    print('get_decision_logics|rule_names : ', rule_names)
+    return rule_names
+
+
 def get_hechms_sim_names():
     hechms_sim_names = []
     for key, id_list in HECHMS_SIMS.items():
@@ -133,9 +141,19 @@ def select_hechms_decision_type(**context):
     decision_config = context['task_instance'].xcom_pull(task_ids='init_task')
     decision_type = decision_config['decision_type']
     if decision_type == 'event':
-        return 'wrf_event'
+        return 'hechms_event'
     else:
         return 'hechms_production'
+
+
+def select_flo2d_decision_type(**context):
+    print('select_flo2d_decision_type|context : ', context)
+    decision_config = context['task_instance'].xcom_pull(task_ids='init_task')
+    decision_type = decision_config['decision_type']
+    if decision_type == 'event':
+        return 'flo2d_event'
+    else:
+        return 'flo2d_production'
 
 
 def push_decision_config_to_xcom(dag_run, **kwargs):
@@ -313,6 +331,14 @@ def hechms_production_models_decision(**context):
     print('hechms_production_models_decision|context:', context)
 
 
+def flo2d_event_models_decision(**context):
+    print('flo2d_event_models_decision|context:', context)
+
+
+def flo2d_production_models_decision(**context):
+    print('flo2d_production_models_decision|context:', context)
+
+
 def evaluate_hechms_model(**context):
     print('evaluate_hechms_model|context:', context)
     rule_name = get_rule_name(context)
@@ -341,6 +367,10 @@ def evaluate_hechms_model(**context):
         task_instance = context['task_instance']
         print('evaluate_wrf_model|event|task_instance : ', task_instance)
         task_instance.xcom_push(rule_name, mean_calc)
+
+
+def evaluate_decision_rule(**context):
+    print('evaluate_decision_rule|context:', context)
 
 
 def log_end_task(**context):
@@ -395,9 +425,16 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         trigger_rule='none_failed',
         dag=dag)
 
+    flo2d_flow_branch = BranchPythonOperator(
+        task_id='flo2d_flow_branch',
+        provide_context=True,
+        python_callable=select_flo2d_decision_type,
+        trigger_rule='none_failed',
+        dag=dag)
+
     init_task >> run_purpose_branch >> [production_flow, event_flow]
-    production_flow >> model_selection_branch >> [wrf_flow_branch, hechms_flow_branch]
-    event_flow >> model_selection_branch >> [wrf_flow_branch, hechms_flow_branch]
+    production_flow >> model_selection_branch >> [wrf_flow_branch, hechms_flow_branch, flo2d_flow_branch]
+    event_flow >> model_selection_branch >> [wrf_flow_branch, hechms_flow_branch, flo2d_flow_branch]
 
     wrf_event = DummyOperator(
         task_id='wrf_event',
@@ -419,8 +456,19 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
+    flo2d_event = DummyOperator(
+        task_id='flo2d_event',
+        pool=dag_pool
+    )
+
+    flo2d_production = DummyOperator(
+        task_id='flo2d_production',
+        pool=dag_pool
+    )
+
     wrf_flow_branch >> [wrf_event, wrf_production]
     hechms_flow_branch >> [hechms_event, hechms_production]
+    flo2d_flow_branch >> [flo2d_event, flo2d_production]
 
     wrf_event_decision = PythonOperator(
         task_id='wrf_event_decision',
@@ -450,6 +498,22 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         task_id='hechms_production_decision',
         provide_context=True,
         python_callable=hechms_production_models_decision,
+        trigger_rule='none_failed',
+        pool=dag_pool
+    )
+
+    flo2d_event_decision = PythonOperator(
+        task_id='flo2d_event_decision',
+        provide_context=True,
+        python_callable=flo2d_event_models_decision,
+        trigger_rule='none_failed',
+        pool=dag_pool
+    )
+
+    flo2d_production_decision = PythonOperator(
+        task_id='flo2d_production_decision',
+        provide_context=True,
+        python_callable=flo2d_production_models_decision,
         trigger_rule='none_failed',
         pool=dag_pool
     )
@@ -490,6 +554,24 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         )
         hechms_event >> hechms_sim >> hechms_event_decision
 
+    for decision_rule_name in get_decision_logics():
+        decision_rule = PythonOperator(
+            task_id='{}_task'.format(decision_rule_name),
+            provide_context=True,
+            python_callable=evaluate_decision_rule,
+            pool=dag_pool
+        )
+        flo2d_production >> decision_rule >> flo2d_production_decision
+
+    for decision_rule_name in get_decision_logics():
+        decision_rule = PythonOperator(
+            task_id='{}_task'.format(decision_rule_name),
+            provide_context=True,
+            python_callable=evaluate_decision_rule,
+            pool=dag_pool
+        )
+        flo2d_event >> decision_rule >> flo2d_event_decision
+
     end_task = PythonOperator(
         task_id='end_task',
         trigger_rule='none_failed',
@@ -500,3 +582,5 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
 
     [wrf_production_decision, wrf_event_decision] >> end_task
     [hechms_production_decision, hechms_event_decision] >> end_task
+    [flo2d_production_decision, flo2d_event_decision] >> end_task
+
