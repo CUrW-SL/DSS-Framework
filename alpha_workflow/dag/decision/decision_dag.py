@@ -65,7 +65,7 @@ def get_wrf_rules():
     wrf_rules = dss_adapter.get_all_wrf_rules()
     rule_names = [wrf_rule['name'] for wrf_rule in wrf_rules]
     print('get_wrf_rules|rule_names : ', rule_names)
-    dss_adapter.close_connection()
+    # dss_adapter.close_connection()
     return rule_names
 
 
@@ -87,7 +87,7 @@ def get_hechms_rules():
     hechms_rules = dss_adapter.get_all_hechms_rules()
     rule_names = [hechms_rule['name'] for hechms_rule in hechms_rules]
     print('get_hechms_rules|rule_names : ', rule_names)
-    dss_adapter.close_connection()
+    # dss_adapter.close_connection()
     return rule_names
 
 
@@ -98,7 +98,7 @@ def get_decision_logics(flow_type=0):
     print('get_decision_logics|decision_logics : ', decision_logics)
     rule_names = [decision_logic['name'] for decision_logic in decision_logics]
     print('get_decision_logics|rule_names : ', rule_names)
-    dss_adapter.close_connection()
+    # dss_adapter.close_connection()
     return rule_names
 
 
@@ -192,7 +192,7 @@ def get_hechms_rule_ids(decision_config):
         for task_param in task_params:
             if task_param['model_type'] == 'hechms':
                 hechms_ids = hechms_ids + task_param['rule_id']
-        dss_adapter.close_connection()
+        # dss_adapter.close_connection()
     return hechms_ids
 
 
@@ -221,7 +221,7 @@ def get_both_hechms_flo2d_rule_ids(decision_config):
                 hechms_ids = hechms_ids + task_param['rule_id']
             elif task_param['model_type'] == 'flo2d':
                 flo2d_ids = flo2d_ids + task_param['rule_id']
-        dss_adapter.close_connection()
+        # dss_adapter.close_connection()
     return [hechms_ids, flo2d_ids]
 
 
@@ -259,7 +259,7 @@ def wrf_event_models_decision(**context):
     if len(flo2d_ids) > 0:
         for flo2d_id in flo2d_ids:
             dss_adapter.set_flo2d_rain_tag(tag, flo2d_id)
-    dss_adapter.close_connection()
+    # dss_adapter.close_connection()
 
 
 def wrf_production_models_decision(**context):
@@ -284,7 +284,7 @@ def wrf_production_models_decision(**context):
                     if min_rmse_params['rmse'] > rmse_params['rmse']:
                         min_rmse_params = rmse_params
                 i += 1
-    dss_adapter.close_connection()
+    # dss_adapter.close_connection()
     print('wrf_models_decision|min_rmse_params : ', min_rmse_params)
 
 
@@ -314,7 +314,7 @@ def evaluate_wrf_model(**context):
             print('evaluate_wrf_model|production|mean_calc : ', mean_calc)
             task_instance = context['task_instance']
             print('evaluate_wrf_model|production|task_instance : ', task_instance)
-            dss_adapter.close_connection()
+            # dss_adapter.close_connection()
             task_instance.xcom_push(rule_name, mean_calc)
     elif decision_config['decision_type'] == 'event':
         print('evaluate_wrf_model|event')
