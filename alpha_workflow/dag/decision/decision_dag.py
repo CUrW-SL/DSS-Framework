@@ -91,7 +91,8 @@ def get_hechms_rules():
     return rule_names
 
 
-def get_decision_logics():
+def get_decision_logics(flow_type=0):
+    print('get_decision_logics|flow_type : ', flow_type)
     dss_adapter = get_dss_db_adapter()
     decision_logics = dss_adapter.get_all_decisions_logics()
     print('get_decision_logics|decision_logics : ', decision_logics)
