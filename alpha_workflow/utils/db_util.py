@@ -80,6 +80,9 @@ class RuleEngineAdapter:
             except ConnectionError as ex:
                 print('ConnectionError|ex: ', ex)
 
+    def close_connection(self):
+        self.connection.close()
+
     def get_single_result(self, sql_query):
         value = None
         cursor = self.cursor
