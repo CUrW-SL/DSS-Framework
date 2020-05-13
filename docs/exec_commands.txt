@@ -123,4 +123,7 @@ curl -X GET "http://172.17.0.2:5000/HECHMS/distributed/post-process/2020-03-22_1
 
 ALTER TABLE dss.rule_logics CHANGE `trigger` `trigger_unit` VARCHAR(500);
 
-20:17:49	Apply changes to rule_logics	Error 2013: Lost connection to MySQL server during query SQL Statement: ALTER TABLE `dss`.`rule_logics`  ADD COLUMN `flow_type` INT NULL AFTER `input_params`
+20:17:49	Apply changes to rule_logics	Error 2013: Lost connection to MySQL server during query SQL Statement: ALTER TABLE `dss`.`rule_logics`  ADD COLUMN `flow_type` INT NULL AFTER `name`
+
+
+I have added Expected Date of Completion as 2020/07/30
