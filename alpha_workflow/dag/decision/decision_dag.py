@@ -564,23 +564,39 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         )
         hechms_event >> hechms_sim >> hechms_event_decision
 
-    for decision_rule_name in get_decision_logics(flow_type=0):
-        decision_rule = PythonOperator(
-            task_id='{}_task_prod'.format(decision_rule_name),
-            provide_context=True,
-            python_callable=evaluate_decision_rule,
+    prod_decision_rules = get_decision_logics(flow_type=0)
+    if len(prod_decision_rules) > 0:
+        for decision_rule_name in prod_decision_rules:
+            decision_rule = PythonOperator(
+                task_id='{}_task'.format(decision_rule_name),
+                provide_context=True,
+                python_callable=evaluate_decision_rule,
+                pool=dag_pool
+            )
+            flo2d_production >> decision_rule >> flo2d_production_decision
+    else:
+        prod_decision_rule_skip = DummyOperator(
+            task_id='prod_decision_rule_skip',
             pool=dag_pool
         )
-        flo2d_production >> decision_rule >> flo2d_production_decision
+        flo2d_production >> prod_decision_rule_skip >> flo2d_production_decision
 
-    for decision_rule_name in get_decision_logics(flow_type=1):
-        decision_rule = PythonOperator(
-            task_id='{}_task'.format(decision_rule_name),
-            provide_context=True,
-            python_callable=evaluate_decision_rule,
+    event_decision_rules = get_decision_logics(flow_type=1)
+    if len(event_decision_rules) > 0:
+        for decision_rule_name in event_decision_rules:
+            decision_rule = PythonOperator(
+                task_id='{}_task'.format(decision_rule_name),
+                provide_context=True,
+                python_callable=evaluate_decision_rule,
+                pool=dag_pool
+            )
+            flo2d_event >> decision_rule >> flo2d_event_decision
+    else:
+        event_decision_rule_skip = DummyOperator(
+            task_id='event_decision_rule_skip',
             pool=dag_pool
         )
-        flo2d_event >> decision_rule >> flo2d_event_decision
+        flo2d_event >> event_decision_rule_skip >> flo2d_event_decision
 
     end_task = PythonOperator(
         task_id='end_task',
@@ -593,4 +609,3 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     [wrf_production_decision, wrf_event_decision] >> end_task
     [hechms_production_decision, hechms_event_decision] >> end_task
     [flo2d_production_decision, flo2d_event_decision] >> end_task
-
