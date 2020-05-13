@@ -1,7 +1,7 @@
 import subprocess
 from datetime import datetime, timedelta
 from airflow import DAG, AirflowException
-from airflow.operators.python_operator import PythonOperator
+from airflow.operators.python_operator import PythonOperator, BranchPythonOperator
 from airflow.models import Variable
 import sys
 import requests
@@ -268,8 +268,8 @@ def get_dss_db_adapter():
 def get_rule_by_id(rule_id):
     db_adapter = get_dss_db_adapter()
     if db_adapter:
-        wrf_rule = db_adapter.get_hechms_rule_info_by_id(rule_id)
-        return wrf_rule
+        hechms_rule = db_adapter.get_hechms_rule_info_by_id(rule_id)
+        return hechms_rule
     else:
         print('db adapter error')
         return None
@@ -298,6 +298,44 @@ def push_rule_to_xcom(dag_run, **kwargs):
     hechms_rule = dag_run.conf
     print('run_this_func|hechms_rule : ', hechms_rule)
     return hechms_rule
+
+
+def run_type_branching(**context):
+    rule_id = get_rule_id(context)
+    if rule_id is not None:
+        rule = get_rule_by_id(rule_id)
+        if rule is not None:
+            run_type = rule['run_type']
+            if run_type == 'event' :
+                return 'pop_event_data'
+            else:
+                return 'run_hechms'
+        else:
+            return 'run_hechms'
+    else:
+        return 'run_hechms'
+
+
+def populate_event_data(**context):
+    rule_id = get_rule_id(context)
+    if rule_id is not None:
+        rule = get_rule_by_id(rule_id)
+        if rule is not None:
+            forward = rule['forecast_days']
+            backward = rule['observed_days']
+            run_datetime = rule['run_date']
+            [start, end] = get_ts_start_end(run_datetime, forward, backward)
+            print('populate_event_data|[start, end] : ', [start, end])
+
+
+def get_ts_start_end(run_datetime, forward, backward):
+    print('get_ts_start_end|[run_datetime, forward, backward] : ', [run_datetime, forward, backward])
+    run_datetime_tmp = datetime.strptime(run_datetime, '%Y-%m-%d %H:%M:%S')
+    run_date_tmp = run_datetime_tmp.strftime('%Y-%m-%d 00:00:00')
+    run_date = datetime.strptime(run_date_tmp, '%Y-%m-%d %H:%M:%S')
+    start = run_date - timedelta(days=backward)
+    end = run_date + timedelta(days=forward)
+    return [start.strftime('%Y-%m-%d %H:%M:%S'), end.strftime('%Y-%m-%d %H:%M:%S')]
 
 
 def get_rule_id(context):
@@ -345,47 +383,26 @@ def create_dag(dag_id, dag_rule, timeout, default_args):
             pool=dag_pool
         )
 
+        run_type_branch = BranchPythonOperator(
+            task_id='run_type_branch',
+            provide_context=True,
+            python_callable=run_type_branching(),
+            trigger_rule='none_failed',
+            dag=dag)
+
+        pop_event_data = PythonOperator(
+            task_id='pop_event_data',
+            provide_context=True,
+            python_callable=populate_event_data,
+            pool=dag_pool
+        )
+
         run_hechms = PythonOperator(
             task_id='run_hechms',
             provide_context=True,
             python_callable=run_hechms_workflow,
             pool=dag_pool
         )
-
-        # create_input_hec_dis = PythonOperator(
-        #     task_id='create_input_hec_dis',
-        #     provide_context=True,
-        #     python_callable=get_create_input_cmd,
-        #     pool=dag_pool
-        # )
-        #
-        # run_hechms_preprocess_hec_dis = PythonOperator(
-        #     task_id='run_hechms_preprocess_hec_dis',
-        #     provide_context=True,
-        #     python_callable=get_run_hechms_preprocess_cmd,
-        #     pool=dag_pool
-        # )
-        #
-        # run_hechms_hec_dis = PythonOperator(
-        #     task_id='run_hechms_hec_dis',
-        #     provide_context=True,
-        #     python_callable=get_run_hechms_cmd,
-        #     pool=dag_pool
-        # )
-        #
-        # run_hechms_postprocess_hec_dis = PythonOperator(
-        #     task_id='run_hechms_postprocess_hec_dis',
-        #     provide_context=True,
-        #     python_callable=get_run_hechms_postprocess_cmd,
-        #     pool=dag_pool
-        # )
-        #
-        # upload_discharge_hec_dis = PythonOperator(
-        #     task_id='upload_discharge_hec_dis',
-        #     provide_context=True,
-        #     python_callable=get_upload_discharge_cmd,
-        #     pool=dag_pool
-        # )
 
         complete_state = PythonOperator(
             task_id='complete_state',
@@ -395,9 +412,9 @@ def create_dag(dag_id, dag_rule, timeout, default_args):
             pool=dag_pool
         )
 
-        # init_hechms >> running_status >> create_input_hec_dis >> run_hechms_preprocess_hec_dis >> \
-        # run_hechms_hec_dis >> run_hechms_postprocess_hec_dis >> upload_discharge_hec_dis >> complete_state
-        init_hechms >> running_status >> run_hechms >> complete_state
+        init_hechms >> running_status >> run_type_branch >> [run_hechms, pop_event_data]
+        pop_event_data >> run_hechms >> complete_state
+        run_hechms >> complete_state
 
     return dag
 
