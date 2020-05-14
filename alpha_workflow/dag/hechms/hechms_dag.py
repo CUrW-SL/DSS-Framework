@@ -305,9 +305,12 @@ def run_type_branching(**context):
     if rule_id is not None:
         rule = get_rule_by_id(rule_id)
         if rule is not None:
-            run_type = rule['run_type']
-            if run_type == 'event' :
-                return 'pop_event_data'
+            if 'run_type' in rule['run_type']:
+                run_type = rule['run_type']
+                if run_type == 'event' :
+                    return 'pop_event_data'
+                else:
+                    return 'run_hechms'
             else:
                 return 'run_hechms'
         else:
@@ -386,7 +389,7 @@ def create_dag(dag_id, dag_rule, timeout, default_args):
         run_type_branch = BranchPythonOperator(
             task_id='run_type_branch',
             provide_context=True,
-            python_callable=run_type_branching(),
+            python_callable=run_type_branching,
             trigger_rule='none_failed',
             dag=dag)
 
