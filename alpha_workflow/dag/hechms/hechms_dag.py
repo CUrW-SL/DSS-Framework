@@ -239,6 +239,7 @@ def update_workflow_status(status, rule_id):
 
 
 def set_running_status(**context):
+    print('set_running_status|context : ', context)
     rule_id = get_rule_id(context)
     if rule_id is not None:
         update_workflow_status(2, rule_id)
