@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 
-while getopts ":d:f:b:r:p:" option; do
+while getopts ":d:f:b:r:p:u:x:y:z:" option; do
   case "${option}" in
   d) EXEC_DATE=$OPTARG ;; # 2019-09-24 10:30:00
   f) FORWARD=$OPTARG ;; # 3
   b) BACKWARD=$OPTARG ;; # 2
   r) INIT_RUN=$OPTARG ;; # 0 or 1
   p) POP_METHOD=$OPTARG ;; # MME
+  u) DB_USER=$OPTARG ;; # MME
+  x) DB_PWD=$OPTARG ;; # MME
+  y) DB_HOST=$OPTARG ;; # MME
+  z) DB_NAME=$OPTARG ;; # MME
   esac
 done
 
@@ -18,6 +22,9 @@ echo "FORWARD : $FORWARD"
 echo "BACKWARD : $BACKWARD"
 echo "INIT_RUN : $INIT_RUN"
 echo "POP_METHOD : $POP_METHOD"
+echo "DB_USER : $DB_USER"
+echo "DB_HOST : $DB_HOST"
+echo "DB_NAME : $DB_NAME"
 
 
 Xvfb :1 -screen 0 1024x768x24 &> xvfb.log &
@@ -73,7 +80,11 @@ python hechms_workflow.py \
                     $( check_empty "$FORWARD" forward ) \
                     $( check_empty "$BACKWARD" backward ) \
                     $( check_empty "$INIT_RUN" init_run ) \
-                    $( check_empty "$POP_METHOD" pop_method )
+                    $( check_empty "$POP_METHOD" pop_method ) \
+                    $( check_empty "$DB_USER" db_user ) \
+                    $( check_empty "$DB_PWD" db_pwd ) \
+                    $( check_empty "$DB_HOST" db_host ) \
+                    $( check_empty "$DB_NAME" db_name ) \
 echo "####HEC-HMS procedures completed"
 
 deactivate
