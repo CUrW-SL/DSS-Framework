@@ -14,6 +14,8 @@ git_path = '/home/curw/git'
 
 RUN_SCRIPT = '/home/curw/git/DSS-Framework/docker/hechms/runner.sh'
 
+POP_SCRIPT = '/home/curw/event_sim_utils/rain/hechms_OBS.py'
+
 default_args = {
     'owner': 'dss admin',
     'start_date': datetime.utcnow(),
@@ -329,6 +331,16 @@ def populate_event_data(**context):
             run_datetime = rule['run_date']
             [start, end] = get_ts_start_end(run_datetime, forward, backward)
             print('populate_event_data|[start, end] : ', [start, end])
+            pop_script = '{}  -s {} -e {}'.format(POP_SCRIPT, start, end)
+            print('populate_event_data|run_script : ', pop_script)
+            vm_config = Variable.get('ubuntu1_config', deserialize_json=True)
+            vm_user = vm_config['user']
+            vm_password = vm_config['password']
+            run_node = rule['rule_details']['run_node']
+            pop_data_cmd = ssh_cmd_template.format(vm_password, vm_user, run_node, pop_script)
+            print('populate_event_data|run_wrf_cmd : ', pop_data_cmd)
+            print('populate_event_data|run_wrf_cmd : ', pop_data_cmd)
+            subprocess.call(pop_data_cmd, shell=True)
 
 
 def get_ts_start_end(run_datetime, forward, backward):
