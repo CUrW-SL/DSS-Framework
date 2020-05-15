@@ -205,18 +205,25 @@ def run_hechms_workflow(**context):
     vm_config = Variable.get('ubuntu1_config', deserialize_json=True)
     vm_user = vm_config['user']
     vm_password = vm_config['password']
-    rule = get_rule_by_id(rule_id)
+    rule = context['task_instance'].xcom_pull(task_ids='init_hechms')
     if rule is not None:
         forward = rule['forecast_days']
         backward = rule['observed_days']
         init_run = rule['init_run']
         pop_method = rule['rainfall_data_from']
         run_node = rule['rule_details']['run_node']
-        run_script = '{}  -d {} -f {} -b {} -r {} -p {} -D {} -T {}'.format(RUN_SCRIPT,
+        if rule['run_type'] == 'event':
+            db_config = Variable.get('event_db_config', deserialize_json=True)['sim_config']
+        else:
+            db_config = Variable.get('prod_db_config', deserialize_json=True)['sim_config']
+        run_script = '{}  -d {} -f {} -b {} -r {} -p {} -D {} -T {} -u {} -x {} -y {} -z {}'.format(RUN_SCRIPT,
                                                                             exec_date,
                                                                             forward, backward,
                                                                             init_run, pop_method,
-                                                                            date_only, time_only)
+                                                                            date_only, time_only, db_config['mysql_user'],
+                                                                            db_config['mysql_password'],
+                                                                            db_config['mysql_host'],
+                                                                            db_config['mysql_db'])
         print('get_wrf_run_command|run_script : ', run_script)
         run_wrf_cmd = ssh_cmd_template.format(vm_password, vm_user, run_node, run_script)
         print('get_wrf_run_command|run_wrf_cmd : ', run_wrf_cmd)
@@ -304,16 +311,12 @@ def push_rule_to_xcom(dag_run, **kwargs):
 
 
 def run_type_branching(**context):
-    rule_id = get_rule_id(context)
-    if rule_id is not None:
-        rule = get_rule_by_id(rule_id)
-        if rule is not None:
-            if 'run_type' in rule['run_type']:
-                run_type = rule['run_type']
-                if run_type == 'event' :
-                    return 'pop_event_data'
-                else:
-                    return 'run_hechms'
+    rule = context['task_instance'].xcom_pull(task_ids='init_hechms')
+    if rule is not None:
+        if 'run_type' in rule['run_type']:
+            run_type = rule['run_type']
+            if run_type == 'event':
+                return 'pop_event_data'
             else:
                 return 'run_hechms'
         else:
