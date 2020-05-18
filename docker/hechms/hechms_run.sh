@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-while getopts ":d:f:b:r:p:u:x:y:z:" option; do
+while getopts ":d:f:b:r:p:u:x:y:z:m:" option; do
   case "${option}" in
   d) EXEC_DATE=$OPTARG ;; # 2019-09-24 10:30:00
   f) FORWARD=$OPTARG ;; # 3
@@ -11,6 +11,7 @@ while getopts ":d:f:b:r:p:u:x:y:z:" option; do
   x) DB_PWD=$OPTARG ;; # MME
   y) DB_HOST=$OPTARG ;; # MME
   z) DB_NAME=$OPTARG ;; # MME
+  m) TARGET_MODEL=$OPTARG ;; # MME
   esac
 done
 
@@ -25,6 +26,7 @@ echo "POP_METHOD : $POP_METHOD"
 echo "DB_USER : $DB_USER"
 echo "DB_HOST : $DB_HOST"
 echo "DB_NAME : $DB_NAME"
+echo "TARGET_MODEL : $TARGET_MODEL"
 
 
 Xvfb :1 -screen 0 1024x768x24 &> xvfb.log &
@@ -85,6 +87,8 @@ python hechms_workflow.py \
                     $( check_empty "$DB_PWD" db_pwd ) \
                     $( check_empty "$DB_HOST" db_host ) \
                     $( check_empty "$DB_NAME" db_name ) \
+                    $( check_empty "$DB_NAME" db_name ) \
+                    $( check_empty "$TARGET_MODEL" target_model ) \
 echo "####HEC-HMS procedures completed"
 
 deactivate
