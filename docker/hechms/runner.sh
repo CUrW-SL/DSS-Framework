@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+HOME_DIR="/mnt/disks/data/hechms"
 HOME_DIR="/mnt/disks/data/hechms/event"
 
 while getopts ":d:f:b:r:p:D:T:u:x:y:z:m:" option; do
@@ -30,6 +31,18 @@ echo "DB_USER : $DB_USER"
 echo "DB_HOST : $DB_HOST"
 echo "DB_NAME : $DB_NAME"
 echo "TARGET_MODEL : $TARGET_MODEL"
+
+#if [[ ${WRF_RUN} == 1 ]] || [[ ${WRF_RUN} == "1" ]]; then
+#    if [ -z "$RUN_DATE" ];then
+#          tmp_date=`date '+%Y-%m-%d' --date="1 days ago"`
+#          exec_date=`date '+%Y-%m-%d'`
+#    else
+#          tmp_date=$(date +%Y-%m-%d -d "${RUN_DATE} - 1 day")
+#          exec_date=${RUN_DATE}
+#    fi
+#    gfs_date="${tmp_date}_${GFS_HOUR}:00"
+#    wrf_id="dwrf_${VERSION}_${WRF_RUN}_${GFS_HOUR}_${exec_date}_${MODEL}"
+#fi
 
 OUTPUT_DIR="${HOME_DIR}/${DATE_ONLY}/${TIME_ONLY}"
 mkdir -p ${OUTPUT_DIR}

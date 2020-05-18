@@ -18,16 +18,6 @@ done
 check_empty() {
   [ -z "$1" ] && echo "" || echo "-$2=$1"
 }
-echo "EXEC_DATE : $EXEC_DATE"
-echo "FORWARD : $FORWARD"
-echo "BACKWARD : $BACKWARD"
-echo "INIT_RUN : $INIT_RUN"
-echo "POP_METHOD : $POP_METHOD"
-echo "DB_USER : $DB_USER"
-echo "DB_HOST : $DB_HOST"
-echo "DB_NAME : $DB_NAME"
-echo "TARGET_MODEL : $TARGET_MODEL"
-
 
 Xvfb :1 -screen 0 1024x768x24 &> xvfb.log &
 export DISPLAY=:1.0
@@ -75,6 +65,16 @@ echo "Installing data layer"
 pip install git+https://github.com/shadhini/curw_db_adapter.git
 touch hechms.log
 
+echo "EXEC_DATE : $EXEC_DATE"
+echo "FORWARD : $FORWARD"
+echo "BACKWARD : $BACKWARD"
+echo "INIT_RUN : $INIT_RUN"
+echo "POP_METHOD : $POP_METHOD"
+echo "DB_USER : $DB_USER"
+echo "DB_HOST : $DB_HOST"
+echo "DB_NAME : $DB_NAME"
+echo "TARGET_MODEL : $TARGET_MODEL"
+
 # Run rfield generating scripts
 echo "Running HEC-HMS Model."
 python hechms_workflow.py \
@@ -86,7 +86,6 @@ python hechms_workflow.py \
                     $( check_empty "$DB_USER" db_user ) \
                     $( check_empty "$DB_PWD" db_pwd ) \
                     $( check_empty "$DB_HOST" db_host ) \
-                    $( check_empty "$DB_NAME" db_name ) \
                     $( check_empty "$DB_NAME" db_name ) \
                     $( check_empty "$TARGET_MODEL" target_model ) \
 echo "####HEC-HMS procedures completed"
