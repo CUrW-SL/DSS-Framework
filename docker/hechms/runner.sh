@@ -37,7 +37,7 @@ echo "OUTPUT_DIR : $OUTPUT_DIR"
 
 docker run -i --rm --privileged \
     -v ${OUTPUT_DIR}:/home/curw/git/distributed_hechms/output  \
-    curw-hechms-centos7:hechms_4.2.1  /home/curw/hechms_run.sh -d ${EXEC_DATE} \
+    curw-hechms-v2-centos7:hechms_4.2.1  /home/curw/hechms_run.sh -d ${EXEC_DATE} \
     -f ${FORWARD} -b ${BACKWARD} -r ${INIT_RUN} -p ${POP_METHOD} \
     -u ${DB_USER} -x ${DB_PWD} -y ${DB_HOST} -z ${DB_NAME} -m ${TARGET_MODEL}
 
