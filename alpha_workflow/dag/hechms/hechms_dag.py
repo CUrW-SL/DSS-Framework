@@ -416,6 +416,7 @@ def create_dag(dag_id, dag_rule, timeout, default_args):
             task_id='pop_event_data',
             provide_context=True,
             python_callable=populate_event_data,
+            trigger_rule='none_failed',
             pool=dag_pool
         )
 
@@ -423,6 +424,7 @@ def create_dag(dag_id, dag_rule, timeout, default_args):
             task_id='run_hechms',
             provide_context=True,
             python_callable=run_hechms_workflow,
+            trigger_rule='none_failed',
             pool=dag_pool
         )
 
