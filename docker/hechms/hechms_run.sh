@@ -87,7 +87,7 @@ python hechms_workflow.py \
                     $( check_empty "$DB_PWD" db_pwd ) \
                     $( check_empty "$DB_HOST" db_host ) \
                     $( check_empty "$DB_NAME" db_name ) \
-                    $( check_empty "$TARGET_MODEL" target_model ) \
+                    $( check_empty "$TARGET_MODEL" target_model )
 echo "####HEC-HMS procedures completed"
 
 deactivate
