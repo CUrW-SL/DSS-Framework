@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 HOME_DIR="/mnt/disks/data/hechms"
-HOME_DIR="/mnt/disks/data/hechms/event"
+#HOME_DIR="/mnt/disks/data/hechms/event"
 
-while getopts ":d:f:b:r:p:D:T:u:x:y:z:m:" option; do
+while getopts ":d:f:b:r:p:D:T:u:x:y:z:m:n:" option; do
   case "${option}" in
   d) EXEC_DATE=$OPTARG ;; # 2019-09-24 10:30:00
   f) FORWARD=$OPTARG ;; # 3
@@ -17,6 +17,7 @@ while getopts ":d:f:b:r:p:D:T:u:x:y:z:m:" option; do
   y) DB_HOST=$OPTARG ;; # MME
   z) DB_NAME=$OPTARG ;; # MME
   m) TARGET_MODEL=$OPTARG ;; # 'hechms_prod' / 'hechms_event'
+  n) RUN_TYPE=$OPTARG ;; # 'event' / 'production'
   esac
 done
 
@@ -31,20 +32,15 @@ echo "DB_USER : $DB_USER"
 echo "DB_HOST : $DB_HOST"
 echo "DB_NAME : $DB_NAME"
 echo "TARGET_MODEL : $TARGET_MODEL"
+echo "RUN_TYPE : $RUN_TYPE"
 
-#if [[ ${WRF_RUN} == 1 ]] || [[ ${WRF_RUN} == "1" ]]; then
-#    if [ -z "$RUN_DATE" ];then
-#          tmp_date=`date '+%Y-%m-%d' --date="1 days ago"`
-#          exec_date=`date '+%Y-%m-%d'`
-#    else
-#          tmp_date=$(date +%Y-%m-%d -d "${RUN_DATE} - 1 day")
-#          exec_date=${RUN_DATE}
-#    fi
-#    gfs_date="${tmp_date}_${GFS_HOUR}:00"
-#    wrf_id="dwrf_${VERSION}_${WRF_RUN}_${GFS_HOUR}_${exec_date}_${MODEL}"
+#if [[ ${RUN_TYPE} == "event" ]]; then
+#    OUTPUT_DIR="${HOME_DIR}/$RUN_TYPE/${DATE_ONLY}/${TIME_ONLY}"
+#else
+#    OUTPUT_DIR="${HOME_DIR}/$RUN_TYPE/${DATE_ONLY}/${TIME_ONLY}"
 #fi
 
-OUTPUT_DIR="${HOME_DIR}/${DATE_ONLY}/${TIME_ONLY}"
+OUTPUT_DIR="${HOME_DIR}/${RUN_TYPE}/${DATE_ONLY}/${TIME_ONLY}"
 mkdir -p ${OUTPUT_DIR}
 echo "OUTPUT_DIR : $OUTPUT_DIR"
 
