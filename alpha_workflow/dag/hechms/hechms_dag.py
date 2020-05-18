@@ -215,18 +215,20 @@ def run_hechms_workflow(**context):
         target_model = rule['target_model']
         pop_method = rule['rainfall_data_from']
         run_node = rule['rule_details']['run_node']
+        run_type = rule['run_type']
         if rule['run_type'] == 'event':
             db_config = Variable.get('event_db_config', deserialize_json=True)['sim_config']
         else:
             db_config = Variable.get('prod_db_config', deserialize_json=True)['sim_config']
-        run_script = '{}  -d {} -f {} -b {} -r {} -p {} -D {} -T {} -u {} -x {} -y {} -z {} -m {}'.format(RUN_SCRIPT,
+        run_script = '{}  -d {} -f {} -b {} -r {} -p {} -D {} -T {} -u {} -x {} -y {} -z {} -m {} -n {}'.format(RUN_SCRIPT,
                                                                             exec_date,
                                                                             forward, backward,
                                                                             init_run, pop_method,
                                                                             date_only, time_only, db_config['mysql_user'],
                                                                             db_config['mysql_password'],
                                                                             db_config['mysql_host'],
-                                                                            db_config['mysql_db'], target_model)
+                                                                            db_config['mysql_db'],
+                                                                            target_model, run_type)
         print('get_wrf_run_command|run_script : ', run_script)
         run_wrf_cmd = ssh_cmd_template.format(vm_password, vm_user, run_node, run_script)
         print('get_wrf_run_command|run_wrf_cmd : ', run_wrf_cmd)
