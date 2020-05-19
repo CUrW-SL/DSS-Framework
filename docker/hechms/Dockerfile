@@ -18,7 +18,8 @@ RUN yum -y install \
     git
 
 RUN mkdir -p curw/distributed_hec \
-    && mkdir -p curw/git
+    && mkdir -p curw/git \
+    && mkdir -p curw/basin_states
 
 WORKDIR /home/curw/distributed_hec
 
