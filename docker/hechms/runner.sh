@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 HOME_DIR="/mnt/disks/data/hechms"
+STATE_DIR="/mnt/disks/data/hechms/basin_states"
 #HOME_DIR="/mnt/disks/data/hechms/event"
 
 while getopts ":d:f:b:r:p:D:T:u:x:y:z:m:n:" option; do
@@ -39,13 +40,16 @@ echo "RUN_TYPE : $RUN_TYPE"
 #else
 #    OUTPUT_DIR="${HOME_DIR}/$RUN_TYPE/${DATE_ONLY}/${TIME_ONLY}"
 #fi
+mkdir -p ${STATE_DIR}
 
 OUTPUT_DIR="${HOME_DIR}/${RUN_TYPE}/${DATE_ONLY}/${TIME_ONLY}"
 mkdir -p ${OUTPUT_DIR}
+
 echo "OUTPUT_DIR : $OUTPUT_DIR"
 
 docker run -i --rm --privileged \
     -v ${OUTPUT_DIR}:/home/curw/git/distributed_hechms/output  \
+    -v ${STATE_DIR}:/home/curw/basin_states  \
     curw-hechms-v2-centos7:hechms_4.2.1  /home/curw/hechms_run.sh -d ${EXEC_DATE} \
     -f ${FORWARD} -b ${BACKWARD} -r ${INIT_RUN} -p ${POP_METHOD} \
     -u ${DB_USER} -x ${DB_PWD} -y ${DB_HOST} -z ${DB_NAME} -m ${TARGET_MODEL}
