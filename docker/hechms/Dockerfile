@@ -17,9 +17,10 @@ RUN yum -y install \
     xorg-x11-server-Xvfb \
     git
 
-RUN mkdir -p curw/distributed_hec \
-    && mkdir -p curw/git \
-    && mkdir -p curw/basin_states
+RUN mkdir -p /home/curw/distributed_hec \
+    && mkdir -p /home/curw/git \
+    && mkdir -p /home/curw/basin_states \
+    && mkdir -p /home/curw/git/distributed_hechms
 
 WORKDIR /home/curw/distributed_hec
 
@@ -98,8 +99,9 @@ RUN pip3 install Flask \
                  virtualenv
 
 WORKDIR /home/curw/git
+COPY distributed_hechms /home/curw/git/distributed_hechms
+#RUN git clone https://github.com/CUrW-SL/distributed_hechms.git
 
-RUN git clone https://github.com/CUrW-SL/distributed_hechms.git
 WORKDIR /home/curw/distributed_hec/hec-dssvue201
 RUN sed -i "s|        exit|        #exit |g" /home/curw/distributed_hec/hec-dssvue201/hec-dssvue.sh
 RUN sed -i "s|PROG_ROOT=.|PROG_ROOT=/home/curw/distributed_hec/hec-dssvue201|g" /home/curw/distributed_hec/hec-dssvue201/hec-dssvue.sh
