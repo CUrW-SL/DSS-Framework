@@ -19,8 +19,7 @@ RUN yum -y install \
 
 RUN mkdir -p /home/curw/distributed_hec \
     && mkdir -p /home/curw/git \
-    && mkdir -p /home/curw/basin_states \
-    && mkdir -p /home/curw/git/distributed_hechms
+    && mkdir -p /home/curw/basin_states
 
 WORKDIR /home/curw/distributed_hec
 
@@ -98,9 +97,8 @@ RUN pip3 install Flask \
                  mysql-connector \
                  virtualenv
 
-WORKDIR /home/curw/git/distributed_hechms
-COPY distributed_hechms /home/curw/git/distributed_hechms
-#RUN git clone https://github.com/CUrW-SL/distributed_hechms.git
+WORKDIR /home/curw/git
+RUN git clone https://github.com/CUrW-SL/distributed_hechms.git
 
 WORKDIR /home/curw/distributed_hec/hec-dssvue201
 RUN sed -i "s|        exit|        #exit |g" /home/curw/distributed_hec/hec-dssvue201/hec-dssvue.sh
