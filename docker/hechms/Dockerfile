@@ -98,7 +98,7 @@ RUN pip3 install Flask \
                  mysql-connector \
                  virtualenv
 
-WORKDIR /home/curw/git
+WORKDIR /home/curw/git/distributed_hechms
 COPY distributed_hechms /home/curw/git/distributed_hechms
 #RUN git clone https://github.com/CUrW-SL/distributed_hechms.git
 
