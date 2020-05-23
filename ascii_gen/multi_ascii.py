@@ -1,8 +1,10 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 from os.path import join as pjoin
 import math, numbers
 import decimal
+from zipfile import ZipFile
+from os.path import basename
 
 BUFFER_SIZE = 65536
 WATER_LEVEL_FILE = 'water_level.asc'
@@ -104,6 +106,21 @@ def get_cell_grid(cadpts_file, boudary, gap=250.0):
     return CellMap
 
 
+def create_zip_file(zip_file, dir_path):
+    try:
+        with ZipFile(zip_file, 'w') as zipObj:
+            for folderName, subfolders, filenames in os.walk(dir_path):
+                for filename in filenames:
+                    filePath = os.path.join(folderName, filename)
+                    print('create_zip_file|filePath : ', filePath)
+                    print('create_zip_file|basename(filePath) : ', basename(filePath))
+                    zipObj.write(filePath, basename(filePath))
+        return True
+    except Exception as e:
+        print('create_zip_file|Exception : ', str(e))
+        return False
+
+
 def generate_ascii_set(ts_start_date, flo2d_output_path, flo2d_model, start_hour=0, end_hour=90, min_depth=0.15):
     print('generate_ascii_set|[ts_start_date, flo2d_output_path, flo2d_model, start_hour, end_hour, min_depth] : ',
           [ts_start_date, flo2d_output_path, flo2d_model, start_hour, end_hour, min_depth])
@@ -145,7 +162,7 @@ def generate_ascii_set(ts_start_date, flo2d_output_path, flo2d_model, start_hour
                         if len(waterLevelLines) > 0:
                             waterLevels = get_water_level_grid(waterLevelLines)
                             EsriGrid = get_esri_grid(min_depth, waterLevels, boundary, CellGrid, gap=grid_size)
-                            fileModelTime = ts_start_date + datetime.timedelta(hours=float(line.strip()))
+                            fileModelTime = ts_start_date + timedelta(hours=float(line.strip()))
                             fileModelTime = fileModelTime.strftime('%Y-%m-%d_%H-%M-%S')
                             fileName = WATER_LEVEL_FILE.rsplit('.', 1)
                             fileName = "%s-%s.%s" % (fileName[0], fileModelTime, fileName[1])
@@ -157,4 +174,16 @@ def generate_ascii_set(ts_start_date, flo2d_output_path, flo2d_model, start_hour
                             waterLevelLines = []
                     else:
                         waterLevelLines.append(line)
+    zip_file = os.path.join(flo2d_output_path, 'multi_ascii.zip')
+    print('generate_ascii_set|zip_file : ', zip_file)
+    print('generate_ascii_set|ascii_dir : ', ascii_dir)
+    if create_zip_file(zip_file, ascii_dir):
+        print('zip file has created.')
+
+
+if __name__ == '__main__':
+    ts_start_date = '2020-05-22'
+    flo2d_output_path = '/home/hasitha/PycharmProjects/DSS-Framework/output/flo2d_output'
+    generate_ascii_set(ts_start_date, flo2d_output_path, 'flo2d_250', start_hour=0, end_hour=90, min_depth=0.15)
+
 
