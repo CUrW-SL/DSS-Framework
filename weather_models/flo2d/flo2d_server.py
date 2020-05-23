@@ -7,10 +7,7 @@ from urllib.parse import urlparse, parse_qs
 from run_model import execute_flo2d, flo2d_model_completed
 from gen_old_outflow import create_outflow_old
 from create_raincell import create_event_raincell
-
-
 import subprocess
-
 from os.path import join as pjoin
 from datetime import datetime, timedelta
 
@@ -348,6 +345,7 @@ if __name__ == '__main__':
         else:
             host_address = HOST_ADDRESS
             host_port = HOST_PORT
+        print('starting flo2d server on host {} and port {} '.format(host_address, host_port))
         server_address = (host_address, host_port)
         httpd = HTTPServer(server_address, StoreHandler)
         print('server running on host {} and port {} ...'.format(host_address, host_port))
