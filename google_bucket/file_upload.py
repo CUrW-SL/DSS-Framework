@@ -1,7 +1,7 @@
 from google.cloud import storage
 
 
-def upload_blob(key_file, bucket_name, source_file_name, destination_blob_name):
+def upload_file_to_bucket(key_file, bucket_name, source_file_name, destination_blob_name):
     """Uploads a file to the bucket."""
     # bucket_name = "your-bucket-name"
     # source_file_name = "local/path/to/file"
@@ -20,7 +20,7 @@ def upload_blob(key_file, bucket_name, source_file_name, destination_blob_name):
 
 
 if __name__ == "__main__":
-    upload_blob(
+    upload_file_to_bucket(
         key_file='/home/hasitha/uwcc-admin.json',
         bucket_name='wrf_nfs',
         source_file_name='/home/hasitha/PycharmProjects/DSS-Framework/output/station_rain.csv',
