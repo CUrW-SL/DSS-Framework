@@ -341,7 +341,7 @@ if __name__ == '__main__':
         arguments = len(sys.argv) - 1
         if arguments > 0:
             host_address = sys.argv[1]
-            host_port = sys.argv[2]
+            host_port = int(sys.argv[2])
         else:
             host_address = HOST_ADDRESS
             host_port = HOST_PORT
