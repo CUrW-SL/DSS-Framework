@@ -115,7 +115,7 @@ def get_local_exec_date_time_from_context(context):
 
 def get_create_raincell_cmd(**context):
     rule_id = get_rule_id(context)
-    rule = get_rule_by_id(rule_id)
+    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
     [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
     if is_allowed_to_run(rule_id):
         forward = rule['forecast_days']
@@ -142,7 +142,7 @@ def get_create_raincell_cmd(**context):
 
 def get_create_inflow_cmd(**context):
     rule_id = get_rule_id(context)
-    rule = get_rule_by_id(rule_id)
+    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
     if is_allowed_to_run(rule_id):
         [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
         forward = rule['forecast_days']
@@ -169,7 +169,7 @@ def get_create_inflow_cmd(**context):
 
 def get_create_chan_cmd(**context):
     rule_id = get_rule_id(context)
-    rule = get_rule_by_id(rule_id)
+    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
     if is_allowed_to_run(rule_id):
         [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
         forward = rule['forecast_days']
@@ -195,7 +195,7 @@ def get_create_chan_cmd(**context):
 
 def get_create_outflow_cmd(**context):
     rule_id = get_rule_id(context)
-    rule = get_rule_by_id(rule_id)
+    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
     if is_allowed_to_run(rule_id):
         [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
         forward = rule['forecast_days']
@@ -248,7 +248,7 @@ def get_run_flo2d_cmd(**context):
 
 def get_extract_water_level_cmd(**context):
     rule_id = get_rule_id(context)
-    rule = get_rule_by_id(rule_id)
+    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
     if is_allowed_to_run(rule_id):
         [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
         forward = rule['forecast_days']
@@ -275,7 +275,7 @@ def get_extract_water_level_cmd(**context):
 
 def get_extract_water_discharge_cmd(**context):
     rule_id = get_rule_id(context)
-    rule = get_rule_by_id(rule_id)
+    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
     if is_allowed_to_run(rule_id):
         [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
         forward = rule['forecast_days']
@@ -388,8 +388,7 @@ def on_dag_failure(context):
 
 
 def update_max_water_levels(**context):
-    rule_id = get_rule_id(context)
-    rule = get_rule_by_id(rule_id)
+    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
     print('update_max_water_levels|rule : ', rule)
     dss_adapter = get_dss_db_adapter()
     fcst_db_config = Variable.get('fcst_db_config', deserialize_json=True)
@@ -417,7 +416,7 @@ def update_max_water_levels(**context):
 
 def create_multi_ascii(**context):
     rule_id = get_rule_id(context)
-    rule = get_rule_by_id(rule_id)
+    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
     if is_allowed_to_run(rule_id):
         [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
         forward = rule['forecast_days']
@@ -442,7 +441,7 @@ def create_multi_ascii(**context):
 
 def create_max_wl_map(**context):
     rule_id = get_rule_id(context)
-    rule = get_rule_by_id(rule_id)
+    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
     if is_allowed_to_run(rule_id):
         [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
         forward = rule['forecast_days']
