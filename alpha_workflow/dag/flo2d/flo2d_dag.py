@@ -21,40 +21,39 @@ default_args = {
 
 create_raincell_cmd_request = 'http://{}:{}/create-raincell?' \
                               'run_date={}&run_time={}&model={}' \
-                              '&forward={}&backward={}&pop_method={}'
+                              '&forward={}&backward={}&pop_method={}&run_type={}'
 
 create_inflow_cmd_request = 'http://{}:{}/create-inflow?' \
                             'run_date={}&run_time={}&model={}' \
-                            '&forward={}&backward={}&pop_method={}'
+                            '&forward={}&backward={}&pop_method={}&run_type={}'
 
 create_outflow_cmd_request = 'http://{}:{}/create-outflow?' \
                              'run_date={}&run_time={}&model={}' \
-                             '&forward={}&backward={}&pop_method={}'
+                             '&forward={}&backward={}&pop_method={}&run_type={}'
 
 create_chan_cmd_request = 'http://{}:{}/create-chan?' \
                           'run_date={}&run_time={}&model={}' \
-                          '&forward={}&backward={}'
+                          '&forward={}&backward={}&run_type={}'
 
 run_flo2d_cmd_request = 'http://{}:{}/run-flo2d?' \
                         'run_date={}&run_time={}&model={}' \
-                        '&forward={}&backward={}'
+                        '&forward={}&backward={}&run_type={}'
 
 extract_water_level_cmd_request = 'http://{}:{}/extract-water-level?' \
                                   'run_date={}&run_time={}&model={}' \
-                                  '&forward={}&backward={}&sim_tag={}'
-
+                                  '&forward={}&backward={}&sim_tag={}&run_type={}'
 
 extract_water_discharge_cmd_request = 'http://{}:{}/extract-discharge?' \
                                       'run_date={}&run_time={}&model={}' \
-                                      '&forward={}&backward={}&sim_tag={}'
+                                      '&forward={}&backward={}&sim_tag={}&run_type={}'
 
 create_ascii_cmd_request = 'http://{}:{}/create-ascii?' \
                         'run_date={}&run_time={}&model={}' \
-                        '&forward={}&backward={}'
+                        '&forward={}&backward={}&run_type={}'
 
 create_max_wl_map_cmd_request = 'http://{}:{}/create-max-wl-map?' \
                         'run_date={}&run_time={}&model={}' \
-                        '&forward={}&backward={}'
+                        '&forward={}&backward={}&run_type={}'
 
 
 def send_http_get_request(url, params=None):
@@ -125,8 +124,9 @@ def get_create_raincell_cmd(**context):
         pop_method = rule['raincell_data_from']
         run_node = rule['rule_details']['run_node']
         run_port = rule['rule_details']['run_port']
+        run_type = rule['run_type']
         request_url = create_raincell_cmd_request.format(run_node, run_port, exec_date, exec_time,
-                                                         target_model, forward, backward, pop_method)
+                                                         target_model, forward, backward, pop_method, run_type)
         print('get_create_raincell_cmd|request_url : ', request_url)
         if send_http_get_request(request_url):
             print('get_create_raincell_cmd|success')
@@ -151,8 +151,9 @@ def get_create_inflow_cmd(**context):
         pop_method = rule['inflow_data_from']
         run_node = rule['rule_details']['run_node']
         run_port = rule['rule_details']['run_port']
+        run_type = rule['run_type']
         request_url = create_inflow_cmd_request.format(run_node, run_port, exec_date, exec_time,
-                                                       target_model, forward, backward, pop_method)
+                                                       target_model, forward, backward, pop_method, run_type)
         print('get_create_inflow_cmd|request_url : ', request_url)
         if send_http_get_request(request_url):
             print('get_create_inflow_cmd|success')
@@ -176,8 +177,9 @@ def get_create_chan_cmd(**context):
         target_model = rule['target_model']
         run_node = rule['rule_details']['run_node']
         run_port = rule['rule_details']['run_port']
+        run_type = rule['run_type']
         request_url = create_chan_cmd_request.format(run_node, run_port, exec_date, exec_time,
-                                                     target_model, forward, backward)
+                                                     target_model, forward, backward, run_type)
         print('get_create_chan_cmd|request_url : ', request_url)
         if send_http_get_request(request_url):
             print('get_create_chan_cmd|success')
@@ -202,8 +204,9 @@ def get_create_outflow_cmd(**context):
         pop_method = rule['outflow_data_from']
         run_node = rule['rule_details']['run_node']
         run_port = rule['rule_details']['run_port']
+        run_type = rule['run_type']
         request_url = create_outflow_cmd_request.format(run_node, run_port, exec_date, exec_time,
-                                                        target_model, forward, backward, pop_method)
+                                                        target_model, forward, backward, pop_method, run_type)
         print('get_create_outflow_cmd|request_url : ', request_url)
         if send_http_get_request(request_url):
             print('get_create_outflow_cmd|success')
@@ -227,8 +230,9 @@ def get_run_flo2d_cmd(**context):
         target_model = rule['target_model']
         run_node = rule['rule_details']['run_node']
         run_port = rule['rule_details']['run_port']
+        run_type = rule['run_type']
         request_url = run_flo2d_cmd_request.format(run_node, run_port, exec_date, exec_time,
-                                                   target_model, forward, backward)
+                                                   target_model, forward, backward, run_type)
         print('get_run_flo2d_cmd|request_url : ', request_url)
         if send_http_get_request(request_url):
             print('get_run_flo2d_cmd|success')
@@ -252,9 +256,10 @@ def get_extract_water_level_cmd(**context):
         target_model = rule['target_model']
         run_node = rule['rule_details']['run_node']
         run_port = rule['rule_details']['run_port']
+        run_type = rule['run_type']
         sim_tag = 'event_run'
         request_url = extract_water_level_cmd_request.format(run_node, run_port, exec_date, exec_time,
-                                                             target_model, forward, backward, sim_tag)
+                                                             target_model, forward, backward, sim_tag, run_type)
         print('get_extract_water_level_cmd|request_url : ', request_url)
         if send_http_get_request(request_url):
             print('get_extract_water_level_cmd|success')
@@ -278,9 +283,10 @@ def get_extract_water_discharge_cmd(**context):
         target_model = rule['target_model']
         run_node = rule['rule_details']['run_node']
         run_port = rule['rule_details']['run_port']
+        run_type = rule['run_type']
         sim_tag = 'event_run'
         request_url = extract_water_discharge_cmd_request.format(run_node, run_port, exec_date, exec_time,
-                                                                 target_model, forward, backward, sim_tag)
+                                                                 target_model, forward, backward, sim_tag, run_type)
         print('get_extract_water_discharge_cmd|request_url : ', request_url)
         if send_http_get_request(request_url):
             print('get_extract_water_discharge_cmd|success')
