@@ -7,6 +7,9 @@ from urllib.parse import urlparse, parse_qs
 from run_model import execute_flo2d, flo2d_model_completed
 from gen_old_outflow import create_outflow_old
 from create_raincell import create_event_raincell
+from multi_ascii import generate_ascii_set
+from single_ascii import generate_flood_map
+from file_upload import upload_file_to_bucket
 import subprocess
 from os.path import join as pjoin
 from datetime import datetime, timedelta
@@ -17,6 +20,8 @@ HOST_PORT = 8088
 WIN_OUTPUT_DIR_PATH = r"D:\flo2d_output"
 WIN_HOME_DIR_PATH = r"D:\DSS-Framework\weather_models\flo2d"
 WIN_FLO2D_DATA_MANAGER_PATH = r"D:\curw_flo2d_data_manager"
+GOOGLE_BUCKET_KEY_PATH = r"D:\DSS-Framework\weather_models\flo2d\uwcc-admin.json"
+BUCKET_NAME = 'curwsl_nfs'
 
 
 CREATE_CHAN_CMD = '.\gen_chan.py -m "{}" -s "{}" -d "{}"'
@@ -325,6 +330,90 @@ class StoreHandler(BaseHTTPRequestHandler):
                 print('create-chan|command_dir_path : ', command_dir_path)
 
                 response = run_input_file_generation_methods(command_dir_path, command)
+            except Exception as e:
+                print(str(e))
+                response = {'response': 'fail'}
+            reply = json.dumps(response)
+            self.send_response(200)
+            self.send_header('Content-type', 'text/json')
+            self.end_headers()
+            self.wfile.write(str.encode(reply))
+
+        if self.path.startswith('/create-ascii'):
+            os.chdir(WIN_HOME_DIR_PATH)
+            print('create-ascii')
+            try:
+                query_components = parse_qs(urlparse(self.path).query)
+                print('query_components : ', query_components)
+
+                params = get_input_params(query_components, 'extract')
+                print('StoreHandler|create-ascii|params : ', params)
+                dir_path = set_daily_dir(params['model'], params['run_date'], params['run_time'])
+
+                ts_start_date_time = datetime.strptime(params['ts_start'], '%Y-%m-%d %H:%M:%S')
+                ts_start_date = ts_start_date_time.strftime('%Y-%m-%d')
+                print('create-ascii|generate_ascii_set|[ts_start_date, dir_path, params[\'model\']] :',
+                      [ts_start_date, dir_path, params['model']])
+                if generate_ascii_set(ts_start_date, dir_path, params['model']):
+                    print('ascii files have generated.')
+                    if params['model'] == 'flo2d_250':
+                        flo2d_model = '250'
+                    elif params['model'] == 'flo2d_150':
+                        flo2d_model = '150'
+                    elif params['model'] == 'flo2d_30':
+                        flo2d_model = '30'
+                    elif params['model'] == 'flo2d_10':
+                        flo2d_model = '10'
+                    bucket_file = 'flo2d/{}/{}/{}/multi_ascii.zip'.format(flo2d_model, params['run_date'], params['run_time'])
+                    zip_file = os.path.join(dir_path, 'multi_ascii.zip')
+                    print('StoreHandler|create-ascii|[BUCKET_NAME, zip_file, bucket_file] : ', [BUCKET_NAME, zip_file,
+                                                                                                bucket_file])
+                    upload_file_to_bucket(GOOGLE_BUCKET_KEY_PATH, BUCKET_NAME, zip_file, bucket_file)
+                    response = {'response': 'success'}
+                else:
+                    response = {'response': 'fail'}
+            except Exception as e:
+                print(str(e))
+                response = {'response': 'fail'}
+            reply = json.dumps(response)
+            self.send_response(200)
+            self.send_header('Content-type', 'text/json')
+            self.end_headers()
+            self.wfile.write(str.encode(reply))
+
+        if self.path.startswith('/create-max-wl-map'):
+            os.chdir(WIN_HOME_DIR_PATH)
+            print('create-max-wl-map')
+            try:
+                query_components = parse_qs(urlparse(self.path).query)
+                print('query_components : ', query_components)
+
+                params = get_input_params(query_components, 'extract')
+                print('StoreHandler|create-max-wl-map|params : ', params)
+                dir_path = set_daily_dir(params['model'], params['run_date'], params['run_time'])
+
+                ts_start_date_time = datetime.strptime(params['ts_start'], '%Y-%m-%d %H:%M:%S')
+                ts_start_date = ts_start_date_time.strftime('%Y-%m-%d')
+                print('create-max-wl-map|generate_ascii_set|[ts_start_date, dir_path, params[\'model\']] :',
+                      [ts_start_date, dir_path, params['model']])
+                if generate_flood_map(ts_start_date, dir_path, params['model']):
+                    print('max water level map has generated.')
+                    if params['model'] == 'flo2d_250':
+                        flo2d_model = '250'
+                    elif params['model'] == 'flo2d_150':
+                        flo2d_model = '150'
+                    elif params['model'] == 'flo2d_30':
+                        flo2d_model = '30'
+                    elif params['model'] == 'flo2d_10':
+                        flo2d_model = '10'
+                    bucket_file = 'flo2d/{}/{}/{}/max_wl_map.asc'.format(flo2d_model, params['run_date'],
+                                                                          params['run_time'])
+                    ascii_file = os.path.join(dir_path, 'max_wl_map.asc')
+                    print('StoreHandler|create-max-wl-map|[BUCKET_NAME, ascii_file, bucket_file] : ', [BUCKET_NAME, ascii_file, bucket_file])
+                    upload_file_to_bucket(GOOGLE_BUCKET_KEY_PATH, BUCKET_NAME, ascii_file, bucket_file)
+                    response = {'response': 'success'}
+                else:
+                    response = {'response': 'fail'}
             except Exception as e:
                 print(str(e))
                 response = {'response': 'fail'}
