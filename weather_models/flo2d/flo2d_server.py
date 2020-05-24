@@ -333,6 +333,7 @@ class StoreHandler(BaseHTTPRequestHandler):
                 dir_path = set_daily_dir(params['model'], params['run_date'], params['run_time'])
 
                 command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'output')
+                params['run_type'] = 'event'
                 if params['run_type'] == 'production':
                     command = EXTRACT_WATER_LEVEL_CMD.format(params['model'], params['ts_start'],
                                                          params['run_date_time'], dir_path, params['sim_tag'])
@@ -364,6 +365,7 @@ class StoreHandler(BaseHTTPRequestHandler):
                 dir_path = set_daily_dir(params['model'], params['run_date'], params['run_time'])
 
                 command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'output')
+                params['run_type'] = 'event'
                 if params['run_type'] == 'production':
                     command = EXTRACT_WATER_DISCHARGE_CMD.format(params['model'], params['ts_start'],
                                                              params['run_date_time'], dir_path, params['sim_tag'])
