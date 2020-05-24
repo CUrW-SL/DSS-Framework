@@ -68,6 +68,14 @@ extract_water_discharge_cmd_request = 'http://{}:{}/extract-discharge?' \
                                       'run_date={}&run_time={}&model={}' \
                                       '&forward={}&backward={}&sim_tag={}'
 
+create_ascii_cmd_request = 'http://{}:{}/create-ascii?' \
+                        'run_date={}&run_time={}&model={}' \
+                        '&forward={}&backward={}'
+
+create_max_wl_map_cmd_request = 'http://{}:{}/create-max-wl-map?' \
+                        'run_date={}&run_time={}&model={}' \
+                        '&forward={}&backward={}'
+
 
 def send_http_get_request(url, params=None):
     if params is not None:
@@ -331,6 +339,35 @@ def get_extract_water_discharge_cmd(**context):
         )
 
 
+def get_extract_water_level_cmd(**context):
+    rule_id = get_rule_id(context)
+    rule = get_rule_by_id(rule_id)
+    if is_allowed_to_run(rule_id):
+        [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
+        forward = rule['forecast_days']
+        backward = rule['observed_days']
+        target_model = rule['target_model']
+        run_node = rule['rule_details']['run_node']
+        run_port = rule['rule_details']['run_port']
+        sim_tag = 'event_run'
+        extract_water_level_cmd = extract_water_level_cmd_template.format(run_node, run_port, exec_date, exec_time,
+                                                                          target_model, forward, backward, sim_tag)
+        print('get_extract_water_level_cmd|extract_water_level_cmd : ', extract_water_level_cmd)
+        request_url = extract_water_level_cmd_request.format(run_node, run_port, exec_date, exec_time,
+                                                             target_model, forward, backward, sim_tag)
+        print('get_extract_water_level_cmd|request_url : ', request_url)
+        if send_http_get_request(request_url):
+            print('get_extract_water_level_cmd|success')
+        else:
+            raise AirflowException(
+                'get_extract_water_level_cmd|failed'
+            )
+    else:
+        raise AirflowException(
+            'Dag has stopped by admin.'
+        )
+
+
 def update_workflow_status(status, rule_id):
     try:
         db_config = Variable.get('db_config', deserialize_json=True)
@@ -433,7 +470,6 @@ def update_max_water_levels(**context):
         if run_type == 'event':
             sim_tag = 'event_run'
         else:
-            # sim_tag = rule['name']
             sim_tag = 'event_run'
         if rule['target_model'] == 'flo2d_250':
             locations = dss_adapter.get_water_level_locations()
@@ -441,6 +477,56 @@ def update_max_water_levels(**context):
             dss_adapter.update_max_flo2d_250_forecast_water_level(locations, exec_datetime, sim_tag, fcst_db_config)
         else:
             print('update_max_water_levels|ToDo..')
+
+
+def create_multi_ascii(**context):
+    rule_id = get_rule_id(context)
+    rule = get_rule_by_id(rule_id)
+    if is_allowed_to_run(rule_id):
+        [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
+        forward = rule['forecast_days']
+        backward = rule['observed_days']
+        target_model = rule['target_model']
+        run_node = rule['rule_details']['run_node']
+        run_port = rule['rule_details']['run_port']
+        request_url = create_ascii_cmd_request.format(run_node, run_port, exec_date, exec_time,
+                                                   target_model, forward, backward)
+        print('create_multi_ascii|request_url : ', request_url)
+        if send_http_get_request(request_url):
+            print('create_multi_ascii|success')
+        else:
+            raise AirflowException(
+                'create_multi_ascii|failed'
+            )
+    else:
+        raise AirflowException(
+            'Dag has stopped by admin.'
+        )
+
+
+def create_max_wl_map(**context):
+    rule_id = get_rule_id(context)
+    rule = get_rule_by_id(rule_id)
+    if is_allowed_to_run(rule_id):
+        [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
+        forward = rule['forecast_days']
+        backward = rule['observed_days']
+        target_model = rule['target_model']
+        run_node = rule['rule_details']['run_node']
+        run_port = rule['rule_details']['run_port']
+        request_url = create_max_wl_map_cmd_request.format(run_node, run_port, exec_date, exec_time,
+                                                   target_model, forward, backward)
+        print('create_max_wl_map|request_url : ', request_url)
+        if send_http_get_request(request_url):
+            print('create_max_wl_map|success')
+        else:
+            raise AirflowException(
+                'create_max_wl_map|failed'
+            )
+    else:
+        raise AirflowException(
+            'Dag has stopped by admin.'
+        )
 
 
 def create_dag(dag_id, dag_rule, timeout, default_args):
@@ -525,6 +611,20 @@ def create_dag(dag_id, dag_rule, timeout, default_args):
             pool=dag_pool
         )
 
+        create_multi_ascii_set = PythonOperator(
+            task_id='create_multi_ascii_set',
+            provide_context=True,
+            python_callable=create_multi_ascii,
+            pool=dag_pool
+        )
+
+        create_max_wl_ascii_map = PythonOperator(
+            task_id='create_max_wl_ascii_map',
+            provide_context=True,
+            python_callable=create_max_wl_map,
+            pool=dag_pool
+        )
+
         complete_state = PythonOperator(
             task_id='complete_state',
             provide_context=True,
@@ -534,7 +634,8 @@ def create_dag(dag_id, dag_rule, timeout, default_args):
 
         init_flo2d >> running_state_flo2d >> create_raincell_flo2d >> create_chan_flo2d >> \
         create_inflow_flo2d >> create_outflow_flo2d >> run_flo2d_flo2d >> \
-        extract_water_level_flo2d >> extract_water_discharge_flo2d >> update_max_water_level >> complete_state
+        extract_water_level_flo2d >> extract_water_discharge_flo2d >> update_max_water_level >> \
+        create_multi_ascii_set >> create_max_wl_ascii_map >> complete_state
 
     return dag
 
