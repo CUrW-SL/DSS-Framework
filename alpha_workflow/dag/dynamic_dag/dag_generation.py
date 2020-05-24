@@ -79,7 +79,7 @@ def create_trigger_dag_run(context):
     print('create_trigger_dag_run|context : ', context)
     run_date = context["execution_date"].to_datetime_string()
     exec_datetime = datetime.strptime(run_date, '%Y-%m-%d %H:%M:%S') + timedelta(hours=5, minutes=30)
-    run_date = exec_datetime.strftime('%Y-%m-%d %H:%M:%S')
+    run_date = exec_datetime.strftime('%Y-%m-%d %H:00:00')
     print('create_trigger_dag_run|run_date : ', run_date)
     task_name = context['task'].task_id
     dag_rule_id = context['params']['id']
