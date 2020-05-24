@@ -103,7 +103,7 @@ def get_local_exec_date_time_from_context(context):
         exec_datetime_str = rule['run_date']
         exec_datetime = datetime.strptime(exec_datetime_str, '%Y-%m-%d %H:%M:%S')
         exec_date = exec_datetime.strftime('%Y-%m-%d')
-        exec_time = exec_datetime.strftime('%H:%M:%S')
+        exec_time = exec_datetime.strftime('%H:00:00')
     else:
         exec_datetime_str = context["execution_date"].to_datetime_string()
         exec_datetime = datetime.strptime(exec_datetime_str, '%Y-%m-%d %H:%M:%S') \
