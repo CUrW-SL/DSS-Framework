@@ -25,12 +25,25 @@ BUCKET_NAME = 'curwsl_nfs'
 
 
 CREATE_CHAN_CMD = '.\gen_chan.py -m "{}" -s "{}" -d "{}"'
+CREATE_CHAN_LOCAL_CMD = '.\gen_chan.py -m "{}" -s "{}" -d "{}" -E'
+
 CREATE_RAINCELL_CMD = '.\gen_raincell.py -m "{}" -s "{}" -e "{}" -d "{}" -M "{}"'
+CREATE_RAINCELL_LOCAL_CMD = '.\gen_raincell.py -m "{}" -s "{}" -e "{}" -d "{}" -M "{}" -E'
+
 CREATE_INFLOW_250_CMD = '.\gen_250_inflow.py -s "{}" -e "{}" -d "{}" -M "{}"'
+CREATE_INFLOW_250_LOCAL_CMD = '.\gen_250_inflow.py -s "{}" -e "{}" -d "{}" -M "{}" -E'
+
 CREATE_INFLOW_150_CMD = '.\gen_150_inflow.py -s "{}" -e "{}" -d "{}" -M "{}"'
+CREATE_INFLOW_150_LOCAL_CMD = '.\gen_150_inflow.py -s "{}" -e "{}" -d "{}" -M "{}" -E'
+
 CREATE_OUTFLOW_CMD = '.\gen_outflow.py -m "{}" -s "{}" -e "{}" -d "{}" -M "{}"'
+CREATE_OUTFLOW_LOCAL_CMD = '.\gen_outflow.py -m "{}" -s "{}" -e "{}" -d "{}" -M "{}" -E'
+
 EXTRACT_WATER_LEVEL_CMD = '.\extract_water_level.py -m "{}" -s "{}" -r "{}" -d "{}" -t "{}"'
+EXTRACT_WATER_LEVEL_LOCAL_CMD = '.\extract_water_level.py -m "{}" -s "{}" -r "{}" -d "{}" -t "{}" -E '
+
 EXTRACT_WATER_DISCHARGE_CMD = '.\extract_discharge.py -m "{}" -s "{}" -r "{}" -d "{}" -t "{}"'
+EXTRACT_WATER_DISCHARGE_LOCAL_CMD = '.\extract_discharge.py -m "{}" -s "{}" -r "{}" -d "{}" -t "{}" -E '
 
 
 def set_daily_dir(target_model, run_date, run_time):
