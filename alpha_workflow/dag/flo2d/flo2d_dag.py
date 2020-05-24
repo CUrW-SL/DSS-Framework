@@ -475,6 +475,10 @@ def update_max_water_levels(**context):
             locations = dss_adapter.get_water_level_locations()
             print('update_max_water_levels|locations : ', locations)
             dss_adapter.update_max_flo2d_250_forecast_water_level(locations, exec_datetime, sim_tag, fcst_db_config)
+        elif rule['target_model'] == 'flo2d_150':
+            locations = dss_adapter.get_water_level_locations()
+            print('update_max_water_levels|locations : ', locations)
+            dss_adapter.update_max_flo2d_150_forecast_water_level(locations, exec_datetime, sim_tag, fcst_db_config)
         else:
             print('update_max_water_levels|ToDo..')
 
