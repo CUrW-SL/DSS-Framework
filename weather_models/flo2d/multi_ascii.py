@@ -179,11 +179,14 @@ def generate_ascii_set(ts_start_date, flo2d_output_path, flo2d_model, start_hour
     print('generate_ascii_set|ascii_dir : ', ascii_dir)
     if create_zip_file(zip_file, ascii_dir):
         print('zip file has created.')
+        return True
+    else:
+        return False
 
 
 if __name__ == '__main__':
     ts_start_date = '2020-05-22'
-    flo2d_output_path = '/home/hasitha/PycharmProjects/DSS-Framework/output/flo2d_output'
+    flo2d_output_path = '/output/flo2d_output'
     generate_ascii_set(ts_start_date, flo2d_output_path, 'flo2d_250', start_hour=0, end_hour=90, min_depth=0.15)
 
 

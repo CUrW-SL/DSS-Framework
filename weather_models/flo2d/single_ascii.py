@@ -145,7 +145,7 @@ def generate_flood_map(ts_start_date, flo2d_output_path, flo2d_model, start_hour
     maxwselev_file = os.path.join(flo2d_output_path, 'MAXWSELEV.OUT')
     cadpts_file = os.path.join(flo2d_output_path, 'CADPTS.DAT')
     shape_data_csv_file = os.path.join(flo2d_output_path, 'shape_data.csv')
-    shape_data_ascii_file = os.path.join(flo2d_output_path, 'shape_data.asc')
+    shape_data_ascii_file = os.path.join(flo2d_output_path, 'max_wl_map.asc')
     if create_data_csv(flo2d_output_path, topo_dat_file, maxwselev_file):
         with open(shape_data_csv_file) as infile:
             waterLevelLines = []
@@ -170,7 +170,7 @@ def generate_flood_map(ts_start_date, flo2d_output_path, flo2d_model, start_hour
 
 if __name__ == '__main__':
     ts_start_date = '2020-05-22'
-    flo2d_output_path = '/home/hasitha/PycharmProjects/DSS-Framework/output/flo2d_output'
+    flo2d_output_path = '/output/flo2d_output'
     generate_flood_map(ts_start_date, flo2d_output_path, 'flo2d_250')
 
 
