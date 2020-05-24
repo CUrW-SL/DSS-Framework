@@ -23,7 +23,6 @@ WIN_FLO2D_DATA_MANAGER_PATH = r"D:\curw_flo2d_data_manager"
 GOOGLE_BUCKET_KEY_PATH = r"D:\DSS-Framework\weather_models\flo2d\uwcc-admin.json"
 BUCKET_NAME = 'curwsl_nfs'
 
-
 CREATE_CHAN_CMD = '.\gen_chan.py -m "{}" -s "{}" -d "{}"'
 CREATE_CHAN_LOCAL_CMD = '.\gen_chan.py -m "{}" -s "{}" -d "{}" -E'
 
@@ -92,6 +91,11 @@ def get_input_params(query_components, input_type=None):
         else:
             model = 'flo2d_250'
 
+        if query_components["run_type"]:  # "production"/"event"
+            [run_type] = query_components["run_type"]
+        else:
+            run_type = 'production'
+
         if query_components["forward"]:
             [forward] = query_components["forward"]
         else:
@@ -112,15 +116,16 @@ def get_input_params(query_components, input_type=None):
             [pop_method] = query_components["pop_method"]
             return {'run_date': run_date, 'run_time': run_time, 'ts_start': ts_start_end['ts_start'],
                     'ts_end': ts_start_end['ts_end'], 'run_date_time': ts_start_end['run_time'], 'model': model,
-                    'pop_method': pop_method}
+                    'pop_method': pop_method, 'run_type': run_type}
         elif input_type == 'extract':
             [sim_tag] = query_components["sim_tag"]
             return {'run_date': run_date, 'run_time': run_time, 'ts_start': ts_start_end['ts_start'],
                     'ts_end': ts_start_end['ts_end'], 'run_date_time': ts_start_end['run_time'], 'model': model,
-                    'sim_tag': sim_tag}
+                    'sim_tag': sim_tag, 'run_type': run_type}
         else:
             return {'run_date': run_date, 'run_time': run_time, 'ts_start': ts_start_end['ts_start'],
-                    'ts_end': ts_start_end['ts_end'], 'run_date_time': ts_start_end['run_time'], 'model': model}
+                    'ts_end': ts_start_end['ts_end'], 'run_date_time': ts_start_end['run_time'],
+                    'model': model, 'run_type': run_type}
     except Exception as e:
         print('get_input_params|Exception : ', str(e))
 
@@ -156,11 +161,15 @@ class StoreHandler(BaseHTTPRequestHandler):
                 dir_path = set_daily_dir(params['model'], params['run_date'], params['run_time'])
                 try:
                     command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'input', 'raincell')
-                    command = CREATE_RAINCELL_CMD.format(params['model'], params['ts_start'],
-                                                         params['ts_end'], dir_path, params['pop_method'])
+                    if params['run_type'] == 'production':
+                        command = CREATE_RAINCELL_CMD.format(params['model'], params['ts_start'],
+                                                             params['ts_end'], dir_path, params['pop_method'])
+                    else:
+                        command = CREATE_RAINCELL_LOCAL_CMD.format(params['model'], params['ts_start'],
+                                                                   params['ts_end'], dir_path, params['pop_method'])
+                    print('create-raincell|command : ', command)
                     if params['pop_method'].isupper():
                         print('create-raincell|command_dir_path : ', command_dir_path)
-                        print('create-raincell|command : ', command)
                         response = run_input_file_generation_methods(command_dir_path, command)
                     else:
                         rule_name = params['pop_method']
@@ -199,11 +208,19 @@ class StoreHandler(BaseHTTPRequestHandler):
 
                 command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'input', 'inflow')
                 if params['model'] == 'flo2d_250':
-                    command = CREATE_INFLOW_250_CMD.format(params['ts_start'], params['ts_end'], dir_path,
+                    if params['run_type'] == 'production':
+                        command = CREATE_INFLOW_250_CMD.format(params['ts_start'], params['ts_end'], dir_path,
                                                            params['pop_method'])
+                    else:
+                        command = CREATE_INFLOW_250_LOCAL_CMD.format(params['ts_start'], params['ts_end'], dir_path,
+                                                     params['pop_method'])
                 else:
-                    command = CREATE_INFLOW_150_CMD.format(params['ts_start'], params['ts_end'], dir_path,
+                    if params['run_type'] == 'production':
+                        command = CREATE_INFLOW_150_CMD.format(params['ts_start'], params['ts_end'], dir_path,
                                                            params['pop_method'])
+                    else:
+                        command = CREATE_INFLOW_150_LOCAL_CMD.format(params['ts_start'], params['ts_end'], dir_path,
+                                                               params['pop_method'])
                 print('create-inflow|command : ', command)
                 print('create-inflow|command_dir_path : ', command_dir_path)
                 response = run_input_file_generation_methods(command_dir_path, command)
@@ -236,8 +253,12 @@ class StoreHandler(BaseHTTPRequestHandler):
                     create_outflow_old(dir_path, params['ts_start'], params['ts_end'])
                     response = {'response': 'success'}
                 else:
-                    command = CREATE_OUTFLOW_CMD.format(params['model'], params['ts_start'],
-                                                    params['ts_end'], dir_path, params['pop_method'])
+                    if params['run_type'] == 'production':
+                        command = CREATE_OUTFLOW_CMD.format(params['model'], params['ts_start'],
+                                                        params['ts_end'], dir_path, params['pop_method'])
+                    else:
+                        command = CREATE_OUTFLOW_LOCAL_CMD.format(params['model'], params['ts_start'],
+                                                            params['ts_end'], dir_path, params['pop_method'])
                     print('create-outflow|command : ', command)
                     print('create-outflow|command_dir_path : ', command_dir_path)
                     response = run_input_file_generation_methods(command_dir_path, command)
@@ -261,7 +282,10 @@ class StoreHandler(BaseHTTPRequestHandler):
                 dir_path = set_daily_dir(params['model'], params['run_date'], params['run_time'])
 
                 command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'input', 'chan')
-                command = CREATE_CHAN_CMD.format(params['model'], params['ts_start'], dir_path)
+                if params['run_type'] == 'production':
+                    command = CREATE_CHAN_CMD.format(params['model'], params['ts_start'], dir_path)
+                else:
+                    command = CREATE_CHAN_LOCAL_CMD.format(params['model'], params['ts_start'], dir_path)
                 print('create-chan|command : ', command)
                 print('create-chan|command_dir_path : ', command_dir_path)
                 response = run_input_file_generation_methods(command_dir_path, command)
@@ -277,7 +301,6 @@ class StoreHandler(BaseHTTPRequestHandler):
         if self.path.startswith('/run-flo2d'):
             os.chdir(WIN_HOME_DIR_PATH)
             print('run-flo2d')
-            response = {}
             try:
                 query_components = parse_qs(urlparse(self.path).query)
                 print('query_components : ', query_components)
@@ -310,8 +333,12 @@ class StoreHandler(BaseHTTPRequestHandler):
                 dir_path = set_daily_dir(params['model'], params['run_date'], params['run_time'])
 
                 command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'output')
-                command = EXTRACT_WATER_LEVEL_CMD.format(params['model'], params['ts_start'],
+                if params['run_type'] == 'production':
+                    command = EXTRACT_WATER_LEVEL_CMD.format(params['model'], params['ts_start'],
                                                          params['run_date_time'], dir_path, params['sim_tag'])
+                else:
+                    command = EXTRACT_WATER_LEVEL_LOCAL_CMD.format(params['model'], params['ts_start'],
+                                                             params['run_date_time'], dir_path, params['sim_tag'])
                 print('create-chan|command : ', command)
                 print('create-chan|command_dir_path : ', command_dir_path)
 
@@ -337,8 +364,12 @@ class StoreHandler(BaseHTTPRequestHandler):
                 dir_path = set_daily_dir(params['model'], params['run_date'], params['run_time'])
 
                 command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'output')
-                command = EXTRACT_WATER_DISCHARGE_CMD.format(params['model'], params['ts_start'],
+                if params['run_type'] == 'production':
+                    command = EXTRACT_WATER_DISCHARGE_CMD.format(params['model'], params['ts_start'],
                                                              params['run_date_time'], dir_path, params['sim_tag'])
+                else:
+                    command = EXTRACT_WATER_DISCHARGE_LOCAL_CMD.format(params['model'], params['ts_start'],
+                                                                 params['run_date_time'], dir_path, params['sim_tag'])
                 print('create-chan|command : ', command)
                 print('create-chan|command_dir_path : ', command_dir_path)
 
@@ -377,7 +408,8 @@ class StoreHandler(BaseHTTPRequestHandler):
                         flo2d_model = '30'
                     elif params['model'] == 'flo2d_10':
                         flo2d_model = '10'
-                    bucket_file = 'flo2d/{}/{}/{}/multi_ascii.zip'.format(flo2d_model, params['run_date'], params['run_time'])
+                    bucket_file = 'flo2d/{}/{}/{}/multi_ascii.zip'.format(flo2d_model, params['run_date'],
+                                                                          params['run_time'])
                     zip_file = os.path.join(dir_path, 'multi_ascii.zip')
                     print('StoreHandler|create-ascii|[BUCKET_NAME, zip_file, bucket_file] : ', [BUCKET_NAME, zip_file,
                                                                                                 bucket_file])
@@ -420,9 +452,10 @@ class StoreHandler(BaseHTTPRequestHandler):
                     elif params['model'] == 'flo2d_10':
                         flo2d_model = '10'
                     bucket_file = 'flo2d/{}/{}/{}/max_wl_map.asc'.format(flo2d_model, params['run_date'],
-                                                                          params['run_time'])
+                                                                         params['run_time'])
                     ascii_file = os.path.join(dir_path, 'max_wl_map.asc')
-                    print('StoreHandler|create-max-wl-map|[BUCKET_NAME, ascii_file, bucket_file] : ', [BUCKET_NAME, ascii_file, bucket_file])
+                    print('StoreHandler|create-max-wl-map|[BUCKET_NAME, ascii_file, bucket_file] : ',
+                          [BUCKET_NAME, ascii_file, bucket_file])
                     upload_file_to_bucket(GOOGLE_BUCKET_KEY_PATH, BUCKET_NAME, ascii_file, bucket_file)
                     response = {'response': 'success'}
                 else:
