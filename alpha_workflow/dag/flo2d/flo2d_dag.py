@@ -222,7 +222,7 @@ def get_create_outflow_cmd(**context):
 
 def get_run_flo2d_cmd(**context):
     rule_id = get_rule_id(context)
-    rule = get_rule_by_id(rule_id)
+    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
     if is_allowed_to_run(rule_id):
         [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
         forward = rule['forecast_days']
