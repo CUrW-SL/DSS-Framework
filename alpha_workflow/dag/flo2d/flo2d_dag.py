@@ -276,7 +276,9 @@ def get_extract_water_level_cmd(**context):
 def get_extract_water_discharge_cmd(**context):
     rule_id = get_rule_id(context)
     rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
+    print('get_extract_water_discharge_cmd|rule : ', rule)
     if is_allowed_to_run(rule_id):
+        print('get_extract_water_discharge_cmd|is_allowed_to_run')
         [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
         forward = rule['forecast_days']
         backward = rule['observed_days']
