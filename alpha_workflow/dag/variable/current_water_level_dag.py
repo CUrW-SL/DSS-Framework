@@ -59,9 +59,8 @@ def update_variable_value(dag_run, **kwargs):
 
 
 def get_rule_id(context):
-    rule_info = context['task_instance'].xcom_pull(task_ids='init_hec_single')['rule_info']
-    if rule_info:
-        rule_id = rule_info['id']
+    rule_id = context['task_instance'].xcom_pull(task_ids='init_task')['id']
+    if rule_id:
         print('get_rule_id|rule_id : ', rule_id)
         return rule_id
     else:
@@ -77,6 +76,13 @@ def on_dag_failure(context):
         print('on_dag_failure|rule_id not found')
 
 
+def push_rule_to_xcom(dag_run, **kwargs):
+    print('run_this_func|dag_run : ', dag_run)
+    hechms_rule = dag_run.conf
+    print('run_this_func|hechms_rule : ', hechms_rule)
+    return hechms_rule
+
+
 default_args = {
     'owner': 'dss admin',
     'start_date': datetime.utcnow(),
@@ -89,6 +95,13 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
          on_failure_callback=on_dag_failure) as dag:
     init_task = PythonOperator(
         task_id='init_task',
+        provide_context=True,
+        python_callable=push_rule_to_xcom,
+        pool=dag_pool
+    )
+
+    running_status = PythonOperator(
+        task_id='running_status',
         provide_context=True,
         python_callable=set_running_status,
         pool=dag_pool
@@ -108,4 +121,4 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    init_task >> update_variable_value >> complete_state
+    init_task >> running_status >> update_variable_value >> complete_state
