@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 DEFAULT_VARIABLE_VALUE = -9999
 
-sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/variable_util')
+sys.path.insert(0, '/home/curw/git/DSS-Framework/variable_util')
 from common_util import get_iteration_gap_of_cron_exp, search_in_dictionary_list, lower_time_limit
 
 
