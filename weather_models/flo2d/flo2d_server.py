@@ -334,16 +334,18 @@ class StoreHandler(BaseHTTPRequestHandler):
 
                 command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'output')
                 params['run_type'] = 'event'
+                print('StoreHandler|extract-water-level|params[run_type] : ', params['run_type'])
                 if params['run_type'] == 'production':
                     command = EXTRACT_WATER_LEVEL_CMD.format(params['model'], params['ts_start'],
                                                          params['run_date_time'], dir_path, params['sim_tag'])
                 else:
                     command = EXTRACT_WATER_LEVEL_LOCAL_CMD.format(params['model'], params['ts_start'],
                                                              params['run_date_time'], dir_path, params['sim_tag'])
-                print('create-chan|command : ', command)
-                print('create-chan|command_dir_path : ', command_dir_path)
+                print('extract-water-level|command : ', command)
+                print('extract-water-level|command_dir_path : ', command_dir_path)
 
                 response = run_input_file_generation_methods(command_dir_path, command)
+                print('extract-water-level|response : ', response)
             except Exception as e:
                 print(str(e))
                 response = {'response': 'fail'}
@@ -372,8 +374,8 @@ class StoreHandler(BaseHTTPRequestHandler):
                 else:
                     command = EXTRACT_WATER_DISCHARGE_LOCAL_CMD.format(params['model'], params['ts_start'],
                                                                  params['run_date_time'], dir_path, params['sim_tag'])
-                print('create-chan|command : ', command)
-                print('create-chan|command_dir_path : ', command_dir_path)
+                print('extract-discharge|command : ', command)
+                print('extract-discharge|command_dir_path : ', command_dir_path)
 
                 response = run_input_file_generation_methods(command_dir_path, command)
             except Exception as e:

@@ -294,7 +294,7 @@ DROP TABLE IF EXISTS `dss`.`variable_routines` ;
 CREATE TABLE IF NOT EXISTS `dss`.`variable_routines` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `variable_name` VARCHAR(45) NULL DEFAULT NULL,
-  `variable_type` VARCHAR(45) NULL DEFAULT NULL,
+  `variable_type` INT(11) NULL DEFAULT 0,
   `dag_name` VARCHAR(45) NULL DEFAULT NULL,
   `status` INT(11) NULL DEFAULT NULL,
   `schedule` VARCHAR(45) NULL DEFAULT NULL,
