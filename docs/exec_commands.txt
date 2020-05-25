@@ -151,3 +151,6 @@ scp -P 6022 curw@124.43.13.195:/mnt/disks/data/hechms/production/2020-05-20/08-0
  /home/curw/git/DSS-Framework/docker/hechms/runner.sh  -d 2020-05-21_04:00:00 -f 2 -b 3 -r 0 -p MME -D 2020-05-21 -T 04-00-00 -u fcst_pusher -x aquafcst -y 35.227.163.211 -z curw_sim -m hechms_event -n production
 
 curl -X GET "http://192.168.1.41:8088/extract-water-level?run_date=2020-05-25&run_time=10:00:00&model=flo2d_250&forward=2&backward=3&sim_tag=event_run&run_type=production"
+
+curl -X GET "http://192.168.1.41:8088/create-ascii?run_date=2020-05-25&run_time=10:00:00&model=flo2d_250&forward=2&backward=3&run_type=production"
+

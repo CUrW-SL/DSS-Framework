@@ -49,11 +49,11 @@ extract_water_discharge_cmd_request = 'http://{}:{}/extract-discharge?' \
 
 create_ascii_cmd_request = 'http://{}:{}/create-ascii?' \
                         'run_date={}&run_time={}&model={}' \
-                        '&forward={}&backward={}&run_type={}'
+                        '&forward={}&backward={}&sim_tag={}&run_type={}'
 
 create_max_wl_map_cmd_request = 'http://{}:{}/create-max-wl-map?' \
                         'run_date={}&run_time={}&model={}' \
-                        '&forward={}&backward={}&run_type={}'
+                        '&forward={}&backward={}&sim_tag={}&run_type={}'
 
 
 def send_http_get_request(url, params=None):
@@ -426,8 +426,14 @@ def create_multi_ascii(**context):
         target_model = rule['target_model']
         run_node = rule['rule_details']['run_node']
         run_port = rule['rule_details']['run_port']
+        run_type = get_run_type(context)
+        print('create_multi_ascii|run_type : ', run_type)
+        if run_type == 'event':
+            sim_tag = 'event_run'
+        else:
+            sim_tag = 'event_run'
         request_url = create_ascii_cmd_request.format(run_node, run_port, exec_date, exec_time,
-                                                   target_model, forward, backward)
+                                                   target_model, forward, backward, sim_tag, run_type)
         print('create_multi_ascii|request_url : ', request_url)
         if send_http_get_request(request_url):
             print('create_multi_ascii|success')
@@ -451,8 +457,14 @@ def create_max_wl_map(**context):
         target_model = rule['target_model']
         run_node = rule['rule_details']['run_node']
         run_port = rule['rule_details']['run_port']
+        run_type = get_run_type(context)
+        print('create_max_wl_map|run_type : ', run_type)
+        if run_type == 'event':
+            sim_tag = 'event_run'
+        else:
+            sim_tag = 'event_run'
         request_url = create_max_wl_map_cmd_request.format(run_node, run_port, exec_date, exec_time,
-                                                   target_model, forward, backward)
+                                                   target_model, forward, backward, sim_tag, run_type)
         print('create_max_wl_map|request_url : ', request_url)
         if send_http_get_request(request_url):
             print('create_max_wl_map|success')
