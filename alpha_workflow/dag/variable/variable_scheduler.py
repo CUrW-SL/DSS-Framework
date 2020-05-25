@@ -6,11 +6,11 @@ import sys
 
 from airflow.operators.python_operator import PythonOperator
 
-sys.path.insert(0, '/home/curw/git/DSS-Framework/local_dss_workflow/plugins/operators')
+sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/plugins/operators')
 from dynamic_external_trigger_operator import DynamicTriggerDagRunOperator
 
-sys.path.insert(0, '/home/curw/git/DSS-Framework/db_util')
-from dss_db import RuleEngineAdapter
+sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/utils')
+from db_util import RuleEngineAdapter
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/gen_util')
 from controller_util import get_triggering_variable_dags
@@ -42,7 +42,7 @@ def end_routine():
 
 default_args = {
     'owner': 'dss admin',
-    'start_date': datetime.strptime('2020-01-04 04:00:00', '%Y-%m-%d %H:%M:%S'),
+    'start_date': datetime.strptime('2020-05-24 04:00:00', '%Y-%m-%d %H:%M:%S'),
     'email': ['hasithadkr7@gmail.com'],
     'email_on_failure': True,
     'retries': 1,
