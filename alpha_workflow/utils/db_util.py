@@ -324,7 +324,8 @@ class RuleEngineAdapter:
         hechms_rule = None
         query = 'select id, name, target_model,forecast_days, observed_days, ' \
                 'init_run, no_forecast_continue, no_observed_continue, rainfall_data_from, ' \
-                'ignore_previous_run, accuracy_rule, rule_details from dss.hechms_rules where name = {}'.format(rule_name)
+                'ignore_previous_run, accuracy_rule, rule_details from dss.hechms_rules where name = {}'.format(
+            rule_name)
         print('get_hechms_rule_info_by_name|query : ', query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
@@ -1020,21 +1021,23 @@ class RuleEngineAdapter:
             print('get_pump_operating_rules|no ids.')
             return []
 
-    def get_logic_rules(self, id_list, status=1):
-        print('get_logic_rules|id_list : ', id_list)
+    def get_logic_trigger_rules(self, id_list, status=1):
+        print('get_logic_trigger_rules|id_list : ', id_list)
         if len(id_list) > 0:
             rule_list = []
             for id in id_list:
-                sql_query = 'select id,name,logic from dss.rule_logics ' \
+                sql_query = 'select id,name,logic_expression, trigger_type, trigger, input_params,timeout  from dss.logic_triggers ' \
                             'where id={};'.format(status, id)
-                print('get_logic_rules|sql_query : ', sql_query)
+                print('get_logic_trigger_rules|sql_query : ', sql_query)
                 result = self.get_single_row(sql_query)
-                print('get_logic_rules|result : ', result)
+                print('get_logic_trigger_rules|result : ', result)
                 if result is not None:
-                    rule_list.append({'id': result[0], 'name': result[1], 'logic': result[2]})
+                    rule_list.append(
+                        {'id': result[0], 'name': result[1], 'logic_expression': result[2], 'trigger_type': result[3],
+                         'trigger': result[4], 'input_params': json.loads(result[5]), 'timeout': json.loads(result[6])})
             return rule_list
         else:
-            print('get_logic_rules|no ids.')
+            print('get_logic_trigger_rules|no ids.')
             return []
 
     def set_hechms_rain_tag(self, tag, id):
@@ -1077,7 +1080,7 @@ class RuleEngineAdapter:
         for location in locations:
             print('update_max_flo2d_250_forecast_water_level|location : ', location)
             station_query = 'select id,latitude,longitude from curw_fcst.station where ' \
-                    'description=\'flo2d_250_channel_cell_map_element\' and name like \'%_{}\''.format(location)
+                            'description=\'flo2d_250_channel_cell_map_element\' and name like \'%_{}\''.format(location)
             print('update_max_flo2d_250_forecast_water_level|station_query: ', station_query)
             result = get_single_result('fcst', fcst_db_config, station_query)
             print('update_max_flo2d_250_forecast_water_level|station_query|result: ', result)
@@ -1086,7 +1089,7 @@ class RuleEngineAdapter:
                 print('update_max_flo2d_250_forecast_water_level|station_id : ', station_id)
                 if station_id is not None:
                     hash_query = 'select id from curw_fcst.run where variable=2 and unit=2 and source=9 ' \
-                            'and sim_tag=\'{}\' and station=\'{}\''.format(sim_tag, station_id)
+                                 'and sim_tag=\'{}\' and station=\'{}\''.format(sim_tag, station_id)
                     print('update_max_flo2d_250_forecast_water_level|hash_query : ', hash_query)
                     result = get_single_result('fcst', fcst_db_config, hash_query)
                     print('update_max_flo2d_250_forecast_water_level|hash_query|result : ', result)
@@ -1174,14 +1177,16 @@ def get_multiple_result(type, db_config, query):
 
 
 def get_fcst_connection(fcst_config):
-    fcst_connection = pymysql.connect(host=fcst_config['mysql_host'], user=fcst_config['mysql_user'], password=fcst_config['mysql_password'],
-                                      db= fcst_config['mysql_db'],cursorclass=pymysql.cursors.DictCursor)
+    fcst_connection = pymysql.connect(host=fcst_config['mysql_host'], user=fcst_config['mysql_user'],
+                                      password=fcst_config['mysql_password'],
+                                      db=fcst_config['mysql_db'], cursorclass=pymysql.cursors.DictCursor)
     return fcst_connection
 
 
 def get_obs_connection(obs_config):
-    obs_connection = pymysql.connect(host=obs_config['mysql_host'], user=obs_config['mysql_user'], password=obs_config['mysql_password'],
-                                     db=obs_config['mysql_db'],cursorclass=pymysql.cursors.DictCursor)
+    obs_connection = pymysql.connect(host=obs_config['mysql_host'], user=obs_config['mysql_user'],
+                                     password=obs_config['mysql_password'],
+                                     db=obs_config['mysql_db'], cursorclass=pymysql.cursors.DictCursor)
     return obs_connection
 
 
