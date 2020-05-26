@@ -1026,15 +1026,15 @@ class RuleEngineAdapter:
         if len(id_list) > 0:
             rule_list = []
             for id in id_list:
-                sql_query = 'select id,name,logic_expression, trigger_type, trigger, input_params,timeout  from dss.logic_triggers ' \
+                sql_query = 'select id,name,logic_expression, trigger, input_params,timeout  from dss.logic_triggers ' \
                             'where id={};'.format(status, id)
                 print('get_logic_trigger_rules|sql_query : ', sql_query)
                 result = self.get_single_row(sql_query)
                 print('get_logic_trigger_rules|result : ', result)
                 if result is not None:
                     rule_list.append(
-                        {'id': result[0], 'name': result[1], 'logic_expression': result[2], 'trigger_type': result[3],
-                         'trigger': result[4], 'input_params': json.loads(result[5]), 'timeout': json.loads(result[6])})
+                        {'id': result[0], 'name': result[1], 'logic_expression': result[2], 'trigger': result[3],
+                         'input_params': json.loads(result[4]), 'timeout': json.loads(result[5])})
             return rule_list
         else:
             print('get_logic_trigger_rules|no ids.')
