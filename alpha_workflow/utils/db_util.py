@@ -1040,6 +1040,20 @@ class RuleEngineAdapter:
             print('get_logic_trigger_rules|no ids.')
             return []
 
+    def get_logic_trigger_rule(self, id, status=1):
+        print('get_logic_trigger_rule|id : ', id)
+        sql_query = 'select id,name,logic_expression, trigger, input_params,timeout  from dss.logic_triggers ' \
+                    'where id={};'.format(status, id)
+        print('get_logic_trigger_rules|sql_query : ', sql_query)
+        result = self.get_single_row(sql_query)
+        print('get_logic_trigger_rules|result : ', result)
+        if result is not None:
+            return {'id': result[0], 'name': result[1], 'logic_expression': result[2], 'trigger': result[3],
+                 'input_params': json.loads(result[4]), 'timeout': json.loads(result[5])}
+        else:
+            print('get_logic_trigger_rules|no ids.')
+            return None
+
     def set_hechms_rain_tag(self, tag, id):
         print('set_hechms_rain_tag|tag: ', tag)
         query = 'update dss.hechms_rules set rainfall_data_from=\'{}\' where id=\'{}\''.format(tag, id)
