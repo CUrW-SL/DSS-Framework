@@ -91,29 +91,26 @@ def get_pump_trigger_payload(dss_adapter, id_list):
     return None
 
 
-def get_logic_trigger_payload(dss_adapter, id_list):
-    rule_list = dss_adapter.get_logic_trigger_rules(id_list)
-    print('get_logic_trigger_payload|rule_list : ', rule_list)
-    for rule in rule_list:
-        print('get_logic_trigger_payload|rule : ', rule)
-        logic = rule['logic_expression']
-        if dss_adapter.evaluate_rule_logic(logic):
-            if rule['trigger']['model_type'] == 'wrf':
-                model_rule_id = rule['trigger']['rule_id']
-                print('get_logic_trigger_payload|model_rule_id : ', model_rule_id)
-                model_rule = dss_adapter.get_wrf_rule_info_by_id(model_rule_id)
-            elif rule['trigger']['model_type'] == 'hechms':
-                model_rule_id = rule['trigger']['rule_id']
-                print('get_logic_trigger_payload|model_rule_id : ', model_rule_id)
-                model_rule = dss_adapter.get_hechms_rule_info_by_id(model_rule_id)
-            elif rule['trigger']['model_type'] == 'flo2d':
-                model_rule_id = rule['trigger']['rule_id']
-                print('get_logic_trigger_payload|model_rule_id : ', model_rule_id)
-                model_rule = dss_adapter.get_flo2d_rule_info_by_id(model_rule_id)
-            print('get_logic_trigger_payload|model_rule : ', model_rule)
-            return model_rule
-        else:
-            print('get_logic_trigger_payload|rule logic evaluated false|logic : ', logic)
-            return None
-    return None
+def get_logic_trigger_payload(dss_adapter, id):
+    logic_rule = dss_adapter.get_logic_trigger_rule(id)
+    print('get_logic_trigger_payload|logic_rule : ', logic_rule)
+    logic = logic_rule['logic_expression']
+    if dss_adapter.evaluate_rule_logic(logic):
+        if logic_rule['trigger']['model_type'] == 'wrf':
+            model_rule_id = logic_rule['trigger']['rule_id']
+            print('get_logic_trigger_payload|model_rule_id : ', model_rule_id)
+            model_rule = dss_adapter.get_wrf_rule_info_by_id(model_rule_id)
+        elif logic_rule['trigger']['model_type'] == 'hechms':
+            model_rule_id = logic_rule['trigger']['rule_id']
+            print('get_logic_trigger_payload|model_rule_id : ', model_rule_id)
+            model_rule = dss_adapter.get_hechms_rule_info_by_id(model_rule_id)
+        elif logic_rule['trigger']['model_type'] == 'flo2d':
+            model_rule_id = logic_rule['trigger']['rule_id']
+            print('get_logic_trigger_payload|model_rule_id : ', model_rule_id)
+            model_rule = dss_adapter.get_flo2d_rule_info_by_id(model_rule_id)
+        print('get_logic_trigger_payload|model_rule : ', model_rule)
+        return model_rule
+    else:
+        print('get_logic_trigger_payload|rule logic evaluated false|logic : ', logic)
+        return None
 
