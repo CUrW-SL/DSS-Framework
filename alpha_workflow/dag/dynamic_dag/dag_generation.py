@@ -8,7 +8,8 @@ import sys
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/utils')
 from dynamic_dag_util import get_all_dynamic_dag_routines, get_dynamic_dag_tasks, \
-    get_trigger_target_dag, get_pump_trigger_payload, get_triggering_decision_dag
+    get_trigger_target_dag, get_pump_trigger_payload, get_triggering_decision_dag, \
+    get_logic_trigger_payload
 
 sys.path.insert(0, '/home/curw/git/DSS-Framework/alpha_workflow/utils')
 from db_util import RuleEngineAdapter
@@ -125,6 +126,11 @@ def create_trigger_dag_run(context):
             model_rules = target_dag_info['input_params']['rule_id']
             for model_rule in model_rules:
                 payload = get_pump_trigger_payload(dss_adapter, model_rule)
+                payloads.append(payload)
+        elif model_type == 'logic_trigger':
+            model_rules = target_dag_info['input_params']['rule_id']
+            for model_rule in model_rules:
+                payload = get_logic_trigger_payload(dss_adapter, model_rule)
                 payloads.append(payload)
         elif model_type == 'decision_unit':
             print('create_trigger_dag_run|xxxxxxxxxxxxxxx|model_type : ', model_type)
