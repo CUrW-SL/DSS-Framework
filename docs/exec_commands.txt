@@ -219,3 +219,9 @@ curl -X GET "http://192.168.1.41:8088/create-ascii?run_date=2020-05-25&run_time=
 "2686": "Aggona",
 "2866": "Kibulawala 1",
 "2874": "Rampalawatta"}}
+
+((location_name='Yakbedda') and (variable_type='WaterLevel') and ((current_water_level>=alert_water_level) or (current_water_level>=warning_water_level))) or
+((location_name='Kohuwala') and (variable_type='Precipitation') and ((rainfall_intensity>=65.4) or ((last_1_day_rainfall>=150) and (last_3_day_rainfall>=420))))
+
+Windows 3 (user & pwd)
+curw - )b|M$akD<H8c1!k
