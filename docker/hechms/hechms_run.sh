@@ -61,6 +61,14 @@ echo "Installing shapely"
 pip install shapely
 echo "Installing numpy"
 pip install numpy
+echo "Installing google"
+pip install google
+echo "Installing google-cloud"
+pip install google-cloud
+echo "Installing google-cloud-core"
+pip install google-cloud-core
+echo "Installing google-cloud-storage"
+pip install google-cloud-storage
 echo "Installing data layer"
 pip install git+https://github.com/shadhini/curw_db_adapter.git
 touch hechms.log
