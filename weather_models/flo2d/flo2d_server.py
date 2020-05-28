@@ -14,7 +14,7 @@ import subprocess
 from os.path import join as pjoin
 from datetime import datetime, timedelta
 
-HOST_ADDRESS = '192.168.1.41'
+HOST_ADDRESS = '10.138.0.18'
 HOST_PORT = 8088
 
 WIN_OUTPUT_DIR_PATH = r"D:\flo2d_output"
