@@ -109,6 +109,7 @@ RUN sed -i "s|PROG=hms.Hms|PROG=hms.Hms\nDISPLAY=\":1.0\"\n |g" /home/curw/distr
 
 WORKDIR /home/curw
 COPY hechms_run.sh /home/curw/hechms_run.sh
+COPY uwcc-admin.json /home/curw/uwcc-admin.json
 RUN chmod +x hechms_run.sh
 CMD ["hechms_run.sh"]
 
