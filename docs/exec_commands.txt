@@ -225,3 +225,6 @@ curl -X GET "http://192.168.1.41:8088/create-ascii?run_date=2020-05-25&run_time=
 
 Windows 3 (user & pwd)
 curw - )b|M$akD<H8c1!k
+----------------------
+
+
