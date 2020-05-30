@@ -227,4 +227,26 @@ Windows 3 (user & pwd)
 curw - )b|M$akD<H8c1!k
 ----------------------
 
+-------flo2d 150m--------------------------------------------------------------------------------------------------------
+run_input_file_generation_methods|command:  .\gen_150_inflow.py -s "2020-05-23 00:00:00" -e "2020-05-31 00:00:00" -d "D:
+\flo2d_output\flo2d_150\2020-05-28\05-00-00" -M "SF"
+
+create-outflow|command :  .\gen_outflow.py -m "flo2d_150" -s "2020-05-23 00:00:00" -e "2020-05-31 00:00:00" -d "D:\flo2d
+_output\flo2d_150\2020-05-28\05-00-00" -M "MGF"
+
+run_input_file_generation_methods|command:  .\gen_chan.py -m "flo2d_150" -s "2020-05-23 00:00:00" -d "D:\flo2d_output\fl
+o2d_150\2020-05-28\05-00-00"
+
+run_input_file_generation_methods|command:  .\gen_raincell.py -m "flo2d_150" -s "2020-05-23 00:00:00" -e "2020-05-31 00:
+00:00" -d "D:\flo2d_output\flo2d_150\2020-05-28\05-00-00" -M "MME"
+
+run_input_file_generation_methods|command:  .\extract_water_level.py -m "flo2d_150" -s "2020-05-23 00:00:00" -r "2020-05
+-28 05:00:00" -d "D:\flo2d_output\flo2d_150\2020-05-28\05-00-00" -t "hourly_run"
+
+run_input_file_generation_methods|command:  .\extract_discharge.py -m "flo2d_150" -s "2020-05-23 00:00:00" -r "2020-05-2
+8 05:00:00" -d "D:\flo2d_output\flo2d_150\2020-05-28\05-00-00" -t "hourly_run"
+
+-------flo2d 250m--------------------------------------------------------------------------------------------------------
+
+docker build -t curw-flo2d-v1:flo2d .
 
