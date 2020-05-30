@@ -424,12 +424,12 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    #    create_inflow_flo2d = PythonOperator(
-    #        task_id='create_inflow_flo2d',
-    #        provide_context=True,
-    #        python_callable=get_create_inflow_cmd,
-    #        pool=dag_pool
-    #    )
+    create_inflow_flo2d = PythonOperator(
+        task_id='create_inflow_flo2d',
+        provide_context=True,
+        python_callable=get_create_inflow_cmd,
+        pool=dag_pool
+    )
 
     create_chan_flo2d = PythonOperator(
         task_id='create_chan_flo2d',
@@ -475,8 +475,6 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
     )
 
     init_flo2d >> running_state_flo2d >> create_raincell_flo2d >> create_chan_flo2d >> \
-    create_outflow_flo2d >> run_flo2d_flo2d >> \
+    create_inflow_flo2d >> create_outflow_flo2d >> run_flo2d_flo2d >> \
     extract_water_level_flo2d >> extract_water_discharge_flo2d >> complete_state
-    # check_accuracy_flo2d250m >> complete_state_flo2d_250m
-    # extract_water_level_flo2d_250m >> check_accuracy_flo2d250m >> complete_state_flo2d_250m
 
