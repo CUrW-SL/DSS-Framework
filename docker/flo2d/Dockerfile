@@ -1,7 +1,7 @@
 # This dockerfile utilizes components licensed by their respective owners/authors.
 # Prior to utilizing this file or resulting images please review the respective licenses at: https://docs.python.org/3/license.html
 
-FROM microsoft/windows
+FROM microsoft/windowsservercore
 
 LABEL Description="FLO2D Model" maintainer="hasitha.10@cse.mrt.ac.lk"
 
