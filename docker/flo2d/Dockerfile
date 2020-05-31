@@ -12,6 +12,6 @@ LABEL Description="FLO2D Model" maintainer="hasitha.10@cse.mrt.ac.lk"
 #    Start-Process c:\python-3.7.3.exe -ArgumentList '/quiet InstallAllUsers=1 PrependPath=1' -Wait ; \
 #    Remove-Item c:\python-3.7.3.exe -Force
 
-RUN echo print("Hello World!") > c:\hello.py
+RUN echo "print('Hello World!')" > c:\hello.py
 
 CMD ["py", "c:/hello.py"]
