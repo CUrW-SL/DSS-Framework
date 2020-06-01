@@ -19,4 +19,4 @@ RUN wget -Uri "https://www.flo-2d.com/wp-content/uploads/2012/08/FLO-2D-Pro-Mode
 
 RUN wget -Uri "https://github.com/git-for-windows/git/releases/download/v2.26.2.windows.1/Git-2.26.2-64-bit.exe"
 
-CMD ["py", "c:/hello.py"]
+CMD [ "cmd" ]
