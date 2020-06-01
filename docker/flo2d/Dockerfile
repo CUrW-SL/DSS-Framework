@@ -5,13 +5,18 @@ FROM winamd64/python
 
 LABEL Description="FLO2D Model" maintainer="hasitha.10@cse.mrt.ac.lk"
 
-#RUN powershell.exe -Command \
-#    $ErrorActionPreference = 'Stop'; \
-#    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
-#    wget https://www.python.org/ftp/python/3.7.3/python-3.7.3.exe -OutFile c:\python-3.7.3.exe ; \
-#    Start-Process c:\python-3.7.3.exe -ArgumentList '/quiet InstallAllUsers=1 PrependPath=1' -Wait ; \
-#    Remove-Item c:\python-3.7.3.exe -Force
+ENV GIT_VERSION 2.15.1
+ENV GIT_PATCH_VERSION 2
 
-RUN echo "print('Hello World!')" > c:\hello.py
+RUN powershell -Command $ErrorActionPreference = 'Stop' ; \
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 ; \
+    Invoke-WebRequest $('https://github.com/git-for-windows/git/releases/download/v{0}.windows.{1}/MinGit-{0}.{1}-busybox-64-bit.zip' -f $env:GIT_VERSION, $env:GIT_PATCH_VERSION) -OutFile 'mingit.zip' -UseBasicParsing ; \
+    Expand-Archive mingit.zip -DestinationPath c:\mingit ; \
+    Remove-Item mingit.zip -Force ; \
+    setx /M PATH $('c:\mingit\cmd;{0}' -f $env:PATH)
+
+RUN wget -Uri "https://www.flo-2d.com/wp-content/uploads/2012/08/FLO-2D-Pro-Model.zip"
+
+RUN wget -Uri "https://github.com/git-for-windows/git/releases/download/v2.26.2.windows.1/Git-2.26.2-64-bit.exe"
 
 CMD ["py", "c:/hello.py"]
