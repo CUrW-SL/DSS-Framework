@@ -8,7 +8,7 @@ LABEL Description="FLO2D Model" maintainer="hasitha.10@cse.mrt.ac.lk"
 WORKDIR /curw
 
 RUN powershell -command [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-RUN powershell -command Invoke-WebRequest -URI "https://www.flo-2d.com/wp-content/uploads/2012/08/FLO-2D-Pro-Model.zip"
+RUN powershell -command Invoke-WebRequest -URI "https://www.flo-2d.com/wp-content/uploads/2012/08/FLO-2D-Pro-Model.zip"  -UseBasicParsing
 
 
 CMD [ "cmd" ]
