@@ -19,6 +19,6 @@ RUN powershell -command [Net.ServicePointManager]::SecurityProtocol = [Net.Secur
 
 RUN powershell -command Invoke-WebRequest -URI "https://www.flo-2d.com/wp-content/uploads/2012/08/FLO-2D-Pro-Model.zip" -UseBasicParsing
 
-RUN powershell -command Invoke-WebRequest -URI "https://github.com/git-for-windows/git/releases/download/v2.26.2.windows.1/Git-2.26.2-64-bit.exe" -UseBasicParsing
+RUN powershell -command Invoke-WebRequest -URI "https://git-scm.com/download/win" -UseBasicParsing
 
 CMD [ "cmd" ]
