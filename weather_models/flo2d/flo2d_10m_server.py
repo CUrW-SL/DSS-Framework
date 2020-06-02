@@ -474,20 +474,28 @@ class StoreHandler(BaseHTTPRequestHandler):
             self.wfile.write(str.encode(reply))
 
 
-if __name__ == '__main__':
+def start_flo2d_server(host_address, host_port):
+    print('start_flo2d_server|[host_address, host_port] :', [host_address, host_port])
     try:
-        print('starting server...')
-        arguments = len(sys.argv) - 1
-        if arguments > 0:
-            host_address = sys.argv[1]
-            host_port = int(sys.argv[2])
-        else:
-            host_address = HOST_ADDRESS
-            host_port = HOST_PORT
-        print('starting flo2d server on host {} and port {} '.format(host_address, host_port))
         server_address = (host_address, host_port)
         httpd = HTTPServer(server_address, StoreHandler)
         print('server running on host {} and port {} ...'.format(host_address, host_port))
         httpd.serve_forever()
+        print('server has started on host {} and port {} ...'.format(host_address, host_port))
+        print('start_flo2d_server|httpd :', httpd)
+        return httpd
+    except Exception as ex:
+        print('start_flo2d_server|Exception : ', str(ex))
+        return None
+
+
+def stop_flo2d_server(httpd):
+    print('start_flo2d_server|httpd :', httpd)
+    try:
+        httpd.shutdown()
+        print('stop_flo2d_server|httpd :', httpd)
+        return httpd
     except Exception as e:
-        print(str(e))
+        print('start_flo2d_server|Exception : ', str(e))
+        return None
+
