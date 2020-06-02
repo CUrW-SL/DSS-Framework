@@ -9,6 +9,9 @@ WORKDIR /curw
 
 RUN powershell -command [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 RUN powershell -command Invoke-WebRequest -URI "https://www.flo-2d.com/wp-content/uploads/2012/08/FLO-2D-Pro-Model.zip" -OutFile "C:\curw\FLO-2D-Pro-Model.zip"  -UseBasicParsing
+RUN powershell -command Expand-Archive -Force FLO-2D-Pro-Model.zip
 
+WORKDIR /curw/FLO-2D-Pro-Model
+RUN powershell -Command $ErrorActionPreference = 'Stop';start-Process FLO-2D-Setup.exe -ArgumentList '/quiet' -PassThru -NoNewWindow
 
 CMD [ "cmd" ]
