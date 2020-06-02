@@ -2,6 +2,7 @@ import os
 import sys
 from builtins import print
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from flo2d_10m_server import start_flo2d_server, stop_flo2d_server
 
 HOST_ADDRESS = '10.138.0.18'
 HOST_PORT = 8080
@@ -12,6 +13,8 @@ class StoreHandler(BaseHTTPRequestHandler):
         print('Handle GET request...')
         if self.path.startswith('/start-flo2d-server'):
             print('StoreHandler|start-flo2d-server')
+            response = start_flo2d_server(HOST_ADDRESS, 8091)
+            print('StoreHandler|start-flo2d-server|response : ', response)
         if self.path.startswith('/stop-flo2d-server'):
             print('StoreHandler|stop-flo2d-server')
 
