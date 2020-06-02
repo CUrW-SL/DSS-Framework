@@ -9,9 +9,6 @@ import sys
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
-sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/accuracy_unit/flo2d')
-from flo2d_accuracy import calculate_flo2d_rule_accuracy
-
 prod_dag_name = 'flo2d_10m_dag'
 dag_pool = 'flo2d_pool'
 
@@ -23,23 +20,21 @@ default_args = {
     'email_on_failure': True,
 }
 
-create_raincell_cmd = 'echo "create_raincell_cmd" ;sleep $[($RANDOM % 10) + 1]s'
-create_inflow_cmd = 'echo "create_inflow_cmd" ;sleep $[($RANDOM % 10) + 1]s'
-create_outflow_cmd = 'echo "create_outflow_cmd" ;sleep $[($RANDOM % 10) + 1]s'
-run_flo2d_10m_cmd = 'echo "run_flo2d_10m_cmd" ;sleep $[($RANDOM % 10) + 1]s'
-extract_water_level_cmd = 'echo "extract_water_level_cmd" ;sleep $[($RANDOM % 10) + 1]s'
+create_raincell_cmd_request = 'http://{}:{}/create-raincell?' \
+                              'run_date={}&run_time={}&model={}' \
+                              '&forward={}&backward={}&pop_method={}&run_type={}'
 
+run_flo2d_cmd_request = 'http://{}:{}/run-flo2d?' \
+                        'run_date={}&run_time={}&model={}' \
+                        '&forward={}&backward={}&run_type={}'
 
-def check_accuracy(**context):
-    print('check_accuracy|context : ', context)
-    rule_info = context['task_instance'].xcom_pull(task_ids='init_flo2d_10m')['rule_info']
-    print('check_accuracy|rule_info : ', rule_info)
-    flo2d_rule = {'model': 'FLO2D', 'version': '10', 'rule_info': rule_info}
-    print('check_accuracy|flo2d_rule : ', flo2d_rule)
-    exec_date = context["execution_date"].to_datetime_string()
-    print('check_accuracy|exec_date : ', flo2d_rule)
-    # TODO: condition tobe added
-    calculate_flo2d_rule_accuracy(flo2d_rule, exec_date)
+create_ascii_cmd_request = 'http://{}:{}/create-ascii?' \
+                           'run_date={}&run_time={}&model={}' \
+                           '&forward={}&backward={}&sim_tag={}&run_type={}'
+
+create_max_wl_map_cmd_request = 'http://{}:{}/create-max-wl-map?' \
+                                'run_date={}&run_time={}&model={}' \
+                                '&forward={}&backward={}&sim_tag={}&run_type={}'
 
 
 def update_workflow_status(status, rule_id):
@@ -80,6 +75,72 @@ def set_complete_status(**context):
         print('set_complete_status|rule_id not found')
 
 
+def get_local_exec_date_time_from_context(context):
+    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d_10m')
+    if 'run_date' in rule:
+        exec_datetime_str = rule['run_date']
+        exec_datetime = datetime.strptime(exec_datetime_str, '%Y-%m-%d %H:%M:%S')
+        exec_date = exec_datetime.strftime('%Y-%m-%d')
+        exec_time = exec_datetime.strftime('%H:00:00')
+    else:
+        exec_datetime_str = context["execution_date"].to_datetime_string()
+        exec_datetime = datetime.strptime(exec_datetime_str, '%Y-%m-%d %H:%M:%S') \
+                        - timedelta(days=1) + timedelta(hours=5, minutes=30)
+        exec_date = exec_datetime.strftime('%Y-%m-%d')
+        exec_time = exec_datetime.strftime('%H:00:00')
+    return [exec_date, exec_time]
+
+
+def get_dss_adapter():
+    adapter = None
+    try:
+        db_config = Variable.get('db_config', deserialize_json=True)
+        try:
+            adapter = RuleEngineAdapter.get_instance(db_config)
+        except Exception as ex:
+            print('update_workflow_status|db_adapter|Exception: ', str(ex))
+    except Exception as e:
+        print('update_workflow_status|db_config|Exception: ', str(e))
+    finally:
+        return adapter
+
+
+def is_allowed_to_run(rule_id):
+    adapter = get_dss_adapter()
+    if adapter is not None:
+        result = adapter.get_flo2d_rule_status_by_id(rule_id)
+        if result is not None:
+            if result['status'] == 5:
+                return False
+            else:
+                return True
+        else:
+            return True
+    else:
+        return True
+
+
+def get_create_rain_cmd(**context):
+    rule_id = get_rule_id(context)
+    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d_10m')
+    [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
+    if is_allowed_to_run(rule_id):
+        forward = rule['forecast_days']
+        backward = rule['observed_days']
+        target_model = rule['target_model']
+        pop_method = rule['raincell_data_from']
+        run_node = rule['rule_details']['run_node']
+        run_port = rule['rule_details']['run_port']
+
+
+def create_multi_ascii(**context):
+    print('')
+
+
+def create_max_wl_map(**context):
+    print('')
+
+
 def run_this_func(dag_run, **kwargs):
     print('run_this_func|dag_run : ', dag_run)
     flo2d_rule = {'model': '10m', 'rule_info': dag_run.conf}
@@ -104,21 +165,10 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    create_raincell_flo2d_10m = BashOperator(
-        task_id='create_raincell_flo2d_10m',
-        bash_command=create_raincell_cmd,
-        pool=dag_pool
-    )
-
-    create_inflow_flo2d_10m = BashOperator(
-        task_id='create_inflow_flo2d_10m',
-        bash_command=create_inflow_cmd,
-        pool=dag_pool
-    )
-
-    create_outflow_flo2d_10m = BashOperator(
-        task_id='create_outflow_flo2d_10m',
-        bash_command=create_outflow_cmd,
+    create_rain_flo2d_10m = PythonOperator(
+        task_id='create_rain_flo2d',
+        provide_context=True,
+        python_callable=get_create_rain_cmd,
         pool=dag_pool
     )
 
@@ -128,16 +178,17 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    extract_water_level_flo2d_10m = BashOperator(
-        task_id='extract_water_level_flo2d_10m',
-        bash_command=extract_water_level_cmd,
+    create_multi_ascii_set = PythonOperator(
+        task_id='create_multi_ascii_set',
+        provide_context=True,
+        python_callable=create_multi_ascii,
         pool=dag_pool
     )
 
-    check_accuracy_flo2d10m = PythonOperator(
-        task_id='check_accuracy_flo2d10m',
+    create_max_wl_ascii_map = PythonOperator(
+        task_id='create_max_wl_ascii_map',
         provide_context=True,
-        python_callable=check_accuracy,
+        python_callable=create_max_wl_map,
         pool=dag_pool
     )
 
@@ -149,6 +200,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    init_flo2d_10m >> running_state_flo2d_10m >> create_raincell_flo2d_10m >> \
-    create_inflow_flo2d_10m >> create_outflow_flo2d_10m >> run_flo2d_10m >> \
-    extract_water_level_flo2d_10m >> check_accuracy_flo2d10m >> complete_state_flo2d_10m
+    init_flo2d_10m >> running_state_flo2d_10m >> create_rain_flo2d_10m >> \
+    run_flo2d_10m >> create_multi_ascii_set >> create_max_wl_ascii_map >> \
+    complete_state_flo2d_10m
+
