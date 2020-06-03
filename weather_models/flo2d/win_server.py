@@ -4,6 +4,7 @@ from builtins import print
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from flo2d_10m_server import start_flo2d_server, stop_flo2d_server, boot_up_flo2d_server
 import json
+from urllib.parse import urlparse, parse_qs
 
 HOST_ADDRESS = '10.138.0.18'
 HOST_PORT = 8080
@@ -12,11 +13,23 @@ HOST_PORT = 8080
 class StoreHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         print('Handle GET request...')
-        if self.path.startswith('/start-flo2d-server1'):
-            print('StoreHandler|start-flo2d-server1')
-            response1 = boot_up_flo2d_server('flo2d-server1', HOST_ADDRESS, 8091)
-            print('StoreHandler|start-flo2d-server|response1 : ', response1)
-            reply = json.dumps({'response': 'flo2d-server1-started'})
+        if self.path.startswith('/start-flo2d-server'):
+            print('StoreHandler|start-flo2d-server')
+            try:
+                query_components = parse_qs(urlparse(self.path).query)
+                print('StoreHandler|query_components : ', query_components)
+                [host] = query_components['host']
+                [port] = query_components['port']
+                port = int(port)
+                print('StoreHandler|start-flo2d-server|host : ', host)
+                print('StoreHandler|start-flo2d-server|port : ', port)
+                result = boot_up_flo2d_server('flo2d-server', host, port)
+                print('StoreHandler|start-flo2d-server|result : ', result)
+                response = {'response': 'flo2d-server-started'}
+            except Exception as ex:
+                print('StoreHandler|start-flo2d-server|Exception : ', str(ex))
+                response = {'response': 'flo2d-server-failed'}
+            reply = json.dumps(response)
             self.send_response(200)
             self.send_header('Content-type', 'text/json')
             self.end_headers()
@@ -42,7 +55,7 @@ class StoreHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(str.encode(reply))
 
-        if self.path.startswith('/stop-flo2d-server4'):
+        if self.path.startswith('/start-flo2d-server4'):
             print('StoreHandler|stop-flo2d-server4')
             response4 = boot_up_flo2d_server('flo2d-server4', HOST_ADDRESS, 8094)
             print('StoreHandler|start-flo2d-server|response4 : ', response4)
