@@ -1,16 +1,19 @@
 from datetime import datetime, timedelta
-import airflow
-from airflow import DAG
+from airflow import DAG, AirflowException
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow.models import Variable
 import sys
+import requests
 
 sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
 prod_dag_name = 'flo2d_10m_dag'
-dag_pool = 'flo2d_pool'
+dag_pool = 'flo2d_10m_pool'
+
+MAIN_SERVER_IP = '10.138.0.18'
+MAIN_SERVER_PORT = 8080
 
 
 default_args = {
@@ -20,21 +23,39 @@ default_args = {
     'email_on_failure': True,
 }
 
-create_raincell_cmd_request = 'http://{}:{}/create-raincell?' \
+
+start_server_cmd_request = 'http://{}:{}/start-flo2d-server?' \
+                          'host={}&port={}'
+
+create_rain_cmd_request = 'http://{}:{}/create-rain?' \
                               'run_date={}&run_time={}&model={}' \
-                              '&forward={}&backward={}&pop_method={}&run_type={}'
+                              '&forward={}&backward={}&pop_method={}'
 
 run_flo2d_cmd_request = 'http://{}:{}/run-flo2d?' \
                         'run_date={}&run_time={}&model={}' \
-                        '&forward={}&backward={}&run_type={}'
+                        '&forward={}&backward={}'
 
 create_ascii_cmd_request = 'http://{}:{}/create-ascii?' \
                            'run_date={}&run_time={}&model={}' \
-                           '&forward={}&backward={}&sim_tag={}&run_type={}'
+                           '&forward={}&backward={}'
 
 create_max_wl_map_cmd_request = 'http://{}:{}/create-max-wl-map?' \
                                 'run_date={}&run_time={}&model={}' \
-                                '&forward={}&backward={}&sim_tag={}&run_type={}'
+                                '&forward={}&backward={}'
+
+shutdown_server_cmd_request = 'http://{}:{}/shutdown-server'
+
+
+def send_http_get_request(url, params=None):
+    if params is not None:
+        r = requests.get(url=url, params=params)
+    else:
+        r = requests.get(url=url)
+    response = r.json()
+    print('send_http_get_request|response : ', response)
+    if response == {'response': 'success'}:
+        return True
+    return False
 
 
 def update_workflow_status(status, rule_id):
@@ -71,6 +92,17 @@ def set_complete_status(**context):
     rule_id = get_rule_id(context)
     if rule_id is not None:
         update_workflow_status(3, rule_id)
+        rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
+        run_node = rule['rule_details']['run_node']
+        run_port = rule['rule_details']['run_port']
+        request_url = shutdown_server_cmd_request.format(run_node, run_port)
+        print('set_complete_status|request_url : ', request_url)
+        if send_http_get_request(request_url):
+            print('set_complete_status|success')
+        else:
+            raise AirflowException(
+                'set_complete_status|failed'
+            )
     else:
         print('set_complete_status|rule_id not found')
 
@@ -122,7 +154,7 @@ def is_allowed_to_run(rule_id):
 
 def get_create_rain_cmd(**context):
     rule_id = get_rule_id(context)
-    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d_10m')
+    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
     [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
     if is_allowed_to_run(rule_id):
         forward = rule['forecast_days']
@@ -131,50 +163,141 @@ def get_create_rain_cmd(**context):
         pop_method = rule['raincell_data_from']
         run_node = rule['rule_details']['run_node']
         run_port = rule['rule_details']['run_port']
+        request_url = create_rain_cmd_request.format(run_node, run_port, exec_date, exec_time,
+                                                         target_model, forward, backward, pop_method)
+        print('get_create_rain_cmd|request_url : ', request_url)
+        if send_http_get_request(request_url):
+            print('get_create_rain_cmd|success')
+        else:
+            raise AirflowException(
+                'get_create_rain_cmd|failed'
+            )
+    else:
+        raise AirflowException(
+            'Dag has stopped by admin.'
+        )
+
+
+def get_run_flo2d_cmd(**context):
+    rule_id = get_rule_id(context)
+    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
+    if is_allowed_to_run(rule_id):
+        [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
+        forward = rule['forecast_days']
+        backward = rule['observed_days']
+        target_model = rule['target_model']
+        run_node = rule['rule_details']['run_node']
+        run_port = rule['rule_details']['run_port']
+        request_url = run_flo2d_cmd_request.format(run_node, run_port, exec_date, exec_time,
+                                                   target_model, forward, backward)
+        print('get_run_flo2d_cmd|request_url : ', request_url)
+        if send_http_get_request(request_url):
+            print('get_run_flo2d_cmd|success')
+        else:
+            raise AirflowException(
+                'get_run_flo2d_cmd|failed'
+            )
+    else:
+        raise AirflowException(
+            'Dag has stopped by admin.'
+        )
 
 
 def create_multi_ascii(**context):
-    print('')
+    rule_id = get_rule_id(context)
+    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
+    if is_allowed_to_run(rule_id):
+        [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
+        forward = rule['forecast_days']
+        backward = rule['observed_days']
+        target_model = rule['target_model']
+        run_node = rule['rule_details']['run_node']
+        run_port = rule['rule_details']['run_port']
+        request_url = create_ascii_cmd_request.format(run_node, run_port, exec_date, exec_time,
+                                                      target_model, forward, backward)
+        print('create_multi_ascii|request_url : ', request_url)
+        if send_http_get_request(request_url):
+            print('create_multi_ascii|success')
+        else:
+            raise AirflowException(
+                'create_multi_ascii|failed'
+            )
+    else:
+        raise AirflowException(
+            'Dag has stopped by admin.'
+        )
 
 
 def create_max_wl_map(**context):
-    print('')
+    rule_id = get_rule_id(context)
+    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
+    if is_allowed_to_run(rule_id):
+        [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
+        forward = rule['forecast_days']
+        backward = rule['observed_days']
+        target_model = rule['target_model']
+        run_node = rule['rule_details']['run_node']
+        run_port = rule['rule_details']['run_port']
+        request_url = create_max_wl_map_cmd_request.format(run_node, run_port, exec_date, exec_time,
+                                                           target_model, forward, backward)
+        print('create_max_wl_map|request_url : ', request_url)
+        if send_http_get_request(request_url):
+            print('create_max_wl_map|success')
+        else:
+            raise AirflowException(
+                'create_max_wl_map|failed'
+            )
+    else:
+        raise AirflowException(
+            'Dag has stopped by admin.'
+        )
 
 
 def run_this_func(dag_run, **kwargs):
     print('run_this_func|dag_run : ', dag_run)
     flo2d_rule = {'model': '10m', 'rule_info': dag_run.conf}
     print('run_this_func|flo2d_rule : ', flo2d_rule)
-    return flo2d_rule
+    run_node = flo2d_rule['rule_details']['run_node']
+    run_port = flo2d_rule['rule_details']['run_port']
+    request_url = start_server_cmd_request.format(MAIN_SERVER_IP, MAIN_SERVER_PORT, run_node, run_port)
+    print('get_create_rain_cmd|request_url : ', request_url)
+    if send_http_get_request(request_url):
+        print('get_create_rain_cmd|success')
+        return flo2d_rule
+    else:
+        raise AirflowException(
+            'get_create_rain_cmd|failed'
+        )
 
 
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
          description='Run Flo2d 10m DAG', catchup=False) as dag:
-    init_flo2d_10m = PythonOperator(
-        task_id='init_flo2d_10m',
+    init_flo2d = PythonOperator(
+        task_id='init_flo2d',
         provide_context=True,
         python_callable=run_this_func,
         pool=dag_pool
     )
 
-    running_state_flo2d_10m = PythonOperator(
-        task_id='running_state_flo2d_10m',
+    running_state_flo2d = PythonOperator(
+        task_id='running_state_flo2d',
         provide_context=True,
         python_callable=set_running_status,
         dag=dag,
         pool=dag_pool
     )
 
-    create_rain_flo2d_10m = PythonOperator(
+    create_rain_flo2d = PythonOperator(
         task_id='create_rain_flo2d',
         provide_context=True,
         python_callable=get_create_rain_cmd,
         pool=dag_pool
     )
 
-    run_flo2d_10m = BashOperator(
-        task_id='run_flo2d_150m',
-        bash_command=run_flo2d_10m_cmd,
+    run_flo2d = PythonOperator(
+        task_id='run_flo2d',
+        provide_context=True,
+        python_callable=get_run_flo2d_cmd,
         pool=dag_pool
     )
 
@@ -200,7 +323,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         pool=dag_pool
     )
 
-    init_flo2d_10m >> running_state_flo2d_10m >> create_rain_flo2d_10m >> \
-    run_flo2d_10m >> create_multi_ascii_set >> create_max_wl_ascii_map >> \
+    init_flo2d >> running_state_flo2d >> create_rain_flo2d >> \
+    run_flo2d >> create_multi_ascii_set >> create_max_wl_ascii_map >> \
     complete_state_flo2d_10m
 
