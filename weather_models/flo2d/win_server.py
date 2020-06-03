@@ -3,6 +3,7 @@ import sys
 from builtins import print
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from flo2d_10m_server import start_flo2d_server, stop_flo2d_server
+import json
 
 HOST_ADDRESS = '10.138.0.18'
 HOST_PORT = 8080
@@ -15,21 +16,41 @@ class StoreHandler(BaseHTTPRequestHandler):
             print('StoreHandler|start-flo2d-server1')
             response1 = start_flo2d_server(HOST_ADDRESS, 8091)
             print('StoreHandler|start-flo2d-server|response1 : ', response1)
+            reply = json.dumps({'response': 'flo2d-server1-started'})
+            self.send_response(200)
+            self.send_header('Content-type', 'text/json')
+            self.end_headers()
+            self.wfile.write(str.encode(reply))
 
         if self.path.startswith('/start-flo2d-server2'):
             print('StoreHandler|start-flo2d-server2')
             response2 = start_flo2d_server(HOST_ADDRESS, 8092)
             print('StoreHandler|start-flo2d-server|response2 : ', response2)
+            reply = json.dumps({'response': 'flo2d-server2-started'})
+            self.send_response(200)
+            self.send_header('Content-type', 'text/json')
+            self.end_headers()
+            self.wfile.write(str.encode(reply))
 
         if self.path.startswith('/start-flo2d-server3'):
             print('StoreHandler|start-flo2d-server3')
             response3 = start_flo2d_server(HOST_ADDRESS, 8093)
             print('StoreHandler|start-flo2d-server|response3 : ', response3)
+            reply = json.dumps({'response': 'flo2d-server3-started'})
+            self.send_response(200)
+            self.send_header('Content-type', 'text/json')
+            self.end_headers()
+            self.wfile.write(str.encode(reply))
 
         if self.path.startswith('/stop-flo2d-server4'):
             print('StoreHandler|stop-flo2d-server4')
             response4 = start_flo2d_server(HOST_ADDRESS, 8094)
             print('StoreHandler|start-flo2d-server|response4 : ', response4)
+            reply = json.dumps({'response': 'flo2d-server4-started'})
+            self.send_response(200)
+            self.send_header('Content-type', 'text/json')
+            self.end_headers()
+            self.wfile.write(str.encode(reply))
 
 
 if __name__ == '__main__':
