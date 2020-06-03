@@ -13,6 +13,7 @@ from file_upload import upload_file_to_bucket
 import subprocess
 from os.path import join as pjoin
 from datetime import datetime, timedelta
+import threading
 
 HOST_ADDRESS = '10.138.0.18'
 HOST_PORT = 8088
@@ -482,6 +483,21 @@ class StoreHandler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'text/json')
             self.end_headers()
             self.wfile.write(str.encode(reply))
+
+
+def boot_up_flo2d_server(server_name, host_address, host_port):
+    print('boot_up_flo2d_server|[server_name, host_address, host_port] :', [server_name, host_address, host_port])
+    try:
+        daemon = threading.Thread(name=server_name,
+                                  target=start_flo2d_server,
+                                  args=(host_address, host_port))
+        daemon.setDaemon(True)  # Set as a daemon so it will be killed once the main thread is dead.
+        daemon.start()
+        print('boot_up_flo2d_server|success on [server_name, host_address, host_port] :',
+              [server_name, host_address, host_port])
+    except Exception as ex:
+        print('boot_up_flo2d_server|Exception : ', str(ex))
+        return None
 
 
 def start_flo2d_server(host_address, host_port):

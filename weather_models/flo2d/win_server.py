@@ -2,7 +2,7 @@ import os
 import sys
 from builtins import print
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from flo2d_10m_server import start_flo2d_server, stop_flo2d_server
+from flo2d_10m_server import start_flo2d_server, stop_flo2d_server, boot_up_flo2d_server
 import json
 
 HOST_ADDRESS = '10.138.0.18'
@@ -14,7 +14,7 @@ class StoreHandler(BaseHTTPRequestHandler):
         print('Handle GET request...')
         if self.path.startswith('/start-flo2d-server1'):
             print('StoreHandler|start-flo2d-server1')
-            response1 = start_flo2d_server(HOST_ADDRESS, 8091)
+            response1 = boot_up_flo2d_server('flo2d-server1', HOST_ADDRESS, 8091)
             print('StoreHandler|start-flo2d-server|response1 : ', response1)
             reply = json.dumps({'response': 'flo2d-server1-started'})
             self.send_response(200)
@@ -24,7 +24,7 @@ class StoreHandler(BaseHTTPRequestHandler):
 
         if self.path.startswith('/start-flo2d-server2'):
             print('StoreHandler|start-flo2d-server2')
-            response2 = start_flo2d_server(HOST_ADDRESS, 8092)
+            response2 = boot_up_flo2d_server('flo2d-server2', HOST_ADDRESS, 8092)
             print('StoreHandler|start-flo2d-server|response2 : ', response2)
             reply = json.dumps({'response': 'flo2d-server2-started'})
             self.send_response(200)
@@ -34,7 +34,7 @@ class StoreHandler(BaseHTTPRequestHandler):
 
         if self.path.startswith('/start-flo2d-server3'):
             print('StoreHandler|start-flo2d-server3')
-            response3 = start_flo2d_server(HOST_ADDRESS, 8093)
+            response3 = boot_up_flo2d_server('flo2d-server3', HOST_ADDRESS, 8093)
             print('StoreHandler|start-flo2d-server|response3 : ', response3)
             reply = json.dumps({'response': 'flo2d-server3-started'})
             self.send_response(200)
@@ -44,7 +44,7 @@ class StoreHandler(BaseHTTPRequestHandler):
 
         if self.path.startswith('/stop-flo2d-server4'):
             print('StoreHandler|stop-flo2d-server4')
-            response4 = start_flo2d_server(HOST_ADDRESS, 8094)
+            response4 = boot_up_flo2d_server('flo2d-server4', HOST_ADDRESS, 8094)
             print('StoreHandler|start-flo2d-server|response4 : ', response4)
             reply = json.dumps({'response': 'flo2d-server4-started'})
             self.send_response(200)
