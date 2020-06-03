@@ -95,11 +95,6 @@ def get_input_params(query_components, input_type=None):
         else:
             model = 'flo2d_250'
 
-        if query_components["run_type"]:  # "production"/"event"
-            [run_type] = query_components["run_type"]
-        else:
-            run_type = 'production'
-
         if query_components["forward"]:
             [forward] = query_components["forward"]
         else:
@@ -120,16 +115,16 @@ def get_input_params(query_components, input_type=None):
             [pop_method] = query_components["pop_method"]
             return {'run_date': run_date, 'run_time': run_time, 'ts_start': ts_start_end['ts_start'],
                     'ts_end': ts_start_end['ts_end'], 'run_date_time': ts_start_end['run_time'], 'model': model,
-                    'pop_method': pop_method, 'run_type': run_type}
+                    'pop_method': pop_method}
         elif input_type == 'extract':
             [sim_tag] = query_components["sim_tag"]
             return {'run_date': run_date, 'run_time': run_time, 'ts_start': ts_start_end['ts_start'],
                     'ts_end': ts_start_end['ts_end'], 'run_date_time': ts_start_end['run_time'], 'model': model,
-                    'sim_tag': sim_tag, 'run_type': run_type}
+                    'sim_tag': sim_tag}
         else:
             return {'run_date': run_date, 'run_time': run_time, 'ts_start': ts_start_end['ts_start'],
                     'ts_end': ts_start_end['ts_end'], 'run_date_time': ts_start_end['run_time'],
-                    'model': model, 'run_type': run_type}
+                    'model': model}
     except Exception as e:
         print('get_input_params|Exception : ', str(e))
 
@@ -152,53 +147,6 @@ class StoreHandler(BaseHTTPRequestHandler):
         self.timeout = 2100
         print('Handle GET request...')
 
-        if self.path.startswith('/create-raincell'):
-            os.chdir(WIN_HOME_DIR_PATH)
-            print('create-raincell')
-            try:
-                query_components = parse_qs(urlparse(self.path).query)
-                print('query_components : ', query_components)
-
-                params = get_input_params(query_components, 'raincell')
-                print('StoreHandler|create-raincell|params : ', params)
-
-                dir_path = set_daily_dir(params['model'], params['run_date'], params['run_time'])
-                try:
-                    command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'input', 'raincell')
-                    if params['run_type'] == 'production':
-                        command = CREATE_RAINCELL_CMD.format(params['model'], params['ts_start'],
-                                                             params['ts_end'], dir_path, params['pop_method'])
-                    else:
-                        command = CREATE_RAINCELL_LOCAL_CMD.format(params['model'], params['ts_start'],
-                                                                   params['ts_end'], dir_path, params['pop_method'])
-                    print('create-raincell|command : ', command)
-                    if params['pop_method'].isupper():
-                        print('create-raincell|command_dir_path : ', command_dir_path)
-                        response = run_input_file_generation_methods(command_dir_path, command)
-                    else:
-                        rule_name = params['pop_method']
-                        print('create-raincell|rule_name : ', rule_name)
-                        sim_tag = rule_name[:len(rule_name) - 3]
-                        print('create-raincell|sim_tag : ', sim_tag)
-                        source_id = int(rule_name[len(rule_name) - 2:])
-                        print('create-raincell|source_id : ', source_id)
-                        [forward] = query_components['forward']
-                        [backward] = query_components['backward']
-                        create_event_raincell(dir_path, params['run_date'], params['run_time'], int(forward),
-                                              int(backward), 'flo2d_250', sim_tag, source_id)
-                        response = {'response': 'success'}
-                except Exception as e:
-                    print(str(e))
-                    response = {'response': 'fail'}
-            except Exception as e:
-                print(str(e))
-                response = {'response': 'fail'}
-            reply = json.dumps(response)
-            self.send_response(200)
-            self.send_header('Content-type', 'text/json')
-            self.end_headers()
-            self.wfile.write(str.encode(reply))
-
         if self.path.startswith('/create-raindat'):
             os.chdir(WIN_HOME_DIR_PATH)
             print('create-raindat')
@@ -212,134 +160,14 @@ class StoreHandler(BaseHTTPRequestHandler):
                 dir_path = set_daily_dir(params['model'], params['run_date'], params['run_time'])
                 try:
                     command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'input', 'raindat')
-                    if params['run_type'] == 'production':
-                        command = CREATE_RAINDAT_CMD.format(params['model'], params['ts_start'],
-                                                             params['ts_end'], dir_path, params['pop_method'])
-                    else:
-                        command = CREATE_RAINDAT_LOCAL_CMD.format(params['model'], params['ts_start'],
-                                                                   params['ts_end'], dir_path, params['pop_method'])
+                    command = CREATE_RAINDAT_CMD.format(params['model'], params['ts_start'],
+                                                        params['ts_end'], dir_path, params['pop_method'])
                     print('create-raindat|command : ', command)
-                    if params['pop_method'].isupper():
-                        print('create-raindat|command_dir_path : ', command_dir_path)
-                        response = run_input_file_generation_methods(command_dir_path, command)
-                    else:
-                        rule_name = params['pop_method']
-                        print('create-raindat|rule_name : ', rule_name)
-                        sim_tag = rule_name[:len(rule_name) - 3]
-                        print('create-raindat|sim_tag : ', sim_tag)
-                        source_id = int(rule_name[len(rule_name) - 2:])
-                        print('create-raindat|source_id : ', source_id)
-                        [forward] = query_components['forward']
-                        [backward] = query_components['backward']
-                        create_event_raincell(dir_path, params['run_date'], params['run_time'], int(forward),
-                                              int(backward), 'flo2d_250', sim_tag, source_id)
-                        response = {'response': 'success'}
+                    print('create-raindat|command_dir_path : ', command_dir_path)
+                    response = run_input_file_generation_methods(command_dir_path, command)
                 except Exception as e:
                     print(str(e))
                     response = {'response': 'fail'}
-            except Exception as e:
-                print(str(e))
-                response = {'response': 'fail'}
-            reply = json.dumps(response)
-            self.send_response(200)
-            self.send_header('Content-type', 'text/json')
-            self.end_headers()
-            self.wfile.write(str.encode(reply))
-
-        if self.path.startswith('/create-inflow'):
-            os.chdir(WIN_HOME_DIR_PATH)
-            print('create-inflow')
-            try:
-                query_components = parse_qs(urlparse(self.path).query)
-                print('query_components : ', query_components)
-
-                params = get_input_params(query_components, 'inflow')
-                print('StoreHandler|create-inflow|params : ', params)
-                dir_path = set_daily_dir(params['model'], params['run_date'], params['run_time'])
-
-                command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'input', 'inflow')
-                if params['model'] == 'flo2d_250':
-                    if params['run_type'] == 'production':
-                        command = CREATE_INFLOW_250_CMD.format(params['ts_start'], params['ts_end'], dir_path,
-                                                           params['pop_method'])
-                    else:
-                        command = CREATE_INFLOW_250_LOCAL_CMD.format(params['ts_start'], params['ts_end'], dir_path,
-                                                     params['pop_method'])
-                else:
-                    if params['run_type'] == 'production':
-                        command = CREATE_INFLOW_150_CMD.format(params['ts_start'], params['ts_end'], dir_path,
-                                                           params['pop_method'])
-                    else:
-                        command = CREATE_INFLOW_150_LOCAL_CMD.format(params['ts_start'], params['ts_end'], dir_path,
-                                                               params['pop_method'])
-                print('create-inflow|command : ', command)
-                print('create-inflow|command_dir_path : ', command_dir_path)
-                response = run_input_file_generation_methods(command_dir_path, command)
-            except Exception as e:
-                print(str(e))
-                response = {'response': 'fail'}
-            reply = json.dumps(response)
-            self.send_response(200)
-            self.send_header('Content-type', 'text/json')
-            self.end_headers()
-            self.wfile.write(str.encode(reply))
-
-        if self.path.startswith('/create-outflow'):
-            os.chdir(WIN_HOME_DIR_PATH)
-            print('create-outflow')
-            try:
-                query_components = parse_qs(urlparse(self.path).query)
-                print('query_components : ', query_components)
-
-                params = get_input_params(query_components, 'outflow')
-                print('StoreHandler|create-outflow|params : ', params)
-
-                dir_path = set_daily_dir(params['model'], params['run_date'], params['run_time'])
-
-                command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'input', 'outflow')
-                if params['pop_method'] == 'CODE':
-                    print('Generating outflow from old method.')
-                    print('input parameters|[dir_path, ts_start, ts_end] : ', [dir_path, params['ts_start'],
-                                                                               params['ts_end']])
-                    create_outflow_old(dir_path, params['ts_start'], params['ts_end'])
-                    response = {'response': 'success'}
-                else:
-                    if params['run_type'] == 'production':
-                        command = CREATE_OUTFLOW_CMD.format(params['model'], params['ts_start'],
-                                                        params['ts_end'], dir_path, params['pop_method'])
-                    else:
-                        command = CREATE_OUTFLOW_LOCAL_CMD.format(params['model'], params['ts_start'],
-                                                            params['ts_end'], dir_path, params['pop_method'])
-                    print('create-outflow|command : ', command)
-                    print('create-outflow|command_dir_path : ', command_dir_path)
-                    response = run_input_file_generation_methods(command_dir_path, command)
-            except Exception as e:
-                print(str(e))
-                response = {'response': 'fail'}
-            reply = json.dumps(response)
-            self.send_response(200)
-            self.send_header('Content-type', 'text/json')
-            self.end_headers()
-            self.wfile.write(str.encode(reply))
-
-        if self.path.startswith('/create-chan'):
-            os.chdir(WIN_HOME_DIR_PATH)
-            print('create-chan')
-            try:
-                query_components = parse_qs(urlparse(self.path).query)
-
-                params = get_input_params(query_components, 'chan')
-                print('StoreHandler|create-chan|params : ', params)
-                dir_path = set_daily_dir(params['model'], params['run_date'], params['run_time'])
-
-                command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'input', 'chan')
-                if params['run_type'] == 'production':
-                    command = CREATE_CHAN_CMD.format(params['model'], params['ts_start'], dir_path)
-                else:
-                    command = CREATE_CHAN_LOCAL_CMD.format(params['model'], params['ts_start'], dir_path)
-                print('create-chan|command : ', command)
-                print('create-chan|command_dir_path : ', command_dir_path)
-                response = run_input_file_generation_methods(command_dir_path, command)
             except Exception as e:
                 print(str(e))
                 response = {'response': 'fail'}
@@ -363,72 +191,6 @@ class StoreHandler(BaseHTTPRequestHandler):
 
                 execute_flo2d(dir_path, params['model'], params['run_date'], params['run_time'])
                 response = {'response': 'success'}
-            except Exception as e:
-                print(str(e))
-                response = {'response': 'fail'}
-            reply = json.dumps(response)
-            self.send_response(200)
-            self.send_header('Content-type', 'text/json')
-            self.end_headers()
-            self.wfile.write(str.encode(reply))
-
-        if self.path.startswith('/extract-water-level'):
-            os.chdir(WIN_HOME_DIR_PATH)
-            print('extract-water-level')
-            try:
-                query_components = parse_qs(urlparse(self.path).query)
-                print('query_components : ', query_components)
-
-                params = get_input_params(query_components, 'extract')
-                print('StoreHandler|extract-water-level|params : ', params)
-                dir_path = set_daily_dir(params['model'], params['run_date'], params['run_time'])
-
-                command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'output')
-                params['run_type'] = 'event'
-                print('StoreHandler|extract-water-level|params[run_type] : ', params['run_type'])
-                if params['run_type'] == 'production':
-                    command = EXTRACT_WATER_LEVEL_CMD.format(params['model'], params['ts_start'],
-                                                         params['run_date_time'], dir_path, params['sim_tag'])
-                else:
-                    command = EXTRACT_WATER_LEVEL_LOCAL_CMD.format(params['model'], params['ts_start'],
-                                                             params['run_date_time'], dir_path, params['sim_tag'])
-                print('extract-water-level|command : ', command)
-                print('extract-water-level|command_dir_path : ', command_dir_path)
-
-                response = run_input_file_generation_methods(command_dir_path, command)
-                print('extract-water-level|response : ', response)
-            except Exception as e:
-                print(str(e))
-                response = {'response': 'fail'}
-            reply = json.dumps(response)
-            self.send_response(200)
-            self.send_header('Content-type', 'text/json')
-            self.end_headers()
-            self.wfile.write(str.encode(reply))
-
-        if self.path.startswith('/extract-discharge'):
-            os.chdir(WIN_HOME_DIR_PATH)
-            print('extract-discharge')
-            try:
-                query_components = parse_qs(urlparse(self.path).query)
-                print('query_components : ', query_components)
-
-                params = get_input_params(query_components, 'extract')
-                print('StoreHandler|extract-discharge|params : ', params)
-                dir_path = set_daily_dir(params['model'], params['run_date'], params['run_time'])
-
-                command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'output')
-                params['run_type'] = 'event'
-                if params['run_type'] == 'production':
-                    command = EXTRACT_WATER_DISCHARGE_CMD.format(params['model'], params['ts_start'],
-                                                             params['run_date_time'], dir_path, params['sim_tag'])
-                else:
-                    command = EXTRACT_WATER_DISCHARGE_LOCAL_CMD.format(params['model'], params['ts_start'],
-                                                                 params['run_date_time'], dir_path, params['sim_tag'])
-                print('extract-discharge|command : ', command)
-                print('extract-discharge|command_dir_path : ', command_dir_path)
-
-                response = run_input_file_generation_methods(command_dir_path, command)
             except Exception as e:
                 print(str(e))
                 response = {'response': 'fail'}
@@ -527,9 +289,14 @@ class StoreHandler(BaseHTTPRequestHandler):
         if self.path.startswith('/shutdown-server'):
             print('--------------------------------------------------------------------')
             print('StoreHandler|shutdown-server|self.server.server_address:', self.server.server_address)
-            self.server.shutdown()
+            reply = json.dumps({'response': 'server-stopping'})
+            self.send_response(200)
+            self.send_header('Content-type', 'text/json')
+            self.end_headers()
+            self.wfile.write(str.encode(reply))
             print('StoreHandler|shutdown-server|self.server.shutdown|success')
             print('---------------------------------------------------------------------')
+            self.server.shutdown()
 
         if self.path.startswith('/test-server-status'):
             print('---------------------------------------------------------------------')
