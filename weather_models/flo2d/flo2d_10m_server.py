@@ -30,6 +30,9 @@ CREATE_CHAN_LOCAL_CMD = '.\gen_chan.py -m "{}" -s "{}" -d "{}" -E'
 CREATE_RAINCELL_CMD = '.\gen_raincell.py -m "{}" -s "{}" -e "{}" -d "{}" -M "{}"'
 CREATE_RAINCELL_LOCAL_CMD = '.\gen_raincell.py -m "{}" -s "{}" -e "{}" -d "{}" -M "{}" -E'
 
+CREATE_RAINDAT_CMD = '.\gen_raindat.py -m "{}" -s "{}" -e "{}" -d "{}" -M "{}"'
+CREATE_RAINDAT_LOCAL_CMD = '.\gen_raindat.py -m "{}" -s "{}" -e "{}" -d "{}" -M "{}" -E'
+
 CREATE_INFLOW_250_CMD = '.\gen_250_inflow.py -s "{}" -e "{}" -d "{}" -M "{}"'
 CREATE_INFLOW_250_LOCAL_CMD = '.\gen_250_inflow.py -s "{}" -e "{}" -d "{}" -M "{}" -E'
 
@@ -179,6 +182,53 @@ class StoreHandler(BaseHTTPRequestHandler):
                         print('create-raincell|sim_tag : ', sim_tag)
                         source_id = int(rule_name[len(rule_name) - 2:])
                         print('create-raincell|source_id : ', source_id)
+                        [forward] = query_components['forward']
+                        [backward] = query_components['backward']
+                        create_event_raincell(dir_path, params['run_date'], params['run_time'], int(forward),
+                                              int(backward), 'flo2d_250', sim_tag, source_id)
+                        response = {'response': 'success'}
+                except Exception as e:
+                    print(str(e))
+                    response = {'response': 'fail'}
+            except Exception as e:
+                print(str(e))
+                response = {'response': 'fail'}
+            reply = json.dumps(response)
+            self.send_response(200)
+            self.send_header('Content-type', 'text/json')
+            self.end_headers()
+            self.wfile.write(str.encode(reply))
+
+        if self.path.startswith('/create-raindat'):
+            os.chdir(WIN_HOME_DIR_PATH)
+            print('create-raindat')
+            try:
+                query_components = parse_qs(urlparse(self.path).query)
+                print('query_components : ', query_components)
+
+                params = get_input_params(query_components, 'raindat')
+                print('StoreHandler|create-raindat|params : ', params)
+
+                dir_path = set_daily_dir(params['model'], params['run_date'], params['run_time'])
+                try:
+                    command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'input', 'raindat')
+                    if params['run_type'] == 'production':
+                        command = CREATE_RAINDAT_CMD.format(params['model'], params['ts_start'],
+                                                             params['ts_end'], dir_path, params['pop_method'])
+                    else:
+                        command = CREATE_RAINDAT_LOCAL_CMD.format(params['model'], params['ts_start'],
+                                                                   params['ts_end'], dir_path, params['pop_method'])
+                    print('create-raindat|command : ', command)
+                    if params['pop_method'].isupper():
+                        print('create-raindat|command_dir_path : ', command_dir_path)
+                        response = run_input_file_generation_methods(command_dir_path, command)
+                    else:
+                        rule_name = params['pop_method']
+                        print('create-raindat|rule_name : ', rule_name)
+                        sim_tag = rule_name[:len(rule_name) - 3]
+                        print('create-raindat|sim_tag : ', sim_tag)
+                        source_id = int(rule_name[len(rule_name) - 2:])
+                        print('create-raindat|source_id : ', source_id)
                         [forward] = query_components['forward']
                         [backward] = query_components['backward']
                         create_event_raincell(dir_path, params['run_date'], params['run_time'], int(forward),
