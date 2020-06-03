@@ -474,10 +474,17 @@ class StoreHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(str.encode(reply))
 
+        if self.path.startswith('/shutdown-server'):
+            print('--------------------------------------------------------------------')
+            print('StoreHandler|shutdown-server|self.server.server_address:', self.server.server_address)
+            self.server.shutdown()
+            print('StoreHandler|shutdown-server|self.server.shutdown|success')
+            print('---------------------------------------------------------------------')
+
         if self.path.startswith('/test-server-status'):
-            print('----------------------------------------------')
+            print('---------------------------------------------------------------------')
             print('StoreHandler|test-server-status|self.server.server_address:', self.server.server_address)
-            print('----------------------------------------------')
+            print('---------------------------------------------------------------------')
             reply = json.dumps({'response': 'server-running'})
             self.send_response(200)
             self.send_header('Content-type', 'text/json')
