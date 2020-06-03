@@ -11,12 +11,25 @@ HOST_PORT = 8080
 class StoreHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         print('Handle GET request...')
-        if self.path.startswith('/start-flo2d-server'):
-            print('StoreHandler|start-flo2d-server')
-            response = start_flo2d_server(HOST_ADDRESS, 8091)
-            print('StoreHandler|start-flo2d-server|response : ', response)
-        if self.path.startswith('/stop-flo2d-server'):
-            print('StoreHandler|stop-flo2d-server')
+        if self.path.startswith('/start-flo2d-server1'):
+            print('StoreHandler|start-flo2d-server1')
+            response1 = start_flo2d_server(HOST_ADDRESS, 8091)
+            print('StoreHandler|start-flo2d-server|response1 : ', response1)
+
+        if self.path.startswith('/start-flo2d-server2'):
+            print('StoreHandler|start-flo2d-server2')
+            response2 = start_flo2d_server(HOST_ADDRESS, 8092)
+            print('StoreHandler|start-flo2d-server|response2 : ', response2)
+
+        if self.path.startswith('/start-flo2d-server3'):
+            print('StoreHandler|start-flo2d-server3')
+            response3 = start_flo2d_server(HOST_ADDRESS, 8093)
+            print('StoreHandler|start-flo2d-server|response3 : ', response3)
+
+        if self.path.startswith('/stop-flo2d-server4'):
+            print('StoreHandler|stop-flo2d-server4')
+            response4 = start_flo2d_server(HOST_ADDRESS, 8094)
+            print('StoreHandler|start-flo2d-server|response4 : ', response4)
 
 
 if __name__ == '__main__':

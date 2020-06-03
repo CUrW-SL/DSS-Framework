@@ -473,6 +473,16 @@ class StoreHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(str.encode(reply))
 
+        if self.path.startswith('/test-server-status'):
+            print('----------------------------------------------')
+            print('StoreHandler|test-server-status|self.server.server_address:', self.server.server_address)
+            print('----------------------------------------------')
+            reply = json.dumps({'response': 'server-running'})
+            self.send_response(200)
+            self.send_header('Content-type', 'text/json')
+            self.end_headers()
+            self.wfile.write(str.encode(reply))
+
 
 def start_flo2d_server(host_address, host_port):
     print('start_flo2d_server|[host_address, host_port] :', [host_address, host_port])
