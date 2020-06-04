@@ -250,3 +250,13 @@ run_input_file_generation_methods|command:  .\extract_discharge.py -m "flo2d_150
 
 docker build -t curw-flo2d-v1:flo2d .
 
+curl -X GET "http://10.138.0.18:8080/start-flo2d-server?host=10.138.0.18&port=8091"
+
+curl -X GET "http://10.138.0.18:8080/start-flo2d-server?host=10.138.0.18&port=8091"
+
+curl -X GET "http://10.138.0.18:8091/test-server-status"
+
+curl -X GET "http://10.138.0.18:8091/shutdown-server"
+
+
+
