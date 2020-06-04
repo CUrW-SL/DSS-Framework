@@ -2,7 +2,7 @@ import os
 import sys
 from builtins import print
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from flo2d_10m_server import start_flo2d_server, stop_flo2d_server, boot_up_flo2d_server
+from flo2d_10m_server import start_flo2d_server, shutdown_flo2d_server, boot_up_flo2d_server
 import json
 from urllib.parse import urlparse, parse_qs
 
@@ -28,6 +28,28 @@ class StoreHandler(BaseHTTPRequestHandler):
                 response = {'response': 'flo2d-server-started'}
             except Exception as ex:
                 print('StoreHandler|start-flo2d-server|Exception : ', str(ex))
+                response = {'response': 'flo2d-server-failed'}
+            reply = json.dumps(response)
+            self.send_response(200)
+            self.send_header('Content-type', 'text/json')
+            self.end_headers()
+            self.wfile.write(str.encode(reply))
+
+        if self.path.startswith('/stop-flo2d-server'):
+            print('StoreHandler|stop-flo2d-server')
+            try:
+                query_components = parse_qs(urlparse(self.path).query)
+                print('StoreHandler|query_components : ', query_components)
+                [host] = query_components['host']
+                [port] = query_components['port']
+                port = int(port)
+                print('StoreHandler|stop-flo2d-server|host : ', host)
+                print('StoreHandler|stop-flo2d-server|port : ', port)
+                result = shutdown_flo2d_server(host, port)
+                print('StoreHandler|stop-flo2d-server|result : ', result)
+                response = {'response': 'flo2d-server-stopped'}
+            except Exception as ex:
+                print('StoreHandler|stop-flo2d-server|Exception : ', str(ex))
                 response = {'response': 'flo2d-server-failed'}
             reply = json.dumps(response)
             self.send_response(200)

@@ -339,13 +339,15 @@ def start_flo2d_server(host_address, host_port):
         return None
 
 
-def stop_flo2d_server(httpd):
-    print('start_flo2d_server|httpd :', httpd)
+def shutdown_flo2d_server(host_address, host_port):
+    print('stop_flo2d_server|[host_address, host_port] :', [host_address, host_port])
     try:
-        httpd.shutdown()
+        server_address = (host_address, host_port)
+        httpd = HTTPServer(server_address, StoreHandler)
+        print('server running on host {} and port {} ...'.format(host_address, host_port))
         print('stop_flo2d_server|httpd :', httpd)
-        return httpd
-    except Exception as e:
-        print('start_flo2d_server|Exception : ', str(e))
+        httpd.shutdown()
+    except Exception as ex:
+        print('stop_flo2d_server|Exception : ', str(ex))
         return None
 
