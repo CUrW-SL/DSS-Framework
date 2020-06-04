@@ -210,7 +210,7 @@ class StoreHandler(BaseHTTPRequestHandler):
                 query_components = parse_qs(urlparse(self.path).query)
                 print('query_components : ', query_components)
 
-                params = get_input_params(query_components, 'extract')
+                params = get_input_params(query_components, 'ascii')
                 print('StoreHandler|create-ascii|params : ', params)
                 dir_path = set_daily_dir(params['model'], params['run_date'], params['run_time'])
 
@@ -246,7 +246,7 @@ class StoreHandler(BaseHTTPRequestHandler):
                 query_components = parse_qs(urlparse(self.path).query)
                 print('query_components : ', query_components)
 
-                params = get_input_params(query_components, 'extract')
+                params = get_input_params(query_components, 'ascii')
                 print('StoreHandler|create-max-wl-map|params : ', params)
                 dir_path = set_daily_dir(params['model'], params['run_date'], params['run_time'])
 
