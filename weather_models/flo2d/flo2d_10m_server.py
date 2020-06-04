@@ -15,6 +15,7 @@ from os.path import join as pjoin
 from datetime import datetime, timedelta
 import threading
 import urllib.request
+import ctypes
 
 HOST_ADDRESS = '10.138.0.18'
 HOST_PORT = 8088
@@ -343,6 +344,9 @@ def start_flo2d_server(host_address, host_port):
         httpd = HTTPServer(server_address, StoreHandler)
         print('server running on host {} and port {} ...'.format(host_address, host_port))
         print('start_flo2d_server|httpd :', httpd)
+        httpd_id = id(httpd)
+        print('start_flo2d_server|httpd_id :', httpd_id)
+        print('start_flo2d_server|httpd from id :', ctypes.cast(id(httpd_id), ctypes.py_object).value)
         httpd.serve_forever()
         print('server has started on host {} and port {} ...'.format(host_address, host_port))
         return httpd
