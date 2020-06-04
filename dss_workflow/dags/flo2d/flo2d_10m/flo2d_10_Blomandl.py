@@ -97,7 +97,7 @@ def set_complete_status(**context):
 
 
 def get_local_exec_date_time_from_context(context):
-    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
+    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')['rule_info']
     if 'run_date' in rule:
         exec_datetime_str = rule['run_date']
         exec_datetime = datetime.strptime(exec_datetime_str, '%Y-%m-%d %H:%M:%S')
@@ -143,7 +143,7 @@ def is_allowed_to_run(rule_id):
 
 def get_create_rain_cmd(**context):
     rule_id = get_rule_id(context)
-    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
+    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')['rule_info']
     print('get_create_rain_cmd|context : ', context)
     print('get_create_rain_cmd|rule : ', rule)
     [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
@@ -171,7 +171,7 @@ def get_create_rain_cmd(**context):
 
 def get_run_flo2d_cmd(**context):
     rule_id = get_rule_id(context)
-    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
+    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')['rule_info']
     if is_allowed_to_run(rule_id):
         [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
         forward = rule['forecast_days']
@@ -196,7 +196,7 @@ def get_run_flo2d_cmd(**context):
 
 def create_multi_ascii(**context):
     rule_id = get_rule_id(context)
-    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
+    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')['rule_info']
     if is_allowed_to_run(rule_id):
         [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
         forward = rule['forecast_days']
@@ -221,7 +221,7 @@ def create_multi_ascii(**context):
 
 def create_max_wl_map(**context):
     rule_id = get_rule_id(context)
-    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
+    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')['rule_info']
     if is_allowed_to_run(rule_id):
         [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
         forward = rule['forecast_days']
