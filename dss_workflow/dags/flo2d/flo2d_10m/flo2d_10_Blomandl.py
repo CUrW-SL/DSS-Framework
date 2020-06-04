@@ -144,6 +144,8 @@ def is_allowed_to_run(rule_id):
 def get_create_rain_cmd(**context):
     rule_id = get_rule_id(context)
     rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
+    print('get_create_rain_cmd|context : ', context)
+    print('get_create_rain_cmd|rule : ', rule)
     [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
     if is_allowed_to_run(rule_id):
         forward = rule['forecast_days']
