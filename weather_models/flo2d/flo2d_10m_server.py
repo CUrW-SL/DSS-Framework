@@ -330,9 +330,9 @@ def start_flo2d_server(host_address, host_port):
         server_address = (host_address, host_port)
         httpd = HTTPServer(server_address, StoreHandler)
         print('server running on host {} and port {} ...'.format(host_address, host_port))
+        print('start_flo2d_server|httpd :', httpd)
         httpd.serve_forever()
         print('server has started on host {} and port {} ...'.format(host_address, host_port))
-        print('start_flo2d_server|httpd :', httpd)
         return httpd
     except Exception as ex:
         print('start_flo2d_server|Exception : ', str(ex))
