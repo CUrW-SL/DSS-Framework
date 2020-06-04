@@ -6,7 +6,7 @@ from airflow.models import Variable
 import sys
 import requests
 
-sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
+sys.path.insert(0, '/home/uwcc-admin/new_dss/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
 prod_dag_name = 'flo2d_10m_dag'
