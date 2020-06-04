@@ -134,8 +134,10 @@ def get_input_params(query_components, input_type=None):
 def get_ts_start_end(run_date, run_time, forward=3, backward=2):
     result = {}
     run_datetime = datetime.strptime('%s %s' % (run_date, '00:00:00'), '%Y-%m-%d %H:%M:%S')
-    ts_start_datetime = run_datetime - timedelta(days=backward)
-    ts_end_datetime = run_datetime + timedelta(days=forward)
+    # ts_start_datetime = run_datetime - timedelta(days=backward)
+    # ts_end_datetime = run_datetime + timedelta(days=forward)
+    ts_start_datetime = run_datetime - timedelta(hours=backward)
+    ts_end_datetime = run_datetime + timedelta(hours=forward)
     run_datetime = datetime.strptime('%s %s' % (run_date, run_time), '%Y-%m-%d %H:%M:%S')
     result['ts_start'] = ts_start_datetime.strftime('%Y-%m-%d %H:%M:%S')
     result['run_time'] = run_datetime.strftime('%Y-%m-%d %H:%M:%S')
@@ -218,14 +220,7 @@ class StoreHandler(BaseHTTPRequestHandler):
                       [ts_start_date, dir_path, params['model']])
                 if generate_ascii_set(ts_start_date, dir_path, params['model']):
                     print('ascii files have generated.')
-                    if params['model'] == 'flo2d_250':
-                        flo2d_model = '250'
-                    elif params['model'] == 'flo2d_150':
-                        flo2d_model = '150'
-                    elif params['model'] == 'flo2d_30':
-                        flo2d_model = '30'
-                    elif params['model'] == 'flo2d_10':
-                        flo2d_model = '10'
+                    flo2d_model = params['model']
                     bucket_file = 'flo2d/{}/{}/{}/multi_ascii.zip'.format(flo2d_model, params['run_date'],
                                                                           params['run_time'])
                     zip_file = os.path.join(dir_path, 'multi_ascii.zip')
@@ -261,14 +256,7 @@ class StoreHandler(BaseHTTPRequestHandler):
                       [ts_start_date, dir_path, params['model']])
                 if generate_flood_map(ts_start_date, dir_path, params['model']):
                     print('max water level map has generated.')
-                    if params['model'] == 'flo2d_250':
-                        flo2d_model = '250'
-                    elif params['model'] == 'flo2d_150':
-                        flo2d_model = '150'
-                    elif params['model'] == 'flo2d_30':
-                        flo2d_model = '30'
-                    elif params['model'] == 'flo2d_10':
-                        flo2d_model = '10'
+                    flo2d_model = params['model']
                     bucket_file = 'flo2d/{}/{}/{}/max_wl_map.asc'.format(flo2d_model, params['run_date'],
                                                                          params['run_time'])
                     ascii_file = os.path.join(dir_path, 'max_wl_map.asc')
