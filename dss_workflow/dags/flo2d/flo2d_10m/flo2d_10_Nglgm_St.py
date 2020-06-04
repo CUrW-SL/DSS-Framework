@@ -71,7 +71,7 @@ def update_workflow_status(status, rule_id):
 
 
 def get_rule_id(context):
-    rule_info = context['task_instance'].xcom_pull(task_ids='init_flo2d_10m')['rule_info']
+    rule_info = context['task_instance'].xcom_pull(task_ids='init_flo2d')['rule_info']
     if rule_info:
         rule_id = rule_info['id']
         print('get_rule_id|rule_id : ', rule_id)
@@ -97,7 +97,7 @@ def set_complete_status(**context):
 
 
 def get_local_exec_date_time_from_context(context):
-    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d_10m')
+    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
     if 'run_date' in rule:
         exec_datetime_str = rule['run_date']
         exec_datetime = datetime.strptime(exec_datetime_str, '%Y-%m-%d %H:%M:%S')
