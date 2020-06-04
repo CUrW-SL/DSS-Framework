@@ -27,7 +27,7 @@ default_args = {
 start_server_cmd_request = 'http://{}:{}/start-flo2d-server?' \
                           'host={}&port={}'
 
-create_rain_cmd_request = 'http://{}:{}/create-rain?' \
+create_rain_cmd_request = 'http://{}:{}/create-raindat?' \
                               'run_date={}&run_time={}&model={}' \
                               '&forward={}&backward={}&pop_method={}'
 
