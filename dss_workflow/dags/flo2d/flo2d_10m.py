@@ -92,17 +92,6 @@ def set_complete_status(**context):
     rule_id = get_rule_id(context)
     if rule_id is not None:
         update_workflow_status(3, rule_id)
-        rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
-        run_node = rule['rule_details']['run_node']
-        run_port = rule['rule_details']['run_port']
-        request_url = shutdown_server_cmd_request.format(run_node, run_port)
-        print('set_complete_status|request_url : ', request_url)
-        if send_http_get_request(request_url):
-            print('set_complete_status|success')
-        else:
-            raise AirflowException(
-                'set_complete_status|failed'
-            )
     else:
         print('set_complete_status|rule_id not found')
 
@@ -257,17 +246,7 @@ def run_this_func(dag_run, **kwargs):
     print('run_this_func|dag_run : ', dag_run)
     flo2d_rule = {'model': '10m', 'rule_info': dag_run.conf}
     print('run_this_func|flo2d_rule : ', flo2d_rule)
-    run_node = flo2d_rule['rule_details']['run_node']
-    run_port = flo2d_rule['rule_details']['run_port']
-    request_url = start_server_cmd_request.format(MAIN_SERVER_IP, MAIN_SERVER_PORT, run_node, run_port)
-    print('get_create_rain_cmd|request_url : ', request_url)
-    if send_http_get_request(request_url):
-        print('get_create_rain_cmd|success')
-        return flo2d_rule
-    else:
-        raise AirflowException(
-            'get_create_rain_cmd|failed'
-        )
+    return flo2d_rule
 
 
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
