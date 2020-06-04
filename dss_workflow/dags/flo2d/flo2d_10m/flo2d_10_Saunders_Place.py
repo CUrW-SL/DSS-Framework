@@ -15,7 +15,6 @@ dag_pool = 'flo2d_10m_pool'
 MAIN_SERVER_IP = '10.138.0.18'
 MAIN_SERVER_PORT = 8080
 
-
 default_args = {
     'owner': 'dss admin',
     'start_date': datetime.utcnow(),
@@ -23,13 +22,12 @@ default_args = {
     'email_on_failure': True,
 }
 
-
 start_server_cmd_request = 'http://{}:{}/start-flo2d-server?' \
-                          'host={}&port={}'
+                           'host={}&port={}'
 
-create_rain_cmd_request = 'http://{}:{}/create-rain?' \
-                              'run_date={}&run_time={}&model={}' \
-                              '&forward={}&backward={}&pop_method={}'
+create_rain_cmd_request = 'http://{}:{}/create-raindat?' \
+                          'run_date={}&run_time={}&model={}' \
+                          '&forward={}&backward={}&pop_method={}'
 
 run_flo2d_cmd_request = 'http://{}:{}/run-flo2d?' \
                         'run_date={}&run_time={}&model={}' \
@@ -97,7 +95,7 @@ def set_complete_status(**context):
 
 
 def get_local_exec_date_time_from_context(context):
-    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
+    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')['rule_info']
     if 'run_date' in rule:
         exec_datetime_str = rule['run_date']
         exec_datetime = datetime.strptime(exec_datetime_str, '%Y-%m-%d %H:%M:%S')
@@ -143,7 +141,9 @@ def is_allowed_to_run(rule_id):
 
 def get_create_rain_cmd(**context):
     rule_id = get_rule_id(context)
-    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
+    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')['rule_info']
+    print('get_create_rain_cmd|context : ', context)
+    print('get_create_rain_cmd|rule : ', rule)
     [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
     if is_allowed_to_run(rule_id):
         forward = rule['forecast_days']
@@ -153,7 +153,7 @@ def get_create_rain_cmd(**context):
         run_node = rule['rule_details']['run_node']
         run_port = rule['rule_details']['run_port']
         request_url = create_rain_cmd_request.format(run_node, run_port, exec_date, exec_time,
-                                                         target_model, forward, backward, pop_method)
+                                                     target_model, forward, backward, pop_method)
         print('get_create_rain_cmd|request_url : ', request_url)
         if send_http_get_request(request_url):
             print('get_create_rain_cmd|success')
@@ -169,7 +169,7 @@ def get_create_rain_cmd(**context):
 
 def get_run_flo2d_cmd(**context):
     rule_id = get_rule_id(context)
-    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
+    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')['rule_info']
     if is_allowed_to_run(rule_id):
         [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
         forward = rule['forecast_days']
@@ -194,7 +194,7 @@ def get_run_flo2d_cmd(**context):
 
 def create_multi_ascii(**context):
     rule_id = get_rule_id(context)
-    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
+    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')['rule_info']
     if is_allowed_to_run(rule_id):
         [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
         forward = rule['forecast_days']
@@ -219,7 +219,7 @@ def create_multi_ascii(**context):
 
 def create_max_wl_map(**context):
     rule_id = get_rule_id(context)
-    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')
+    rule = context['task_instance'].xcom_pull(task_ids='init_flo2d')['rule_info']
     if is_allowed_to_run(rule_id):
         [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
         forward = rule['forecast_days']
