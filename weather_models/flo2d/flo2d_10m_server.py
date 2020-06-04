@@ -146,7 +146,6 @@ def get_ts_start_end(run_date, run_time, forward=3, backward=2):
 
 class StoreHandler(BaseHTTPRequestHandler):
     def do_GET(self):
-        self.timeout = 2100
         print('Handle GET request...')
 
         if self.path.startswith('/create-raindat'):
@@ -302,18 +301,7 @@ class StoreHandler(BaseHTTPRequestHandler):
 
         if self.path.startswith('/test-server-status'):
             print('---------------------------------------------------------------------')
-            query_components = parse_qs(urlparse(self.path).query)
-            print('StoreHandler|query_components : ', query_components)
-            [host] = query_components['host']
-            [port] = query_components['port']
-            port = int(port)
-            print('StoreHandler|test-server-status|host : ', host)
-            print('StoreHandler|test-server-status|port : ', port)
             print('StoreHandler|test-server-status|self.server.server_address:', self.server.server_address)
-            url = 'http://{}:{}/'.format(host, port)
-            print('StoreHandler|test-server-status|url : ', url)
-            print('StoreHandler|test-server-status|urllib.request.urlopen(url).read() : ',
-                  urllib.request.urlopen(url).read())
             print('---------------------------------------------------------------------')
             reply = json.dumps({'response': 'server-running'})
             self.send_response(200)
@@ -366,3 +354,19 @@ def shutdown_flo2d_server(host_address, host_port):
     except Exception as ex:
         print('stop_flo2d_server|Exception : ', str(ex))
 
+
+if __name__ == '__main__':
+    try:
+        print('starting flo2d 10m server...')
+        arguments = len(sys.argv) - 1
+        if arguments > 0:
+            host_address = sys.argv[1]
+            host_port = int(sys.argv[2])
+        else:
+            host_address = HOST_ADDRESS
+            host_port = HOST_PORT
+        print('starting flo2d 10m server on host {} and port {} '.format(host_address, host_port))
+        start_flo2d_server(host_address, host_port)
+        print('flo2d 10m server running on host {} and port {} ...'.format(host_address, host_port))
+    except Exception as e:
+        print('Exception : ', str(e))
