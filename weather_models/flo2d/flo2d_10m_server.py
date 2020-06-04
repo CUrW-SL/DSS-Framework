@@ -14,6 +14,7 @@ import subprocess
 from os.path import join as pjoin
 from datetime import datetime, timedelta
 import threading
+import urllib.request
 
 HOST_ADDRESS = '10.138.0.18'
 HOST_PORT = 8088
@@ -300,7 +301,18 @@ class StoreHandler(BaseHTTPRequestHandler):
 
         if self.path.startswith('/test-server-status'):
             print('---------------------------------------------------------------------')
+            query_components = parse_qs(urlparse(self.path).query)
+            print('StoreHandler|query_components : ', query_components)
+            [host] = query_components['host']
+            [port] = query_components['port']
+            port = int(port)
+            print('StoreHandler|test-server-status|host : ', host)
+            print('StoreHandler|test-server-status|port : ', port)
             print('StoreHandler|test-server-status|self.server.server_address:', self.server.server_address)
+            url = 'http://{}:{}/'.format(host, port)
+            print('StoreHandler|test-server-status|url : ', url)
+            print('StoreHandler|test-server-status|urllib.request.urlopen(url).read() : ',
+                  urllib.request.urlopen(url).read())
             print('---------------------------------------------------------------------')
             reply = json.dumps({'response': 'server-running'})
             self.send_response(200)
@@ -349,5 +361,4 @@ def shutdown_flo2d_server(host_address, host_port):
         httpd.shutdown()
     except Exception as ex:
         print('stop_flo2d_server|Exception : ', str(ex))
-        return None
 
