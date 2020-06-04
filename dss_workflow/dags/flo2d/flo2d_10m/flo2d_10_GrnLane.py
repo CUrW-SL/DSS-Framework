@@ -9,7 +9,7 @@ import requests
 sys.path.insert(0, '/home/uwcc-admin/new_dss/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
-prod_dag_name = 'flo2d_10m_dag'
+prod_dag_name = 'flo2d_10_GrnLane_dag'
 dag_pool = 'flo2d_10m_pool'
 
 MAIN_SERVER_IP = '10.138.0.18'
