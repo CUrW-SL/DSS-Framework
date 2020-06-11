@@ -23,6 +23,7 @@ CREATE_CHAN_CMD = '.\gen_chan.py -m "{}" -s "{}" -d "{}"'
 CREATE_RAINCELL_CMD = '.\gen_raincell.py -m "{}" -s "{}" -e "{}" -d "{}" -M "{}"'
 CREATE_INFLOW_250_CMD = '.\gen_250_inflow.py -s "{}" -e "{}" -d "{}" -M "{}"'
 CREATE_INFLOW_150_CMD = '.\gen_150_inflow.py -s "{}" -e "{}" -d "{}" -M "{}"'
+CREATE_INFLOW_150_v2_CMD = '.\gen_150_v2_inflow.py -s "{}" -e "{}" -d "{}" -M "{}"'
 CREATE_OUTFLOW_CMD = '.\gen_outflow.py -m "{}" -s "{}" -e "{}" -d "{}" -M "{}"'
 EXTRACT_WATER_LEVEL_CMD = '.\extract_water_level.py -m "{}" -s "{}" -r "{}" -d "{}" -t "{}"'
 EXTRACT_WATER_DISCHARGE_CMD = '.\extract_discharge.py -m "{}" -s "{}" -r "{}" -d "{}" -t "{}"'
@@ -170,8 +171,11 @@ class StoreHandler(BaseHTTPRequestHandler):
                 if params['model'] == 'flo2d_250':
                     command = CREATE_INFLOW_250_CMD.format(params['ts_start'], params['ts_end'], dir_path,
                                                            params['pop_method'])
-                else:
+                elif params['model'] == 'flo2d_150':
                     command = CREATE_INFLOW_150_CMD.format(params['ts_start'], params['ts_end'], dir_path,
+                                                              params['pop_method'])
+                elif params['model'] == 'flo2d_150_v2':
+                    command = CREATE_INFLOW_150_v2_CMD.format(params['ts_start'], params['ts_end'], dir_path,
                                                            params['pop_method'])
                 print('create-inflow|command : ', command)
                 print('create-inflow|command_dir_path : ', command_dir_path)
