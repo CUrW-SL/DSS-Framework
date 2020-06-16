@@ -85,7 +85,8 @@ echo "TARGET_MODEL : $TARGET_MODEL"
 
 # Run rfield generating scripts
 echo "Running HEC-HMS Model."
-python hechms_workflow.py \
+#python hechms_workflow.py \
+python hechms_controller.py \
                     $( check_empty "$EXEC_DATE" run_datetime ) \
                     $( check_empty "$FORWARD" forward ) \
                     $( check_empty "$BACKWARD" backward ) \
