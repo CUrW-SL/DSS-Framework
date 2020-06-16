@@ -40,10 +40,12 @@ echo "RUN_TYPE : $RUN_TYPE"
 #else
 #    OUTPUT_DIR="${HOME_DIR}/$RUN_TYPE/${DATE_ONLY}/${TIME_ONLY}"
 #fi
-mkdir -p ${STATE_DIR}
+
+#mkdir -p ${STATE_DIR}
 
 OUTPUT_DIR="${HOME_DIR}/${RUN_TYPE}/${DATE_ONLY}/${TIME_ONLY}"
-mkdir -p ${OUTPUT_DIR}
+
+#mkdir -p ${OUTPUT_DIR}
 
 echo "OUTPUT_DIR : $OUTPUT_DIR"
 
