@@ -41,15 +41,16 @@ echo "RUN_TYPE : $RUN_TYPE"
 #    OUTPUT_DIR="${HOME_DIR}/$RUN_TYPE/${DATE_ONLY}/${TIME_ONLY}"
 #fi
 
-#mkdir -p ${STATE_DIR}
+mkdir -p ${STATE_DIR}
 
 OUTPUT_DIR="${HOME_DIR}/${TARGET_MODEL}/${DATE_ONLY}/${TIME_ONLY}"
 
-#mkdir -p ${OUTPUT_DIR}
+mkdir -p ${OUTPUT_DIR}
 
 echo "OUTPUT_DIR : $OUTPUT_DIR"
 
 #db_user, db_pwd, db_host, db_name, run_datetime, backward, forward, init_run, pop_method,target_model
+echo "Start running ${TARGET_MODEL} HEC-HMS model..."
 docker run -i --rm --privileged \
     -v ${OUTPUT_DIR}:/home/curw/git/distributed_hechms/output  \
     -v ${STATE_DIR}:/home/curw/basin_states  \
