@@ -54,7 +54,8 @@ echo "wrf_id : ${wrf_id}"
 echo "docker_tag : ${docker_tag}"
 
 
-docker run -i --rm --privileged -v /mnt/disks/workspace1/wrf-data/geog:/home/Build_WRF/geog \
+docker run -i --rm --privileged
+    -v /mnt/disks/workspace1/wrf-data/geog:/home/Build_WRF/geog \
     -v /home/uwcc-admin/uwcc-admin.json:/wrf/gcs.json curw-wrfv4:${docker_tag} \
     /home/Build_WRF/code/wrfv4_run.sh -d ${gfs_date} -k ${wrf_id} \
     -v wrf_nfs:/home/Build_WRF/nfs -v curwsl_archive_1:/home/Build_WRF/archive

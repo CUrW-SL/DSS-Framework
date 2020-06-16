@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+
 while getopts ":d:f:b:r:p:u:x:y:z:m:" option; do
   case "${option}" in
   d) EXEC_DATE=$OPTARG ;; # 2019-09-24 10:30:00
