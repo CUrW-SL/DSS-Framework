@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-HOME_DIR="/mnt/disks/data/hechms"
-STATE_DIR="/mnt/disks/data/hechms/basin_states"
+HOME_DIR="/mnt/disks/wrf-mod/wrf_nfs/hechms"
+STATE_DIR="/mnt/disks/wrf-mod/wrf_nfs/hechms/basin_states"
 #HOME_DIR="/mnt/disks/data/hechms/event"
 
 while getopts ":d:f:b:r:p:D:T:u:x:y:z:m:n:" option; do
@@ -17,7 +17,7 @@ while getopts ":d:f:b:r:p:D:T:u:x:y:z:m:n:" option; do
   x) DB_PWD=$OPTARG ;; # MME
   y) DB_HOST=$OPTARG ;; # MME
   z) DB_NAME=$OPTARG ;; # MME
-  m) TARGET_MODEL=$OPTARG ;; # 'hechms_prod' / 'hechms_event'
+  m) TARGET_MODEL=$OPTARG ;; # 'HDC'/'HDE'/'HLC'/'HLE'
   n) RUN_TYPE=$OPTARG ;; # 'event' / 'production'
   esac
 done
