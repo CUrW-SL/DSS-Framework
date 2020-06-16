@@ -141,14 +141,14 @@ docker run -it curw-hechms-v2-centos7:hechms_4.2.1  /bin/bash
 
 https://www.youtube.com/watch?v=6pdtPxsIt_A&list=PLgwlM6VPdy_ZYS-QMwakk9D02XBUyY8Wy&index=16
 
-/home/curw/git/DSS-Framework/docker/hechms/runner.sh  -d 2020-05-19_10:00:00 -f 2 -b 3 -r 1 -p MME -D 2020-05-19 -T 10-00-00 -u fcst_pusher -x aquafcst -y 35.227.163.211 -z curw_sim -m hechms_event -n production
+/home/curw/git/DSS-Framework/docker/hechms/runner.sh  -d 2020-05-19_10:00:00 -f 2 -b 3 -r 1 -p MME -D 2020-05-19 -T 10-00-00 -u fcst_pusher -x aquafcst -y 35.197.98.125 -z curw_sim -m hechms_event -n production
 
 scp -P 6022 curw@124.43.13.195:/mnt/disks/data/hechms/production/2020-05-20/08-00-00.tar.gz ./08-00-00.tar.gz
 
 /home/curw/git/distributed_hechms/output/DailyRain.csv
 
 # run initial conditions from database
- /home/curw/git/DSS-Framework/docker/hechms/runner.sh  -d 2020-05-21_04:00:00 -f 2 -b 3 -r 0 -p MME -D 2020-05-21 -T 04-00-00 -u fcst_pusher -x aquafcst -y 35.227.163.211 -z curw_sim -m hechms_event -n production
+ /home/curw/git/DSS-Framework/docker/hechms/runner.sh  -d 2020-05-21_04:00:00 -f 2 -b 3 -r 0 -p MME -D 2020-05-21 -T 04-00-00 -u fcst_pusher -x aquafcst -y 35.197.98.125 -z curw_sim -m hechms_event -n production
 
 curl -X GET "http://192.168.1.41:8088/extract-water-level?run_date=2020-05-25&run_time=10:00:00&model=flo2d_250&forward=2&backward=3&sim_tag=event_run&run_type=production"
 
