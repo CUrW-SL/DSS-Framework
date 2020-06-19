@@ -70,10 +70,16 @@ def run_hechms_workflow(**context):
 
 
 def get_local_exec_date_from_context(context):
-    exec_datetime_str = context["execution_date"].to_datetime_string()
-    exec_datetime = datetime.strptime(exec_datetime_str, '%Y-%m-%d %H:%M:%S') + timedelta(hours=5, minutes=30)
-    exec_date = exec_datetime.strftime('%Y-%m-%d_%H:00:00')
-    return exec_date
+    rule = context['task_instance'].xcom_pull(task_ids='init_hechms')
+    if 'run_date' in rule:
+        exec_datetime_str = rule['run_date']
+        exec_datetime = datetime.strptime(exec_datetime_str, '%Y-%m-%d %H:%M:%S')
+        exec_date = exec_datetime.strftime('%Y-%m-%d_%H:00:00')
+    else:
+        exec_datetime_str = context["execution_date"].to_datetime_string()
+        exec_datetime = datetime.strptime(exec_datetime_str, '%Y-%m-%d %H:%M:%S') + timedelta(hours=5, minutes=30)
+        exec_date = exec_datetime.strftime('%Y-%m-%d_%H:00:00')
+    return [exec_date, exec_datetime.strftime('%Y-%m-%d'), exec_datetime.strftime('%H-00-00')]
 
 
 def update_workflow_status(status, rule_id):
