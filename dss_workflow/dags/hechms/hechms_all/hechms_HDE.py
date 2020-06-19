@@ -20,18 +20,8 @@ default_args = {
     'email_on_failure': True,
 }
 
-ssh_cmd_template = "ssh -i /home/uwcc-admin/.ssh/uwcc-admin -o \"StrictHostKeyChecking no\" uwcc-admin@{ip} " \
-                   "\'bash -c \"{run script}\"'"
-
-create_input_cmd_template = 'curl -X GET "http://{}:{}/HECHMS/distributed/init/{}/{}/{}/{}"'
-
-run_hechms_preprocess_cmd_template = 'curl -X GET "http://{}:{}/HECHMS/distributed/pre-process/{}/{}/{}"'
-
-run_hechms_cmd_template = 'curl -X GET "http://{}:{}/HECHMS/distributed/run"'
-
-run_hechms_postprocess_cmd_template = 'curl -X GET "http://{}:{}/HECHMS/distributed/post-process/{}/{}/{}"'
-
-upload_discharge_cmd_template = 'curl -X GET "http://{}:{}/HECHMS/distributed/upload-discharge/{}"'
+ssh_cmd_template = "ssh -i /home/uwcc-admin/.ssh/uwcc-admin -o \"StrictHostKeyChecking no\" uwcc-admin@{} " \
+                   "\'bash -c \"{}\"'"
 
 
 def get_rule_from_context(context):
@@ -40,7 +30,7 @@ def get_rule_from_context(context):
     return rule
 
 
-#/home/uwcc-admin/DSS-Framework/docker/hechms/runner.sh
+# /home/uwcc-admin/DSS-Framework/docker/hechms/runner.sh
 # -d 2020-06-19_12:00:00 -f 2 -b 3 -r 0 -p MME
 # -D 2020-06-19 -T 12-00-00 -u fcst_pusher -x aquafcst
 # -y 35.197.98.125 -z curw_sim -m HDC -n production
@@ -48,9 +38,6 @@ def run_hechms_workflow(**context):
     [exec_date, date_only, time_only] = get_local_exec_date_from_context(context)
     rule_id = get_rule_id(context)
     print('run_hechms|[exec_date,date_only, time_only, rule_id] : ', [exec_date, date_only, time_only, rule_id])
-    vm_config = Variable.get('ubuntu1_config', deserialize_json=True)
-    vm_user = vm_config['user']
-    vm_password = vm_config['password']
     rule = context['task_instance'].xcom_pull(task_ids='init_hechms')
     if rule is not None:
         forward = rule['forecast_days']
@@ -72,7 +59,7 @@ def run_hechms_workflow(**context):
             db_config['mysql_db'],
             target_model, run_type)
         print('run_hechms_workflow|run_script : ', run_script)
-        run_cmd = ssh_cmd_template.format(vm_password, vm_user, run_node, run_script)
+        run_cmd = ssh_cmd_template.format(run_node, run_script)
         print('run_hechms_workflow|run_cmd : ', run_cmd)
         subprocess.call(run_cmd, shell=True)
     else:
@@ -80,68 +67,16 @@ def run_hechms_workflow(**context):
 
 
 def get_local_exec_date_from_context(context):
-    exec_datetime_str = context["execution_date"].to_datetime_string()
-    exec_datetime = datetime.strptime(exec_datetime_str, '%Y-%m-%d %H:%M:%S') + timedelta(hours=5, minutes=30)
-    exec_date = exec_datetime.strftime('%Y-%m-%d_%H:00:00')
-    return exec_date
-
-
-def get_create_input_cmd(**context):
-    rule = get_rule_from_context(context)
-    exec_date = get_local_exec_date_from_context(context)
-    forward = rule['rule_info']['forecast_days']
-    backward = rule['rule_info']['observed_days']
-    init_run = rule['rule_info']['init_run']
-    run_node = rule['rule_info']['rule_details']['run_node']
-    run_port = rule['rule_info']['rule_details']['run_port']
-    create_input_cmd = create_input_cmd_template.format(run_node, run_port, exec_date, backward, forward, init_run)
-    print('get_create_input_cmd|create_input_cmd : ', create_input_cmd)
-    subprocess.call(create_input_cmd, shell=True)
-
-
-def get_run_hechms_preprocess_cmd(**context):
-    rule = get_rule_from_context(context)
-    exec_date = get_local_exec_date_from_context(context)
-    forward = rule['rule_info']['forecast_days']
-    backward = rule['rule_info']['observed_days']
-    run_node = rule['rule_info']['rule_details']['run_node']
-    run_port = rule['rule_info']['rule_details']['run_port']
-    run_hechms_preprocess_cmd = run_hechms_preprocess_cmd_template.format(run_node, run_port, exec_date, backward,
-                                                                          forward)
-    print('get_run_hechms_preprocess_cmd|run_hechms_preprocess_cmd : ', run_hechms_preprocess_cmd)
-    subprocess.call(run_hechms_preprocess_cmd, shell=True)
-
-
-def get_run_hechms_cmd(**context):
-    rule = get_rule_from_context(context)
-    run_node = rule['rule_info']['rule_details']['run_node']
-    run_port = rule['rule_info']['rule_details']['run_port']
-    run_hechms_cmd = run_hechms_cmd_template.format(run_node, run_port)
-    print('get_run_hechms_preprocess_cmd|run_hechms_cmd : ', run_hechms_cmd)
-    subprocess.call(run_hechms_cmd, shell=True)
-
-
-def get_run_hechms_postprocess_cmd(**context):
-    rule = get_rule_from_context(context)
-    exec_date = get_local_exec_date_from_context(context)
-    forward = rule['rule_info']['forecast_days']
-    backward = rule['rule_info']['observed_days']
-    run_node = rule['rule_info']['rule_details']['run_node']
-    run_port = rule['rule_info']['rule_details']['run_port']
-    run_hechms_postprocess_cmd = run_hechms_postprocess_cmd_template.format(run_node, run_port, exec_date, backward,
-                                                                            forward)
-    print('get_run_hechms_postprocess_cmd|run_hechms_postprocess_cmd : ', run_hechms_postprocess_cmd)
-    subprocess.call(run_hechms_postprocess_cmd, shell=True)
-
-
-def get_upload_discharge_cmd(**context):
-    rule = get_rule_from_context(context)
-    exec_date = get_local_exec_date_from_context(context)
-    run_node = rule['rule_info']['rule_details']['run_node']
-    run_port = rule['rule_info']['rule_details']['run_port']
-    upload_discharge_cmd = upload_discharge_cmd_template.format(run_node, run_port, exec_date)
-    print('get_upload_discharge_cmd|upload_discharge_cmd : ', upload_discharge_cmd)
-    subprocess.call(upload_discharge_cmd, shell=True)
+    rule = context['task_instance'].xcom_pull(task_ids='init_hechms')
+    if 'run_date' in rule:
+        exec_datetime_str = rule['run_date']
+        exec_datetime = datetime.strptime(exec_datetime_str, '%Y-%m-%d %H:%M:%S')
+        exec_date = exec_datetime.strftime('%Y-%m-%d_%H:00:00')
+    else:
+        exec_datetime_str = context["execution_date"].to_datetime_string()
+        exec_datetime = datetime.strptime(exec_datetime_str, '%Y-%m-%d %H:%M:%S') + timedelta(hours=5, minutes=30)
+        exec_date = exec_datetime.strftime('%Y-%m-%d_%H:00:00')
+    return [exec_date, exec_datetime.strftime('%Y-%m-%d'), exec_datetime.strftime('%H-00-00')]
 
 
 def update_workflow_status(status, rule_id):
@@ -157,7 +92,7 @@ def update_workflow_status(status, rule_id):
 
 
 def get_rule_id(context):
-    rule_info = context['task_instance'].xcom_pull(task_ids='init_hechms')['rule_info']
+    rule_info = context['task_instance'].xcom_pull(task_ids='init_hechms')
     if rule_info:
         rule_id = rule_info['id']
         print('get_rule_id|rule_id : ', rule_id)
