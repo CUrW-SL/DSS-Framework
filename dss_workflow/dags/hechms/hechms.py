@@ -5,12 +5,12 @@ from airflow.models import Variable
 import sys
 import subprocess
 
-sys.path.insert(0, '/home/uwcc-admin/git/DSS-Framework/db_util')
+sys.path.insert(0, '/home/uwcc-admin/DSS-Framework/db_util')
 from dss_db import RuleEngineAdapter
 
-RUN_SCRIPT = '/home/uwcc-admin/git/DSS-Framework/docker/hechms/runner.sh'
+RUN_SCRIPT = '/home/uwcc-admin/DSS-Framework/docker/hechms/runner.sh'
 
-prod_dag_name = 'hechms_distributed_event_dag'
+prod_dag_name = 'hechms_dag'
 dag_pool = 'hechms_pool'
 
 default_args = {
@@ -19,8 +19,6 @@ default_args = {
     'email': ['hasithadkr7@gmail.com'],
     'email_on_failure': True,
 }
-
-ssh_cmd_template = 'sshpass -p \'{}\' ssh {}@{} {}'
 
 ssh_cmd_template = "ssh -i /home/uwcc-admin/.ssh/uwcc-admin -o \"StrictHostKeyChecking no\" uwcc-admin@{ip} " \
                    "\'bash -c \"{run script}\"'"
@@ -42,6 +40,10 @@ def get_rule_from_context(context):
     return rule
 
 
+#/home/uwcc-admin/DSS-Framework/docker/hechms/runner.sh
+# -d 2020-06-19_12:00:00 -f 2 -b 3 -r 0 -p MME
+# -D 2020-06-19 -T 12-00-00 -u fcst_pusher -x aquafcst
+# -y 35.197.98.125 -z curw_sim -m HDC -n production
 def run_hechms_workflow(**context):
     [exec_date, date_only, time_only] = get_local_exec_date_from_context(context)
     rule_id = get_rule_id(context)
@@ -69,11 +71,10 @@ def run_hechms_workflow(**context):
             db_config['mysql_host'],
             db_config['mysql_db'],
             target_model, run_type)
-        print('get_wrf_run_command|run_script : ', run_script)
-        run_wrf_cmd = ssh_cmd_template.format(vm_password, vm_user, run_node, run_script)
-        print('get_wrf_run_command|run_wrf_cmd : ', run_wrf_cmd)
-        print('get_wrf_run_command|run_wrf_cmd : ', run_wrf_cmd)
-        subprocess.call(run_wrf_cmd, shell=True)
+        print('run_hechms_workflow|run_script : ', run_script)
+        run_cmd = ssh_cmd_template.format(vm_password, vm_user, run_node, run_script)
+        print('run_hechms_workflow|run_cmd : ', run_cmd)
+        subprocess.call(run_cmd, shell=True)
     else:
         raise AirflowException('hechms rule not found')
 
@@ -198,7 +199,7 @@ def on_dag_failure(context):
 
 
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
-         description='Run HecHms DISTRIBUTED EVENT DAG', catchup=False, on_failure_callback=on_dag_failure) as dag:
+         description='Run HecHms DAG', catchup=False, on_failure_callback=on_dag_failure) as dag:
     init_hechms = PythonOperator(
         task_id='init_hechms',
         provide_context=True,
