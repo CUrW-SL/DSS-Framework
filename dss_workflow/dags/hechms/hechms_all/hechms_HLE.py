@@ -10,7 +10,7 @@ from dss_db import RuleEngineAdapter
 
 RUN_SCRIPT = '/home/uwcc-admin/DSS-Framework/docker/hechms/runner.sh'
 
-prod_dag_name = 'hechms_dag'
+prod_dag_name = 'hechms_HLE_dag'
 dag_pool = 'hechms_pool'
 
 default_args = {
