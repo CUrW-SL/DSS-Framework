@@ -39,16 +39,7 @@ def get_triggering_dags(db_adapter, dss_rule_id, model_type):
                 target_model = target_model.strip()
                 print('target_model : ', target_model)
                 dag_name = 'hechms_{}_dag'.format(target_model)
-                payload = {'id': hechms_rule_info['id'], 'forecast_days': hechms_rule_info['forecast_days'],
-                           'observed_days': hechms_rule_info['observed_days'],
-                           'init_run': hechms_rule_info['init_run'],
-                           'target_model': hechms_rule_info['target_model'],
-                           'no_forecast_continue': hechms_rule_info['no_forecast_continue'],
-                           'no_observed_continue': hechms_rule_info['no_observed_continue'],
-                           'rainfall_data_from': hechms_rule_info['rainfall_data_from'],
-                           'ignore_previous_run': hechms_rule_info['ignore_previous_run'],
-                           'accuracy_rule': hechms_rule_info['accuracy_rule'],
-                           'rule_details': hechms_rule_info['rule_details']}
+                payload = hechms_rule_info
                 dag_info.append({'dag_name': dag_name, 'payload': payload})
         else:
             print('No hechms rules found.')
