@@ -40,7 +40,6 @@ def get_triggering_dags(db_adapter, dss_rule_id, model_type):
                 print('target_model : ', target_model)
                 dag_name = 'hechms_{}_dag'.format(target_model)
                 payload = hechms_rule_info
-                print('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|payload : ', payload)
                 dag_info.append({'dag_name': dag_name, 'payload': payload})
         else:
             print('No hechms rules found.')
