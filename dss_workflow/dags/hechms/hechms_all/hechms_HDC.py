@@ -20,8 +20,8 @@ default_args = {
     'email_on_failure': True,
 }
 
-ssh_cmd_template = "ssh -i /home/uwcc-admin/.ssh/uwcc-admin -o \"StrictHostKeyChecking no\" uwcc-admin@{ip} " \
-                   "\'bash -c \"{run script}\"'"
+ssh_cmd_template = "ssh -i /home/uwcc-admin/.ssh/uwcc-admin -o \"StrictHostKeyChecking no\" uwcc-admin@{} " \
+                   "\'bash -c \"{}\"'"
 
 
 def get_rule_from_context(context):
@@ -38,9 +38,6 @@ def run_hechms_workflow(**context):
     [exec_date, date_only, time_only] = get_local_exec_date_from_context(context)
     rule_id = get_rule_id(context)
     print('run_hechms|[exec_date,date_only, time_only, rule_id] : ', [exec_date, date_only, time_only, rule_id])
-    vm_config = Variable.get('ubuntu1_config', deserialize_json=True)
-    vm_user = vm_config['user']
-    vm_password = vm_config['password']
     rule = context['task_instance'].xcom_pull(task_ids='init_hechms')
     if rule is not None:
         forward = rule['forecast_days']
@@ -62,7 +59,7 @@ def run_hechms_workflow(**context):
             db_config['mysql_db'],
             target_model, run_type)
         print('run_hechms_workflow|run_script : ', run_script)
-        run_cmd = ssh_cmd_template.format(vm_password, vm_user, run_node, run_script)
+        run_cmd = ssh_cmd_template.format(run_node, run_script)
         print('run_hechms_workflow|run_cmd : ', run_cmd)
         subprocess.call(run_cmd, shell=True)
     else:
