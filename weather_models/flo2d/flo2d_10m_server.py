@@ -32,8 +32,8 @@ CREATE_CHAN_LOCAL_CMD = '.\gen_chan.py -m "{}" -s "{}" -d "{}" -E'
 CREATE_RAINCELL_CMD = '.\gen_raincell.py -m "{}" -s "{}" -e "{}" -d "{}" -M "{}"'
 CREATE_RAINCELL_LOCAL_CMD = '.\gen_raincell.py -m "{}" -s "{}" -e "{}" -d "{}" -M "{}" -E'
 
-CREATE_RAINDAT_CMD = '.\gen_raindat.py -m "{}" -s "{}" -e "{}" -d "{}" -M "{}"'
-CREATE_RAINDAT_LOCAL_CMD = '.\gen_raindat.py -m "{}" -s "{}" -e "{}" -d "{}" -M "{}" -E'
+CREATE_RAINDAT_CMD = '.\gen_rain.py -m "{}" -s "{}" -e "{}" -d "{}" '
+CREATE_RAINDAT_LOCAL_CMD = '.\gen_rain.py -m "{}" -s "{}" -e "{}" -d "{}" -E'
 
 CREATE_INFLOW_250_CMD = '.\gen_250_inflow.py -s "{}" -e "{}" -d "{}" -M "{}"'
 CREATE_INFLOW_250_LOCAL_CMD = '.\gen_250_inflow.py -s "{}" -e "{}" -d "{}" -M "{}" -E'
@@ -164,7 +164,7 @@ class StoreHandler(BaseHTTPRequestHandler):
                 try:
                     command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'input', 'raindat')
                     command = CREATE_RAINDAT_CMD.format(params['model'], params['ts_start'],
-                                                        params['ts_end'], dir_path, params['pop_method'])
+                                                        params['ts_end'], dir_path)
                     print('create-raindat|command : ', command)
                     print('create-raindat|command_dir_path : ', command_dir_path)
                     response = run_input_file_generation_methods(command_dir_path, command)
