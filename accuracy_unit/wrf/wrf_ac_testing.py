@@ -312,6 +312,8 @@ def get_obs_and_fcst_times(test_date, gfs_hour):
     ts_start_str = ts_start.strftime('%Y-%m-%d %H:%M:%S')
     test_date_str = test_date.strftime('%Y-%m-%d %H:%M:%S')
     ts_end_str = ts_end.strftime('%Y-%m-%d %H:%M:%S')
+    print('get_obs_and_fcst_times|[ts_start_str, test_date_str, ts_end_str] : ',
+          [ts_start_str, test_date_str, ts_end_str])
     return [ts_start_str, test_date_str, ts_end_str]
 
 
@@ -343,9 +345,10 @@ def measure_accuracy(sim_tag, test_date, gfs_hour, model_id):
 
 if __name__ == "__main__":
     sim_tag = 'dwrf_gfs_d1_18'
-    test_date = '2020-05-10'
+    test_date = '2020-05-16'
     gfs_hour = '18'
     # mem_usage = memory_usage(wrf_model_selection('dwrf_gfs_d1_18', '2020-05-10', '18', [19, 20, 21, 22]))
+    # wrf_model_selection(sim_tag, test_date, gfs_hour, [19, 20, 21, 22])
     selected = wrf_model_selection(sim_tag, test_date, gfs_hour, [19, 20, 21, 22])
     print('selected model : ', selected)
     measure_accuracy(sim_tag, test_date, gfs_hour, selected['wrf_model'])
