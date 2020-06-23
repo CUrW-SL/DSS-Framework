@@ -37,6 +37,7 @@ def calculate_wrf_model_mean(sim_tag, wrf_model, start_time, end_time):
     obs_connection = pymysql.connect(host=HOST, user=USER, password=PASSWORD, db=OBS_DB,
                                      cursorclass=pymysql.cursors.DictCursor)
     shape_file = os.path.join(RESOURCE_PATH, 'Kalani_basin_hec_wgs/Kalani_basin_hec_wgs.shp')
+    rmse_params = {}
     obs_cum_mean_df = get_obs_cum_mean_df(obs_connection, shape_file, start_time, end_time)
     if obs_cum_mean_df is not None and obs_cum_mean_df.empty is False:
         fcst_cum_mean_df = get_fcst_cum_mean_df(fcst_connection, shape_file, sim_tag, wrf_model, start_time, end_time)
@@ -57,7 +58,9 @@ def calculate_wrf_model_mean(sim_tag, wrf_model, start_time, end_time):
             rmse = ((compare_cum_mean_df.observed - compare_cum_mean_df.forecast) ** 2).mean() ** .5
             rmse_params = {'sim_tag': sim_tag, 'wrf_model': wrf_model, 'rmse': rmse}
             print('calculate_wrf_model_mean|rmse_params : ', rmse_params)
-            return rmse_params
+    fcst_connection.close()
+    obs_connection.close()
+    return rmse_params
 
 
 def get_common_start_end(obs_cum_mean_df, fcst_cum_mean_df):
