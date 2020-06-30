@@ -148,14 +148,15 @@ def get_archive_gfs_data_url_dest_tuple(url, inv, date_str, cycle, fcst_id, res,
 
 def get_gfs_inventory_url_dest_list(date, period, url, archive_url, inv, step, cycle, res, gfs_dir, start=0):
     date_str = date.strftime('%Y%m%d') if type(date) is datetime else date
-    run_date = datetime.strptime('%Y%m%d', date_str)
+    run_date = datetime.strptime(date_str, '%Y%m%d')
     current_date = datetime.now()
-    back_days = (current_date-run_date).days
-    if back_days<10:
+    back_days = (current_date - run_date).days
+    if back_days < 10:
         return [get_gfs_data_url_dest_tuple(url, inv, date_str, cycle, str(i).zfill(3), res, gfs_dir) for i in
-            range(start, start + int(period * 24) + 1, step)]
+                range(start, start + int(period * 24) + 1, step)]
     else:
-        return [get_archive_gfs_data_url_dest_tuple(archive_url, inv, date_str, cycle, str(i).zfill(3), res, gfs_dir) for i in
+        return [get_archive_gfs_data_url_dest_tuple(archive_url, inv, date_str, cycle, str(i).zfill(3), res, gfs_dir)
+                for i in
                 range(start, start + int(period * 24) + 1, step)]
 
 
