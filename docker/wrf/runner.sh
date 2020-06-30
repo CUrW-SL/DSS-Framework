@@ -73,7 +73,7 @@ echo "runner docker_tag : ${docker_tag}"
 docker run -i --rm --privileged --network host \
     -v /mnt/disks/data/wrf-data/nfs:/home/Build_WRF/nfs \
     -v /mnt/disks/data/wrf-data/archive:/home/Build_WRF/archive \
-    curw-wrf-18_04:${docker_tag} /home/Build_WRF/code/wrfv4_run.sh \
+    curw-wrf-v1-ubuntu18:${docker_tag} /home/Build_WRF/code/wrfv4_run.sh \
     -d ${gfs_date} -k ${wrf_id} -a ${NAMELIST_WPS_ID} \
     -b ${NAMELIST_INPUT_ID} -p ${DB_USER} \
     -q ${DB_PASSWORD} -t ${DB_NAME} -s ${DB_HOST}
