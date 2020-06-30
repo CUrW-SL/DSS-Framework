@@ -130,18 +130,21 @@ def get_execution_date_time(context):
 
 def get_wrf_run_command(**context):
     wrf_rule_id = get_rule_id(context)
-    db_config = Variable.get('db_config', deserialize_json=True)
-    db_user = db_config['mysql_user']
-    db_password = db_config['mysql_password']
-    db_name = db_config['mysql_db']
-    db_host = db_config['mysql_host']
     vm_config = Variable.get('ubuntu1_config', deserialize_json=True)
     vm_user = vm_config['user']
     vm_password = vm_config['password']
     print('get_wrf_run_command|wrf_rule_id : ', wrf_rule_id)
     allowed_to_proceed(wrf_rule_id)
-    wrf_rule = get_rule_by_id(wrf_rule_id)
+    wrf_rule = get_rule_from_context(wrf_rule_id)
     if wrf_rule is not None:
+        if wrf_rule['run_type'] == 'production':
+            db_config = Variable.get('prod_db_config', deserialize_json=True)
+        else:
+            db_config = Variable.get('event_db_config', deserialize_json=True)
+        db_user = db_config['fcst_config']['mysql_user']
+        db_password = db_config['fcst_config']['mysql_password']
+        db_name = db_config['fcst_config']['mysql_db']
+        db_host = db_config['fcst_config']['mysql_host']
         wrf_model = wrf_rule['target_model']
         wrf_version = wrf_rule['version']
         wrf_run = wrf_rule['run']
@@ -213,6 +216,15 @@ def get_rule_id(context):
     if rule_id:
         print('get_rule_id|rule_id : ', rule_id)
         return rule_id
+    else:
+        return None
+
+
+def get_rule_from_context(context):
+    rule = context['task_instance'].xcom_pull(task_ids='init_wrf')
+    if rule:
+        print('get_rule_id|rule : ', rule)
+        return rule
     else:
         return None
 
