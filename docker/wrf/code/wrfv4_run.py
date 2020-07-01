@@ -138,14 +138,14 @@ def get_gfs_data_url_dest_tuple(url, inv, date_str, cycle, fcst_id, res, gfs_dir
 
 def get_archive_gfs_data_url_dest_tuple(url, inv, date_str, cycle, fcst_id, res, gfs_dir):
     url0 = url.replace('YYYY', date_str[0:4]).replace('MM', date_str[4:6]).replace('DD', date_str[6:8])
-    inv0 = inv.replace('CC', cycle).replace('FFF', fcst_id).replace('RRRR', res).replace('YYYY', date_str[0:4]).replace(
+    inv0 = inv.replace('CC', cycle).replace('FFF', fcst_id).replace('YYYY', date_str[0:4]).replace(
         'MM', date_str[4:6]).replace('DD', date_str[6:8])
 
     dest = os.path.join(gfs_dir, date_str + '.' + inv0)
     return url0 + inv0, dest
 
 
-def get_gfs_inventory_url_dest_list(date, period, url, archive_url, inv, step, cycle, res, gfs_dir, start=0):
+def get_gfs_inventory_url_dest_list(date, period, url, archive_url, inv, archive_inv, step, cycle, res, gfs_dir, start=0):
     date_str = date.strftime('%Y%m%d') if type(date) is datetime else date
     run_date = datetime.strptime(date_str, '%Y%m%d')
     current_date = datetime.now()
@@ -157,7 +157,7 @@ def get_gfs_inventory_url_dest_list(date, period, url, archive_url, inv, step, c
                 range(start, start + int(period * 24) + 1, step)]
     else:
         print('get_gfs_inventory_url_dest_list|archive_url : ', archive_url)
-        return [get_archive_gfs_data_url_dest_tuple(archive_url, inv, date_str, cycle, str(i).zfill(3), res, gfs_dir)
+        return [get_archive_gfs_data_url_dest_tuple(archive_url, archive_inv, date_str, cycle, str(i).zfill(3), res, gfs_dir)
                 for i in
                 range(start, start + int(period * 24) + 1, step)]
 
@@ -206,8 +206,8 @@ def download_gfs_data(wrf_conf):
         gfs_date, gfs_cycle, start_inv = get_appropriate_gfs_inventory(wrf_conf)
         inventories = get_gfs_inventory_url_dest_list(gfs_date, wrf_conf['period'],
                                                       wrf_conf['gfs_url'], wrf_conf['gfs_archive_url'],
-                                                      wrf_conf['gfs_inv'], wrf_conf['gfs_step'],
-                                                      gfs_cycle, wrf_conf['gfs_res'],
+                                                      wrf_conf['gfs_inv'], wrf_conf['archive_gfs_inv'],
+                                                      wrf_conf['gfs_step'], gfs_cycle, wrf_conf['gfs_res'],
                                                       wrf_conf['gfs_dir'], start=start_inv)
         gfs_threads = wrf_conf['gfs_threads']
         print('Following data will be downloaded in %d parallel threads\n%s' % (gfs_threads, '\n'.join(

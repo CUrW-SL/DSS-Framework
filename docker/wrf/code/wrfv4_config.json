@@ -13,6 +13,7 @@
     "gfs_cycle": "00",
     "gfs_delay": 60,
     "gfs_inv": "gfs.tCCz.pgrb2.RRRR.fFFF",
+    "archive_gfs_inv": "gfs_4_YYYYMMDD_CC00_FFF.grb2",
     "gfs_res": "0p50",
     "gfs_retries": 5,
     "gfs_step": 3,
