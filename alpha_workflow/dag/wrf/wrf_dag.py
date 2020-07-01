@@ -135,7 +135,7 @@ def get_wrf_run_command(**context):
     vm_password = vm_config['password']
     print('get_wrf_run_command|wrf_rule_id : ', wrf_rule_id)
     allowed_to_proceed(wrf_rule_id)
-    wrf_rule = get_rule_from_context(wrf_rule_id)
+    wrf_rule = get_rule_from_context(context)
     if wrf_rule is not None:
         db_config = Variable.get('db_config', deserialize_json=True)
         db_user = db_config['mysql_user']
@@ -220,7 +220,7 @@ def get_rule_id(context):
 def get_rule_from_context(context):
     rule = context['task_instance'].xcom_pull(task_ids='init_wrf')
     if rule:
-        print('get_rule_id|rule : ', rule)
+        print('get_rule_from_context|rule : ', rule)
         return rule
     else:
         return None
