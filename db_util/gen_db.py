@@ -34,7 +34,7 @@ class CurwSimAdapter:
     @staticmethod
     def get_instance(db_config):
         """ Static access method. """
-        print('get_instance|db_config : ', db_config)
+        # print('get_instance|db_config : ', db_config)
         if CurwSimAdapter.__instance is None:
             CurwSimAdapter(db_config['mysql_user'], db_config['mysql_password'],
                               db_config['mysql_host'], db_config['mysql_db'],
@@ -149,16 +149,16 @@ class CurwSimAdapter:
             grid_id = 'rainfall_{}_{}'.format(station_name, grid_interpolation)
             sql = 'select id, obs_end from curw_sim.run where model=\'{}\' and method=\'{}\'  and grid_id=\'{}\''.format(
                 model, value_interpolation, grid_id)
-            print('sql : ', sql)
+            # print('sql : ', sql)
             cursor.execute(sql)
             result = cursor.fetchone()
             if result:
                 hash_id = result[0]
-                print('hash_id : ', hash_id)
+                # print('hash_id : ', hash_id)
                 data_sql = 'select time,value from curw_sim.data where time>=\'{}\' and time<=\'{}\' and id=\'{}\' '.format(
                     timeseries_start, timeseries_end, hash_id)
                 try:
-                    print('data_sql : ', data_sql)
+                    # print('data_sql : ', data_sql)
                     cursor.execute(data_sql)
                     results = cursor.fetchall()
                     # print('results : ', results)
@@ -166,17 +166,17 @@ class CurwSimAdapter:
                         time_step_count = int((datetime.strptime(timeseries_end, '%Y-%m-%d %H:%M:%S')
                                                - datetime.strptime(timeseries_start,
                                                                    '%Y-%m-%d %H:%M:%S')).total_seconds() / (60 * 5))
-                        print('timeseries_start : {}'.format(timeseries_start))
-                        print('timeseries_end : {}'.format(timeseries_end))
-                        print('time_step_count : {}'.format(time_step_count))
-                        print('len(results) : {}'.format(len(results)))
+                        # print('timeseries_start : {}'.format(timeseries_start))
+                        # print('timeseries_end : {}'.format(timeseries_end))
+                        # print('time_step_count : {}'.format(time_step_count))
+                        # print('len(results) : {}'.format(len(results)))
                         data_error = ((time_step_count - len(results)) / time_step_count) * 100
                         if data_error < 1:
                             df = pd.DataFrame(data=results, columns=['time', 'value'])
                             return df
                         elif data_error <= acceppted_error:
-                            print('data_error : {}'.format(data_error))
-                            print('filling missing data.')
+                            # print('data_error : {}'.format(data_error))
+                            # print('filling missing data.')
                             formatted_ts = []
                             i = 0
                             for step in range(time_step_count):
@@ -191,7 +191,7 @@ class CurwSimAdapter:
                                     formatted_ts.append((tms_step, Decimal(0)))
                                 i += 1
                             df = pd.DataFrame(data=formatted_ts, columns=['time', 'value'])
-                            print('get_station_timeseries|df: ', df)
+                            # print('get_station_timeseries|df: ', df)
                             return df
                         else:
                             print('Missing data.')
@@ -214,7 +214,7 @@ class CurwSimAdapter:
         data_sql = 'select time,value from curw_sim.data where time>=\'{}\' and time<=\'{}\' and id=\'{}\' '.format(
             timeseries_start, timeseries_end, hash_id)
         try:
-            print('data_sql : ', data_sql)
+            # print('data_sql : ', data_sql)
             cursor.execute(data_sql)
             results = cursor.fetchall()
             # print('results : ', results)
@@ -223,10 +223,10 @@ class CurwSimAdapter:
                                        - datetime.strptime(timeseries_start,
                                                            '%Y-%m-%d %H:%M:%S')).total_seconds() / (
                                               60 * time_step_size))
-                print('timeseries_start : {}'.format(timeseries_start))
-                print('timeseries_end : {}'.format(timeseries_end))
-                print('time_step_count : {}'.format(time_step_count))
-                print('len(results) : {}'.format(len(results)))
+                # print('timeseries_start : {}'.format(timeseries_start))
+                # print('timeseries_end : {}'.format(timeseries_end))
+                # print('time_step_count : {}'.format(time_step_count))
+                # print('len(results) : {}'.format(len(results)))
                 data_error = ((time_step_count - len(results)) / time_step_count) * 100
                 if data_error < 0:
                     df = pd.DataFrame(data=results, columns=['time', 'value'])
@@ -249,7 +249,7 @@ class CurwSimAdapter:
                             formatted_ts.append((tms_step, Decimal(0)))
                         i += 1
                     df = pd.DataFrame(data=formatted_ts, columns=['time', 'value'])
-                    print('get_station_timeseries|df: ', df)
+                    # print('get_station_timeseries|df: ', df)
                     return df
                 else:
                     print('data_error : {}'.format(data_error))
@@ -377,7 +377,7 @@ class CurwFcstAdapter:
     @staticmethod
     def get_instance(db_config):
         """ Static access method. """
-        print('get_instance|db_config : ', db_config)
+        # print('get_instance|db_config : ', db_config)
         if CurwFcstAdapter.__instance is None:
             CurwFcstAdapter(db_config['mysql_user'], db_config['mysql_password'],
                            db_config['mysql_host'], db_config['mysql_db'],
@@ -475,7 +475,7 @@ class CurwFcstAdapter:
 
     def get_source_id(self, model, version):
         sql_query = 'select id from curw_fcst.source where model=\'{}\' and version=\'{}\';'.format(model, version)
-        print('get_source_id|sql_query : ', sql_query)
+        # print('get_source_id|sql_query : ', sql_query)
         result = self.get_single_result(sql_query)
         if result is not None:
             return result[0]
@@ -487,7 +487,7 @@ class CurwFcstAdapter:
                     'and station=\'{}\' and sim_tag=\'{}\' and end_date >= \'{}\';'.format(variable, unit, source,
                                                                                            station_id,
                                                                                            sim_tag, exec_date)
-        print('get_hash_id_of_station|sql_query : ', sql_query)
+        # print('get_hash_id_of_station|sql_query : ', sql_query)
         result = self.get_single_result(sql_query)
         if result is not None:
             return result[0]
@@ -498,17 +498,40 @@ class CurwFcstAdapter:
         sql_query = 'select time,value from curw_fcst.data where id=\'{}\' and ' \
                     'time >= \'{}\' and time <= \'{}\' and ' \
                     'fgt >= \'{}\';'.format(hash_id, tms_start, tms_end, exec_date)
-        print('get_station_tms|sql_query : ', sql_query)
+        # print('get_station_tms|sql_query : ', sql_query)
         results = self.get_multiple_result(sql_query)
         if results is not None:
             df = pd.DataFrame(data=results, columns=['time', 'value'])
             return df
         return None
 
+    def get_station_tms_fgt(self, hash_id, tms_start, tms_end, fgt):
+        sql_query = 'select time,value from curw_fcst.data where id=\'{}\' and ' \
+                    'time >= \'{}\' and time <= \'{}\' and ' \
+                    'fgt = \'{}\';'.format(hash_id, tms_start, tms_end, fgt)
+        # print('get_station_tms|sql_query : ', sql_query)
+        results = self.get_multiple_result(sql_query)
+        if results is not None:
+            df = pd.DataFrame(data=results, columns=['time', 'value'])
+            return df
+        return None
+
+    def get_latest_fgt(self, hash_id, exec_datetime):
+        sql_query = 'select temp.fgt, (\'{}\' - temp.fgt) as gap from ' \
+                    '(select distinct curw_fcst.data.fgt as fgt from curw_fcst.data where curw_fcst.data.id=\'{}\' and curw_fcst.data.fgt < \'{}\') as temp ' \
+                    'order by gap limit 10;'.format(exec_datetime, hash_id, exec_datetime)
+        # print('get_latest_fgt|sql_query : ', sql_query)
+        results = self.get_multiple_result(sql_query)
+        if results is not None:
+            (fgt, time_gap) = results[0]
+            print('get_latest_fgt|fgt : ', fgt)
+            return fgt
+        return None
+
     def get_flo2d_cell_map(self, model, version):
         sql_query = 'select parameters from curw_fcst.source where model=\'{}\' and version=\'{}\';'.format(model,
                                                                                                             version)
-        print('get_source_id|sql_query : ', sql_query)
+        # print('get_source_id|sql_query : ', sql_query)
         result = self.get_single_result(sql_query)
         if result is not None:
             cell_map = json.loads(result[0])
@@ -518,7 +541,29 @@ class CurwFcstAdapter:
 
     def get_flo2d_station_id_by_name(self, name):
         sql_query = 'select id from curw_fcst.station where name=\'{}\';'.format(name)
-        print('get_source_id|sql_query : ', sql_query)
+        # print('get_source_id|sql_query : ', sql_query)
+        result = self.get_single_result(sql_query)
+        if result is not None:
+            station_id = result[0]
+            return station_id
+        else:
+            return None
+
+    def get_flo2d_station_id_by_cell_id1(self, cell_id):
+        sql_query = 'select id from curw_fcst.station where description=\'flo2d_250_channel_cell_map_element\' ' \
+                    'and name like \'%{}%\';'.format(cell_id)
+        # print('get_source_id|sql_query : ', sql_query)
+        result = self.get_single_result(sql_query)
+        if result is not None:
+            station_id = result[0]
+            return station_id
+        else:
+            return None
+
+    def get_flo2d_station_id_by_cell_id2(self, cell_id):
+        sql_query = 'select id from curw_fcst.station where description=\'flo2d_250_flood_plain_cell_map_element\' ' \
+                    'and name like \'%{}%\';'.format(cell_id)
+        # print('get_source_id|sql_query : ', sql_query)
         result = self.get_single_result(sql_query)
         if result is not None:
             station_id = result[0]
@@ -533,7 +578,7 @@ class CurwObsAdapter:
     @staticmethod
     def get_instance(db_config):
         """ Static access method. """
-        print('get_instance|db_config : ', db_config)
+        # print('get_instance|db_config : ', db_config)
         if CurwObsAdapter.__instance is None:
             CurwObsAdapter(db_config['mysql_user'], db_config['mysql_password'],
                            db_config['mysql_host'], db_config['mysql_db'], db_config['log_path'])
@@ -611,10 +656,10 @@ class CurwObsAdapter:
 
     def get_timeseries_by_id(self, hash_id, timeseries_start, timeseries_end, time_step_size=5):
         cursor = self.cursor
-        data_sql = 'select time,value from curw_obs.data where time>=\'{}\' and time<=\'{}\' and id=\'{}\' '.format(
+        data_sql = 'select time,value from curw_obs.data where time>\'{}\' and time<=\'{}\' and id=\'{}\' '.format(
             timeseries_start, timeseries_end, hash_id)
         try:
-            print('data_sql : ', data_sql)
+            # print('get_timeseries_by_id|data_sql : ', data_sql)
             cursor.execute(data_sql)
             results = cursor.fetchall()
             # print('results : ', results)
@@ -623,17 +668,17 @@ class CurwObsAdapter:
                                        - datetime.strptime(timeseries_start,
                                                            '%Y-%m-%d %H:%M:%S')).total_seconds() / (
                                               60 * time_step_size))
-                print('timeseries_start : {}'.format(timeseries_start))
-                print('timeseries_end : {}'.format(timeseries_end))
-                print('time_step_count : {}'.format(time_step_count))
-                print('len(results) : {}'.format(len(results)))
+                # print('timeseries_start : {}'.format(timeseries_start))
+                # print('timeseries_end : {}'.format(timeseries_end))
+                # print('time_step_count : {}'.format(time_step_count))
+                # print('len(results) : {}'.format(len(results)))
                 data_error = ((time_step_count - len(results)) / time_step_count) * 100
                 if data_error < 0:
                     df = pd.DataFrame(data=results, columns=['time', 'value'])
                     return df
                 elif data_error < 30:
-                    print('data_error : {}'.format(data_error))
-                    print('filling missing data.')
+                    # print('data_error : {}'.format(data_error))
+                    # print('filling missing data.')
                     formatted_ts = []
                     i = 0
                     for step in range(time_step_count + 1):
@@ -649,11 +694,11 @@ class CurwObsAdapter:
                             formatted_ts.append((tms_step, Decimal(0)))
                         i += 1
                     df = pd.DataFrame(data=formatted_ts, columns=['time', 'value'])
-                    print('get_station_timeseries|df: ', df)
+                    # print('get_station_timeseries|df: ', df)
                     return df
                 else:
-                    print('data_error : {}'.format(data_error))
-                    print('Data error is too large')
+                    # print('data_error : {}'.format(data_error))
+                    # print('Data error is too large')
                     return None
             else:
                 print('No data.')
@@ -682,7 +727,7 @@ class CurwObsAdapter:
     def get_station_id_by_name(self, station_type, station_name):
         sql_query = 'select id,latitude,longitude from curw_obs.station where ' \
                     'station_type = \'{}\' and name = \'{}\''.format(station_type, station_name)
-        print('get_station_id_by_name|sql_query : ', sql_query)
+        # print('get_station_id_by_name|sql_query : ', sql_query)
         result = self.get_single_result(sql_query)
         if result is not None:
             station_id = result[0]
@@ -692,7 +737,7 @@ class CurwObsAdapter:
     def get_station_hash_id(self, station_id, variable, unit):
         sql_query = 'select id from curw_obs.run where station=\'{}\' and ' \
                     'variable=\'{}\' and unit=\'{}\';'.format(station_id, variable, unit)
-        print('get_station_hash_id|sql_query : ', sql_query)
+        # print('get_station_hash_id|sql_query : ', sql_query)
         result = self.get_single_result(sql_query)
         if result is not None:
             hash_id = result[0]
