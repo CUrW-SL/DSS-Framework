@@ -1,3 +1,6 @@
+import argparse
+import json
+
 import pandas as pd
 import pymysql
 import os
@@ -343,12 +346,24 @@ def measure_accuracy(sim_tag, test_date, gfs_hour, model_id):
     print('measure_accuracy|model_result : ', model_result)
 
 
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-run_date')
+    parser.add_argument('-sim_tag')
+    parser.add_argument('-gfs_hour')
+    return parser.parse_args()
+
+
 if __name__ == "__main__":
-    sim_tag = 'dwrf_gfs_d1_18'
-    test_date = '2020-05-16'
-    gfs_hour = '18'
-    # mem_usage = memory_usage(wrf_model_selection('dwrf_gfs_d1_18', '2020-05-10', '18', [19, 20, 21, 22]))
-    # wrf_model_selection(sim_tag, test_date, gfs_hour, [19, 20, 21, 22])
+    args = vars(parse_args())
+    print('Running arguments:\n%s' % json.dumps(args, sort_keys=True, indent=0))
+    test_date = args['run_date']
+    sim_tag = args['sim_tag']
+    gfs_hour = args['gfs_hour']
+    print('Input arguements|[test_date, sim_tag, gfs_hour] : ', [test_date, sim_tag, gfs_hour])
+    # sim_tag = 'gfs_d0_18'
+    # test_date = '2020-04-17'
+    # gfs_hour = '18'
     selected = wrf_model_selection(sim_tag, test_date, gfs_hour, [19, 20, 21, 22])
     print('selected model : ', selected)
     measure_accuracy(sim_tag, test_date, gfs_hour, selected['wrf_model'])
