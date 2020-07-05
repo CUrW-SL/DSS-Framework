@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 HOME_DIR="/mnt/disks/wrf-mod/hechms"
-STATE_DIR="/mnt/disks/wrf-mod/hechms/basin_states"
+STATE_DIR="/mnt/disks/wrf-mod\
+top -c/hechms/basin_states"
 #HOME_DIR="/mnt/disks/data/hechms/event"
 
 while getopts ":d:f:b:r:p:D:T:u:x:y:z:m:n:" option; do
