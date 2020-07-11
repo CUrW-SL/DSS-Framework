@@ -39,7 +39,6 @@ def get_esri_grid(min_depth, waterLevels, boudary, CellMap, gap=30.0, missingVal
     # rows = 533
     print('>>>>>  cols: %d, rows: %d' % (cols, rows))
     Grid = [[missingVal for x in range(cols)] for y in range(rows)]
-    print(Grid)
     for level in waterLevels:
         v = level.split()
         i, j = CellMap[int(v[0])]
@@ -107,7 +106,6 @@ def get_cell_grid(cadpts_file, boudary, gap=30.0):
                 print('### WARNING i: %d, j: %d, cols: %d, rows: %d' % (i, j, cols, rows))
             if i >= 0 or j >= 0:
                 CellMap[int(v[0])] = (i, rows - j - 1)
-    print(CellMap)
     return CellMap
 
 
