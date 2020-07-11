@@ -18,7 +18,7 @@ import urllib.request
 import ctypes
 
 HOST_ADDRESS = '10.138.0.18'
-HOST_PORT = 8088
+HOST_PORT = 8051
 
 WIN_OUTPUT_DIR_PATH = r"D:\flo2d_output"
 WIN_HOME_DIR_PATH = r"D:\DSS-Framework\weather_models\flo2d"
@@ -162,7 +162,7 @@ class StoreHandler(BaseHTTPRequestHandler):
 
                 dir_path = set_daily_dir(params['model'], params['run_date'], params['run_time'])
                 try:
-                    command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'input', 'raindat')
+                    command_dir_path = os.path.join(WIN_FLO2D_DATA_MANAGER_PATH, 'input', 'rain')
                     command = CREATE_RAINDAT_CMD.format(params['model'], params['ts_start'],
                                                         params['ts_end'], dir_path)
                     print('create-raindat|command : ', command)
