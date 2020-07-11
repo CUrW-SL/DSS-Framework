@@ -216,10 +216,11 @@ def run_hechms_workflow(**context):
         pop_method = rule['rainfall_data_from']
         run_node = rule['rule_details']['run_node']
         run_type = rule['run_type']
-        if rule['run_type'] == 'event':
-            db_config = Variable.get('event_db_config', deserialize_json=True)['sim_config']
-        else:
-            db_config = Variable.get('prod_db_config', deserialize_json=True)['sim_config']
+        # if rule['run_type'] == 'event':
+        #     db_config = Variable.get('event_db_config', deserialize_json=True)['sim_config']
+        # else:
+        #     db_config = Variable.get('prod_db_config', deserialize_json=True)['sim_config']
+        db_config = Variable.get('event_db_config', deserialize_json=True)['sim_config']
         run_script = '{}  -d {} -f {} -b {} -r {} -p {} -D {} -T {} -u {} -x {} -y {} -z {} -m {} -n {}'.format(RUN_SCRIPT,
                                                                             exec_date,
                                                                             forward, backward,
