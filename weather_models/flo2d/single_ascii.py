@@ -1,4 +1,6 @@
 import os
+import re
+
 import pandas as pd
 import math, numbers
 import decimal
@@ -129,6 +131,7 @@ def create_data_csv(flo2d_output_path, topo_dat_file, maxwselev_file):
 def generate_flood_map(ts_start_date, flo2d_output_path, flo2d_model, start_hour=0, end_hour=90, min_depth=0.15):
     print('generate_flood_map|[ts_start_date, flo2d_output_path, flo2d_model, start_hour, end_hour, min_depth] : ',
           [ts_start_date, flo2d_output_path, flo2d_model, start_hour, end_hour, min_depth])
+    pattern_10m = re.compile('flo2d_10_+')
     grid_size = 250
     buf_size = BUFFER_SIZE
     if flo2d_model == 'flo2d_250':
@@ -137,7 +140,7 @@ def generate_flood_map(ts_start_date, flo2d_output_path, flo2d_model, start_hour
         grid_size = 150
     elif flo2d_model == 'flo2d_30':
         grid_size = 30
-    elif flo2d_model == 'flo2d_10':
+    elif pattern_10m.match(flo2d_model):
         grid_size = 10
     topo_dat_file = os.path.join(flo2d_output_path, 'TOPO.DAT')
     maxwselev_file = os.path.join(flo2d_output_path, 'MAXWSELEV.OUT')
