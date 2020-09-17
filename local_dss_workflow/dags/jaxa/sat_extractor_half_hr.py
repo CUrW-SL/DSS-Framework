@@ -1,28 +1,51 @@
 import argparse
 import ast
 import datetime as dt
+import glob
 import logging
 import multiprocessing
+import ntpath
 import os
 import shutil
 import tempfile
+import time
 import zipfile
 from random import random
+import sys
+from urllib.error import HTTPError, URLError
+from urllib.request import urlopen
 
 import matplotlib
 import numpy as np
-from curw.rainfall.wrf.extraction import utils as ext_utils
+import imageio
+from mpl_toolkits.basemap import Basemap
+import math
+
 from joblib import Parallel, delayed
 from mpl_toolkits.basemap import cm
-from curw.rainfall.wrf import utils
+
 from curwmysqladapter import Station
 
 matplotlib.use('Agg')
 from matplotlib import colors, pyplot as plt
 
+DEFAULT_WRF_HOME = '/mnt/disks/wrf-mod/'
+
+
+def create_dir_if_not_exists(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+    return path
+
+
+def copy_files_with_prefix(src_dir, prefix, dest_dir):
+    create_dir_if_not_exists(dest_dir)
+    for filename in glob.glob(os.path.join(src_dir, prefix)):
+        shutil.copy(filename, os.path.join(dest_dir, ntpath.basename(filename)))
+
 
 def extract_jaxa_satellite_hourly_data(ts, output_dir):
-    ts = utils.datetime_floor(ts, 3600)
+    ts = datetime_floor(ts, 3600)
     logging.info('Jaxa satellite data extraction for %s (previous hour)' % str(ts))
     extract_jaxa_satellite_data(ts - dt.timedelta(hours=1), ts, output_dir)
 
@@ -30,16 +53,28 @@ def extract_jaxa_satellite_hourly_data(ts, output_dir):
 def create_daily_gif(start, output_dir, output_filename, output_prefix):
     tmp_dir = tempfile.mkdtemp(prefix='tmp_jaxa_daily')
 
-    utils.copy_files_with_prefix(output_dir, output_prefix + '_' + start.strftime('%Y-%m-%d') + '*.png', tmp_dir)
+    copy_files_with_prefix(output_dir, output_prefix + '_' + start.strftime('%Y-%m-%d') + '*.png', tmp_dir)
     logging.info('Writing gif ' + output_filename)
     gif_list = [os.path.join(tmp_dir, i) for i in sorted(os.listdir(tmp_dir))]
     if len(gif_list) > 0:
-        ext_utils.create_gif(gif_list, os.path.join(output_dir, output_filename))
+        create_gif(gif_list, os.path.join(output_dir, output_filename))
     else:
         logging.info('No images found to create the gif')
 
     logging.info('Cleaning up ' + tmp_dir)
     shutil.rmtree(tmp_dir)
+
+
+def create_gif(filenames, output, duration=0.5):
+    images = []
+    for filename in filenames:
+        images.append(imageio.imread(filename))
+    imageio.mimsave(output, images, duration=duration)
+
+
+def delete_files_with_prefix(src_dir, prefix):
+    for filename in glob.glob(os.path.join(src_dir, prefix)):
+        os.remove(filename)
 
 
 def extract_jaxa_satellite_data_every_half_hr(exe_ts_utc, output_dir, cleanup=True, cum=False, tmp_dir=None,
@@ -85,7 +120,7 @@ def extract_jaxa_satellite_data_every_half_hr(exe_ts_utc, output_dir, cleanup=Tr
     procs = multiprocessing.cpu_count()
 
     logging.info('Downloading inventory in parallel')
-    utils.download_parallel(url_dest_list, procs)
+    download_parallel(url_dest_list, procs)
     logging.info('Downloading inventory complete')
 
     logging.info('Processing files in parallel')
@@ -98,9 +133,9 @@ def extract_jaxa_satellite_data_every_half_hr(exe_ts_utc, output_dir, cleanup=Tr
     create_daily_gif(exe_ts_utc, output_dir, output_prefix + '_today.gif', output_prefix)
 
     prev_day_gif = os.path.join(output_dir, output_prefix + '_yesterday.gif')
-    if not utils.file_exists_nonempty(prev_day_gif) or exe_ts_utc.strftime('%H:%M') == '00:00':
+    if not file_exists_nonempty(prev_day_gif) or exe_ts_utc.strftime('%H:%M') == '00:00':
         logging.info('Creating sat rf gif for yesterday')
-        create_daily_gif(utils.datetime_floor(exe_ts_utc, 3600 * 24) - dt.timedelta(days=1), output_dir,
+        create_daily_gif(datetime_floor(exe_ts_utc, 3600 * 24) - dt.timedelta(days=1), output_dir,
                          output_prefix + '_yesterday.gif', output_prefix)
 
     if cum:
@@ -112,7 +147,7 @@ def extract_jaxa_satellite_data_every_half_hr(exe_ts_utc, output_dir, cleanup=Tr
     if cleanup:
         logging.info('Cleaning up')
         shutil.rmtree(tmp_dir)
-        utils.delete_files_with_prefix(output_dir, '*.archive')
+        delete_files_with_prefix(output_dir, '*.archive')
 
 
 def extract_jaxa_satellite_data_half_hr(exe_ts_utc, output_dir, cleanup=True, cum=False, tmp_dir=None,
@@ -172,7 +207,7 @@ def extract_jaxa_satellite_data_half_hr(exe_ts_utc, output_dir, cleanup=True, cu
     procs = multiprocessing.cpu_count()
 
     logging.info('Downloading inventory in parallel')
-    utils.download_parallel(url_dest_list, procs)
+    download_parallel(url_dest_list, procs)
     logging.info('Downloading inventory complete')
 
     logging.info('Processing files in parallel')
@@ -185,9 +220,9 @@ def extract_jaxa_satellite_data_half_hr(exe_ts_utc, output_dir, cleanup=True, cu
     create_daily_gif(exe_ts_utc, output_dir, output_prefix + '_today.gif', output_prefix)
 
     prev_day_gif = os.path.join(output_dir, output_prefix + '_yesterday.gif')
-    if not utils.file_exists_nonempty(prev_day_gif) or exe_ts_utc.strftime('%H:%M') == '00:00':
+    if not file_exists_nonempty(prev_day_gif) or exe_ts_utc.strftime('%H:%M') == '00:00':
         logging.info('Creating sat rf gif for yesterday')
-        create_daily_gif(utils.datetime_floor(exe_ts_utc, 3600 * 24) - dt.timedelta(days=1), output_dir,
+        create_daily_gif(datetime_floor(exe_ts_utc, 3600 * 24) - dt.timedelta(days=1), output_dir,
                          output_prefix + '_yesterday.gif', output_prefix)
 
     if cum:
@@ -199,14 +234,14 @@ def extract_jaxa_satellite_data_half_hr(exe_ts_utc, output_dir, cleanup=True, cu
     if cleanup:
         logging.info('Cleaning up')
         shutil.rmtree(tmp_dir)
-        utils.delete_files_with_prefix(output_dir, '*.archive')
+        delete_files_with_prefix(output_dir, '*.archive')
 
 
 def extract_jaxa_satellite_data(start_ts_utc, end_ts_utc, output_dir, cleanup=True, cum=False, tmp_dir=None,
                                 lat_min=5.722969, lon_min=79.52146, lat_max=10.06425, lon_max=82.18992,
                                 output_prefix='jaxa_sat', db_adapter_config=None):
-    start = utils.datetime_floor(start_ts_utc, 3600)
-    end = utils.datetime_floor(end_ts_utc, 3600)
+    start = datetime_floor(start_ts_utc, 3600)
+    end = datetime_floor(end_ts_utc, 3600)
 
     login = 'rainmap:Niskur+1404'
 
@@ -240,7 +275,7 @@ def extract_jaxa_satellite_data(start_ts_utc, end_ts_utc, output_dir, cleanup=Tr
     procs = multiprocessing.cpu_count()
 
     logging.info('Downloading inventory in parallel')
-    utils.download_parallel(url_dest_list, procs)
+    download_parallel(url_dest_list, procs)
     logging.info('Downloading inventory complete')
 
     logging.info('Processing files in parallel')
@@ -253,9 +288,9 @@ def extract_jaxa_satellite_data(start_ts_utc, end_ts_utc, output_dir, cleanup=Tr
     create_daily_gif(start, output_dir, output_prefix + '_today.gif', output_prefix)
 
     prev_day_gif = os.path.join(output_dir, output_prefix + '_yesterday.gif')
-    if not utils.file_exists_nonempty(prev_day_gif) or start.strftime('%H:%M') == '00:00':
+    if not file_exists_nonempty(prev_day_gif) or start.strftime('%H:%M') == '00:00':
         logging.info('Creating sat rf gif for yesterday')
-        create_daily_gif(utils.datetime_floor(start, 3600 * 24) - dt.timedelta(days=1), output_dir,
+        create_daily_gif(datetime_floor(start, 3600 * 24) - dt.timedelta(days=1), output_dir,
                          output_prefix + '_yesterday.gif', output_prefix)
 
     if cum:
@@ -267,7 +302,7 @@ def extract_jaxa_satellite_data(start_ts_utc, end_ts_utc, output_dir, cleanup=Tr
     if cleanup:
         logging.info('Cleaning up')
         shutil.rmtree(tmp_dir)
-        utils.delete_files_with_prefix(output_dir, '*.archive')
+        delete_files_with_prefix(output_dir, '*.archive')
 
 
 def test_extract_jaxa_satellite_data():
@@ -312,7 +347,7 @@ def process_cumulative_plot(url_dest_list, start_ts_utc, end_ts_utc, output_dir,
     from_to = '%s-%s' % (start_ts_utc.strftime('%Y-%m-%d_%H:%M'), end_ts_utc.strftime('%Y-%m-%d_%H:%M'))
     cum_filename = os.path.join(output_dir, 'jaxa_sat_cum_rf_' + from_to + '.png')
 
-    if not utils.file_exists_nonempty(cum_filename):
+    if not file_exists_nonempty(cum_filename):
         total = None
         for url_dest in url_dest_list:
             if total is None:
@@ -324,7 +359,7 @@ def process_cumulative_plot(url_dest_list, start_ts_utc, end_ts_utc, output_dir,
         clevs_cum = 10 * np.array([0.1, 0.5, 1, 2, 3, 5, 10, 15, 20, 25, 30, 50, 75, 100])
         norm_cum = colors.BoundaryNorm(boundaries=clevs_cum, ncolors=256)
         cmap = plt.get_cmap('jet')
-        ext_utils.create_contour_plot(total, cum_filename, lat_min, lon_min, lat_max, lon_max, title, clevs=clevs_cum,
+        create_contour_plot(total, cum_filename, lat_min, lon_min, lat_max, lon_max, title, clevs=clevs_cum,
                                       cmap=cmap, norm=norm_cum)
     else:
         logging.info('%s already exits' % cum_filename)
@@ -342,7 +377,7 @@ def process_jaxa_zip_file(zip_file_path, out_file_path, lat_min, lon_min, lat_ma
 
     data = sat_filt['RainRate'].reshape(len(lats), len(lons))
 
-    ext_utils.create_asc_file(np.flip(data, 0), lats, lons, out_file_path)
+    create_asc_file(np.flip(data, 0), lats, lons, out_file_path)
 
     # clevs = np.concatenate(([-1, 0], np.array([pow(2, i) for i in range(0, 9)])))
     # clevs = 10 * np.array([0.1, 0.5, 1, 2, 3, 5, 10, 15, 20, 25, 30])
@@ -355,65 +390,181 @@ def process_jaxa_zip_file(zip_file_path, out_file_path, lat_min, lon_min, lat_ma
 
     ts = dt.datetime.strptime(os.path.basename(out_file_path).replace(output_prefix + '_', '').replace('.asc', ''),
                               '%Y-%m-%d_%H:%M')
-    lk_ts = utils.datetime_utc_to_lk(ts)
+    lk_ts = datetime_utc_to_lk(ts)
     title_opts = {
         'label': output_prefix + ' ' + lk_ts.strftime('%Y-%m-%d %H:%M') + ' LK\n' + ts.strftime(
             '%Y-%m-%d %H:%M') + ' UTC',
         'fontsize': 30
     }
-    ext_utils.create_contour_plot(data, out_file_path + '.png', np.min(lats), np.min(lons), np.max(lats), np.max(lons),
+    create_contour_plot(data, out_file_path + '.png', np.min(lats), np.min(lons), np.max(lats), np.max(lons),
                                   title_opts, clevs=clevs, cmap=cmap, norm=norm)
 
-    if archive_data and not utils.file_exists_nonempty(out_file_path + '.archive'):
+    if archive_data and not file_exists_nonempty(out_file_path + '.archive'):
         np.savetxt(out_file_path + '.archive', data, fmt='%g')
     else:
         logging.info('%s already exits' % (out_file_path + '.archive'))
 
-    if not db_adapter_config:
-        logging.info('db_adapter not available. Unable to push data!')
-        return
 
-    db_adapter = ext_utils.get_curw_adapter(mysql_config=db_adapter_config)
+def create_asc_file(data, lats, lons, out_file_path, cell_size=0.1, no_data_val=-99, overwrite=False):
+    if not file_exists_nonempty(out_file_path) or overwrite:
+        with open(out_file_path, 'wb') as out_file:
+            out_file.write(('NCOLS %d\n' % len(lons)).encode())
+            out_file.write(('NROWS %d\n' % len(lats)).encode())
+            out_file.write(('XLLCORNER %f\n' % lons[0]).encode())
+            out_file.write(('YLLCORNER %f\n' % lats[0]).encode())
+            out_file.write(('CELLSIZE %f\n' % cell_size).encode())
+            out_file.write(('NODATA_VALUE %d\n' % no_data_val).encode())
 
-    width = len(lons)
-    height = len(lats)
-    station_prefix = 'sat'
-    run_name = 'Cloud-1'
-    upsert = True
+            np.savetxt(out_file, data, fmt='%.4f')
+    else:
+        logging.info('%s already exits' % out_file_path)
 
-    def random_check_stations_exist():
-        for _ in range(10):
-            _x = lons[int(random() * width)]
-            _y = lats[int(random() * height)]
-            _name = '%s_%.6f_%.6f' % (station_prefix, _x, _y)
-            _query = {'name': _name}
-            if db_adapter.get_station(_query) is None:
-                logging.debug('Random stations check fail')
-                return False
-        logging.debug('Random stations check success')
-        return True
 
-    stations_exists = random_check_stations_exist()
+def create_gif(filenames, output, duration=0.5):
+    images = []
+    for filename in filenames:
+        images.append(imageio.imread(filename))
+    imageio.mimsave(output, images, duration=duration)
 
-    rf_ts = {}
-    for y in range(height):
-        for x in range(width):
-            lat = lats[y]
-            lon = lons[x]
 
-            station_id = '%s_%.6f_%.6f' % (station_prefix, lon, lat)
-            name = station_id
+def file_exists_nonempty(filename):
+    return os.path.exists(filename) and os.path.isfile(filename) and os.stat(filename).st_size != 0
 
-            if not stations_exists:
-                logging.info('Creating station %s ...' % name)
-                station = [Station.Sat, station_id, name, str(lon), str(lat), str(0), "WRF point"]
-                db_adapter.create_station(station)
 
-            # add rf series to the dict
-            rf_ts[name] = [[lk_ts.strftime('%Y-%m-%d %H:%M:%S'), data[y, x]]]
+def create_contour_plot(data, out_file_path, lat_min, lon_min, lat_max, lon_max, plot_title, basemap=None, clevs=None,
+                        cmap=plt.get_cmap('Reds'), overwrite=False, norm=None, additional_changes=None, **kwargs):
+    """
+    create a contour plot using basemap
+    :param additional_changes:
+    :param norm:
+    :param title_ops:
+    :param cmap: color map
+    :param clevs: color levels
+    :param basemap: creating basemap takes time, hence you can create it outside and pass it over
+    :param plot_title:
+    :param data: 2D grid data
+    :param out_file_path:
+    :param lat_min:
+    :param lon_min:
+    :param lat_max:
+    :param lon_max:
+    :param overwrite:
+    :return:
+    """
+    if not file_exists_nonempty(out_file_path) or overwrite:
+        fig = plt.figure(figsize=(8.27, 11.69))
+        # ax = fig.add_axes([0.1, 0.1, 0.8, 0.8])
+        if basemap is None:
+            basemap = Basemap(projection='merc', llcrnrlon=lon_min, llcrnrlat=lat_min, urcrnrlon=lon_max,
+                              urcrnrlat=lat_max,
+                              resolution='h')
+        basemap.drawcoastlines()
+        parallels = np.arange(math.floor(lat_min) - 1, math.ceil(lat_max) + 1, 1)
+        basemap.drawparallels(parallels, labels=[1, 0, 0, 0], fontsize=10)
+        meridians = np.arange(math.floor(lon_min) - 1, math.ceil(lon_max) + 1, 1)
+        basemap.drawmeridians(meridians, labels=[0, 0, 0, 1], fontsize=10)
 
-    ext_utils.push_rainfall_to_db(db_adapter, rf_ts, source=station_prefix, name=run_name, types=['Observed'],
-                                  upsert=upsert)
+        ny = data.shape[0]
+        nx = data.shape[1]
+        lons, lats = basemap.makegrid(nx, ny)
+
+        if clevs is None:
+            clevs = np.arange(-1, np.max(data) + 1, 1)
+
+        # cs = basemap.contourf(lons, lats, data, clevs, cmap=cm.s3pcpn_l, latlon=True)
+        cs = basemap.contourf(lons, lats, data, clevs, cmap=cmap, latlon=True, norm=norm)
+
+        cbar = basemap.colorbar(cs, location='bottom', pad="5%")
+        cbar.set_label('mm')
+
+        if isinstance(plot_title, str):
+            plt.title(plot_title)
+        elif isinstance(plot_title, dict):
+            plt.title(plot_title.pop('label'), **plot_title)
+
+        # make any additional changes to the plot
+        if additional_changes is not None:
+            additional_changes(plt, data, **kwargs)
+
+        # draw_center_of_mass(data)
+        # com = ndimage.measurements.center_of_mass(data)
+        # plt.plot(com[1], com[0], 'ro')
+
+        plt.draw()
+        plt.savefig(out_file_path)
+        # fig.savefig(out_file_path)
+        plt.close()
+    else:
+        logging.info('%s already exists' % out_file_path)
+
+
+def datetime_to_epoch(timestamp=None):
+    timestamp = dt.datetime.now() if timestamp is None else timestamp
+    return (timestamp - dt.datetime(1970, 1, 1)).total_seconds()
+
+
+def epoch_to_datetime(epoch_time):
+    return dt.datetime(1970, 1, 1) + dt.timedelta(seconds=epoch_time)
+
+
+def datetime_floor(timestamp, floor_sec):
+    return epoch_to_datetime(math.floor(datetime_to_epoch(timestamp) / floor_sec) * floor_sec)
+
+
+def datetime_utc_to_lk(timestamp_utc, shift_mins=0):
+    return timestamp_utc + dt.timedelta(hours=5, minutes=30 + shift_mins)
+
+
+def download_parallel(url_dest_list, procs=multiprocessing.cpu_count(), retries=0, delay=60, overwrite=False,
+                      secondary_dest_dir=None):
+    Parallel(n_jobs=procs)(
+        delayed(download_file)(i[0], i[1], retries, delay, overwrite, secondary_dest_dir) for i in url_dest_list)
+
+
+def download_file(url, dest, retries=0, delay=60, overwrite=False, secondary_dest_dir=None):
+    try_count = 1
+    last_e = None
+
+    def _download_file(_url, _dest):
+        _f = urlopen(_url)
+        with open(_dest, "wb") as _local_file:
+            _local_file.write(_f.read())
+
+    while try_count <= retries + 1:
+        try:
+            logging.info("Downloading %s to %s" % (url, dest))
+            if secondary_dest_dir is None:
+                if not overwrite and file_exists_nonempty(dest):
+                    logging.info('File already exists. Skipping download!')
+                else:
+                    _download_file(url, dest)
+                return
+            else:
+                secondary_file = os.path.join(secondary_dest_dir, os.path.basename(dest))
+                if file_exists_nonempty(secondary_file):
+                    logging.info("File available in secondary dir. Copying to the destination dir from secondary dir")
+                    shutil.copyfile(secondary_file, dest)
+                else:
+                    logging.info("File not available in secondary dir. Downloading...")
+                    _download_file(url, dest)
+                    logging.info("Copying to the secondary dir")
+                    shutil.copyfile(dest, secondary_file)
+                return
+
+        except (HTTPError, URLError) as e:
+            logging.error(
+                'Error in downloading %s Attempt %d : %s . Retrying in %d seconds' % (url, try_count, e.message, delay))
+            try_count += 1
+            last_e = e
+            time.sleep(delay)
+        except FileExistsError:
+            logging.info('File was already downloaded by another process! Returning')
+            return
+    raise last_e
+
+
+def get_output_dir(wrf_home=DEFAULT_WRF_HOME):
+    return create_dir_if_not_exists(os.path.join(wrf_home, 'OUTPUT'))
 
 
 if __name__ == "__main__":
@@ -439,7 +590,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.output is None:
-        output = os.path.join(utils.get_output_dir(), 'jaxa_sat')
+        output = os.path.join(get_output_dir(), 'jaxa_sat')
     else:
         output = args.output
 
