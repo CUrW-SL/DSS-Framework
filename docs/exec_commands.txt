@@ -135,6 +135,8 @@ I have added Expected Date of Completion as 2020/07/30
 
 docker build --no-cache -t curw-hechms-v2-centos7:hechms_4.2.1 .
 
+docker build --no-cache -t curw-hechms-v2-centos7:hechms_4.2.1 .
+
 docker build -t curw-hechms-v2-centos7:hechms_4.2.1 .
 
 docker build -t curw-hechms-v2-centos7:hechms_4.2.1 .
