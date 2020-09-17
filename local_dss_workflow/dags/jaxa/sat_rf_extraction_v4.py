@@ -14,7 +14,7 @@ output_dir = '/mnt/disks/curwsl_nfs/sat'
 # output_dir = '/home/curw/temp'
 
 default_args = {
-    'owner': 'curwsl admin',
+    'owner': 'dss admin',
     'depends_on_past': False,
     'start_date': airflow.utils.dates.days_ago(0),
     'email': ['admin@curwsl.com'],
