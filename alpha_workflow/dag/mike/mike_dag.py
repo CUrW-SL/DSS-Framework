@@ -1,9 +1,6 @@
-from datetime import datetime, timedelta
-
 import airflow
 from airflow import DAG, AirflowException
 from airflow.operators.python_operator import PythonOperator
-from airflow.models import Variable
 from datetime import datetime,timedelta
 import requests
 
