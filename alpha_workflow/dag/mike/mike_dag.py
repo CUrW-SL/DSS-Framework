@@ -7,7 +7,7 @@ from airflow.models import Variable
 from datetime import datetime,timedelta
 import requests
 
-
+schedule_interval = '10 * * * *'
 prod_dag_name = 'mike_dag'
 dag_pool = 'mike_pool'
 
@@ -50,8 +50,7 @@ def send_http_get_request(url, params=None):
 
 def get_local_exec_date_time_from_context(context):
     exec_datetime_str = context["execution_date"].to_datetime_string()
-    exec_datetime = datetime.strptime(exec_datetime_str, '%Y-%m-%d %H:%M:%S') \
-                    - timedelta(days=1) + timedelta(hours=5, minutes=30)
+    exec_datetime = datetime.strptime(exec_datetime_str, '%Y-%m-%d %H:%M:%S') + timedelta(hours=5, minutes=30)
     exec_date = exec_datetime.strftime('%Y-%m-%d')
     exec_time = exec_datetime.strftime('%H:00:00')
     return [exec_date, exec_time]
