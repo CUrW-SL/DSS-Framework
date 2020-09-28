@@ -40,39 +40,43 @@ echo "Activating venv python3 virtual environment."
 source venv/bin/activate
 
 # Install dependencies using pip.
-echo "Installing Pandas"
-pip install pandas
-echo "Installing netCDF4"
-pip install netCDF4
-echo "Installing Flask"
-pip install Flask
-echo "Installing Flask-JSON"
-pip install Flask-JSON
-echo "Installing pandas"
-pip install pandas
-echo "Installing geopandas"
-pip install geopandas
-echo "Installing shapely"
-pip install shapely
-echo "Installing scipy"
-pip install scipy
-echo "Installing mysql-connector"
-pip install mysql-connector
-echo "Installing shapely"
-pip install shapely
-echo "Installing numpy"
-pip install numpy
-echo "Installing google"
-pip install google
-echo "Installing google-cloud"
-pip install google-cloud
-echo "Installing google-cloud-core"
-pip install google-cloud-core
-echo "Installing google-cloud-storage"
-pip install google-cloud-storage
-echo "Installing data layer"
-pip install git+https://github.com/shadhini/curw_db_adapter.git
-touch hechms.log
+if [ ! -f "hechms.log" ]
+then
+    # Install dependencies using pip.
+    echo "Installing Pandas"
+    pip install pandas
+    echo "Installing netCDF4"
+    pip install netCDF4
+    echo "Installing Flask"
+    pip install Flask
+    echo "Installing Flask-JSON"
+    pip install Flask-JSON
+    echo "Installing pandas"
+    pip install pandas
+    echo "Installing geopandas"
+    pip install geopandas
+    echo "Installing shapely"
+    pip install shapely
+    echo "Installing scipy"
+    pip install scipy
+    echo "Installing mysql-connector"
+    pip install mysql-connector
+    echo "Installing shapely"
+    pip install shapely
+    echo "Installing numpy"
+    pip install numpy
+    echo "Installing google"
+    pip install google
+    echo "Installing google-cloud"
+    pip install google-cloud
+    echo "Installing google-cloud-core"
+    pip install google-cloud-core
+    echo "Installing google-cloud-storage"
+    pip install google-cloud-storage
+    echo "Installing data layer"
+    pip install git+https://github.com/shadhini/curw_db_adapter.git
+    touch hechms.log
+fi
 
 echo "EXEC_DATE : $EXEC_DATE"
 echo "FORWARD : $FORWARD"
