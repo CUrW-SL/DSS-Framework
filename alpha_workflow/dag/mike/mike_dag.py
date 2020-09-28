@@ -1,11 +1,13 @@
+import subprocess
+
 import airflow
 from airflow import DAG, AirflowException
 from airflow.operators.python_operator import PythonOperator
 from datetime import datetime,timedelta
 import requests
 
-schedule_interval = '10 * * * *'
-prod_dag_name = 'mike_dag'
+schedule_interval = '10 */3 * * *'
+prod_dag_name = 'mike_dag_v3'
 dag_pool = 'mike_pool'
 
 ROUTER_IP = '124.43.13.195'
@@ -14,23 +16,21 @@ MATLAB_WIN_PORT = '8082'
 
 default_args = {
     'owner': 'dss admin',
-    'start_date': airflow.utils.dates.days_ago(0),
+    'start_date': airflow.utils.dates.days_ago(1),
     'email': ['hasithadkr7gmail.com'],
     'email_on_failure': True,
-    'retries': 2,
-    'retry_delay': timedelta(minutes=10),
 }
 
 # curl -X GET "http://124.43.13.195:8082/input-process?run_date=2020-09-21&run_time=08:00:00"
 
-input_process_cmd_request = 'http://{}:{}/input-process?' \
-                            'run_date={}&run_time={} '
+input_process_cmd_request = 'curl -X GET "http://{}:{}/input-process?' \
+                            'run_date={}&run_time={}"'
 
-model_run_cmd_request = 'http://{}:{}/model-run?' \
-                            'run_date={}&run_time={} '
+model_run_cmd_request = 'curl -X GET "http://{}:{}/model-run?' \
+                            'run_date={}&run_time={}"'
 
-output_process_cmd_request = 'http://{}:{}/output-process?' \
-                            'run_date={}&run_time={} '
+output_process_cmd_request = 'curl -X GET "http://{}:{}/output-process?' \
+                            'run_date={}&run_time={}"'
 
 
 def send_http_get_request(url, params=None):
@@ -57,44 +57,51 @@ def get_input_process_cmd(**context):
     [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
     request_url = input_process_cmd_request.format(ROUTER_IP, MATLAB_WIN_PORT, exec_date, exec_time)
     print('get_input_process_cmd|request_url : ', request_url)
-    if send_http_get_request(request_url):
-        print('get_input_process_cmd|success')
-    else:
-        raise AirflowException(
-            'get_input_process_cmd|failed'
-        )
+    subprocess.call(request_url, shell=True)
+    print('get_input_process_cmd|success')
+    # if send_http_get_request(request_url):
+    #     print('get_input_process_cmd|success')
+    # else:
+    #     raise AirflowException(
+    #         'get_input_process_cmd|failed'
+    #     )
 
 
 def get_model_run_cmd(**context):
     [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
-    request_url = model_run_cmd_request.format(ROUTER_IP, MATLAB_WIN_PORT, exec_date, exec_time)
+    request_url = model_run_cmd_request.format(ROUTER_IP, MIKE_WIN_PORT, exec_date, exec_time)
     print('get_model_run_cmd|request_url : ', request_url)
-    if send_http_get_request(request_url):
-        print('get_model_run_cmd|success')
-    else:
-        raise AirflowException(
-            'get_model_run_cmd|failed'
-        )
+    subprocess.call(request_url, shell=True)
+    print('get_model_run_cmd|success')
+    # if send_http_get_request(request_url):
+    #     print('get_model_run_cmd|success')
+    # else:
+    #     raise AirflowException(
+    #         'get_model_run_cmd|failed'
+    #     )
 
 
 def get_output_process_cmd(**context):
     [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
     request_url = output_process_cmd_request.format(ROUTER_IP, MATLAB_WIN_PORT, exec_date, exec_time)
     print('get_output_process_cmd|request_url : ', request_url)
-    if send_http_get_request(request_url):
-        print('get_output_process_cmd|success')
-    else:
-        raise AirflowException(
-            'get_output_process_cmd|failed'
-        )
+    subprocess.call(request_url, shell=True)
+    print('get_output_process_cmd|success')
+    # if send_http_get_request(request_url):
+    #     print('get_output_process_cmd|success')
+    # else:
+    #     raise AirflowException(
+    #         'get_output_process_cmd|failed'
+    #     )
 
 
-with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None,
-         description='Run MIKE DAG', catchup=False) as dag:
+with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=schedule_interval,
+         description='Run MIKE DAG', catchup=False, max_active_runs=1) as dag:
     input_process = PythonOperator(
         task_id='input_process',
         provide_context=True,
         python_callable=get_input_process_cmd,
+        execution_timeout=timedelta(minutes=15),
         pool=dag_pool
     )
 
@@ -102,6 +109,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         task_id='model_run',
         provide_context=True,
         python_callable=get_model_run_cmd,
+        execution_timeout=timedelta(minutes=150),
         pool=dag_pool
     )
 
@@ -109,6 +117,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=None
         task_id='output_process',
         provide_context=True,
         python_callable=get_output_process_cmd,
+        execution_timeout=timedelta(minutes=15),
         pool=dag_pool
     )
 
