@@ -32,6 +32,13 @@ model_run_cmd_request = 'curl -X GET "http://{}:{}/model-run?' \
 output_process_cmd_request = 'curl -X GET "http://{}:{}/output-process?' \
                             'run_date={}&run_time={}"'
 
+upload_data_cmd_request = '/home/uwcc-admin/curw_mike_data_handler/outputs/extract_water_level.py' \
+                            ' -m "mike11_2016" ' \
+                            '-t "hourly_run" ' \
+                            '-d "{}"'
+
+WL_OUTPUT_FILE = '/mnt/disks/wrf-mod/wrf_nfs/mike/outputs/{}'
+
 
 def send_http_get_request(url, params=None):
     if params is not None:
@@ -95,13 +102,23 @@ def get_output_process_cmd(**context):
     #     )
 
 
+def data_upload_cmd(**context):
+    [exec_date, exec_time] = get_local_exec_date_time_from_context(context)
+    run_datetime = datetime.strptime('{} {}'.format(exec_date, exec_time), '%Y-%m-%d %H:%M:%S')
+    bucket_time = run_datetime.strftime('%Y-%m-%d_%H-00-00')
+    request_url = upload_data_cmd_request.format(WL_OUTPUT_FILE.format(bucket_time))
+    print('data_upload_cmd|request_url : ', request_url)
+    subprocess.call(request_url, shell=True)
+    print('data_upload_cmd|success')
+
+
 with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=schedule_interval,
          description='Run MIKE DAG', catchup=False, max_active_runs=1) as dag:
     input_process = PythonOperator(
         task_id='input_process',
         provide_context=True,
         python_callable=get_input_process_cmd,
-        execution_timeout=timedelta(minutes=15),
+        execution_timeout=timedelta(minutes=20),
         pool=dag_pool
     )
 
@@ -109,7 +126,7 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=sche
         task_id='model_run',
         provide_context=True,
         python_callable=get_model_run_cmd,
-        execution_timeout=timedelta(minutes=150),
+        execution_timeout=timedelta(minutes=120),
         pool=dag_pool
     )
 
@@ -117,9 +134,17 @@ with DAG(dag_id=prod_dag_name, default_args=default_args, schedule_interval=sche
         task_id='output_process',
         provide_context=True,
         python_callable=get_output_process_cmd,
-        execution_timeout=timedelta(minutes=15),
+        execution_timeout=timedelta(minutes=20),
         pool=dag_pool
     )
 
-    input_process >> model_run >> output_process
+    data_upload = PythonOperator(
+        task_id='data_upload',
+        provide_context=True,
+        python_callable=data_upload_cmd,
+        execution_timeout=timedelta(minutes=20),
+        pool=dag_pool
+    )
+
+    input_process >> model_run >> output_process >> data_upload
 
